@@ -21,7 +21,9 @@ function defShop(){ return [
   { id:'s6', name:'Подарок до 10 €', price:400 } ].concat(THEME_SHOP.map(x => Object.assign({}, x))); }
 function load(){ try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return s; } catch (e) {} return { v:1, parentPin:null, kids:{ yarik:newKid(), anya:newKid() }, shop:defShop(), cfg:{ sync:'' }, queue:[], log:[] }; }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+const SYNC_URL = 'https://script.google.com/macros/s/AKfycbzlcMocKjYfldhFSe25-6w9_HVEN0sXMmlJrbj1VWuqMhHvQo5Fs-M0J7zZW2sDYEM3sw/exec';
 S = load();
+if (!S.cfg.sync) S.cfg.sync = SYNC_URL;
 if (!S.themeShop) { for (const x of THEME_SHOP) if (!S.shop.some(y => y.id === x.id)) S.shop.push(Object.assign({}, x)); S.themeShop = true; }
 const hashPin = p => String(U.h('uroki:' + p));
 
@@ -492,4 +494,4 @@ document.addEventListener('submit', e => {
 window.addEventListener('online', () => { flush(); pull(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { pull(); flush(); if (cur.ds !== U.today() && cur.view === 'home') render(); } });
 if ('speechSynthesis' in window) try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; } catch (e) {}
-render(); pull(); flush();
+render(); pull(); flush(); setInterval(() => { pull(); flush(); }, 5 * 60 * 1000);
