@@ -13,7 +13,7 @@ function spotTask(kid, t, seed){ const R = U.rng(seed), S0 = spotSent(t.text), n
     if (!cand.length) continue; const x = R.pick(cand), low = x.c.toLowerCase(), end = low.slice(-3);
     /* замена: то же окончание из 3 букв (меньше грамматических несостыковок, которые выдают подмену), другой корень, такого слова нет в предложении, не однокоренное с приставкой */
     const nz = v => v.toLowerCase().replace(/ё/g, 'е'), sk = nz(win[k]), lz = nz(low);
-    const reps = all.filter(w => { const l = w.toLowerCase(), l2 = nz(w); return l.slice(-3) === end && stem(l) !== stem(low) && !sk.includes(stem(l)) && !l2.includes(lz.slice(0, -3)) && !lz.includes(l2.slice(0, -3)) && (w[0] === w[0].toUpperCase()) === (x.c[0] === x.c[0].toUpperCase()); });
+    const reps = all.filter(w => { const l = w.toLowerCase(), l2 = nz(w); return nz(l).slice(-3) === nz(end) && stem(l) !== stem(low) && !sk.includes(stem(l)) && !l2.includes(lz.slice(0, -3)) && !lz.includes(l2.slice(0, -3)) && (w[0] === w[0].toUpperCase()) === (x.c[0] === x.c[0].toUpperCase()); });
     if (!reps.length) continue; const r = R.pick(reps); const nw = words.slice(); nw[x.i] = words[x.i].replace(x.c, r);
     const sents = win.slice(); sents[k] = nw.join(' '); return { sents, k, wi: x.i, was: x.c, now: r }; }
   return null; }

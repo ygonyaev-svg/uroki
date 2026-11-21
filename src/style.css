@@ -103,6 +103,7 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 .author{ color:var(--ink2); margin-top:-8px; }
 .counter{ font-size:15px; color:var(--ink2); margin-top:8px; }
 .task .q{ font-size:24px; line-height:1.4; margin:4px 0 14px; }
+.bw{ font-size:1.35em; font-weight:800; letter-spacing:.04em; } /* крупные буквы и слова для «Учимся читать» */
 .gap{ display:inline-block; min-width:44px; border-bottom:2px solid var(--acc); color:var(--acc); text-align:center; }
 .opts{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
 .opt{ appearance:none; border:2px solid var(--line); background:var(--card); border-radius:14px; padding:14px; min-height:60px; font-size:21px; cursor:pointer; }
