@@ -326,10 +326,10 @@ function startLesson(subj){
   go('lesson', { subj });
 }
 function unitById(kid, subj, uid){ const c = KIDS[kid].cur[subj]; return (c.units || []).concat(c.alt || [], c.old || []).find(u => u.id === uid); }
-function lessonTasks(L, kid, subj){ if (ITEMS(subj)) return L.items; if (!L._t) { const u = unitById(kid, subj, L.uid); let T = genTasks(u, L.seed, L.n);
+function lessonTasks(L, kid, subj){ if (ITEMS(subj)) { if (!L._c || L._c.src !== L.items) { const c = allChoice(L.items, L.seed || 3); c.src = L.items; Object.defineProperty(L, '_c', { value: c, enumerable: false, configurable: true, writable: true }); } return L._c; } if (!L._t) { const u = unitById(kid, subj, L.uid); let T = genTasks(u, L.seed, L.n);
     /* Математика: в конце урока 3 задания на повторение пройденных тем (вперемешку, со вводом ответа) */
     if (subj === 'math' && L.mix !== 0) { const list = unitsOf(kid, subj, L.tr || ''), j = list.indexOf(u); if (j > 0) { const r = U.rng(L.seed + 5); for (let k = 0; k < 3; k++) { const pu = list[r.int(Math.max(0, j - 12), j - 1)], x = genTasks(HARD[pu.id] ? { g: HARD[pu.id] } : pu, L.seed + 17 * k, 1)[0]; if (x) { x.rev = pu.t; T.push(x); } } } }
-    Object.defineProperty(L, '_t', { value: T, enumerable: false }); } return L._t; }
+    T = allChoice(T, L.seed); Object.defineProperty(L, '_t', { value: T, enumerable: false }); } return L._t; }
 
 function vLesson(){
   const kid = cur.kid, subj = cur.subj, D = dayRec(kid, cur.ds), L = D.les[subj];
@@ -494,7 +494,7 @@ function finishLesson(){
   let pts = q < .6 ? 0 : Math.round(M * q * q);
   /* Баллы за усилие: урок, пролетевший быстрее нормы времени, даёт меньше (норма ≈ 25–30 с на задание) */
   if (subj !== 'read' && !ITEMS(subj)) { const T0 = lessonTasks(L, kid, subj), minS = (T0.length || 5) * (TPL(kid) === 'yarik' ? 35 : 40), fk = Math.min(1, L.secs / minS); if (fk < 1) { pts = Math.round(pts * Math.max(.3, fk)); L.fastCut = fk < .9; }
-    /* Выбор из вариантов стоит меньше, чем ответ, написанный самому */ const inS = T0.filter(x => x.k !== 'c').length / Math.max(1, T0.length); pts = Math.round(pts * (.6 + .4 * inS)); }
+  }
   /* Урок, открытый не по порядку за баллы: пока день не закрыт целиком, только треть */
   if (subj !== 'read' && !ITEMS(subj)) { const ow = hwOwed(kid, subj, cur.ds); if (ow && pts > 0) { pts = Math.round(pts * HW_K); L.hwCut = ow.n; } }
   { const rk = rusK(kid, subj); if (rk < 1 && pts > 0) { L.rusCut = Math.round(rk * 100); pts = Math.round(pts * rk); } }

@@ -44,3 +44,19 @@ const AGREE_PREP = /(?:^|[\s(«])(из|от|до|без|у|для|около|к�
 function agree(s){ if (typeof s !== 'string') return s; return s.replace(/(^|[^\d,.])(\d+)(\s+)([а-яё]+)(?![а-яё])/gi, (all, pre, n, sp, w, off, str) => { off += pre.length; const f = AGREE[w.toLowerCase()]; if (!f) return all;
   if (AGREE_PREP.test(str.slice(Math.max(0, off - 12), off))) return all; const k = +n, m10 = k % 10, m100 = k % 100;
   const v = m10 === 1 && m100 !== 11 ? f[0] : m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? f[1] : f[2]; return pre + n + sp + (w[0] === w[0].toUpperCase() ? v[0].toUpperCase() + v.slice(1) : v); }); }
+/* ===== Везде — варианты ответа крупными кнопками (правило Юры 21.11): ручной ввод заменяем выбором ===== */
+function numOpts(a, r){ a = Number(a); const isInt = Math.abs(a - Math.round(a)) < 1e-9, m = Math.abs(a), c = [];
+  if (isInt) { c.push(a + 1, a - 1, a + 10, a - 10, a + 2); if (m >= 100) c.push(a + 100, a - 100); if (m >= 1000) c.push(a + 1000, a - 1000, Math.round(a / 10), a * 10); if (m >= 20 && m < 1000) c.push(a * 10, Math.round(a / 10)); const s = String(Math.abs(a)); if (s.length >= 2) { const sw = Number(s.slice(0, -2) + s.slice(-1) + s.slice(-2, -1)) * (a < 0 ? -1 : 1); c.push(sw); } }
+  else c.push(a + .1, a - .1, a + 1, a - 1, a * 10, a / 10, a + .01);
+  const out = []; for (const v0 of r.shuffle(c)) { const v = Math.round(v0 * 1000) / 1000; if (v !== a && (a < 0 || v >= 0) && !out.includes(v)) out.push(v); if (out.length === 3) break; }
+  while (out.length < 3) { const v = a + out.length + 3; if (!out.includes(v)) out.push(v); } return out; }
+function asChoice(t, seed, pool){ if (!t || t.k === 'c' || !(t.k === 'n' || t.k === 't')) return t; const r = U.rng(seed);
+  if (t.k === 'n') { const a = U.dec(t.a); return Object.assign({}, t, { k: 'c', a, opts: r.shuffle([a].concat(numOpts(t.a, r).map(U.dec))), was: 'n' }); }
+  const low = x => String(x).toLowerCase().replace(/ё/g, 'е').trim(), A = String(t.a), bad = [A].concat(t.alt || []).map(low);
+  const qw = (String(t.q).replace(/<[^>]+>/g, ' ').match(/«([^»]+)»/) || [])[1] || '';
+  const fromQ = qw.split(/[\s,.;:!?—–-]+/).filter(w => w.length >= 2 && /[А-Яа-яЁёA-Za-zÀ-ÿ]/.test(w));
+  const cand = []; const add = w => { const l = low(w); if (l && !bad.includes(l) && !cand.some(x => low(x) === l)) cand.push(/^[А-ЯЁA-Z]/.test(A) ? w : (w.length > 1 && w !== w.toUpperCase() ? w.toLowerCase() : w)); };
+  if (A.split(/\s+/).length === 1 && fromQ.length) r.shuffle(fromQ).forEach(add);
+  (pool || []).forEach(x => { if (x && x !== t && x.k === 't') add(String(x.a)); });
+  if (cand.length < 1) return t; return Object.assign({}, t, { k: 'c', a: A, opts: r.shuffle([A].concat(cand.slice(0, 3))), was: 't' }); }
+function allChoice(T, seed){ return (T || []).map((t, i) => asChoice(t, (seed || 1) * 31 + i * 7, T)); }

@@ -181,16 +181,20 @@ ALWAYS.push({ id: 'zad', order: 40,
     if (!z) return h + '<div class="card win"><h2>Все задачи этого уровня решены!</h2><p>Скоро добавим новые.</p></div>';
     var r = cur.fq;
     h += '<article class="card task"><span class="sticker" aria-hidden="true">' + U.rng(z.id).pick(THEME[TH(kid)].pics) + '</span><div class="q">' + U.esc(z.q) + '</div>' + (typeof picWords === 'function' ? picWords(z.q) : '') + '<div class="row">' + sayGate('zd' + z.id, '<button class="btn ghost small" data-act="zdsay">🔊 Послушать</button>') + '</div>' +
-      '<form class="numf" data-form="zadf"><input id="zdin" inputmode="decimal" autocomplete="off" ' + (r ? 'disabled value="' + U.esc(r.v) + '"' : 'autofocus') + ' aria-label="Ответ"><button class="btn"' + (r ? ' disabled' : '') + '>Проверить</button></form>';
+      '<div class="opts">' + zdOpts(z).map(function(o){ var cls = r && o === U.dec(z.a) ? 'right' : r && r.v === o && !r.ok ? 'wrong' : ''; return '<button class="opt ' + cls + '" data-act="zdc" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + U.esc(o) + '</button>'; }).join('') + '</div>';
     if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Неверно. Ответ: <b>' + U.esc(z.as) + '</b>') + '</div><p class="hint">' + U.esc(z.e) + '</p>' + (r.ok ? funBurst(r.pts) : '');
     h += '</article>' + (r ? '<button class="btn big" data-act="zdnext">Следующая задача →</button>' : '');
     return h; },
   act: function(act, b){ var kid = cur.kid; if (!kid) return;
     if (act === 'zdtab') { cur.zdL = +b.getAttribute('data-l'); cur.fq = null; render(); }
     else if (act === 'zdsay') { var z = zdCur(kid); if (z) say(z.q); }
+    else if (act === 'zdc') { zdAnswer(b.getAttribute('data-v')); }
     else if (act === 'zdnext') { cur.fq = null; render(); window.scrollTo(0, 0); } },
-  form: function(k, f){ var kid = cur.kid; if (!kid || cur.fq) return; var z = zdCur(kid); if (!z) return; var el = document.getElementById('zdin'), v = String(el && el.value || '').trim(); if (!v) return alertMsg('Напиши ответ числом');
+  form: function(k, f){ var el = document.getElementById('zdin'); zdAnswer(String(el && el.value || '').trim()); }
+});
+function zdOpts(z){ var r = U.rng('zo' + z.id); return r.shuffle([U.dec(z.a)].concat(numOpts(z.a, r).map(U.dec))); }
+function zdAnswer(v){ var kid = cur.kid; if (!kid || cur.fq) return; var z = zdCur(kid); if (!z) return; if (!v) return;
     var n = Number(v.replace(',', '.').replace(/\s/g, '')); if (isNaN(n)) return alertMsg('Нужно число');
     var ok = Math.abs(n - z.a) < 1e-9, F = funK(kid); F.q[z.id] = ok ? 1 : 0; var pts = ok ? funPts(kid, 'zad', zdPts(kid, z)) : 0; cur.fq = { id: z.id, v: v, ok: ok, pts: pts };
     ev(kid, 'задача на смекалку', { subj: 'Задачи на смекалку', q: z.q, ans: v, right: z.as, ok: ok ? 'верно' : 'ошибка', coins: S.kids[kid].coins, text: pts ? '+' + pts + ' баллов' : '' }); save(); render(); }
-});
+

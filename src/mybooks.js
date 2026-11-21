@@ -168,7 +168,8 @@ function bkTaskView(kid, b, t){
   }
   return h + '</article>';
 }
-function bkQs(t){
+function bkQs(t){ var Q = bkQs0(t); return Q.map(function(q, i){ return asChoice(q, U.h(t.id) + i, Q); }); }
+function bkQs0(t){
   var r = U.rng(t.id);
   return (t.qs || []).map(function(x){
     if (Object.prototype.toString.call(x) === '[object Array]') return { k: 'c', q: x[0], a: String(x[1]), opts: r.shuffle(x.slice(1).map(String)) };
