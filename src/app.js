@@ -95,7 +95,7 @@ function applyCfg(rows){ let fresh = false;
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
     else if (type.startsWith('чтен')) { const n = Number(row.value); if (n > 0) K.readWords = n; }
     else if (type.startsWith('книг')) bkApply(kid, row);
-    else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; }
+    else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; }
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     else continue; /* незнакомую команду не отмечаем — её выполнит следующая версия приложения */
     K.applied.push(row.id); fresh = true;
@@ -515,15 +515,22 @@ function extraTile(kid, D){ if (!D.bonus || cur.ds !== U.today()) return ''; con
   if (!L && !extraTasks(kid, D).length) return '';
   const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new';
   return `<button class="tile extra ${st}" data-act="openextra"><span class="ico">⭐</span><span class="tt"><span class="sn">Экстра</span><span class="ut">${st === 'done' ? `Сделано: +${L.coins || 0} баллов` : 'Хочешь ещё? Задания по сегодняшним ошибкам: +5 баллов'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : ''}</button>`; }
-/* Перерыв: позанимался ~20 минут (блок уроков) — следующее новое занятие откроется через 2 часа. Пройденные уроки открываются всегда. */
-const REST_MS = 2 * 3600 * 1000, BLOCK_SECS = 20 * 60;
+/* Перерывы (правило Юры 21.11): каждые ~20 минут спрашиваем «Не устал?». Готов — занимается дальше; устал — сам выбирает отдых 15/20/30 мин.
+   Но за одну сессию не больше часа занятий: после часа — обязательный перерыв 2 часа. Пройденные уроки и работа над ошибками открыты всегда. */
+const REST_MS = 2 * 3600 * 1000, BLOCK_SECS = 20 * 60, SESS_SECS = 60 * 60;
 function restLeft(kid){ if (TEST) return 0; return Math.max(0, (S.kids[kid].restUntil || 0) - Date.now()); }
 function hhmm(ts){ const d = new Date(ts), z = n => (n < 10 ? '0' : '') + n; return d.getHours() + ':' + z(d.getMinutes()); }
 function fmtLeft(ms){ const m = Math.ceil(ms / 60000), h = Math.floor(m / 60), r = m % 60; return h ? h + ' ч ' + r + ' мин' : r + ' мин'; }
-function restTick(kid, secs){ const K = S.kids[kid], now = Date.now(); if (!K.blkAt || now - K.blkAt > REST_MS) K.blk = 0; K.blk = (K.blk || 0) + (secs || 0); K.blkAt = now;
-  if (K.blk >= BLOCK_SECS) { K.blk = 0; K.restUntil = now + REST_MS; ev(kid, 'перерыв', { text: 'занимался ' + Math.round(secs / 60) + '+ мин; следующее занятие после ' + hhmm(K.restUntil) }); } }
-function restGate(kid, s){ const D = dayRec(kid, cur.ds); if (D.les[s]) return false; const ms = restLeft(kid); if (!ms) return false; alertMsg(`Перерыв ☕ Следующее занятие откроется в ${hhmm(S.kids[kid].restUntil)} (через ${fmtLeft(ms)})`); return true; }
-function restCard(kid){ const ms = restLeft(kid); if (!ms) return ''; return `<div class="note rest tipc" data-tip="rest">☕ <b>Перерыв.</b> Ты хорошо позанимался(ась)! Следующее занятие откроется в <b>${hhmm(S.kids[kid].restUntil)}</b> (через <span id="restleft">${fmtLeft(ms)}</span>). Пройденные уроки можно открыть и повторить.</div>`; }
+function restTick(kid, secs){ if (TEST) return; const K = S.kids[kid], now = Date.now(); if (!K.blkAt || now - K.blkAt > REST_MS) { K.blk = 0; K.sess = 0; } K.blk = (K.blk || 0) + (secs || 0); K.sess = (K.sess || 0) + (secs || 0); K.blkAt = now;
+  if (K.sess >= SESS_SECS) { K.blk = 0; K.sess = 0; K.ask = false; K.restUntil = now + REST_MS; K.restForced = true; ev(kid, 'перерыв', { text: 'час занятий за сессию; обязательный перерыв до ' + hhmm(K.restUntil) }); }
+  else if (K.blk >= BLOCK_SECS) { K.blk = 0; K.ask = true; } }
+function restAsk(kid){ const K = S.kids[kid]; return !TEST && K.ask && !restLeft(kid); }
+function askCard(kid){ if (!restAsk(kid)) return ''; const K = S.kids[kid], m = Math.round((K.sess || 0) / 60), left = Math.max(5, Math.round((SESS_SECS - (K.sess || 0)) / 60)), g = T(kid) === 'anya';
+  return `<div class="card askrest"><h2>${g ? 'Не устала?' : 'Не устал?'} 🙂</h2><p>Ты занимаешься уже <b>${m} мин</b>. Можно продолжить (сегодня ещё до ${left} мин подряд) или отдохнуть.</p>
+   <div class="row"><button class="btn" data-act="restgo">💪 ${g ? 'Готова' : 'Готов'} ещё</button></div><p class="hint">Или отдохни — выбери сколько:</p>
+   <div class="row">${[15, 20, 30].map(n => `<button class="btn ghost" data-act="restpick" data-m="${n}">😴 ${n} мин</button>`).join(' ')}</div></div>`; }
+function restGate(kid, s){ const D = dayRec(kid, cur.ds); if (D.les[s]) return false; if (restAsk(kid)) { go('home'); alertMsg('Сначала ответь: устал или готов ещё? 🙂'); return true; } const ms = restLeft(kid); if (!ms) return false; alertMsg(`Перерыв ☕ Следующее занятие откроется в ${hhmm(S.kids[kid].restUntil)} (через ${fmtLeft(ms)})`); return true; }
+function restCard(kid){ const ms = restLeft(kid); if (!ms) return askCard(kid); if (!S.kids[kid].restForced) return `<div class="note rest tipc" data-tip="rest">😴 <b>Отдыхаешь.</b> Новые уроки откроются в <b>${hhmm(S.kids[kid].restUntil)}</b> (через <span id="restleft">${fmtLeft(ms)}</span>). Отойди от экрана: подвигайся, попей воды. Пройденные уроки и работа над ошибками открыты.</div>`; return `<div class="note rest tipc" data-tip="rest">☕ <b>Перерыв.</b> Ты хорошо позанимался(ась)! Следующее занятие откроется в <b>${hhmm(S.kids[kid].restUntil)}</b> (через <span id="restleft">${fmtLeft(ms)}</span>). Пройденные уроки и работа над ошибками открыты.</div>`; }
 setInterval(() => { const el = document.getElementById('restleft'); if (!el || !cur.kid) return; const ms = restLeft(cur.kid); if (!ms) render(); else el.textContent = fmtLeft(ms); }, 30000);
 function ITEMS(subj){ return subj === 'hw' || subj === 'extra' || subj === 'pro' || subj === 'train'; }
 /* Испытание: после PRO — сложные задачи по следующим темам программы (математика, русский, языки), одна попытка */
@@ -868,7 +875,7 @@ function devInfo(){ const ua = navigator.userAgent; const m = ua.match(/OS (\d+)
   return `Версия системы: ${ios}, открыто ${pwa}. Распознавание чтения вслух: ${SR ? '✅ есть' : '❌ нет — нужен iPadOS 14.5 или новее (Настройки → Основные → Обновление ПО); пока скорость чтения считается по таймеру'}. Микрофон: ${navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? 'доступен' : 'недоступен'}.`; }
 function vSettings(){
   const unitSel = kid => Object.entries(KIDS[kid].cur).filter(([, c]) => c.units).map(([k, c]) => [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []).map(([tr, list, nm]) => `<label>${KIDS[kid].name} · ${nm}<select id="sel_${kid}_${k}${tr}">${list.map((u, i) => `<option value="${i}" ${(S.kids[kid].pos[k + tr] || 0) === i ? 'selected' : ''}>${i + 1}. ${U.esc(u.t)}</option>`).join('')}</select></label>`).join('')).join('');
-  return `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерыв 2 часа</h2><p class="hint">После ~20 минут занятий новые уроки открываются через 2 часа.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
+  return `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
   ${FAM ? '' : `<div class="card form" ><h2>Связь с таблицей родителя</h2><label>Адрес скрипта Google<input id="syncurl" value="${U.esc(S.cfg.sync || '')}" autocomplete="off"></label><p class="hint">В очереди на отправку: ${S.queue.length}.</p><div class="row"><button class="btn small" data-act="savesync">Сохранить и отправить</button></div></div>`}
   <div class="card"><h2>Начать заново</h2><p class="hint">Стирает на этом айпаде весь прогресс, монеты, покупки и коды. После теста нажмите — и приложение будет как новое.</p><button class="btn small stop" data-act="resetall">Сбросить всё на этом устройстве</button></div>
   ${FAM ? famSettings() : `<form class="card form" data-form="pins"><h2>Коды</h2><label>Новый код родителя<input id="np" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ярика<input id="ny" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ани<input id="na" inputmode="numeric" maxlength="4" autocomplete="off"></label><button class="btn small">Сменить коды</button></form>`}`;
@@ -904,7 +911,9 @@ document.addEventListener('click', e => {
     startLesson(s0); if (D.les[s0] && (D.unlock || []).includes(s0)) { D.les[s0].oot = true; save(); } break; }
     case 'install': { const ie = window.INSTALL_EV; if (ie) { ie.prompt(); ie.userChoice.then(() => { window.INSTALL_EV = null; render(); }); } break; }
     case 'dripseen': { const R = S.kids[kid].drip; if (R) R.sess = 0; save(); render(); break; }
-    case 'norest': { const K0 = S.kids[b.dataset.k]; K0.restUntil = 0; K0.blk = 0; save(); render(); break; }
+    case 'restgo': { const K0 = S.kids[kid]; K0.ask = false; K0.blk = 0; ev(kid, 'не устал', { text: 'занимается дальше; за сессию ' + Math.round((K0.sess || 0) / 60) + ' мин' }); save(); render(); break; }
+    case 'restpick': { const K0 = S.kids[kid], m = +b.dataset.m; K0.ask = false; K0.blk = 0; K0.restForced = false; K0.restUntil = Date.now() + m * 60000; ev(kid, 'перерыв', { text: 'сам выбрал отдых ' + m + ' мин' }); save(); render(); break; }
+    case 'norest': { const K0 = S.kids[b.dataset.k]; K0.restUntil = 0; K0.blk = 0; K0.sess = 0; K0.ask = false; save(); render(); break; }
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
     case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); if (L.phase === 'theory' && L.helpN === 1) say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
     case 'dunnotask': { L.showTh = L.i; L.helpN = (L.helpN || 0) + 1; const t = lessonTasks(L, kid, cur.subj)[L.i], u = (t.uid && t.sj ? unitById(kid, t.sj, t.uid) : unitById(kid, cur.subj, L.uid)) || { t: '' }; ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, q: strip(t.q) }); save(); render(); if (!t.sp) say(strip(String(t.q)).replace(/_+/g, ' пропуск '), 'ru-RU'); break; }
