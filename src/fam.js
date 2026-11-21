@@ -109,17 +109,17 @@ function famBrand(big){ return '<div class="fambrand' + (big ? ' big' : '') + '"
 function famIn(id, label, type, extra){ return '<label>' + label + '<input id="' + id + '" type="' + (type || 'text') + '" autocomplete="off" ' + (extra || '') + '></label>'; }
 function vFamReg(){
   if (!FAM_INV) return famWrap(famBrand(true) + '<header class="hero"><p class="eyebrow">Закрытая тестовая версия</p><h1>Только по приглашению</h1><p>Зарегистрироваться можно по личной ссылке-приглашению. Каждая ссылка действует для одной семьи. Если вы уже зарегистрированы — войдите.</p></header>' +
-    '<p class="center"><button class="btn big" data-act="fklogin">Войти</button></p>');
+    '<p class="center"><button class="btn big" data-act="fklogin">Войти</button></p>' + '<p class="center"><a class="link" href="semya/ustanovka.html" target="_blank">Как установить на телефон, планшет и компьютер</a></p>');
   return famWrap(famBrand(true) + '<header class="hero"><p class="eyebrow">Бесплатная тестовая версия</p><p class="famintro">Всё начинается со слова. Родная речь — корни, из которых растёт человек, где бы он ни жил. Русский язык, чтение вслух, математика и логика для детей 6–13 лет. 20–40 минут в день, уроки ведёт приложение, отчёт — родителю.</p></header>' +
     '<form class="card form" data-form="freg"><h2>Регистрация семьи</h2>' + famIn('fname', 'Ваше имя') + famIn('femail', 'Email', 'email', 'inputmode="email" autocapitalize="off"') + famIn('fpass', 'Пароль (не короче 6 знаков)', 'password') +
     '<button class="btn big"' + (FAM_BUSY ? ' disabled' : '') + '>' + (FAM_BUSY ? 'Подождите…' : 'Зарегистрироваться') + '</button></form>' +
-    '<p class="center"><button class="link" data-act="fklogin">Уже регистрировались? Войти</button></p>');
+    '<p class="center"><button class="link" data-act="fklogin">Уже регистрировались? Войти</button></p>' + '<p class="center"><a class="link" href="semya/ustanovka.html" target="_blank">Как установить на телефон, планшет и компьютер</a></p>');
 }
 function vFamLogin(){
   return famWrap(famBrand(true) + '<header class="hero"><h1>Вход для родителей</h1><p>Войдите тем же email и паролем, что при регистрации.</p></header>' +
     '<form class="card form" data-form="flogin">' + famIn('femail', 'Email', 'email', 'inputmode="email" autocapitalize="off"') + famIn('fpass', 'Пароль', 'password') +
     '<button class="btn big"' + (FAM_BUSY ? ' disabled' : '') + '>' + (FAM_BUSY ? 'Подождите…' : 'Войти') + '</button></form>' +
-    '<p class="center"><button class="link" data-act="fkreg">Новая семья? Регистрация</button></p>');
+    '<p class="center"><button class="link" data-act="fkreg">Новая семья? Регистрация</button></p>' + '<p class="center"><a class="link" href="semya/ustanovka.html" target="_blank">Как установить на телефон, планшет и компьютер</a></p>');
 }
 /* Черновик списка детей на экране настройки */
 function fkDraft(){ if (!cur.fk) cur.fk = ((S.fam && S.fam.kids) || []).map(function(c){ return { id: c.id, name: c.name, age: c.age, ints: (c.ints || []).slice(), hero: c.hero || '', books: c.books || '', done: c.done || '', rd: c.rd == null ? '' : String(c.rd), color: c.color || '', has: !!c.pin, q: FAM_QK.reduce(function(o, k){ o[k] = c[k] == null ? '' : String(c[k]); return o; }, {}) }; }); if (!cur.fk.length) cur.fk.push({ id: '', name: '', age: 8, ints: [], hero: '', books: '', done: '', rd: '', color: '' }); return cur.fk; }
