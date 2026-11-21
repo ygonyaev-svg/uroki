@@ -354,10 +354,121 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 @keyframes stamp{ 0%{ transform:scale(2.5) rotate(-20deg); opacity:0; } 100%{ transform:scale(1) rotate(-6deg); opacity:1; } }
 .result .earn{ font-size:22px; font-weight:900; }
 @media (prefers-reduced-motion: reduce){ .burst span,.result .bigmark,.opt.right,.opt.wrong{ animation:none; } }
+
+/* ===== Игра «Тоби-программист» ===== */
+.tiles .tile.code{ grid-column:1 / -1; background:linear-gradient(135deg,#0d3b2e 0%,#17694c 60%,#2fa36b 120%) !important; color:#fff; border:2px solid #7be0a8 !important; }
+.tiles .tile.code .sn{ color:#b9ffd6 !important; font-weight:800; }
+.tiles .tile.code .ut{ color:#e6fff0 !important; -webkit-line-clamp:unset; display:block; overflow:visible; }
+.tiles .tile.code .ico{ background:#fff !important; overflow:hidden; padding:0; }
+.tile.code .ico img{ width:100%; height:100%; object-fit:cover; display:block; }
+.tile.code .state{ background:#7be0a8; color:#0d3b2e; font-weight:700; white-space:nowrap; }
+
+.cghero{ display:flex; gap:16px; align-items:center; }
+.cgtoby{ width:120px; height:120px; border-radius:24px; object-fit:cover; flex:none; box-shadow:0 6px 18px rgba(0,0,0,.18); }
+@media (max-width:520px){ .cghero{ flex-direction:column; text-align:center; } }
+.cgch{ margin-top:14px; }
+.cgchh{ display:flex; gap:14px; align-items:center; }
+.cgchh h2{ margin:0 0 4px; }
+.cgcov{ width:84px; height:84px; flex:none; border-radius:18px; background:#e9f5ee center/cover no-repeat; display:flex; align-items:flex-end; justify-content:flex-end; box-shadow:0 3px 10px rgba(0,0,0,.15); }
+.cgcov span{ font-size:22px; background:rgba(255,255,255,.85); border-radius:10px 0 16px 0; padding:2px 6px; }
+.cglvs{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+.cglv{ -webkit-appearance:none; appearance:none; width:72px; height:72px; border-radius:16px; border:2px solid var(--line); background:var(--card); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; font:inherit; color:inherit; }
+.cglv b{ font-size:19px; }
+.cglv i{ font-style:normal; font-size:14px; color:#e0a417; letter-spacing:1px; }
+.cglv i s{ text-decoration:none; color:#cfd5df; }
+.cglv.open{ border-color:#2fa36b; background:#eafff2; box-shadow:0 0 0 3px rgba(47,163,107,.18); }
+.cglv.open i{ color:#2fa36b; font-size:18px; }
+.cglv.won{ border-color:#e0a417; background:#fffaf0; }
+.cglv.lock{ opacity:.45; }
+.cglv.hard b::after{ content:" 🔥"; font-size:12px; }
+
+.cglvl .bar{ align-items:center; }
+.cgttl{ font-weight:800; font-size:18px; flex:1; text-align:center; }
+.cgsay{ font-size:18px; line-height:1.4; background:var(--card); border-radius:14px; padding:12px 14px; box-shadow:var(--sh); margin:8px 0 10px; }
+.cgtabs{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:4px 0; }
+
+/* поле */
+#cgbwrap{ max-width:560px; margin:0 auto; }
+.cgboard{ position:relative; width:100%; height:0; border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,.18); border:4px solid #6b4f2a; }
+.cggrid{ position:absolute; left:0; top:0; right:0; bottom:0; display:grid; }
+.cgcell{ position:relative; display:flex; align-items:center; justify-content:center; }
+.th-park .cgcell.a{ background:#8fd16a; } .th-park .cgcell.b{ background:#82c55e; }
+.th-pitch{ border-color:#fff; } .th-pitch .cgcell.a{ background:#3fa34d; } .th-pitch .cgcell.b{ background:#379445; }
+.th-pitch .cgcell.net{ background:repeating-linear-gradient(45deg,#f4f4f4 0 3px,#cfd8dc 3px 7px); }
+.th-street{ border-color:#5d4037; } .th-street .cgcell.a{ background:#d9c9a8; } .th-street .cgcell.b{ background:#cdbb97; }
+.th-lab{ border-color:#1d3a6e; } .th-lab .cgcell.a{ background:#cfe3ff; } .th-lab .cgcell.b{ background:#c2d9fb; }
+.cgsp{ position:absolute; display:flex; align-items:center; justify-content:center; -webkit-transition:left .3s ease, top .3s ease, opacity .3s, -webkit-transform .3s; transition:left .3s ease, top .3s ease, opacity .3s, transform .3s; pointer-events:none; }
+.cgsp.hero{ z-index:3; }
+.cgsp.ball{ z-index:4; -webkit-transition:left .14s linear, top .14s linear; transition:left .14s linear, top .14s linear; }
+.cgsp.ball .cgs{ width:52%; height:52%; -webkit-transform:translate(18%,22%); transform:translate(18%,22%); }
+.cgsp.ball.in .cgs{ -webkit-transform:none; transform:none; }
+.cgsp.it.got{ opacity:0; -webkit-transform:scale(1.6); transform:scale(1.6); }
+.cgsp.hero.bump{ -webkit-animation:cgshake .35s; animation:cgshake .35s; }
+.cgsp.hero.sniff .cgs{ -webkit-animation:cgjump .35s; animation:cgjump .35s; }
+.cgsp.hero.joy .cgs{ -webkit-animation:cgjump .5s 2; animation:cgjump .5s 2; }
+.cgsp.hero.dL .cgs{ -webkit-transform:scaleX(-1); transform:scaleX(-1); }
+.cgsp.hintdot span{ width:44%; height:44%; border-radius:50%; background:rgba(255,255,255,.75); border:2px dashed #e0a417; color:#a06b00; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
+@-webkit-keyframes cgshake{ 25%{ -webkit-transform:translateX(-8%); } 75%{ -webkit-transform:translateX(8%); } }
+@keyframes cgshake{ 25%{ transform:translateX(-8%); } 75%{ transform:translateX(8%); } }
+@-webkit-keyframes cgjump{ 50%{ -webkit-transform:translateY(-18%); } }
+@keyframes cgjump{ 50%{ transform:translateY(-18%); } }
+
+/* спрайты: картинка, а если её нет — эмодзи */
+.cgs{ display:block; width:86%; height:86%; background:center/contain no-repeat; position:relative; }
+.cgs::before{ position:absolute; left:0; right:0; top:50%; -webkit-transform:translateY(-50%); transform:translateY(-50%); text-align:center; font-style:normal; line-height:1; font-size:28px; }
+.cgs-toby{ background-image:url(img/code/toby.png); } .cgs-bone{ background-image:url(img/code/bone.png); width:70%; height:70%; }
+.cgs-ball{ background-image:url(img/code/ball.png); } .cgs-paw{ background-image:url(img/code/paw.png); width:66%; height:66%; }
+.cgs-house{ background-image:url(img/code/house.png); } .cgs-flag{ background-image:url(img/code/flag.png); }
+.cgs-bush{ background-image:url(img/code/bush.png); } .cgs-tree{ background-image:url(img/code/tree.png); }
+.cgs-def{ background-image:url(img/code/def.png); } .cgs-brick{ background-image:url(img/code/brick.png); width:100%; height:100%; }
+
+/* программа и блоки */
+.cgprog{ margin-top:12px; }
+.cgph{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+.cgl{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; min-height:56px; padding:6px; border-radius:12px; border:2px dashed transparent; }
+.cgl.on{ border-color:#2fa36b; background:rgba(47,163,107,.06); }
+.cgb{ -webkit-appearance:none; appearance:none; position:relative; min-width:52px; height:52px; padding:0 8px; border-radius:12px; border:0; display:inline-flex; align-items:center; justify-content:center; font-size:26px; color:#fff; cursor:pointer; box-shadow:0 3px 0 rgba(0,0,0,.25); -webkit-user-select:none; user-select:none; font-family:inherit; }
+.cgb.wide{ font-size:17px; font-weight:800; padding:0 14px; }
+.cgU,.cgD,.cgL,.cgR{ background:#2f80ed; } .cgK{ background:#27ae60; } .cgT{ background:#8e44ad; }
+.cgP{ background:#f2994a; } .cgW{ background:#16a085; } .cgI{ background:#9b51e0; }
+.cgb[disabled]{ opacity:.4; }
+.cgb.sel,.cgc.sel>.cghd{ outline:3px solid #e0a417; outline-offset:2px; }
+.cgb.run,.cgc.run>.cghd{ box-shadow:0 0 0 4px #ffe066, 0 3px 0 rgba(0,0,0,.25); -webkit-transform:scale(1.08); transform:scale(1.08); }
+.cgc{ border-radius:14px; padding:4px 6px 6px; color:#fff; flex-basis:100%; }
+.cgc.cgP{ background:#f2994a; } .cgc.cgW{ background:#16a085; } .cgc.cgI{ background:#9b51e0; }
+.cgc .cgl{ background:rgba(255,255,255,.9); min-height:52px; }
+.cgc .cgl.on{ background:#effff5; }
+.cghd{ display:flex; align-items:center; gap:8px; padding:4px 6px; border-radius:10px; font-weight:800; font-size:17px; cursor:pointer; position:relative; }
+.cgn{ display:inline-flex; min-width:40px; height:40px; align-items:center; justify-content:center; background:#fff; color:#222; border-radius:10px; font-size:22px; padding:0 6px; box-shadow:0 2px 0 rgba(0,0,0,.2); cursor:pointer; }
+.cglab{ font-size:14px; font-weight:800; margin:4px 4px 2px; opacity:.95; }
+.cgdel{ position:absolute; top:-10px; right:-10px; width:26px; height:26px; border-radius:50%; background:#e53935; color:#fff; font-size:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,.3); z-index:2; }
+.cgdrop{ display:inline-flex; min-width:14px; height:44px; align-items:center; justify-content:center; color:#2fa36b; font-size:24px; font-weight:800; cursor:pointer; }
+.cgdrop.end{ -webkit-box-flex:1; -webkit-flex:1; flex:1; min-width:30px; }
+.cgcur{ display:inline-block; width:4px; height:46px; border-radius:2px; background:#2fa36b; -webkit-animation:cgblink 1s infinite; animation:cgblink 1s infinite; }
+@-webkit-keyframes cgblink{ 50%{ opacity:.2; } } @keyframes cgblink{ 50%{ opacity:.2; } }
+.cgpal{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:14px 0 6px; padding:12px; background:var(--card); border-radius:16px; box-shadow:var(--sh); }
+.cgpal .cgb{ min-width:64px; height:64px; font-size:32px; }
+.cgpal .cgb.wide{ font-size:18px; }
+.cgctl{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:10px 0; }
+.cgctl .cgrun{ background:#27ae60; border-color:#27ae60; font-size:20px; padding-left:28px; padding-right:28px; }
+.cgctl .glow{ box-shadow:0 0 0 3px rgba(224,164,23,.5); }
+.cg .fb{ background:#fff; box-shadow:var(--sh); font-size:18px; }
+.cg .fb.ok{ color:#1b7a43; } .cg .fb.try{ color:#b23b16; }
+.cgdrop.lead{ height:14px; min-width:100%; font-size:0; }
+.cgsay,.cgprog,.cgpal{ color:#1d2433; }
+.cglvl .cgtabs + .hint{ display:inline-block; }
+.cgttl{ color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+.cgdrop.end.after{ font-size:22px; opacity:.55; justify-content:flex-start; padding-left:6px; min-height:44px; }
+.cgbadge{ display:inline-block; margin:6px 0 0; padding:4px 12px; border-radius:999px; background:linear-gradient(135deg,#ffe58a,#f2b632); color:#5a3b00; font-weight:800; }
+.cgbadge.big{ display:block; margin:10px 0 4px; font-size:19px; text-align:center; }
+.cgb.tut{ -webkit-animation:cgpulse 1.1s infinite; animation:cgpulse 1.1s infinite; }
+@-webkit-keyframes cgpulse{ 50%{ -webkit-transform:scale(1.15); box-shadow:0 0 0 8px rgba(47,128,237,.35); } }
+@keyframes cgpulse{ 50%{ transform:scale(1.15); box-shadow:0 0 0 8px rgba(47,128,237,.35); } }
+.tile.code .state{ border-radius:999px; padding:4px 10px; font-size:14px; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v2b210718 */
+<script>/* v98ad183f */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -2566,6 +2677,255 @@ const COVER_IMG = { 'Пёстрая лента':'cover-holmes.webp', 'Серая
   'Городок в табакерке':'cover-tabakerka.webp', 'Мороз Иванович':'cover-moroz.webp', 'Алёнушкины сказки':'cover-alenushka.webp', 'Сказка о рыбаке и рыбке':'cover-rybka.webp',
   'Сказка о мёртвой царевне':'cover-carevna.webp', 'Филипок':'cover-filipok.webp' };
 
+/* ===== Игра «Тоби-программист»: основы программирования для Ярика =====
+   Последовательность → удар по мячу → циклы → условия и «пока» → отладка.
+   Поле: '.' трава, '#' препятствие, 'S' старт, 'G' финиш, '*' косточка (собирается сама),
+   'c' улика (нужно 🔍), 'o' мяч, 'N' ворота. Решение пишется кратко: R D 3(R U) W(R) I:c(T)() K */
+const CODE_KIDS = ['yarik'], CODE_DAY_MAX = 10, CODE_STEP_MS = 360;
+const CG_CH = [
+  { id: 1, t: 'Тоби ищет косточку', ico: '🦴', img: 'code-ch1', bg: 'park', what: 'Команды по порядку', badge: '🐕 Ошейник путешественника' },
+  { id: 2, t: 'Футбол', ico: '⚽', img: 'code-ch2', bg: 'pitch', what: 'Команды и удар', badge: '🏆 Кубок бомбардира' },
+  { id: 3, t: 'Повторяй!', ico: '🔁', img: 'code-ch3', bg: 'park', what: 'Циклы', badge: '🗝 Ключ от тайного тоннеля' },
+  { id: 4, t: 'Тоби-сыщик', ico: '🔍', img: 'code-ch4', bg: 'street', what: 'Условия: «если» и «пока»', badge: '🎩 Шляпа настоящего сыщика' },
+  { id: 5, t: 'Найди ошибку', ico: '🐞', img: 'code-ch5', bg: 'lab', what: 'Отладка программ', badge: '🎓 Диплом мастера программирования' }
+];
+const CG_LV = [
+  /* 1. Последовательность */
+  { id: '1.1', ch: 1, b: 'UDLR', g: ['.....', 'S...G', '.....'], sol: 'R R R R', say: 'Помоги Тоби добежать до косточки. Нажимай стрелки, они встанут в программу. Потом жми зелёную кнопку Пуск.' },
+  { id: '1.2', ch: 1, b: 'UDLR', g: ['S..##', '##.##', '##..G'], sol: 'R R D D R R', say: 'Тоби слушается только программы. Посчитай клетки и собери стрелки по порядку.' },
+  { id: '1.3', ch: 1, b: 'UDLR', g: ['##..G', '##.##', 'S..##'], sol: 'R R U U R R', say: 'Теперь косточка наверху. Не наткнись на кусты!' },
+  { id: '1.4', ch: 1, b: 'UDLR', g: ['S.*.#', '#.#.#', '#*#.G'], sol: 'R D D U U R R D D R', say: 'Собери все косточки и приведи Тоби в будку.' },
+  { id: '1.5', ch: 1, b: 'UDLR', g: ['S.#...', '#.#.#.', '#...#G'], sol: 'R D D R R U U R R D D', say: 'Длинная дорожка. Будь внимательным: каждая стрелка — один шаг.' },
+  { id: '1.6', ch: 1, b: 'UDLR', g: ['*...#', '.##.#', 'S#*.G'], sol: 'U U R R R D D L R R', say: 'Две косточки и будка. Придумай самый короткий путь.' },
+  { id: '1.7', ch: 1, b: 'UDLR', g: ['S.#.....', '#.#.###.', '#...#G..'], sol: 'R D D R R U U R R R R D D L L', say: 'Большой лабиринт! Сначала проследи путь пальцем, а потом пиши программу.' },
+  /* 2. Футбол: удар летит туда, куда Тоби шагнул последним */
+  { id: '2.1', ch: 2, b: 'UDLRK', g: ['.....N', 'S.o..N', '.....N'], sol: 'R R K', say: 'Футбол! Добеги до мяча и нажми удар. Мяч полетит туда, куда Тоби шёл последним.' },
+  { id: '2.2', ch: 2, b: 'UDLRK', g: ['NNNNN', '.....', '..#..', 'S..o.'], sol: 'R R R U K', say: 'Ворота наверху. Сначала повернись к воротам: сделай шаг вверх вместе с мячом.' },
+  { id: '2.3', ch: 2, b: 'UDLRK', g: ['#...N', 'S#o.N', '...#N'], sol: 'D R R U R K', say: 'Обведи защитника и забей гол.' },
+  { id: '2.4', ch: 2, b: 'UDLRK', g: ['..#..N', 'S.o#.N', '.#...N'], sol: 'R R D R R K', say: 'Мяч у ног бежит вместе с Тоби. Обведи защитника снизу.' },
+  { id: '2.5', ch: 2, b: 'UDLRK', g: ['S#...#.N', '.#.#.#.N', 'o..#...N'], sol: 'D D R R U U R R D D R R K', say: 'Целая команда защитников! Пройди змейкой и бей.' },
+  { id: '2.6', ch: 2, b: 'UDLRK', g: ['S...#', '.##o#', '.....', 'NNNNN'], sol: 'R R R D D K', say: 'Ворота внизу. С какой стороны подойти к мячу, чтобы ударить вниз?' },
+  /* 3. Циклы */
+  { id: '3.1', ch: 3, b: 'UDLRP', max: 2, g: ['S.......G'], sol: '8(R)', say: 'Слишком длинно! Возьми оранжевый блок Повтори, положи в него стрелку и выбери число.' },
+  { id: '3.2', ch: 3, b: 'UDLRP', max: 3, g: ['####G', '###..', '##..#', '#..##', 'S.###'], sol: '4(R U)', say: 'Лесенка! Какие два шага повторяются? Положи их в Повтори.' },
+  { id: '3.3', ch: 3, b: 'UDLRP', max: 4, g: ['S.*####', '##..*##', '####..*', '######G'], sol: '3(R R D)', say: 'Найди кусочек пути, который повторяется три раза.' },
+  { id: '3.4', ch: 3, b: 'UDLRP', max: 8, g: ['*...*', '.###.', '.###.', '.###.', 'SG..*'], sol: '4(U) 4(R) 4(D) 3(L)', say: 'Обойди пруд и собери косточки. Каждую сторону пройди одним Повтори.' },
+  { id: '3.5', ch: 3, b: 'UDLRPK', max: 7, g: ['S........', '########.', 'N.o......'], sol: '8(R) 2(D) 6(L) K', say: 'Мяч далеко. Добеги до него с помощью Повтори и забей гол.' },
+  { id: '3.6', ch: 3, b: 'UDLRP', max: 7, g: ['S***G', '****#', '****#', '****#'], sol: '2(3(D) R 3(U) R)', say: 'Повтори внутри Повтори! Собери все косточки змейкой: вниз, вправо, вверх, вправо.' },
+  { id: '3.7', ch: 3, b: 'UDLRP', max: 5, g: ['S.*....', '.......', '..*.*..', '.......', '....*.*', '.......', '......G'], sol: '3(2(R) 2(D))', say: 'Лесенка из больших ступенек. Хватит пяти блоков!' },
+  /* 4. Условия и «пока» */
+  { id: '4.1', ch: 4, b: 'UDLRPT', g: ['S.c.c.G'], sol: '2(R R T) R R', say: 'Тоби — сыщик! Встань на след и нажми лупу, чтобы осмотреть его. Осмотри все следы.' },
+  { id: '4.2', ch: 4, b: 'UDLRW', v: [['S....G'], ['S.........G'], ['S.G']], sol: 'W(R)', say: 'Мы не знаем, сколько шагов до флажка. Блок Пока: повторяй, пока не дойдёшь до флажка.' },
+  { id: '4.3', ch: 4, b: 'UDLRPTI', cond: 'c', v: [['S.c..c..G'], ['Sc.c....G']], sol: '8(R I:c(T)())', say: 'Следы каждый раз в другом месте! Блок Если: если тут след — осмотри. Программа должна сработать на обеих улицах.' },
+  { id: '4.4', ch: 4, b: 'UDLRWIT', cond: 'c', v: [['S.c..c.G'], ['Sc....c..cG'], ['S..G']], sol: 'W(R I:c(T)())', say: 'Улицы разной длины, и следы в разных местах. Объедини Пока и Если.' },
+  { id: '4.5', ch: 4, b: 'UDLRWI', cond: 'r', v: [['####.G', '###..#', '#...##', 'S.####'], ['##...G', '##.###', 'S..###'], ['#..G', '#.##', 'S.##']], sol: 'W(I:r(U)(R))', say: 'Лестница каждый раз другая. Если справа преграда — иди вверх, иначе — вправо.' },
+  { id: '4.6', ch: 4, b: 'UDLRWIT', cond: 'dc', v: [['S####', 'c####', '.####', '..c.G'], ['S#####', 'c.c.cG'], ['S##', 'c##', '.##', '..c', '##G']], sol: 'W(I:d(R)(D) I:c(T)())', say: 'Самое трудное дело! Спускайся, пока можно, потом иди вправо. И осматривай каждый след.' },
+  { id: '4.7', ch: 4, b: 'UDLRWI', cond: 'ru', v: [['.#..G', '...##', 'S.###'], ['...G', '.###', 'S###'], ['..#G', '.##.', 'S...']], sol: 'W(I:r(I:u(L)(U))(R))', say: 'Лабиринт Мориарти! Если справа преграда, а сверху тоже — шагни влево. Если сверху свободно — вверх. Иначе — вправо.', hard: 1 },
+  /* 5. Отладка: программа уже написана, но в ней ошибка */
+  { id: '5.1', ch: 5, b: 'UDLR', g: ['S..##', '##.##', '##..G'], bug: 'R R D R R', sol: 'R R D D R R', say: 'Эту программу написал робот, и Тоби врезается в куст. Найди ошибку и исправь её.' },
+  { id: '5.2', ch: 5, b: 'UDLRP', max: 2, g: ['S.....G'], bug: '3(R)', sol: '6(R)', say: 'Тоби не добегает. Что не так с числом в Повтори?' },
+  { id: '5.3', ch: 5, b: 'UDLRP', max: 3, g: ['####G', '###..', '##..#', '#..##', 'S.###'], bug: '4(U R)', sol: '4(R U)', say: 'Лесенка не получается. Может, шаги перепутаны местами?' },
+  { id: '5.4', ch: 5, b: 'UDLRK', g: ['NNNNN', '.....', '..#..', 'S..o.'], bug: 'R R R K', sol: 'R R R U K', say: 'Мяч летит мимо ворот. Чего не хватает перед ударом?' },
+  { id: '5.5', ch: 5, b: 'UDLRWI', cond: 'r', v: [['####.G', '###..#', '#...##', 'S.####'], ['##...G', '##.###', 'S..###']], bug: 'W(I:r(R)(U))', sol: 'W(I:r(U)(R))', say: 'В этой программе перепутаны да и нет. Найди и поменяй.' }
+];
+const CG_BLK = { U: '⬆', D: '⬇', L: '⬅', R: '➡', K: '⚽', T: '🔍' };
+const CG_COND = { c: { i: '🐾', t: 'тут след?' }, r: { i: '➡🧱', t: 'справа преграда?' }, d: { i: '⬇🧱', t: 'снизу преграда?' }, u: { i: '⬆🧱', t: 'сверху преграда?' } };
+const CG_DIR = { U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0] };
+
+/* --- разбор краткой записи программы --- */
+function cgParse(s){ let i = 0; const src = String(s || '').replace(/\s+/g, ' ');
+  function list(){ const out = []; for (;;) { while (src[i] === ' ') i++; if (i >= src.length || src[i] === ')') return out; out.push(node()); } }
+  function body(){ i++; const b = list(); i++; return b; }
+  function node(){ const c = src[i];
+    if (/\d/.test(c)) { let n = ''; while (/\d/.test(src[i])) n += src[i++]; return { t: 'P', n: +n, b: body() }; }
+    if (c === 'W') { i++; return { t: 'W', b: body() }; }
+    if (c === 'I') { const cd = src[i + 2]; i += 3; const b = body(); const e = body(); return { t: 'I', c: cd, b: b, e: e }; }
+    i++; return { t: c }; }
+  return list(); }
+function cgCount(p){ let n = 0; for (const x of p) { n++; if (x.b) n += cgCount(x.b); if (x.e) n += cgCount(x.e); } return n; }
+function cgDepth(p){ let d = 0; for (const x of p) if (x.b) d = Math.max(d, 1 + cgDepth(x.b), x.e ? 1 + cgDepth(x.e) : 0); return d; }
+function cgGrids(lv){ return lv.v || [lv.g]; }
+function cgFind(grid, ch){ const out = []; grid.forEach((row, y) => { for (let x = 0; x < row.length; x++) if (row[x] === ch) out.push([x, y]); }); return out; }
+
+/* --- выполнение: возвращает весь путь по шагам, потом он проигрывается анимацией --- */
+function cgSim(lv, grid, prog){
+  const W = grid[0].length, H = grid.length, at = (x, y) => (y < 0 || y >= H || x < 0 || x >= W) ? '#' : grid[y][x];
+  const s = cgFind(grid, 'S')[0], g = cgFind(grid, 'G')[0], b0 = cgFind(grid, 'o')[0];
+  const st = { x: s[0], y: s[1], d: 'R', ball: b0 ? { x: b0[0], y: b0[1], held: false } : null, left: {}, goal: false, n: 0 };
+  cgFind(grid, '*').concat(cgFind(grid, 'c')).forEach(p => { st.left[p[0] + ',' + p[1]] = grid[p[1]][p[0]]; });
+  const tr = [];
+  const snap = (hl, ev) => { tr.push({ x: st.x, y: st.y, d: st.d, ball: st.ball ? { x: st.ball.x, y: st.ball.y } : null, left: Object.keys(st.left), goal: st.goal, hl: hl, ev: ev || '' }); };
+  const blocked = (x, y) => { const c = at(x, y); return c === '#' || c === 'N'; };
+  function Fail(msg, code){ this.msg = msg; this.code = code; }
+  const tick = () => { if (++st.n > 400) throw new Fail('Программа никак не кончается. Проверь блок Пока.', 'loop'); };
+  function run(list, path){
+    list.forEach((x, i) => { const id = path + i; tick();
+      if (CG_DIR[x.t]) { const v = CG_DIR[x.t], nx = st.x + v[0], ny = st.y + v[1]; st.d = x.t;
+        if (blocked(nx, ny)) { snap(id, 'bump'); throw new Fail(at(nx, ny) === 'N' ? 'В ворота надо бить мячом, а не бежать самому!' : nx < 0 || ny < 0 || nx >= W || ny >= H ? 'Ой! Дальше края поля идти нельзя.' : 'Бух! Там преграда.', 'bump'); }
+        st.x = nx; st.y = ny;
+        if (st.ball && !st.ball.held && st.ball.x === nx && st.ball.y === ny) st.ball.held = true;
+        if (st.ball && st.ball.held) { st.ball.x = nx; st.ball.y = ny; }
+        const k = nx + ',' + ny; if (st.left[k] === '*') delete st.left[k];
+        snap(id); }
+      else if (x.t === 'T') { const k = st.x + ',' + st.y; if (st.left[k] !== 'c') { snap(id, 'no'); throw new Fail('Тут нет следа. Лупа нужна только там, где след 🐾.', 'take'); } delete st.left[k]; snap(id, 'take'); }
+      else if (x.t === 'K') { if (!st.ball || !st.ball.held || st.ball.x !== st.x || st.ball.y !== st.y) { snap(id, 'no'); throw new Fail('Мяча нет у ног. Сначала добеги до мяча.', 'kick'); }
+        st.ball.held = false; const v = CG_DIR[st.d]; snap(id, 'kick');
+        for (;;) { const nx = st.ball.x + v[0], ny = st.ball.y + v[1], c = at(nx, ny);
+          if (c === 'N') { st.ball.x = nx; st.ball.y = ny; st.goal = true; snap(id, 'goal'); break; }
+          if (c === '#') { snap(id, 'miss'); throw new Fail(nx < 0 || ny < 0 || nx >= W || ny >= H ? 'Мимо! Мяч улетел за поле. Куда смотрел Тоби, когда бил?' : 'Мяч попал в защитника.', 'miss'); }
+          st.ball.x = nx; st.ball.y = ny; snap(id, 'fly'); } }
+      else if (x.t === 'P') { for (let k = 0; k < x.n; k++) run(x.b, id + '.'); }
+      else if (x.t === 'W') { if (!x.b.length) throw new Fail('Блок Пока пустой. Положи в него команды.', 'loop'); let k = 0; while (!(g && st.x === g[0] && st.y === g[1])) { if (++k > 60) throw new Fail('Программа никак не кончается. Проверь блок Пока.', 'loop'); run(x.b, id + '.'); } }
+      else if (x.t === 'I') { const c = x.c; let yes = false;
+        if (c === 'c') yes = st.left[st.x + ',' + st.y] === 'c';
+        else { const v = CG_DIR[c === 'r' ? 'R' : c === 'd' ? 'D' : c === 'u' ? 'U' : 'L']; yes = blocked(st.x + v[0], st.y + v[1]); }
+        run(yes ? x.b : x.e, id + (yes ? '.' : ':')); } }); }
+  snap('', 'start');
+  try { run(prog, ''); } catch (e) { if (e instanceof Fail) return { ok: false, tr: tr, msg: e.msg, code: e.code }; throw e; }
+  const left = Object.keys(st.left).map(k => st.left[k]);
+  if (cgFind(grid, 'N').length && !st.goal) return { ok: false, tr: tr, msg: 'Гола нет. Добеги до мяча и ударь ⚽ в сторону ворот.', code: 'nogoal' };
+  if (left.indexOf('*') >= 0) return { ok: false, tr: tr, msg: 'Остались косточки. Тоби хочет собрать все!', code: 'items' };
+  if (left.indexOf('c') >= 0) return { ok: false, tr: tr, msg: 'Остались неосмотренные следы 🐾.', code: 'items' };
+  if (g && !(st.x === g[0] && st.y === g[1])) return { ok: false, tr: tr, msg: 'Тоби не дошёл до цели. Добавь шагов.', code: 'short' };
+  return { ok: true, tr: tr }; }
+
+/* --- состояние ребёнка --- */
+function cgK(kid){ const K = S.kids[kid]; if (!K.code) K.code = { lv: {}, pts: {}, pend: 0, last: '' }; return K.code; }
+function cgIdx(id){ for (let i = 0; i < CG_LV.length; i++) if (CG_LV[i].id === id) return i; return -1; }
+function cgOpen(kid, i){ if (i <= 0) return true; const C = cgK(kid).lv, a = C[CG_LV[i - 1].id]; if (a && a.s) return true;
+  /* быстрый темп: три уровня подряд на 3 звезды с первой попытки — можно перешагнуть через один */
+  if (i >= 4) { for (let k = i - 4; k < i - 1; k++) { const r = C[CG_LV[k].id]; if (!r || r.s < 3 || r.first !== 1) return false; } return true; }
+  return false; }
+function cgStars(lv, n, used){ if (used) return 1; const o = cgCount(cgParse(lv.sol)); return n <= o ? 3 : n <= o + 2 ? 2 : 1; }
+function cgToday(kid){ return cgK(kid).pts[U.today()] || 0; }
+/* Баллы приходят в копилку, когда уроки дня сделаны; до этого лежат «в ожидании» */
+function cgPayPending(kid){ const C = cgK(kid); if (!C.pend) return; const t = U.today(); const D = S.kids[kid].days[t]; if (!(D && D.bonus) && !dayDone(kid, t)) return;
+  piggyAdd(S.kids[kid], C.pend); ev(kid, 'программирование', { subj: 'Программирование', text: `+${C.pend} баллов из ожидания в копилку` }); C.pend = 0; save(); }
+
+/* --- плитка на главной --- */
+function codeTile(kid){ if (CODE_KIDS.indexOf(kid) < 0) return ''; const C = cgK(kid); let won = 0; CG_LV.forEach(l => { if (C.lv[l.id] && C.lv[l.id].s) won++; });
+  const nx = CG_LV.find((l, i) => !(C.lv[l.id] && C.lv[l.id].s) && cgOpen(kid, i));
+  return `<button class="tile code" data-act="code"><span class="ico"><img src="img/code-tile.webp" alt="" onerror="this.parentNode.textContent='🐶'"></span><span class="tt"><span class="sn">Тоби-программист</span><span class="ut">${won ? `Пройдено ${won} из ${CG_LV.length}` : 'Игра: научи щенка Тоби слушаться программы'}${nx ? ` · дальше: уровень ${nx.id}` : ' · всё пройдено!'}</span></span><span class="state">до +${CODE_DAY_MAX}</span></button>`; }
+
+/* --- карта уровней --- */
+function vCode(){ const kid = cur.kid, C = cgK(kid); cgPayPending(kid);
+  const day = cgToday(kid);
+  const chs = CG_CH.map(ch => { const L = CG_LV.map((l, i) => ({ l, i })).filter(z => z.l.ch === ch.id);
+    const got = L.filter(z => C.lv[z.l.id] && C.lv[z.l.id].s).length;
+    return `<section class="cgch card"><div class="cgchh"><div class="cgcov" style="background-image:url(img/${ch.img}.webp)"><span>${ch.ico}</span></div><div><h2>${ch.id}. ${U.esc(ch.t)}</h2><p class="hint">${U.esc(ch.what)} · ${got} из ${L.length}</p>${got === L.length ? `<p class="cgbadge">${U.esc(ch.badge)}</p>` : `<p class="hint">Награда за главу: ${U.esc(ch.badge)}</p>`}</div></div>
+      <div class="cglvs">${L.map(z => { const r = C.lv[z.l.id], op = cgOpen(kid, z.i), s = r && r.s || 0;
+        return `<button class="cglv ${s ? 'won' : op ? 'open' : 'lock'}${z.l.hard ? ' hard' : ''}" data-act="cglv" data-id="${z.l.id}" ${op ? '' : 'aria-disabled="true"'}><b>${z.l.id}</b><i>${s ? '★★★'.slice(0, s) + '<s>' + '★★★'.slice(s) + '</s>' : op ? '▶' : '🔒'}</i></button>`; }).join('')}</div></section>`; }).join('');
+  return `<main class="wrap ${kid} cg"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header>
+    <section class="hello cghero"><img class="cgtoby" src="img/code-toby.webp" alt="" onerror="this.remove()"><div><p class="eyebrow">Игра</p><h1>Тоби-программист</h1><p>Щенок Тоби понимает только программы. Собери из блоков программу, и Тоби выполнит её шаг за шагом.</p>
+    <p class="hint">За новый уровень — столько баллов, сколько звёзд. Сегодня: <b>${day} из ${CODE_DAY_MAX}</b>.${C.pend ? ` Ждут в копилку: <b>${C.pend}</b> — придут, когда сделаешь уроки дня.` : ''}</p></div></section>${chs}</main>`; }
+
+/* --- экран уровня --- */
+let CG = null; /* { id, prog, sel:{k,i}, run, vi, step, res, hint } */
+function cgStart(id){ const lv = CG_LV[cgIdx(id)]; const C = cgK(cur.kid); const r = C.lv[id] || {};
+  CG = { id: id, prog: lv.bug ? cgParse(lv.bug) : (r.prog ? JSON.parse(JSON.stringify(r.prog)) : []), sel: { k: '', i: -1 }, run: false, vi: 0, res: null, hint: 0, used: false };
+  CG.sel.i = CG.prog.length; C.last = id; save(); go('codelv'); setTimeout(() => say(lv.say), 400); }
+function cgSlot(prog, k){ if (!k) return prog; let a = prog; for (const part of k.split('/')) { const m = part.split('.'); const n = a[+m[0]]; a = m[1] === 'e' ? n.e : n.b; } return a; }
+function cgBlockHtml(x, path, k, i){ const sel = CG.sel.k === k && CG.sel.i === i + 1 && CG.selB, id = path;
+  const del = sel ? `<span class="cgdel" data-act="cgdel" data-k="${k}" data-i="${i}">✕</span>` : '';
+  if (x.t === 'P' || x.t === 'W' || x.t === 'I') {
+    const kb = (k ? k + '/' : '') + i + '.b', ke = (k ? k + '/' : '') + i + '.e';
+    const head = x.t === 'P' ? `<span class="cgh">🔁 Повтори <span class="cgn" data-act="cgnum" data-k="${k}" data-i="${i}">${x.n}</span> раз</span>`
+      : x.t === 'W' ? `<span class="cgh">⟳ Пока не 🏁</span>` : `<span class="cgh">❓ Если <span class="cgn" data-act="cgcond" data-k="${k}" data-i="${i}">${CG_COND[x.c].i}</span></span>`;
+    return `<div class="cgc cg${x.t}${sel ? ' sel' : ''}" data-id="${id}"><div class="cghd" data-act="cgsel" data-k="${k}" data-i="${i}">${head}${del}</div>${x.t === 'I' ? '<div class="cglab">да</div>' : ''}${cgListHtml(x.b, id + '.', kb)}${x.t === 'I' ? '<div class="cglab">иначе</div>' + cgListHtml(x.e, id + ':', ke) : ''}</div>`; }
+  return `<span class="cgb cg${x.t}${sel ? ' sel' : ''}" data-id="${id}" data-act="cgsel" data-k="${k}" data-i="${i}">${CG_BLK[x.t]}${del}</span>`; }
+function cgListHtml(list, path, k){ const on = CG.sel.k === k && !CG.selB;
+  return `<div class="cgl${on ? ' on' : ''}">${CG.sel.k === k && CG.sel.i === 0 ? '<span class="cgcur"></span>' : ''}<span class="cgdrop${list.length && list[0].b ? ' lead' : ''}" data-act="cgslot" data-k="${k}" data-i="0">${list.length ? '' : '＋'}</span>${list.map((x, i) => cgBlockHtml(x, path + i, k, i) + (CG.sel.k === k && CG.sel.i === i + 1 ? '<span class="cgcur"></span>' : '')).join('')}${list.length ? `<span class="cgdrop end${list[list.length - 1].b ? ' after' : ''}" data-act="cgslot" data-k="${k}" data-i="${list.length}">${list[list.length - 1].b ? '＋' : ''}</span>` : ''}</div>`; }
+function cgSprite(t){ return `<i class="cgs cgs-${t}"></i>`; }
+function cgBoard(lv, grid){ const W = grid[0].length, H = grid.length, ch = CG_CH[lv.ch - 1];
+  let cells = ''; grid.forEach((row, y) => { for (let x = 0; x < W; x++) { const c = row[x]; cells += `<div class="cgcell ${(x + y) % 2 ? 'b' : 'a'}${c === '#' ? ' wall' : c === 'N' ? ' net' : ''}">${c === '#' ? cgSprite(lv.ch === 2 || (lv.ch === 3 && cgFind(grid, 'N').length) ? 'def' : lv.ch === 4 ? 'brick' : (x * 7 + y * 3) % 3 ? 'bush' : 'tree') : c === 'G' ? cgSprite(lv.ch === 4 || lv.ch === 5 ? 'flag' : cgFind(grid, '*').length ? 'house' : 'bone') : ''}</div>`; } });
+  const pos = (x, y) => `left:${x / W * 100}%;top:${y / H * 100}%;width:${100 / W}%;height:${100 / H}%`;
+  const items = cgFind(grid, '*').map(p => `<div class="cgsp it" data-k="${p[0]},${p[1]}" style="${pos(p[0], p[1])}">${cgSprite('bone')}</div>`).join('') + cgFind(grid, 'c').map(p => `<div class="cgsp it" data-k="${p[0]},${p[1]}" style="${pos(p[0], p[1])}">${cgSprite('paw')}</div>`).join('');
+  const s = cgFind(grid, 'S')[0], b = cgFind(grid, 'o')[0];
+  let hint = ''; if (CG.hint) { const r = cgSim(lv, grid, cgParse(lv.sol)); const seen = {}; r.tr.forEach((t, i) => { const k = t.x + ',' + t.y; if (i && !seen[k]) { seen[k] = 1; hint += `<div class="cgsp hintdot" style="${pos(t.x, t.y)}"><span>${Object.keys(seen).length}</span></div>`; } }); }
+  return `<div class="cgboard th-${ch.bg}" style="padding-bottom:${H / W * 100}%"><div class="cggrid" style="grid-template-columns:repeat(${W},1fr);grid-template-rows:repeat(${H},1fr)">${cells}</div>${hint}${items}${b ? `<div class="cgsp ball" id="cgball" style="${pos(b[0], b[1])}">${cgSprite('ball')}</div>` : ''}<div class="cgsp hero dR" id="cghero" style="${pos(s[0], s[1])}">${cgSprite('toby')}</div></div>`; }
+function vCodeLv(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids(lv), n = cgCount(CG.prog), r = cgK(kid).lv[lv.id] || {};
+  const bl = lv.b.split('').filter(c => c !== 'P' && c !== 'W' && c !== 'I');
+  const full = lv.max && n >= lv.max;
+  const tut = lv.id === '1.1' && !CG.prog.length ? 'R' : lv.id === '1.1' && CG.prog.length < 4 ? 'R' : ''; const pal = bl.map(c => `<button class="cgb cg${c}${c === tut ? ' tut' : ''}" data-act="cgadd" data-t="${c}" ${CG.run || full ? 'disabled' : ''}>${CG_BLK[c]}</button>`).join('')
+    + (lv.b.indexOf('P') >= 0 ? `<button class="cgb cgP wide" data-act="cgadd" data-t="P" ${CG.run || full ? 'disabled' : ''}>🔁 Повтори</button>` : '')
+    + (lv.b.indexOf('W') >= 0 ? `<button class="cgb cgW wide" data-act="cgadd" data-t="W" ${CG.run || full ? 'disabled' : ''}>⟳ Пока не 🏁</button>` : '')
+    + (lv.b.indexOf('I') >= 0 ? `<button class="cgb cgI wide" data-act="cgadd" data-t="I" ${CG.run || full ? 'disabled' : ''}>❓ Если</button>` : '');
+  const res = CG.res;
+  const tabs = grids.length > 1 ? `<div class="cgtabs">${grids.map((g, i) => `<button class="chip ${i === CG.vi ? 'on' : ''}" data-act="cgvar" data-i="${i}" ${CG.run ? 'disabled' : ''}>Улица ${i + 1}${res && res.vr && res.vr[i] != null ? (res.vr[i] ? ' ✓' : ' ✗') : ''}</button>`).join('')}</div><p class="hint center">Программа одна — она должна сработать на каждой улице.</p>` : '';
+  const goal = lv.ch === 2 || cgFind(grids[0], 'N').length ? '⚽ → 🥅' : grids[0].join('').indexOf('c') >= 0 ? '🐾 → 🏁' : grids[0].join('').indexOf('*') >= 0 ? '🦴 → 🏠' : lv.ch >= 4 ? '🏁' : '🦴';
+  return `<main class="wrap ${kid} cg cglvl"><header class="bar"><button class="link" data-act="code">← Уровни</button><span class="cgttl">Уровень ${lv.id} · ${goal}</span><button class="link" data-act="cgsay">🔊</button></header>
+  <p class="cgsay">${U.esc(lv.say)}</p>${tabs}
+  <div id="cgbwrap">${cgBoard(lv, grids[CG.vi])}</div>
+  ${res && !CG.run ? `<div class="fb ${res.ok ? 'ok' : 'try'}">${res.ok ? `Ура! ${'⭐'.repeat(res.stars)} ${res.pts ? `+${res.pts} ${U.pl(res.pts, 'балл', 'балла', 'баллов')}${res.pend ? ' (придут после уроков дня)' : ''}` : ''}${res.badge ? `<div class="cgbadge big">Глава пройдена! Награда: ${U.esc(res.badge)}</div>` : ''}${res.stars < 3 && !CG.used ? `<br><small>Можно короче: попробуй уложиться в ${cgCount(cgParse(lv.sol))} ${U.pl(cgCount(cgParse(lv.sol)), 'блок', 'блока', 'блоков')}, чтобы получить 3 звезды.</small>` : ''}` : U.esc(res.msg)}</div>` : ''}
+  <section class="cgprog card"><div class="cgph"><b>Программа</b><span class="hint">${lv.max ? `блоков ${n} из ${lv.max}` : `блоков: ${n}`}</span></div>${cgListHtml(CG.prog, '', '')}</section>
+  <section class="cgpal">${pal}</section>
+  <div class="cgctl">${res && res.ok && !CG.run ? `<button class="btn" data-act="cgnext">Дальше ▶</button>` : `<button class="btn cgrun" data-act="cgrun" ${CG.run || !CG.prog.length ? 'disabled' : ''}>▶ Пуск</button>`}
+    <button class="btn ghost" data-act="cgclear" ${CG.run ? 'disabled' : ''}>🗑 Очистить</button>
+    ${(r.t || 0) >= 2 && !CG.hint && !(res && res.ok) ? `<button class="btn ghost glow" data-act="cghint">💡 Подсказка</button>` : ''}
+    ${(r.t || 0) >= 4 && !(res && res.ok) && !CG.used ? `<button class="btn ghost" data-act="cgsol">📖 Показать решение</button>` : ''}</div>
+  <p class="hint center">Нажми на блок в программе, чтобы выбрать его: новый блок встанет после него, ✕ — удалить. Нажми на «＋» внутри Повтори, чтобы класть блоки внутрь. Число в Повтори меняется нажатием.</p></main>`; }
+
+/* --- проигрывание --- */
+function cgApply(t){ const h = document.getElementById('cghero'); if (!h) return;
+  const grid = cgGrids(CG_LV[cgIdx(CG.id)])[CG.vi], w = grid[0].length, hh = grid.length;
+  h.style.left = t.x / w * 100 + '%'; h.style.top = t.y / hh * 100 + '%'; h.className = 'cgsp hero d' + t.d + (t.ev === 'bump' || t.ev === 'no' ? ' bump' : t.ev === 'take' ? ' sniff' : t.ev === 'goal' ? ' joy' : '');
+  const ball = document.getElementById('cgball'); if (ball && t.ball) { ball.style.left = t.ball.x / w * 100 + '%'; ball.style.top = t.ball.y / hh * 100 + '%'; ball.className = 'cgsp ball' + (t.goal ? ' in' : ''); }
+  const L = {}; t.left.forEach(k => { L[k] = 1; }); Array.prototype.forEach.call(document.querySelectorAll('.cgsp.it'), el => { el.classList.toggle('got', !L[el.dataset.k]); });
+  Array.prototype.forEach.call(document.querySelectorAll('.cgprog .run'), el => el.classList.remove('run'));
+  if (t.hl) { const el = document.querySelector(`.cgprog [data-id="${t.hl}"]`); if (el) el.classList.add('run'); } }
+function cgRun(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids(lv);
+  if (lv.max && cgCount(CG.prog) > lv.max) { alertMsg(`Не больше ${lv.max} блоков`); return; }
+  const R = grids.map(g => cgSim(lv, g, CG.prog)); const vr = R.map(x => x.ok);
+  CG.run = true; CG.res = null; CG.vi = 0; render(); let vi = 0, i = 0;
+  const done = () => { CG.run = false; const ok = vr.every(Boolean), bad = R.find(x => !x.ok);
+    const C = cgK(kid), rec = C.lv[lv.id] || (C.lv[lv.id] = { s: 0, t: 0, w: 0 });
+    if (!ok) { rec.t = (rec.t || 0) + 1; CG.res = { ok: false, msg: (grids.length > 1 ? `Улица ${R.indexOf(bad) + 1}: ` : '') + bad.msg, vr: vr }; CG.vi = R.indexOf(bad); save(); render(); say(bad.msg); return; }
+    const n = cgCount(CG.prog), stars = cgStars(lv, n, CG.used); const prev = rec.s || 0; if (!prev && !rec.first) rec.first = (rec.t || 0) + 1;
+    rec.w = (rec.w || 0) + 1; rec.prog = JSON.parse(JSON.stringify(CG.prog));
+    let pts = 0, pend = false; if (stars > prev && !CG.used) { const room = Math.max(0, CODE_DAY_MAX - cgToday(kid)); pts = Math.min(stars - prev, room); }
+    if (stars > prev) rec.s = stars;
+    if (pts) { C.pts[U.today()] = cgToday(kid) + pts; const t = U.today(), D = S.kids[kid].days[t]; if ((D && D.bonus) || dayDone(kid, t)) piggyAdd(S.kids[kid], pts); else { C.pend = (C.pend || 0) + pts; pend = true; } }
+    ev(kid, 'программирование', { subj: 'Программирование', unit: `Уровень ${lv.id}`, score: stars + '★', ok: CG.used ? 'по решению' : 'верно', text: `попыток ${rec.t + 1}, блоков ${n}${pts ? `, +${pts} баллов` : ''}` });
+    const chL = CG_LV.filter(l => l.ch === lv.ch), chDone = chL.every(l => C.lv[l.id] && C.lv[l.id].s); const badge = chDone && prev === 0 ? CG_CH[lv.ch - 1].badge : '';
+    if (badge) ev(kid, 'программирование', { subj: 'Программирование', unit: `Глава ${lv.ch} пройдена`, text: badge });
+    CG.res = { ok: true, stars: stars, pts: pts, pend: pend, vr: vr, badge: badge }; save(); render();
+    say(badge ? 'Глава пройдена! Тоби получает награду: ' + badge.replace(/^\S+\s/, '') : stars === 3 ? 'Отлично! Три звезды!' : 'Получилось!'); };
+  const me = CG; const step = () => { if (CG !== me || cur.view !== 'codelv') { me.run = false; return; } const tr = R[vi].tr;
+    if (i < tr.length) { cgApply(tr[i]); i++; setTimeout(step, tr[i - 1].ev === 'fly' ? 140 : CODE_STEP_MS); return; }
+    if (R[vi].ok && vi + 1 < R.length) { vi++; i = 0; CG.vi = vi; CG.res = { vr: vr.map((v, k) => k < vi ? v : null) }; const w = document.getElementById('cgbwrap'); if (w) w.innerHTML = cgBoard(lv, grids[vi]); Array.prototype.forEach.call(document.querySelectorAll('.cgtabs .chip'), (el, k) => { el.classList.toggle('on', k === vi); }); setTimeout(step, 500); return; }
+    if (!R[vi].ok) { R.forEach((x, k) => { if (k > vi) vr[k] = null; }); }
+    setTimeout(done, 350); };
+  setTimeout(step, 250); }
+
+/* --- действия --- */
+function codeAct(act, b){ const kid = cur.kid;
+  if (act === 'code') { if (CG) CG.run = false; CG = null; go('code'); return true; }
+  if (act === 'cglv') { const i = cgIdx(b.dataset.id); if (!cgOpen(kid, i)) { alertMsg('Сначала пройди предыдущий уровень'); return true; } cgStart(b.dataset.id); return true; }
+  if (!CG) return false; const lv = CG_LV[cgIdx(CG.id)];
+  if (CG.run && cur.view === 'codelv') return true;
+  const touch = () => { CG.res = null; };
+  switch (act) {
+    case 'cgsay': say(lv.say); return true;
+    case 'cgadd': { const t = b.dataset.t; const arr = cgSlot(CG.prog, CG.sel.k); const depth = CG.sel.k ? CG.sel.k.split('/').length : 0;
+      if ((t === 'P' || t === 'W' || t === 'I') && depth >= 2) { alertMsg('Глубже класть нельзя'); return true; }
+      const node = t === 'P' ? { t: 'P', n: 2, b: [] } : t === 'W' ? { t: 'W', b: [] } : t === 'I' ? { t: 'I', c: (lv.cond || 'c')[0], b: [], e: [] } : { t: t };
+      const at = Math.max(0, Math.min(CG.sel.i, arr.length)); arr.splice(at, 0, node);
+      if (node.b) CG.sel = { k: (CG.sel.k ? CG.sel.k + '/' : '') + at + '.b', i: 0 }; else CG.sel = { k: CG.sel.k, i: at + 1 }; CG.selB = false;
+      touch(); render(); return true; }
+    case 'cgsel': { const k = b.dataset.k, i = +b.dataset.i; if (CG.sel.k === k && CG.sel.i === i + 1 && CG.selB) CG.selB = false; else { CG.sel = { k: k, i: i + 1 }; CG.selB = true; } render(); return true; }
+    case 'cgslot': CG.sel = { k: b.dataset.k, i: +b.dataset.i }; CG.selB = false; render(); return true;
+    case 'cgdel': { const arr = cgSlot(CG.prog, b.dataset.k), i = +b.dataset.i; arr.splice(i, 1); CG.sel = { k: b.dataset.k, i: i }; CG.selB = false; touch(); render(); return true; }
+    case 'cgnum': { const x = cgSlot(CG.prog, b.dataset.k)[+b.dataset.i]; x.n = x.n >= 9 ? 2 : x.n + 1; touch(); render(); return true; }
+    case 'cgcond': { const x = cgSlot(CG.prog, b.dataset.k)[+b.dataset.i]; const cs = (lv.cond || 'c').split(''); x.c = cs[(cs.indexOf(x.c) + 1) % cs.length]; touch(); render(); say(CG_COND[x.c].t); return true; }
+    case 'cgclear': CG.prog = []; CG.sel = { k: '', i: 0 }; CG.selB = false; CG.used = false; touch(); render(); return true;
+    case 'cgvar': CG.vi = +b.dataset.i; render(); return true;
+    case 'cgrun': cgRun(); return true;
+    case 'cghint': CG.hint = 1; render(); say('Номера на поле показывают, куда должен пройти Тоби. Посчитай шаги.'); ev(kid, 'не понимаю', { subj: 'Программирование', unit: `Уровень ${lv.id}`, text: 'подсказка' }); return true;
+    case 'cgsol': if (!window.confirm('Показать решение? За этот уровень тогда будет одна звезда и без баллов. Разберись, как оно работает!')) return true; CG.prog = cgParse(lv.sol); CG.used = true; CG.sel = { k: '', i: CG.prog.length }; touch(); render(); return true;
+    case 'cgnext': { const i = cgIdx(CG.id) + 1; if (i < CG_LV.length && cgOpen(kid, i)) cgStart(CG_LV[i].id); else { CG = null; go('code'); } return true; }
+  }
+  return false; }
+
 /* ===== Настройка детей ===== */
 CUR_Y.lang = { name:'Языки', src:'Português: 2.º–3.º ano (gramática, ortografia) и English', units: PT_NAT, old: PT_Y, alt: EN_UNITS, altName:'English' };
 CUR_A.logic.alt = A_FIN; CUR_A.logic.altName = '💶 Финансы'; CUR_Y.world.alt = Y_FIN; CUR_Y.world.altName = '💶 Деньги'; CUR_Y.world.altSrc = 'Финансовая грамотность (по стандартам Jump$tart, K-5)';
@@ -2687,8 +3047,8 @@ function coinsHtml(n){ return `<span class="coin" aria-hidden="true"></span><b>$
 function render(){
   if (S.parentPin) for (const k of ['yarik', 'anya']) { burnCheck(k); piggyCheck(k); }
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
-  const v = !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'parent' ? vParent() : vLogin();
-  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes'].includes(cur.view) ? cur.kid : '';
+  const v = !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'parent' ? vParent() : cur.view === 'code' ? vCode() : cur.view === 'codelv' && CG ? vCodeLv() : cur.view === 'codelv' ? vCode() : vLogin();
+  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'code', 'codelv'].includes(cur.view) ? cur.kid : '';
   app().innerHTML = v; afterRender();
 }
 function afterRender(){ const f = app().querySelector('[autofocus]'); if (f) try { f.focus(); } catch (e) {} }
@@ -2757,7 +3117,7 @@ function vHome(){
   <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${restCard(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
-  <section class="tiles">${tiles}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
+  <section class="tiles">${tiles}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}${codeTile(kid)}</section>
   ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
   <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
@@ -3309,6 +3669,7 @@ function vSettings(){
 /* ===== События ===== */
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act;
+  if (codeAct(act, b)) return;
   const kid = cur.kid; const D = kid && dayRec(kid, cur.ds); const L = D && cur.subj && D.les[cur.subj];
   switch (act) {
     case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;

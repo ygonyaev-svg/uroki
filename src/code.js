@@ -4,11 +4,11 @@
    'c' улика (нужно 🔍), 'o' мяч, 'N' ворота. Решение пишется кратко: R D 3(R U) W(R) I:c(T)() K */
 const CODE_KIDS = ['yarik'], CODE_DAY_MAX = 10, CODE_STEP_MS = 360;
 const CG_CH = [
-  { id: 1, t: 'Тоби ищет косточку', ico: '🦴', img: 'code-ch1', bg: 'park', what: 'Команды по порядку' },
-  { id: 2, t: 'Футбол', ico: '⚽', img: 'code-ch2', bg: 'pitch', what: 'Команды и удар' },
-  { id: 3, t: 'Повторяй!', ico: '🔁', img: 'code-ch3', bg: 'park', what: 'Циклы' },
-  { id: 4, t: 'Тоби-сыщик', ico: '🔍', img: 'code-ch4', bg: 'street', what: 'Условия: «если» и «пока»' },
-  { id: 5, t: 'Найди ошибку', ico: '🐞', img: 'code-ch5', bg: 'lab', what: 'Отладка программ' }
+  { id: 1, t: 'Тоби ищет косточку', ico: '🦴', img: 'code-ch1', bg: 'park', what: 'Команды по порядку', badge: '🐕 Ошейник путешественника' },
+  { id: 2, t: 'Футбол', ico: '⚽', img: 'code-ch2', bg: 'pitch', what: 'Команды и удар', badge: '🏆 Кубок бомбардира' },
+  { id: 3, t: 'Повторяй!', ico: '🔁', img: 'code-ch3', bg: 'park', what: 'Циклы', badge: '🗝 Ключ от тайного тоннеля' },
+  { id: 4, t: 'Тоби-сыщик', ico: '🔍', img: 'code-ch4', bg: 'street', what: 'Условия: «если» и «пока»', badge: '🎩 Шляпа настоящего сыщика' },
+  { id: 5, t: 'Найди ошибку', ico: '🐞', img: 'code-ch5', bg: 'lab', what: 'Отладка программ', badge: '🎓 Диплом мастера программирования' }
 ];
 const CG_LV = [
   /* 1. Последовательность */
@@ -36,8 +36,8 @@ const CG_LV = [
   { id: '3.7', ch: 3, b: 'UDLRP', max: 5, g: ['S.*....', '.......', '..*.*..', '.......', '....*.*', '.......', '......G'], sol: '3(2(R) 2(D))', say: 'Лесенка из больших ступенек. Хватит пяти блоков!' },
   /* 4. Условия и «пока» */
   { id: '4.1', ch: 4, b: 'UDLRPT', g: ['S.c.c.G'], sol: '2(R R T) R R', say: 'Тоби — сыщик! Встань на след и нажми лупу, чтобы осмотреть его. Осмотри все следы.' },
-  { id: '4.2', ch: 4, b: 'UDLRPTI', cond: 'c', v: [['S.c..c..G'], ['Sc.c....G'], ['S...cc..G']], sol: '8(R I:c(T)())', say: 'Следы каждый раз в другом месте! Блок Если: если тут след — осмотри. Программа должна сработать на всех трёх улицах.' },
-  { id: '4.3', ch: 4, b: 'UDLRW', v: [['S....G'], ['S.........G'], ['S.G']], sol: 'W(R)', say: 'Мы не знаем, сколько шагов до флажка. Блок Пока: повторяй, пока не дойдёшь до флажка.' },
+  { id: '4.2', ch: 4, b: 'UDLRW', v: [['S....G'], ['S.........G'], ['S.G']], sol: 'W(R)', say: 'Мы не знаем, сколько шагов до флажка. Блок Пока: повторяй, пока не дойдёшь до флажка.' },
+  { id: '4.3', ch: 4, b: 'UDLRPTI', cond: 'c', v: [['S.c..c..G'], ['Sc.c....G']], sol: '8(R I:c(T)())', say: 'Следы каждый раз в другом месте! Блок Если: если тут след — осмотри. Программа должна сработать на обеих улицах.' },
   { id: '4.4', ch: 4, b: 'UDLRWIT', cond: 'c', v: [['S.c..c.G'], ['Sc....c..cG'], ['S..G']], sol: 'W(R I:c(T)())', say: 'Улицы разной длины, и следы в разных местах. Объедини Пока и Если.' },
   { id: '4.5', ch: 4, b: 'UDLRWI', cond: 'r', v: [['####.G', '###..#', '#...##', 'S.####'], ['##...G', '##.###', 'S..###'], ['#..G', '#.##', 'S.##']], sol: 'W(I:r(U)(R))', say: 'Лестница каждый раз другая. Если справа преграда — иди вверх, иначе — вправо.' },
   { id: '4.6', ch: 4, b: 'UDLRWIT', cond: 'dc', v: [['S####', 'c####', '.####', '..c.G'], ['S#####', 'c.c.cG'], ['S##', 'c##', '.##', '..c', '##G']], sol: 'W(I:d(R)(D) I:c(T)())', say: 'Самое трудное дело! Спускайся, пока можно, потом иди вправо. И осматривай каждый след.' },
@@ -133,7 +133,7 @@ function vCode(){ const kid = cur.kid, C = cgK(kid); cgPayPending(kid);
   const day = cgToday(kid);
   const chs = CG_CH.map(ch => { const L = CG_LV.map((l, i) => ({ l, i })).filter(z => z.l.ch === ch.id);
     const got = L.filter(z => C.lv[z.l.id] && C.lv[z.l.id].s).length;
-    return `<section class="cgch card"><div class="cgchh"><div class="cgcov" style="background-image:url(img/${ch.img}.webp)"><span>${ch.ico}</span></div><div><h2>${ch.id}. ${U.esc(ch.t)}</h2><p class="hint">${U.esc(ch.what)} · ${got} из ${L.length}</p></div></div>
+    return `<section class="cgch card"><div class="cgchh"><div class="cgcov" style="background-image:url(img/${ch.img}.webp)"><span>${ch.ico}</span></div><div><h2>${ch.id}. ${U.esc(ch.t)}</h2><p class="hint">${U.esc(ch.what)} · ${got} из ${L.length}</p>${got === L.length ? `<p class="cgbadge">${U.esc(ch.badge)}</p>` : `<p class="hint">Награда за главу: ${U.esc(ch.badge)}</p>`}</div></div>
       <div class="cglvs">${L.map(z => { const r = C.lv[z.l.id], op = cgOpen(kid, z.i), s = r && r.s || 0;
         return `<button class="cglv ${s ? 'won' : op ? 'open' : 'lock'}${z.l.hard ? ' hard' : ''}" data-act="cglv" data-id="${z.l.id}" ${op ? '' : 'aria-disabled="true"'}><b>${z.l.id}</b><i>${s ? '★★★'.slice(0, s) + '<s>' + '★★★'.slice(s) + '</s>' : op ? '▶' : '🔒'}</i></button>`; }).join('')}</div></section>`; }).join('');
   return `<main class="wrap ${kid} cg"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header>
@@ -167,7 +167,7 @@ function cgBoard(lv, grid){ const W = grid[0].length, H = grid.length, ch = CG_C
 function vCodeLv(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids(lv), n = cgCount(CG.prog), r = cgK(kid).lv[lv.id] || {};
   const bl = lv.b.split('').filter(c => c !== 'P' && c !== 'W' && c !== 'I');
   const full = lv.max && n >= lv.max;
-  const pal = bl.map(c => `<button class="cgb cg${c}" data-act="cgadd" data-t="${c}" ${CG.run || full ? 'disabled' : ''}>${CG_BLK[c]}</button>`).join('')
+  const tut = lv.id === '1.1' && !CG.prog.length ? 'R' : lv.id === '1.1' && CG.prog.length < 4 ? 'R' : ''; const pal = bl.map(c => `<button class="cgb cg${c}${c === tut ? ' tut' : ''}" data-act="cgadd" data-t="${c}" ${CG.run || full ? 'disabled' : ''}>${CG_BLK[c]}</button>`).join('')
     + (lv.b.indexOf('P') >= 0 ? `<button class="cgb cgP wide" data-act="cgadd" data-t="P" ${CG.run || full ? 'disabled' : ''}>🔁 Повтори</button>` : '')
     + (lv.b.indexOf('W') >= 0 ? `<button class="cgb cgW wide" data-act="cgadd" data-t="W" ${CG.run || full ? 'disabled' : ''}>⟳ Пока не 🏁</button>` : '')
     + (lv.b.indexOf('I') >= 0 ? `<button class="cgb cgI wide" data-act="cgadd" data-t="I" ${CG.run || full ? 'disabled' : ''}>❓ Если</button>` : '');
@@ -177,7 +177,7 @@ function vCodeLv(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGri
   return `<main class="wrap ${kid} cg cglvl"><header class="bar"><button class="link" data-act="code">← Уровни</button><span class="cgttl">Уровень ${lv.id} · ${goal}</span><button class="link" data-act="cgsay">🔊</button></header>
   <p class="cgsay">${U.esc(lv.say)}</p>${tabs}
   <div id="cgbwrap">${cgBoard(lv, grids[CG.vi])}</div>
-  ${res && !CG.run ? `<div class="fb ${res.ok ? 'ok' : 'try'}">${res.ok ? `Ура! ${'⭐'.repeat(res.stars)} ${res.pts ? `+${res.pts} ${U.pl(res.pts, 'балл', 'балла', 'баллов')}${res.pend ? ' (придут после уроков дня)' : ''}` : ''}${res.stars < 3 && !CG.used ? `<br><small>Можно короче: попробуй уложиться в ${cgCount(cgParse(lv.sol))} ${U.pl(cgCount(cgParse(lv.sol)), 'блок', 'блока', 'блоков')}, чтобы получить 3 звезды.</small>` : ''}` : U.esc(res.msg)}</div>` : ''}
+  ${res && !CG.run ? `<div class="fb ${res.ok ? 'ok' : 'try'}">${res.ok ? `Ура! ${'⭐'.repeat(res.stars)} ${res.pts ? `+${res.pts} ${U.pl(res.pts, 'балл', 'балла', 'баллов')}${res.pend ? ' (придут после уроков дня)' : ''}` : ''}${res.badge ? `<div class="cgbadge big">Глава пройдена! Награда: ${U.esc(res.badge)}</div>` : ''}${res.stars < 3 && !CG.used ? `<br><small>Можно короче: попробуй уложиться в ${cgCount(cgParse(lv.sol))} ${U.pl(cgCount(cgParse(lv.sol)), 'блок', 'блока', 'блоков')}, чтобы получить 3 звезды.</small>` : ''}` : U.esc(res.msg)}</div>` : ''}
   <section class="cgprog card"><div class="cgph"><b>Программа</b><span class="hint">${lv.max ? `блоков ${n} из ${lv.max}` : `блоков: ${n}`}</span></div>${cgListHtml(CG.prog, '', '')}</section>
   <section class="cgpal">${pal}</section>
   <div class="cgctl">${res && res.ok && !CG.run ? `<button class="btn" data-act="cgnext">Дальше ▶</button>` : `<button class="btn cgrun" data-act="cgrun" ${CG.run || !CG.prog.length ? 'disabled' : ''}>▶ Пуск</button>`}
@@ -207,8 +207,10 @@ function cgRun(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids
     if (stars > prev) rec.s = stars;
     if (pts) { C.pts[U.today()] = cgToday(kid) + pts; const t = U.today(), D = S.kids[kid].days[t]; if ((D && D.bonus) || dayDone(kid, t)) piggyAdd(S.kids[kid], pts); else { C.pend = (C.pend || 0) + pts; pend = true; } }
     ev(kid, 'программирование', { subj: 'Программирование', unit: `Уровень ${lv.id}`, score: stars + '★', ok: CG.used ? 'по решению' : 'верно', text: `попыток ${rec.t + 1}, блоков ${n}${pts ? `, +${pts} баллов` : ''}` });
-    CG.res = { ok: true, stars: stars, pts: pts, pend: pend, vr: vr }; save(); render();
-    say(stars === 3 ? 'Отлично! Три звезды!' : 'Получилось!'); };
+    const chL = CG_LV.filter(l => l.ch === lv.ch), chDone = chL.every(l => C.lv[l.id] && C.lv[l.id].s); const badge = chDone && prev === 0 ? CG_CH[lv.ch - 1].badge : '';
+    if (badge) ev(kid, 'программирование', { subj: 'Программирование', unit: `Глава ${lv.ch} пройдена`, text: badge });
+    CG.res = { ok: true, stars: stars, pts: pts, pend: pend, vr: vr, badge: badge }; save(); render();
+    say(badge ? 'Глава пройдена! Тоби получает награду: ' + badge.replace(/^\S+\s/, '') : stars === 3 ? 'Отлично! Три звезды!' : 'Получилось!'); };
   const me = CG; const step = () => { if (CG !== me || cur.view !== 'codelv') { me.run = false; return; } const tr = R[vi].tr;
     if (i < tr.length) { cgApply(tr[i]); i++; setTimeout(step, tr[i - 1].ev === 'fly' ? 140 : CODE_STEP_MS); return; }
     if (R[vi].ok && vi + 1 < R.length) { vi++; i = 0; CG.vi = vi; CG.res = { vr: vr.map((v, k) => k < vi ? v : null) }; const w = document.getElementById('cgbwrap'); if (w) w.innerHTML = cgBoard(lv, grids[vi]); Array.prototype.forEach.call(document.querySelectorAll('.cgtabs .chip'), (el, k) => { el.classList.toggle('on', k === vi); }); setTimeout(step, 500); return; }
