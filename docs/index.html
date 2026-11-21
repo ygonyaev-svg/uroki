@@ -424,6 +424,7 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .hwc .hwrow{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px solid var(--soft); }
 .hwc, .hwc p, .hwc b{ color:#2a2622; } .hwc .hint{ color:#5a524a !important; } .hwc{ border:2px solid var(--acc); }
 .restscr h1, .restscr p, .restscr h3, .restscr li{ color:#2a2622; } .restscr .hint{ color:#5a524a !important; } .tmr{ text-align:left; margin:8px 0 12px; padding-left:20px; } .tmr li{ margin:6px 0; }
+.xtrow{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:8px 0; }
 
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
@@ -996,8 +997,9 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v6256d4a0 */
+<script>/* ve897f6f5 */
 var FAM = 0;
+var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -1014,7 +1016,7 @@ const U = {
   dec(x){ return String(Math.round(x * 1000) / 1000).replace('.', ','); },
   big(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); },
   esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); },
-  today(){ const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
+  today(){ const d = new Date(Date.now() + (typeof TEST_SHIFT === 'number' ? TEST_SHIFT : 0) * 864e5); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
   dayNum(ds){ const [y, m, d] = ds.split('-').map(Number); return Math.floor(Date.UTC(y, m - 1, d) / 864e5); },
   addDays(ds, n){ const [y, m, d] = ds.split('-').map(Number); const t = new Date(Date.UTC(y, m - 1, d + n)); return t.toISOString().slice(0, 10); },
   roman(n){ const r = [[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let s = ''; for (const [v, c] of r) while (n >= v) { s += c; n -= v; } return s; },
@@ -7669,7 +7671,7 @@ function testCard(){ return `<div class="card testc"><h2>🧪 Тестовый �
 function testEnter(k){ const real = S; S = JSON.parse(JSON.stringify(real)); S.queue = []; S.test = true; TEST = true;
   Object.keys(S.kids).forEach(x => { S.kids[x].restUntil = 0; S.kids[x].blk = 0; S.kids[x].prizesSet = true; });
   cur.kid = k; go('home'); }
-function testExit(){ TEST = false; S = load(); cur.kid = null; go('login'); }
+function testExit(){ TEST = false; TEST_SHIFT = 0; S = load(); cur.kid = null; go('login'); }
 function testBar(){ return `<div class="testbar">🧪 Тест · ${U.esc(cur.kid ? KIDS[cur.kid].name : '')} <button class="link" data-act="testkid">сменить ребёнка</button> <button class="link" data-act="testday">новый день</button> <button class="link" data-act="testexit">выйти из теста</button></div><button class="notebtn" data-act="noteopen">📝 Замечание</button>`; }
 function noteCtx(){ const h = document.querySelector('#app h1'), q = document.querySelector('#app .q'); return [cur.kid ? KIDS[cur.kid].name : '', cur.view, cur.subj && cur.view === 'lesson' ? cur.subj : '', h ? h.textContent.trim().slice(0, 80) : ''].filter(Boolean).join(' / ') + (q ? ' — ' + q.textContent.trim().slice(0, 200) : ''); }
 function noteOpen(){ const ctx = noteCtx(); const d = document.createElement('div'); d.className = 'tipbox'; d.id = 'notebox';
@@ -7686,7 +7688,7 @@ function testAct(act, b){ switch (act) {
   case 'testgo': testEnter(b.dataset.k); return true;
   case 'testexit': testExit(); return true;
   case 'testkid': { const ks = kidIds(), i = ks.indexOf(cur.kid); cur.kid = ks[(i + 1) % ks.length]; go('home'); return true; }
-  case 'testday': { if (!cur.kid) return true; const K = S.kids[cur.kid]; delete K.days[U.today()]; K.restUntil = 0; K.blk = 0; go('home'); alertMsg('Тестовый день начат заново'); return true; }
+  case 'testday': { if (!cur.kid) return true; TEST_SHIFT++; Object.keys(S.kids).forEach(x => { const K = S.kids[x]; K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; K.restForced = false; }); go('home'); alertMsg('Тестовый день: ' + U.today().split('-').reverse().join('.') + ' (календарь сдвинут на ' + TEST_SHIFT + ' ' + U.pl(TEST_SHIFT, 'день', 'дня', 'дней') + ' вперёд)'); return true; }
   case 'noteopen': noteOpen(); return true;
   case 'noteclose': { try { micStop(); } catch (x) {} const o = document.getElementById('notebox'); if (o) o.remove(); return true; }
   case 'notesend': noteSend(); return true;
@@ -7715,7 +7717,7 @@ function posMark(kid){ const K = S.kids && S.kids[kid]; if (!K || !KIDS[kid] || 
 
 /* ===== Настройка детей ===== */
 CUR_Y.lang = { name:'Языки', src:'Português: 2.º–3.º ano (gramática, ortografia) и English', units: PT_NAT, old: PT_Y, alt: EN_UNITS, altName:'English' };
-CUR_A.logic.alt = A_FIN; CUR_A.logic.altName = '💶 Финансы'; CUR_Y.world.alt = Y_FIN; CUR_Y.world.altName = '💶 Деньги'; CUR_Y.world.altSrc = 'Финансовая грамотность (по стандартам Jump$tart, K-5)';
+CUR_A.logic.alt = A_FIN; CUR_A.logic.altName = 'Финансы'; CUR_Y.world.alt = Y_FIN; CUR_Y.world.altName = 'Деньги'; CUR_Y.world.altSrc = 'Финансовая грамотность (по стандартам Jump$tart, K-5)';
 delete CUR_Y.pt;
 /* Блок «Продолжение» (решение методсовета, п. 2): темы следующего класса помечены в программах cont:1 и стоят в конце своих списков,
    после основной программы; порядок внутри основной части и внутри «Продолжения» сохраняется. Позиция детей переносится по id (posmap.js). */
@@ -7817,6 +7819,7 @@ function applyCfg(rows){ let fresh = false;
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
     else if (type.startsWith('чтен')) { const n = Number(row.value); if (n > 0) K.readWords = n; }
     else if (type.startsWith('книг')) bkApply(kid, row);
+    else if (type.startsWith('врем')) { const t = U.today(), m = Math.round((Number(row.value) || 10) / 10) * 10; if (!K.xt || K.xt.d !== t) K.xt = { d: t, m: 0 }; K.xt.m = Math.max(0, Math.min(180, K.xt.m + m)); if (m > 0 && K.restForced && K.restUntil > Date.now()) { K.restUntil = 0; K.restForced = false; K.sess = Math.max(0, SESS_SECS + extraSecs(K) - m * 60); K.blkAt = Date.now(); } }
     else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; }
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     else continue; /* незнакомую команду не отмечаем — её выполнит следующая версия приложения */
@@ -8317,7 +8320,7 @@ function hhmm(ts){ const d = new Date(ts), z = n => (n < 10 ? '0' : '') + n; ret
 function fmtLeft(ms){ const m = Math.ceil(ms / 60000), h = Math.floor(m / 60), r = m % 60; return h ? h + ' ч ' + r + ' мин' : r + ' мин'; }
 function restTick(kid, secs){ /* время теперь считает общий таймер экрана (screenTick) */ }
 function restTick0(kid, secs){ if (TEST) return; const K = S.kids[kid], now = Date.now(); if (!K.blkAt || now - K.blkAt > REST_MS) { K.blk = 0; K.sess = 0; } K.blk = (K.blk || 0) + (secs || 0); K.sess = (K.sess || 0) + (secs || 0); K.blkAt = now;
-  if (K.sess >= SESS_SECS) { K.blk = 0; K.sess = 0; K.ask = false; K.restUntil = now + REST_MS; K.restForced = true; ev(kid, 'перерыв', { text: 'час занятий за сессию; обязательный перерыв до ' + hhmm(K.restUntil) }); }
+  if (K.sess >= SESS_SECS + extraSecs(K)) { K.blk = 0; K.sess = 0; K.ask = false; K.restUntil = now + REST_MS; K.restForced = true; ev(kid, 'перерыв', { text: 'час занятий за сессию; обязательный перерыв до ' + hhmm(K.restUntil) }); }
   else if (K.blk >= BLOCK_SECS) { K.blk = 0; K.ask = true; } }
 /* Таймер экрана: считаем всё время в приложении (уроки, загадки, шахматы, программирование…), пока ребёнок реально нажимает. */
 let LAST_IN = Date.now(); ['pointerdown', 'touchstart', 'keydown'].forEach(e => document.addEventListener(e, () => { LAST_IN = Date.now(); }, true));
@@ -8333,8 +8336,10 @@ function vRestScreen(kid){ const K = S.kids[kid], ms = restLeft(kid), g = T(kid)
    : `<div class="cheer">😴</div><h1>Отдыхаешь</h1><p>Вернёшься через <b><span id="restleft">${fmtLeft(ms)}</span></b> (в ${hhmm(K.restUntil)}). Отойди от экрана: подвигайся, попей воды, посмотри в окно.</p>`}
    <p class="hint">Все баллы и прогресс сохранены.</p></article></section></main>`; }
 function vAsk(kid){ return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header><section class="lesson">${askCard(kid)}</section></main>`; }
+/* Родитель может добавить ребёнку время на сегодня, шагами по 10 минут */
+function extraSecs(K){ return K.xt && K.xt.d === U.today() ? K.xt.m * 60 : 0; }
 function restAsk(kid){ const K = S.kids[kid]; return !TEST && K.ask && !restLeft(kid); }
-function askCard(kid){ if (!restAsk(kid)) return ''; const K = S.kids[kid], m = Math.round((K.sess || 0) / 60), left = Math.max(5, Math.round((SESS_SECS - (K.sess || 0)) / 60)), g = T(kid) === 'anya';
+function askCard(kid){ if (!restAsk(kid)) return ''; const K = S.kids[kid], m = Math.round((K.sess || 0) / 60), left = Math.max(5, Math.round((SESS_SECS + extraSecs(K) - (K.sess || 0)) / 60)), g = T(kid) === 'anya';
   return `<div class="card askrest"><h2>${g ? 'Не устала?' : 'Не устал?'} 🙂</h2><p>Ты занимаешься уже <b>${m} мин</b>. Можно продолжить (сегодня ещё до ${left} мин подряд) или отдохнуть.</p>
    <div class="row"><button class="btn" data-act="restgo">💪 ${g ? 'Готова' : 'Готов'} ещё</button></div><p class="hint">Или отдохни — выбери сколько:</p>
    <div class="row">${[15, 20, 30].map(n => `<button class="btn ghost" data-act="restpick" data-m="${n}">😴 ${n} мин</button>`).join(' ')}</div></div>`; }
@@ -8689,7 +8694,7 @@ function devInfo(){ const ua = navigator.userAgent; const m = ua.match(/OS (\d+)
   return `Версия системы: ${ios}, открыто ${pwa}. Распознавание чтения вслух: ${SR ? '✅ есть' : '❌ нет — нужен iPadOS 14.5 или новее (Настройки → Основные → Обновление ПО); пока скорость чтения считается по таймеру'}. Микрофон: ${navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? 'доступен' : 'недоступен'}.`; }
 function vSettings(){
   const unitSel = kid => Object.entries(KIDS[kid].cur).filter(([, c]) => c.units).map(([k, c]) => [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []).map(([tr, list, nm]) => `<label>${KIDS[kid].name} · ${nm}<select id="sel_${kid}_${k}${tr}">${list.map((u, i) => `${u.cont && !(list[i - 1] || {}).cont ? '<optgroup label="Продолжение (следующий класс)">' : ''}<option value="${i}" ${(S.kids[kid].pos[k + tr] || 0) === i ? 'selected' : ''}>${i + 1}. ${CONT_MARK(u)}${U.esc(u.t)}</option>${u.cont && i === list.length - 1 ? '</optgroup>' : ''}`).join('')}</select></label>`).join('')).join('');
-  return (typeof lookSettings === 'function' ? lookSettings() : '') + `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
+  return (typeof lookSettings === 'function' ? lookSettings() : '') + `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => { const K0 = S.kids[k], x = extraSecs(K0) / 60, used = Math.round((K0.sess || 0) / 60); return `<div class="xtrow"><span><b>${KIDS[k].name}</b>: сегодня в сессии ${used} из ${60 + x} мин${x ? ` (+${x} от вас)` : ''}</span> <button class="btn small" data-act="xtadd" data-k="${k}" data-m="10">+10 мин</button> ${x ? `<button class="btn ghost small" data-act="xtadd" data-k="${k}" data-m="-10">−10</button>` : ''}</div>`; }).join('')}<p class="hint">Добавленное время — только на сегодня. Если ребёнок уже на большом перерыве, он сразу снимается.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
   ${FAM ? '' : `<div class="card form" ><h2>Связь с таблицей родителя</h2><label>Адрес скрипта Google<input id="syncurl" value="${U.esc(S.cfg.sync || '')}" autocomplete="off"></label><p class="hint">В очереди на отправку: ${S.queue.length}.</p><div class="row"><button class="btn small" data-act="savesync">Сохранить и отправить</button></div></div>`}
   <div class="card"><h2>Начать заново</h2><p class="hint">Стирает на этом айпаде весь прогресс, монеты, покупки и коды. После теста нажмите — и приложение будет как новое.</p><button class="btn small stop" data-act="resetall">Сбросить всё на этом устройстве</button></div>
   ${FAM ? famSettings() : `<form class="card form" data-form="pins"><h2>Коды</h2><label>Новый код родителя<input id="np" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ярика<input id="ny" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ани<input id="na" inputmode="numeric" maxlength="4" autocomplete="off"></label><button class="btn small">Сменить коды</button></form>`}`;
@@ -8727,6 +8732,7 @@ document.addEventListener('click', e => {
     case 'dripseen': { const R = S.kids[kid].drip; if (R) R.sess = 0; save(); render(); break; }
     case 'restgo': { const K0 = S.kids[kid]; K0.ask = false; K0.blk = 0; ev(kid, 'не устал', { text: 'занимается дальше; за сессию ' + Math.round((K0.sess || 0) / 60) + ' мин' }); save(); render(); break; }
     case 'restpick': { const K0 = S.kids[kid], m = +b.dataset.m; K0.ask = false; K0.blk = 0; K0.restForced = false; K0.restUntil = Date.now() + m * 60000; ev(kid, 'перерыв', { text: 'сам выбрал отдых ' + m + ' мин' }); save(); render(); break; }
+    case 'xtadd': { const K0 = S.kids[b.dataset.k], t = U.today(); if (!K0.xt || K0.xt.d !== t) K0.xt = { d: t, m: 0 }; K0.xt.m = Math.max(0, Math.min(180, K0.xt.m + (+b.dataset.m))); if (+b.dataset.m > 0 && K0.restForced && K0.restUntil > Date.now()) { K0.restUntil = 0; K0.restForced = false; K0.sess = Math.max(0, SESS_SECS + extraSecs(K0) - (+b.dataset.m) * 60); K0.blkAt = Date.now(); } ev(b.dataset.k, 'родитель добавил время', { text: (+b.dataset.m > 0 ? '+' : '') + b.dataset.m + ' мин; всего сверху ' + K0.xt.m + ' мин' }); save(); render(); break; }
     case 'norest': { const K0 = S.kids[b.dataset.k]; K0.restUntil = 0; K0.blk = 0; K0.sess = 0; K0.ask = false; save(); render(); break; }
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
     case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); if (L.phase === 'theory' && L.helpN === 1) say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
