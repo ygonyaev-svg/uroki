@@ -288,9 +288,9 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .tile.fun .ico{ font-size:30px; }
 .tile.fun{ border-style:dashed; }
 .fntabs{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px; }
-.zgpic{ position:relative; height:200px; border-radius:16px; overflow:hidden; margin:-4px 0 14px; background:linear-gradient(160deg,#e8f3ff,#fdf6e3); display:flex; align-items:center; justify-content:center; }
+.zgpic{ position:relative; height:260px; border-radius:16px; overflow:hidden; margin:-4px 0 14px; background:linear-gradient(160deg,#e8f3ff,#fdf6e3); display:flex; align-items:center; justify-content:center; }
 .anya .zgpic{ background:linear-gradient(160deg,#2a1d4a,#5b3b8c); }
-.zgpic img{ position:absolute; left:0; top:0; width:100%; height:100%; object-fit:cover; }
+.zgpic img{ position:absolute; left:0; top:0; width:100%; height:100%; object-fit:cover; object-position:50% 70%; }
 .zgpic .zgemo{ font-size:56px; letter-spacing:12px; opacity:.8; }
 .zgpic .zgq{ position:absolute; right:14px; bottom:8px; font:900 64px/1 Nunito,sans-serif; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,.25),0 0 18px rgba(0,0,0,.35); }
 .zgtext{ font-size:24px; line-height:1.45; }
@@ -410,7 +410,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v28ed33f1 */
+<script>/* va2f3b79a */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -2852,7 +2852,7 @@ var ZAG = [
 'Бел, как мел, с неба прилетел. Зиму пролежал — в землю убежал.|Снег|Дождь;Лёд;Облака|1|dom',
 'Без рук, без ног, а рисовать умеет.|Мороз|Ветер;Снег;Дождь|1|dom',
 'Шёл долговяз, в сыру землю увяз.|Дождь|Снег;Гром;Ветер|1|dom',
-'Что выше леса, краше света, без огня горит?|Солнце|Облака;Звезда;Радуга|1|reka',
+'Что выше леса, краше света, без огня горит?|Солнце|Облака;Звезда;Радуга|1|kab',
 'Сам алый, сахарный; кафтан зелёный, бархатный.|Арбуз|Огурец;Дыня;Яблоко|1|dvor',
 'Маленький, серенький, по полу шныряет, кошки стережётся.|Мышь|Крот;Ёж;Белка|1|dvor',
 'С бородой, а не старик; с рогами, а не бык; доят, а не корова.|Коза|Овца;Лошадь;Олень|1|sad',
@@ -2903,12 +2903,12 @@ var ZAG = [
 'Что не войдёт даже в самую большую кастрюлю?|Крышка|Огонь;Ложка;Вода|2|dom',
 'Что бросают, когда оно нужно, и поднимают, когда не нужно?|Якорь|Парус;Ключ;Мяч|2|reka',
 'На какое дерево садится ворона во время проливного дождя?|На мокрое|На сухое;На высокое;На берёзу|2|les',
-'Какая цифра становится больше, если её перевернуть вверх ногами?|Число 6|Число 9;Число 8;Число 0|2|kab',
-'Сколько горошин может войти в один пустой стакан?|Ни одной|Сто;Тысяча;Пять|2|kab',
-'Шли муж с женою, брат с сестрою да зять с шурином. Сколько всего человек?|Трое|Шесть;Четыре;Пять|2|kab',
+'Какая цифра становится больше, если её перевернуть вверх ногами?|Число 6|Число 9;Число 8;Число 0|2|extra',
+'Сколько горошин может войти в один пустой стакан?|Ни одной|Сто;Тысяча;Пять|2|extra',
+'Шли муж с женою, брат с сестрою да зять с шурином. Сколько всего человек?|Трое|Шесть;Четыре;Пять|2|extra',
 'Летели гуси: один впереди, а два позади; один позади, а два впереди; один между двумя. Сколько было гусей?|Три|Пять;Четыре;Шесть|2|reka',
-'Без ног и без крыльев оно — быстро летит, не догонишь его.|Время|Ветер;Облака;Эхо|2|kab',
-'Что у вас есть такое: стоит его назвать — и оно исчезнет?|Тишина|Тень;Секрет;Сон|2|kab',
+'Без ног и без крыльев оно — быстро летит, не догонишь его.|Время|Ветер;Облака;Эхо|2|extra',
+'Что у вас есть такое: стоит его назвать — и оно исчезнет?|Тишина|Тень;Секрет;Сон|2|extra',
 'Кто ходит сидя?|Шахматист|Шофёр;Бегун;Самолёт|2|kab',
 'Две сестры летом зелены, к осени одна краснеет, другая чернеет.|Смородина|Вишня;Малина;Берёза|2|sad',
 'Один льёт, другой пьёт, третий растёт. Кто третий?|Трава|Дождь;Солнце;Земля|2|dvor',
@@ -3030,7 +3030,7 @@ function funBurst(pts){ if (!pts) return ''; var s = ''; for (var i = 0; i < Mat
 
 /* ---------- Загадки ---------- */
 var ZG = ZAG.map(function(l){ var p = l.split('|'), own = p[0].charAt(0) === '*'; return { id: 'z' + U.h(p[0]), q: own ? p[0].slice(1) : p[0], own: own, a: p[1], w: p[2].split(';'), lv: +p[3], sc: p[4] }; });
-var ZG_SCENE = { les: '🍂🌳🍂', sad: '🌱🪴🌱', dom: '🪟🛋️🕰️', dvor: '🏡🌾🪵', zima: '🌨️🏠🌨️', reka: '🌊🛶🌾', kab: '📚🔍🕯️' };
+var ZG_SCENE = { les: '🍂🌳🍂', sad: '🌱🪴🌱', dom: '🪟🛋️🕰️', dvor: '🏡🌾🪵', zima: '🌨️🏠🌨️', reka: '🌊🛶🌾', kab: '📚🔍🕯️', extra: '✨🔭✨' };
 function zgList(kid, lv){ var L = ZG.filter(function(z){ return z.lv === lv; }); var o = funOrder(kid, L, 'zg' + lv); return o.map(function(i){ return L[i]; }); }
 function zgPic(kid, z){ var k = kid === 'anya' ? 'a' : 'y'; return '<div class="zgpic sc-' + z.sc + '"><span class="zgemo" aria-hidden="true">' + ZG_SCENE[z.sc] + '</span><img src="img/zg-' + k + '-' + z.sc + '.webp" alt="" onerror="this.style.display=\'none\'"><span class="zgq" aria-hidden="true">?</span></div>'; }
 function zgOpt(w){ return '<span class="zge">' + (ZAG_EMO[w] || '❔') + '</span><span>' + U.esc(w) + '</span>'; }
