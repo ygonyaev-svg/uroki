@@ -33,7 +33,7 @@ ALWAYS.push({ id: 'zag', order: 10,
     h += '<article class="card task zgcard">' + zgPic(kid, z) + '<div class="q zgtext">' + U.esc(z.q).replace(/\. /g, '.<br>') + '</div><div class="row">' + sayGate('zg' + z.id, '<button class="btn ghost small" data-act="zgsay">🔊 Послушать</button>') + '</div>' +
       '<div class="opts zgopts">' + opts.map(function(o){ var cls = r ? (o === z.a ? 'right' : o === r.v ? 'wrong' : '') : ''; return '<button class="opt ' + cls + '" data-act="zgans" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + zgOpt(o) + '</button>'; }).join('') + '</div>';
     if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! Это ' + U.esc(z.a.toLowerCase()) + '. ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Не угадал(а). Правильный ответ: <b>' + U.esc(z.a) + '</b> ' + (ZAG_EMO[z.a] || '')) + '</div>' + (r.pts ? funBurst(r.pts) : '');
-    h += (z.own ? '<p class="src">Загадка придумана для этого приложения.</p>' : '<p class="src">Русская народная загадка.</p>') + '</article>';
+    h += (z.own ? '<p class="src">Загадка придумана для этого приложения.</p>' : '<p class="src">Народная загадка.</p>') + '</article>';
     if (r) h += '<button class="btn big" data-act="zgnext">Следующая загадка →</button>';
     return h; },
   act: function(act, b){ var kid = cur.kid; if (!kid) return;
@@ -166,7 +166,7 @@ document.addEventListener('mousemove', function(e){ if (PZD) pzDrag(e.clientX, e
 document.addEventListener('mouseup', function(e){ if (PZD) pzUp(e.clientX, e.clientY); });
 
 /* ---------- Задачи на смекалку ---------- */
-function zdParse(l, lv){ var p = l.split('|'); return { id: 'q' + U.h(p[0]), q: p[0], a: Number(p[1].replace(',', '.')), as: p[1], e: p[2], lv: lv }; }
+function zdParse(l, lv){ var p = l.split('|'); return { id: 'q' + U.h(p[0]), q: p[0], a: Number(p[1].replace(',', '.')), as: p[1], e: p[2], w: p[3] ? p[3].split(';').map(function(x){ return Number(x.replace(',', '.')); }) : null, lv: lv }; }
 var ZD = ZAD1.map(function(l){ return zdParse(l, 1); }).concat(ZAD2.map(function(l){ return zdParse(l, 2); }));
 function zdList(kid, lv){ var L = ZD.filter(function(z){ return z.lv === lv; }); var o = funOrder(kid, L, 'zd' + lv); return o.map(function(i){ return L[i]; }); }
 function zdPts(kid, z){ var my = funLvl(kid); return z.lv > my ? 3 : z.lv < my ? 1 : 2; }
@@ -192,7 +192,7 @@ ALWAYS.push({ id: 'zad', order: 40,
     else if (act === 'zdnext') { cur.fq = null; render(); window.scrollTo(0, 0); } },
   form: function(k, f){ var el = document.getElementById('zdin'); zdAnswer(String(el && el.value || '').trim()); }
 });
-function zdOpts(z){ var r = U.rng('zo' + z.id); return r.shuffle([U.dec(z.a)].concat(numOpts(z.a, r).map(U.dec))); }
+function zdOpts(z){ var r = U.rng('zo' + z.id); return r.shuffle([U.dec(z.a)].concat((z.w || numOpts(z.a, r)).map(U.dec))); }
 function zdAnswer(v){ var kid = cur.kid; if (!kid || cur.fq) return; var z = zdCur(kid); if (!z) return; if (!v) return;
     var n = Number(v.replace(',', '.').replace(/\s/g, '')); if (isNaN(n)) return alertMsg('Нужно число');
     var ok = Math.abs(n - z.a) < 1e-9, F = funK(kid); F.q[z.id] = ok ? 1 : 0; var pts = ok ? funPts(kid, 'zad', zdPts(kid, z)) : 0; cur.fq = { id: z.id, v: v, ok: ok, pts: pts };
