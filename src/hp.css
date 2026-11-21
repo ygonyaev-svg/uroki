@@ -1,0 +1,58 @@
+/* ===== Аня: факультеты (цвета поверх «Школы волшебства») и викторина ===== */
+body.anya.h-s .wrap{ --acc:#1a6b3c; --accsoft:#e3efe6; --gold:#c0c7cf; }
+body.anya.h-s .btn{ background:linear-gradient(#1f7a46,#0f3d24); color:#e5e7eb; box-shadow:0 6px 0 #072414; }
+body.anya.h-s .btn.ghost{ background:#e3efe6; color:#0f3d24; }
+body.anya.h-s .card h2,body.anya.h-s .card h3{ color:#14532d; }
+body.anya.h-s .hello h1,body.anya.h-s .lesson > h1{ color:#dfe3e8; }
+body.anya.h-s .wrap > .hello::after{ background:repeating-linear-gradient(90deg,#1a6b3c 0 22px,#c0c7cf 22px 34px); }
+body.anya.h-s .coins{ background:#062a17; color:#dfe3e8; }
+body.anya.h-s .prog i{ background:linear-gradient(90deg,#9ca3af,#e5e7eb); }
+
+body.anya.h-r .wrap{ --acc:#1e3a8a; --accsoft:#e0e7f7; --gold:#c89b5e; }
+body.anya.h-r .btn{ background:linear-gradient(#2a4fb0,#14245c); color:#f1d9a7; box-shadow:0 6px 0 #0a1433; }
+body.anya.h-r .btn.ghost{ background:#e0e7f7; color:#14245c; }
+body.anya.h-r .card h2,body.anya.h-r .card h3{ color:#1e3a8a; }
+body.anya.h-r .hello h1,body.anya.h-r .lesson > h1{ color:#e8c48a; }
+body.anya.h-r .wrap > .hello::after{ background:repeating-linear-gradient(90deg,#1e3a8a 0 22px,#b08d57 22px 34px); }
+body.anya.h-r .coins{ background:#0c1838; color:#e8c48a; }
+body.anya.h-r .prog i{ background:linear-gradient(90deg,#b08d57,#e8c48a); }
+
+body.anya.h-h .wrap{ --acc:#8a6a00; --accsoft:#fdf3c7; --gold:#f2c230; }
+body.anya.h-h .btn{ background:linear-gradient(#f5c842,#c99410); color:#1c1600; box-shadow:0 6px 0 #4a3600; }
+body.anya.h-h .btn.ghost{ background:#fdf3c7; color:#4a3600; }
+body.anya.h-h .card h2,body.anya.h-h .card h3{ color:#6b4f00; }
+body.anya.h-h .hello h1,body.anya.h-h .lesson > h1{ color:#fcd34d; }
+body.anya.h-h .wrap > .hello::after{ background:repeating-linear-gradient(90deg,#f2c230 0 22px,#1f1f1f 22px 34px); }
+body.anya.h-h .coins{ background:#1f1a0a; color:#fcd34d; }
+body.anya.h-h .prog i{ background:linear-gradient(90deg,#f2c230,#fde68a); }
+
+/* Викторина */
+.hpbook{ margin:0 0 6px; font-size:14px; font-weight:800; opacity:.75; }
+.hpcard .q{ font-size:21px; }
+.hpread{ margin-top:12px; line-height:1.45; }
+.hplist{ list-style:none; padding:0; margin:8px 0 0; }
+.hplist li{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; padding:8px 0; border-top:1px dashed rgba(0,0,0,.15); }
+.hplist li span{ flex:1 1 220px; }
+.hpbk{ display:flex; align-items:center; gap:10px; margin:6px 0; font-size:15px; }
+.hpbk > span:first-child{ flex:0 0 46%; }
+.hpbk .prog{ flex:1; height:10px; margin:0; }
+.hprank{ margin-top:6px; }
+.hpbooks .prog{ display:block; background:rgba(0,0,0,.12); border-radius:6px; overflow:hidden; }
+.hpbooks .prog i{ display:block; height:100%; }
+
+/* Шляпа */
+.hatsay{ font-size:19px; line-height:1.5; }
+.hatpick{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:14px; }
+.hatbtn{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:14px 10px; border:0; border-radius:16px; cursor:pointer; font:inherit; color:#fff; box-shadow:0 6px 0 rgba(0,0,0,.35); text-align:center; }
+.hatbtn small{ opacity:.85; font-size:13px; }
+.hatbtn.rec{ outline:4px solid #f5d27a; outline-offset:2px; }
+.hatbtn.h-g{ background:linear-gradient(#b91c3c,#7f1d1d); } .hatbtn.h-s{ background:linear-gradient(#1f7a46,#0f3d24); }
+.hatbtn.h-r{ background:linear-gradient(#2a4fb0,#14245c); } .hatbtn.h-h{ background:linear-gradient(#f5c842,#c99410); color:#1c1600; }
+.hatcrest{ font-size:44px; line-height:1; }
+.hatres{ text-align:center; } .hatres .hatcrest{ font-size:72px; margin:4px 0 8px; }
+.hatopts .opt{ text-align:left; }
+.hppic{ display:flex; align-items:center; justify-content:center; min-height:150px; margin:6px 0 8px; padding:16px; border-radius:16px; background:linear-gradient(160deg,#1b1440,#3b2a6e 60%,#5b3b8c); box-shadow:inset 0 0 0 2px #c9a35a; }
+.hppic span{ font-size:54px; line-height:1.25; letter-spacing:6px; text-align:center; color:#fde68a; font-weight:800; }
+.hpcap{ margin:0 0 6px; font-style:italic; opacity:.85; }
+@media (max-width:520px){ .hppic span{ font-size:40px; letter-spacing:3px; } }
+.hprank .rlvb{ background:#f5d27a; color:#3b2a1a; }
