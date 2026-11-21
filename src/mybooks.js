@@ -37,7 +37,7 @@ function bkFlush(){
 function bkStatus(){ var el = document.getElementById('bkup'); if (el) el.innerHTML = bkUpHtml(); }
 function bkUpHtml(){ var n = BK_UPQ.length; return n ? '⏳ Отправляется ' + n + ' ' + U.pl(n, 'фото', 'фото', 'фото') + '… Не закрывай приложение.' : ''; }
 function bkSnapBtn(kind, label, extra){ return '<label class="btn big bksnap">' + label + '<input type="file" accept="image/*" capture="environment" data-bkkind="' + kind + '"' + (extra || '') + ' style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"></label>'; }
-function bkSay(text){ return ' <button class="link" data-act="bksay" data-t="' + U.esc(text) + '" title="Прочитать вслух">🔊</button>'; }
+function bkSay(text){ return ' ' + sayGate('bk' + U.h(text), '<button class="link" data-act="bksay" data-t="' + U.esc(text) + '" title="Прочитать вслух">🔊</button>'); }
 
 /* --- задания от Claude из листа «Указания» --- */
 function bkApply(kid, row){

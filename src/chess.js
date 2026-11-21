@@ -323,7 +323,7 @@ function chStepInit(){
 }
 function chLesson(kid){
   var L = CH_COURSE[CHS.li], st = L.steps[CHS.si], h = '<div class="card chpz"><p class="eyebrow">Урок ' + (CHS.li + 1) + ': ' + L.t + ' · шаг ' + (CHS.si + 1) + ' из ' + L.steps.length + '</p>';
-  if (st.h) h += '<div class="chtext">' + st.h + ' <button class="link" data-act="chsay">🔊</button></div>';
+  if (st.h) h += '<div class="chtext">' + st.h + ' ' + sayGate('ch' + CHS.li + '-' + CHS.si, '<button class="link" data-act="chsay">🔊</button>') + '</div>';
   if (st.fen) { var mk = {}, k; if (CHS.stars) for (k in CHS.stars) mk[k] = 'star'; if (st.mk) for (k = 0; k < st.mk.length; k++) mk[CH.sqIdx(st.mk[k])] = 'ring';
     h += CHB.html({ P:CHS.P, sel:CHS.sel, last:CHS.last, marks:mk, hint:CHS.hint, noCheck: st.t === 'stars' }); }
   if (CHS.promo) h += CHB.promo('w', 'chlpromo');
