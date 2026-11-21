@@ -119,8 +119,8 @@ function coinsHtml(n){ return `<span class="coin" aria-hidden="true"></span><b>$
 function render(){
   if (S.parentPin) for (const k of ['yarik', 'anya']) { burnCheck(k); piggyCheck(k); }
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
-  const v = !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'parent' ? vParent() : vLogin();
-  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes'].includes(cur.view) ? cur.kid : '';
+  const v = !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'parent' ? vParent() : cur.view === 'code' ? vCode() : cur.view === 'codelv' && CG ? vCodeLv() : cur.view === 'codelv' ? vCode() : vLogin();
+  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'code', 'codelv'].includes(cur.view) ? cur.kid : '';
   app().innerHTML = v; afterRender();
 }
 function afterRender(){ const f = app().querySelector('[autofocus]'); if (f) try { f.focus(); } catch (e) {} }
@@ -189,7 +189,7 @@ function vHome(){
   <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${restCard(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
-  <section class="tiles">${tiles}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
+  <section class="tiles">${tiles}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}${codeTile(kid)}</section>
   ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
   <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
@@ -741,6 +741,7 @@ function vSettings(){
 /* ===== События ===== */
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act;
+  if (codeAct(act, b)) return;
   const kid = cur.kid; const D = kid && dayRec(kid, cur.ds); const L = D && cur.subj && D.les[cur.subj];
   switch (act) {
     case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;
