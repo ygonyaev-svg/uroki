@@ -23,7 +23,7 @@
 .cglv.open i{ color:#2fa36b; font-size:18px; }
 .cglv.won{ border-color:#e0a417; background:#fffaf0; }
 .cglv.lock{ opacity:.45; }
-.cglv.hard b::after{ content:" 🔥"; font-size:12px; }
+.cglv.hard b::after{ content:""; display:inline-block; width:13px; height:13px; margin-left:4px; vertical-align:-1px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23F7883A' stroke='%231B2A44' stroke-width='2' stroke-linejoin='round' d='M16 29c-6 0-9-4-9-9 0-6 5-8 5-14 4 2 6 5 6 8 1-1 2-3 2-5 3 3 5 7 5 11 0 5-3 9-9 9z'/%3E%3Cpath fill='%23FFD35A' d='M16 27c-2.5 0-4-1.8-4-4 0-2.5 2-3.5 3-6 2 1.5 5 3.5 5 6 0 2.2-1.5 4-4 4z'/%3E%3C/svg%3E") center/contain no-repeat; }
 
 .cglvl .bar{ align-items:center; }
 .cgttl{ font-weight:800; font-size:18px; flex:1; text-align:center; }

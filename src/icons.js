@@ -146,7 +146,7 @@ function icoBuildRe(){ var ks = Object.keys(EMO_ICON).concat(Object.keys(ICO_ONL
 var EMO_RE = icoBuildRe();
 function icoSkip(el){ for (var n = el; n && n.nodeType === 1; n = n.parentNode) { var c = n.className; if (typeof c !== 'string') c = n.getAttribute && n.getAttribute('class') || '';
     var t = n.tagName; if (t === 'TEXTAREA' || t === 'INPUT' || t === 'SCRIPT' || t === 'STYLE' || t === 'OPTION' || t === 'svg' || t === 'SVG' || t === 'TITLE') return true;
-    if (/(^| )(noico|ic|chboard|pc|toast)( |$)/.test(c)) return true; if (n.id === 'app' || n.tagName === 'BODY') break; } return false; }
+    if (/(^| )(noico|ic|chboard|pc)( |$)/.test(c)) return true; if (n.id === 'app' || n.tagName === 'BODY') break; } return false; }
 function icoize(root){ if (!root || !document.createTreeWalker) return; var w = document.createTreeWalker(root, 4, null, false), list = [], n;
   while ((n = w.nextNode())) { EMO_RE.lastIndex = 0; if (EMO_RE.test(n.nodeValue)) list.push(n); }
   for (var i = 0; i < list.length; i++) { n = list[i]; var par = n.parentNode; if (!par || icoSkip(par)) continue;
@@ -176,7 +176,7 @@ function icoSvgText(root){ if (!root || !root.getElementsByTagName) return; var 
     if (g.firstChild) t.parentNode.replaceChild(g, t); }
 }
 (function(){ var busy = false, sched = false;
-  function run(){ sched = false; var a = document.getElementById('app'); if (!a) return; busy = true; try { icoize(a); icoSvgText(a); var ms = document.querySelectorAll('.modal,.tipbox,.testbar'); for (var i = 0; i < ms.length; i++) { if (a.contains(ms[i])) continue; icoize(ms[i]); icoSvgText(ms[i]); } } catch (e) {} busy = false; }
+  function run(){ sched = false; var a = document.getElementById('app'); if (!a) return; busy = true; try { icoize(a); icoSvgText(a); var ms = document.querySelectorAll('.modal,.tipbox,.testbar,.toast,.dripfly'); for (var i = 0; i < ms.length; i++) { if (a.contains(ms[i])) continue; icoize(ms[i]); icoSvgText(ms[i]); } } catch (e) {} busy = false; }
   function start(){ var a = document.getElementById('app'); if (!a || !window.MutationObserver) return;
     new MutationObserver(function(){ if (busy) return; if (!sched) { sched = true; run(); } }).observe(document.body, { childList: true, subtree: true, characterData: true }); run(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start(); })();
