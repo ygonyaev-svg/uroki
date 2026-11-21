@@ -623,6 +623,7 @@ function vRead(kid, L){
     <div class="readbar">${readBar('startread', SR ? `<button class="btn big mic" data-act="startread">🎤 Читать вслух</button>` : `<button class="btn big" data-act="startread">Начать (засекаю время)</button><p class="hint">Здесь айпад не умеет слушать чтение (нужно обновить iPadOS). Ничего страшного: нажми «Начать», читай вслух, в конце нажми «Готово» — я засеку время и посчитаю скорость.</p>`)}</div></section>`;
   }
   if (L.res && L.res.pace && !L.paceSeen && ['silent', 'retell', 'qs'].includes(L.phase)) return head + paceCard(kid, L.res) + '</section>';
+  if (L.phase === 'spot') { const v = vSpot(kid, L, head); if (v) return v; }
   if (L.phase === 'words') return vWords(kid, L, head);
   if (L.phase === 'silent') {
     if (!L.st0) { L.st0 = Date.now(); save(); }
@@ -646,7 +647,7 @@ function vRead(kid, L){
   if (L.phase === 'survey') return head + vSurvey(L) + '</section>';
   return head + vResult(kid, 'read', L) + `<p class="center hint">${L.res && L.res.good ? 'Отличный темп! Следующий текст будет чуть длиннее.' : L.res && L.res.repeat ? 'Завтра перечитаем этот текст ещё раз — так читать станет легче.' : ''}</p></section>`;
 }
-const PH_STEP = { warm:'Разминка', read:'Читаю вслух', silent:'Читаю сам', retell:'Пересказ', qs:'Вопросы', words:'Слова', survey:'Отзыв', done:'Отзыв' };
+const PH_STEP = { warm:'Разминка', read:'Читаю вслух', silent:'Читаю сам', retell:'Пересказ', qs:'Вопросы', spot:'Найди ошибку', words:'Слова', survey:'Отзыв', done:'Отзыв' };
 /* Повтор пройденного этапа: можно перечитать, послушать, пересказать ещё раз — баллы не меняются */
 function vReview(kid, L, t, aloud, rest){
   const s = cur.rview, K = S.kids[kid], r = L.res || {};
@@ -663,7 +664,7 @@ function vReview(kid, L, t, aloud, rest){
     return back + `<article class="card"><h2>Вопросы</h2><ol class="plain">${qs.map((q, i) => { const a = L.ans[i] || {}; return `<li><b>${U.esc(q.q)}</b><br>Правильно: ${U.esc(q.a)}${a.wrong && a.wrong.length ? `<br><span class="hint">Сначала ответил(а): ${a.wrong.map(U.esc).join(', ')}</span>` : a.final ? ' ✓' : ''}</li>`; }).join('')}</ol></article><details class="peek"><summary>Посмотреть текст</summary><div class="text">${tokensHtml(t.text)}</div></details>`; }
   return back;
 }
-function readSteps(t, rest, L){ const s = ['Разминка', 'Читаю вслух']; if (rest) s.push('Читаю сам'); if (t.kw) s.push('Пересказ'); s.push('Вопросы'); if (L && L.gl && L.gl.length) s.push('Слова'); return s.concat(['Отзыв']); }
+function readSteps(t, rest, L){ const s = ['Разминка', 'Читаю вслух']; if (rest) s.push('Читаю сам'); if (t.kw) s.push('Пересказ'); s.push('Вопросы'); s.push('Найди ошибку'); if (L && L.gl && L.gl.length) s.push('Слова'); return s.concat(['Отзыв']); }
 function readLim(kid, L){ return (L && L.lim) || wordsLimit(kid); }
 function silentMin(kid, rest){ const w = rest.split(/\s+/).filter(Boolean).length; return Math.min(900, Math.round(w / (KIDS[kid].norm * 2.5) * 60)); }
 let RT = null; /* пересказ голосом */
@@ -943,7 +944,7 @@ document.addEventListener('click', e => {
       ev(kid, 'ответ', { subj: 'Чтение', unit: 'Новые слова', q: 'Что значит «' + q.w + '»?', ans: b.dataset.v, right: q.a, ok: ok ? 'верно' : 'ошибка' }); save(); render(); break; }
     case 'wnext': L.wi = (L.wi || 0) + 1; save(); render(); break;
     case 'wdone': { const K = S.kids[kid]; K.vocab = K.vocab || []; (L.gl || []).forEach((g, k) => { if (!K.vocab.some(v => v.w === g.w)) K.vocab.push({ w: g.w, d: g.d, e: g.e, ok: !!(L.wans && L.wans[k] && L.wans[k].ok), ds: cur.ds }); }); L.phase = 'survey'; save(); render(); window.scrollTo(0, 0); break; }
-    case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = L.gl && L.gl.length ? 'words' : 'survey'; L.wi = 0; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) K.pos.read = (K.pos.read || 0) + 1; } save(); render(); break; }
+    case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = 'spot'; L.wi = 0; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) K.pos.read = (K.pos.read || 0) + 1; } save(); render(); break; }
     case 'startfread': if (!(RD && RD.paused)) RD = null; startRead(LCODE(cur.kid, L.tr)); break;
     case 'sayfull': say(curForeign(L).text, LCODE(cur.kid, L.tr)); break;
     case 'fq': foreignAnswer(b.dataset.v); break;
@@ -965,7 +966,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (testAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (testAct(act, b)) break; if (spotAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }

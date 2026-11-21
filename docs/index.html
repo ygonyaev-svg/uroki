@@ -407,6 +407,8 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .testc{ border:2px dashed #7a3cff; } .tipin textarea{ width:100%; box-sizing:border-box; font-size:17px; border-radius:12px; border:1px solid var(--line); padding:10px; margin-bottom:6px; background:var(--card); color:var(--ink); }
 .rbad{ text-decoration:underline wavy #d9534f; text-decoration-thickness:2px; text-underline-offset:4px; color:#b8322e; }
 .learnt .hidmsg{ display:none; } .learnt.hid .ptext{ display:none; } .learnt.hid .hidmsg{ display:block; padding:14px; border-radius:12px; background:var(--soft); text-align:center; }
+.spot .spt p{ font-size:20px; line-height:2; margin:6px 0; } .spw{ font:inherit; color:inherit; background:none; border:0; padding:2px 3px; border-radius:8px; cursor:pointer; -webkit-appearance:none; }
+.spw:active{ background:var(--soft); } .spw.wrong{ background:#f3d3d2; text-decoration:line-through; } .spw.right{ background:#2e9d5b; color:#fff; font-weight:700; } .spw.miss{ background:#d9534f; color:#fff; font-weight:700; } .spw:disabled{ opacity:1; cursor:default; }
 
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
@@ -829,7 +831,7 @@ body.anya.h-h .prog i{ background:linear-gradient(90deg,#f2c230,#fde68a); }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* vaabfb5d9 */
+<script>/* v4a171e23 */
 var FAM = 0;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -5629,6 +5631,40 @@ function retellStartFor(id){ const ta = document.getElementById(id), had = ta ? 
 /* Поле «Расскажи наизусть»: как только ребёнок начал отвечать — текст стиха прячется (показ только по «Подсказке»). */
 document.addEventListener('focusin', e => { if (!e.target || e.target.id !== 'prec' || cur.view !== 'poem') return; try { const P = dayRec(cur.kid, cur.ds).poem; if (P && !P.reciting) { P.reciting = true; P.peek = false; save(); const d = document.querySelector('.learnt'); if (d) d.classList.add('hid'); } } catch (x) {} });
 
+/* ===== «Найди ошибку» после чтения: тест на внимательность =====
+   Берём кусочек прочитанной главы (Ярик 3 предложения, Аня 4) и в одном предложении меняем одно слово
+   на другое слово из того же текста с тем же окончанием — грамматически звучит гладко, но по смыслу неверно.
+   Текст спрятан: ребёнок вспоминает прочитанное и нажимает на неверное слово. Две попытки. */
+function spotSent(text){ return (String(text).replace(/\s+/g, ' ').match(/[^.!?…]+[.!?…]+[»"]?/g) || []).map(s => s.trim()).filter(Boolean); }
+function spotTask(kid, t, seed){ const R = U.rng(seed), S0 = spotSent(t.text), n = T(kid) === 'anya' ? 4 : 3;
+  const wc = s => s.split(' ').length, okS = s => wc(s) >= 4 && wc(s) <= (n === 3 ? 16 : 24);
+  const pool = []; for (let i = 0; i + n <= S0.length; i++) if (S0.slice(i, i + n).every(okS)) pool.push(i); if (!pool.length) return null;
+  const all = [...new Set(t.text.split(/\s+/).map(w => w.replace(/[^А-Яа-яЁё-]/g, '')).filter(w => w.length >= 4))];
+  const stem = w => w.toLowerCase().replace(/ё/g, 'е').slice(0, 4);
+  for (let tries = 0; tries < 30; tries++) { const st = R.pick(pool), win = S0.slice(st, st + n), k = R.int(0, n - 1), words = win[k].split(' ');
+    const cand = words.map((w, i) => ({ i, c: w.replace(/[^А-Яа-яЁё-]/g, '') })).filter(x => x.c.length >= 5 && !/-/.test(x.c) && x.i > 0 && words.filter(w => w.toLowerCase().includes(x.c.toLowerCase())).length === 1);
+    if (!cand.length) continue; const x = R.pick(cand), low = x.c.toLowerCase(), end = low.slice(-2);
+    const reps = all.filter(w => { const l = w.toLowerCase(); return l.slice(-2) === end && stem(l) !== stem(low) && !win[k].toLowerCase().includes(stem(l)) && (w[0] === w[0].toUpperCase()) === (x.c[0] === x.c[0].toUpperCase()); });
+    if (!reps.length) continue; const r = R.pick(reps); const nw = words.slice(); nw[x.i] = words[x.i].replace(x.c, r);
+    const sents = win.slice(); sents[k] = nw.join(' '); return { sents, k, wi: x.i, was: x.c, now: r }; }
+  return null; }
+function vSpot(kid, L, head){ const t = readText(kid), q = spotTask(kid, t, (L.seed || 1) + 77), a = L.spot || {};
+  if (!q) { L.phase = L.gl && L.gl.length ? 'words' : 'survey'; save(); return null; }
+  const fin = a.fin, girl = T(kid) === 'anya';
+  const sent = (s, si) => s.split(' ').map((w, wi) => { const bad = si === q.k && wi === q.wi, tried = (a.wrong || []).some(x => x[0] === si && x[1] === wi);
+    const cls = fin && bad ? (a.ok ? 'right' : 'miss') : tried ? 'wrong' : ''; return `<button class="spw ${cls}" data-act="spw" data-s="${si}" data-w="${wi}" ${fin || tried ? 'disabled' : ''}>${U.esc(w)}</button>`; }).join(' ');
+  return head + `<article class="card task spot"><h2>🔎 Найди ошибку</h2><p class="hint">Это кусочек из главы, которую ты ${girl ? 'прочитала' : 'прочитал'}. Но в одном предложении я поменял одно слово — и получилось не так, как в книге. Найди его и нажми.</p>
+   <div class="spt">${q.sents.map((s, si) => `<p>${sent(s, si)}</p>`).join('')}</div>
+   ${fin ? (a.ok ? `<div class="fb ok"><b>${a.tries === 1 ? 'Верно, с первого раза! Ты внимательн' + (girl ? 'а' : 'ый') + '.' : 'Нашёл' + (girl ? 'ла' : '') + '!'}</b> В книге было «${U.esc(q.was.toLowerCase())}», а не «${U.esc(q.now.toLowerCase())}».</div>` : `<div class="fb bad"><b>Ошибка была здесь:</b> в книге «${U.esc(q.was.toLowerCase())}», а я написал «${U.esc(q.now.toLowerCase())}».</div>`) : a.tries ? '<div class="fb try">Это слово верное. Вспомни, как было в книге, и попробуй ещё раз.</div>' : '<p class="hint">Есть две попытки.</p>'}</article>
+   ${fin ? '<button class="btn big" data-act="spnext">Дальше</button>' : ''}</section>`; }
+function spotAct(act, b){ if (act !== 'spw' && act !== 'spnext') return false; const kid = cur.kid, L = dayRec(kid, cur.ds).les.read; if (!L) return true;
+  if (act === 'spnext') { L.phase = L.gl && L.gl.length ? 'words' : 'survey'; L.wi = 0; save(); render(); window.scrollTo(0, 0); return true; }
+  const q = spotTask(kid, readText(kid), (L.seed || 1) + 77), a = L.spot || (L.spot = { tries: 0, wrong: [] }); if (!q || a.fin) return true;
+  const si = +b.dataset.s, wi = +b.dataset.w, ok = si === q.k && wi === q.wi; a.tries++;
+  if (ok || a.tries >= 2) { a.fin = true; a.ok = ok; ev(kid, 'найди ошибку', { subj: 'Чтение', unit: readText(kid).t || '', q: q.sents[q.k], ans: q.sents[si].split(' ')[wi], right: q.now + ' → ' + q.was, ok: ok ? (a.tries === 1 ? 'верно' : 'со 2-й попытки') : 'ошибка' }); }
+  else a.wrong.push([si, wi]);
+  save(); render(); return true; }
+
 /* Подсказки по касанию: дети нажимают на непонятное (баллы, копилку, проценты…) — всплывает объяснение, можно послушать. */
 const TIPS = {
   coins: ['⭐ Баллы на счёте', 'Это твои баллы. 1 балл = 1 минута игры или мультиков сверх обычного времени. Их можно потратить на призы, которые ты выбрал{а}.'],
@@ -6496,6 +6532,7 @@ function vRead(kid, L){
     <div class="readbar">${readBar('startread', SR ? `<button class="btn big mic" data-act="startread">🎤 Читать вслух</button>` : `<button class="btn big" data-act="startread">Начать (засекаю время)</button><p class="hint">Здесь айпад не умеет слушать чтение (нужно обновить iPadOS). Ничего страшного: нажми «Начать», читай вслух, в конце нажми «Готово» — я засеку время и посчитаю скорость.</p>`)}</div></section>`;
   }
   if (L.res && L.res.pace && !L.paceSeen && ['silent', 'retell', 'qs'].includes(L.phase)) return head + paceCard(kid, L.res) + '</section>';
+  if (L.phase === 'spot') { const v = vSpot(kid, L, head); if (v) return v; }
   if (L.phase === 'words') return vWords(kid, L, head);
   if (L.phase === 'silent') {
     if (!L.st0) { L.st0 = Date.now(); save(); }
@@ -6519,7 +6556,7 @@ function vRead(kid, L){
   if (L.phase === 'survey') return head + vSurvey(L) + '</section>';
   return head + vResult(kid, 'read', L) + `<p class="center hint">${L.res && L.res.good ? 'Отличный темп! Следующий текст будет чуть длиннее.' : L.res && L.res.repeat ? 'Завтра перечитаем этот текст ещё раз — так читать станет легче.' : ''}</p></section>`;
 }
-const PH_STEP = { warm:'Разминка', read:'Читаю вслух', silent:'Читаю сам', retell:'Пересказ', qs:'Вопросы', words:'Слова', survey:'Отзыв', done:'Отзыв' };
+const PH_STEP = { warm:'Разминка', read:'Читаю вслух', silent:'Читаю сам', retell:'Пересказ', qs:'Вопросы', spot:'Найди ошибку', words:'Слова', survey:'Отзыв', done:'Отзыв' };
 /* Повтор пройденного этапа: можно перечитать, послушать, пересказать ещё раз — баллы не меняются */
 function vReview(kid, L, t, aloud, rest){
   const s = cur.rview, K = S.kids[kid], r = L.res || {};
@@ -6536,7 +6573,7 @@ function vReview(kid, L, t, aloud, rest){
     return back + `<article class="card"><h2>Вопросы</h2><ol class="plain">${qs.map((q, i) => { const a = L.ans[i] || {}; return `<li><b>${U.esc(q.q)}</b><br>Правильно: ${U.esc(q.a)}${a.wrong && a.wrong.length ? `<br><span class="hint">Сначала ответил(а): ${a.wrong.map(U.esc).join(', ')}</span>` : a.final ? ' ✓' : ''}</li>`; }).join('')}</ol></article><details class="peek"><summary>Посмотреть текст</summary><div class="text">${tokensHtml(t.text)}</div></details>`; }
   return back;
 }
-function readSteps(t, rest, L){ const s = ['Разминка', 'Читаю вслух']; if (rest) s.push('Читаю сам'); if (t.kw) s.push('Пересказ'); s.push('Вопросы'); if (L && L.gl && L.gl.length) s.push('Слова'); return s.concat(['Отзыв']); }
+function readSteps(t, rest, L){ const s = ['Разминка', 'Читаю вслух']; if (rest) s.push('Читаю сам'); if (t.kw) s.push('Пересказ'); s.push('Вопросы'); s.push('Найди ошибку'); if (L && L.gl && L.gl.length) s.push('Слова'); return s.concat(['Отзыв']); }
 function readLim(kid, L){ return (L && L.lim) || wordsLimit(kid); }
 function silentMin(kid, rest){ const w = rest.split(/\s+/).filter(Boolean).length; return Math.min(900, Math.round(w / (KIDS[kid].norm * 2.5) * 60)); }
 let RT = null; /* пересказ голосом */
@@ -6816,7 +6853,7 @@ document.addEventListener('click', e => {
       ev(kid, 'ответ', { subj: 'Чтение', unit: 'Новые слова', q: 'Что значит «' + q.w + '»?', ans: b.dataset.v, right: q.a, ok: ok ? 'верно' : 'ошибка' }); save(); render(); break; }
     case 'wnext': L.wi = (L.wi || 0) + 1; save(); render(); break;
     case 'wdone': { const K = S.kids[kid]; K.vocab = K.vocab || []; (L.gl || []).forEach((g, k) => { if (!K.vocab.some(v => v.w === g.w)) K.vocab.push({ w: g.w, d: g.d, e: g.e, ok: !!(L.wans && L.wans[k] && L.wans[k].ok), ds: cur.ds }); }); L.phase = 'survey'; save(); render(); window.scrollTo(0, 0); break; }
-    case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = L.gl && L.gl.length ? 'words' : 'survey'; L.wi = 0; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) K.pos.read = (K.pos.read || 0) + 1; } save(); render(); break; }
+    case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = 'spot'; L.wi = 0; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) K.pos.read = (K.pos.read || 0) + 1; } save(); render(); break; }
     case 'startfread': if (!(RD && RD.paused)) RD = null; startRead(LCODE(cur.kid, L.tr)); break;
     case 'sayfull': say(curForeign(L).text, LCODE(cur.kid, L.tr)); break;
     case 'fq': foreignAnswer(b.dataset.v); break;
@@ -6838,7 +6875,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (testAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (testAct(act, b)) break; if (spotAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }

@@ -389,3 +389,5 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .testc{ border:2px dashed #7a3cff; } .tipin textarea{ width:100%; box-sizing:border-box; font-size:17px; border-radius:12px; border:1px solid var(--line); padding:10px; margin-bottom:6px; background:var(--card); color:var(--ink); }
 .rbad{ text-decoration:underline wavy #d9534f; text-decoration-thickness:2px; text-underline-offset:4px; color:#b8322e; }
 .learnt .hidmsg{ display:none; } .learnt.hid .ptext{ display:none; } .learnt.hid .hidmsg{ display:block; padding:14px; border-radius:12px; background:var(--soft); text-align:center; }
+.spot .spt p{ font-size:20px; line-height:2; margin:6px 0; } .spw{ font:inherit; color:inherit; background:none; border:0; padding:2px 3px; border-radius:8px; cursor:pointer; -webkit-appearance:none; }
+.spw:active{ background:var(--soft); } .spw.wrong{ background:#f3d3d2; text-decoration:line-through; } .spw.right{ background:#2e9d5b; color:#fff; font-weight:700; } .spw.miss{ background:#d9534f; color:#fff; font-weight:700; } .spw:disabled{ opacity:1; cursor:default; }
