@@ -844,7 +844,7 @@ body.anya.h-h .prog i{ background:linear-gradient(90deg,#f2c230,#fde68a); }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v98160f01 */
+<script>/* v75b23a9a */
 var FAM = 0;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -892,6 +892,22 @@ const AGREE_PREP = /(?:^|[\s(«])(из|от|до|без|у|для|около|к�
 function agree(s){ if (typeof s !== 'string') return s; return s.replace(/(^|[^\d,.])(\d+)(\s+)([а-яё]+)(?![а-яё])/gi, (all, pre, n, sp, w, off, str) => { off += pre.length; const f = AGREE[w.toLowerCase()]; if (!f) return all;
   if (AGREE_PREP.test(str.slice(Math.max(0, off - 12), off))) return all; const k = +n, m10 = k % 10, m100 = k % 100;
   const v = m10 === 1 && m100 !== 11 ? f[0] : m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? f[1] : f[2]; return pre + n + sp + (w[0] === w[0].toUpperCase() ? v[0].toUpperCase() + v.slice(1) : v); }); }
+/* ===== Везде — варианты ответа крупными кнопками (правило Юры 21.11): ручной ввод заменяем выбором ===== */
+function numOpts(a, r){ a = Number(a); const isInt = Math.abs(a - Math.round(a)) < 1e-9, m = Math.abs(a), c = [];
+  if (isInt) { c.push(a + 1, a - 1, a + 10, a - 10, a + 2); if (m >= 100) c.push(a + 100, a - 100); if (m >= 1000) c.push(a + 1000, a - 1000, Math.round(a / 10), a * 10); if (m >= 20 && m < 1000) c.push(a * 10, Math.round(a / 10)); const s = String(Math.abs(a)); if (s.length >= 2) { const sw = Number(s.slice(0, -2) + s.slice(-1) + s.slice(-2, -1)) * (a < 0 ? -1 : 1); c.push(sw); } }
+  else c.push(a + .1, a - .1, a + 1, a - 1, a * 10, a / 10, a + .01);
+  const out = []; for (const v0 of r.shuffle(c)) { const v = Math.round(v0 * 1000) / 1000; if (v !== a && (a < 0 || v >= 0) && !out.includes(v)) out.push(v); if (out.length === 3) break; }
+  while (out.length < 3) { const v = a + out.length + 3; if (!out.includes(v)) out.push(v); } return out; }
+function asChoice(t, seed, pool){ if (!t || t.k === 'c' || !(t.k === 'n' || t.k === 't')) return t; const r = U.rng(seed);
+  if (t.k === 'n') { const a = U.dec(t.a); return Object.assign({}, t, { k: 'c', a, opts: r.shuffle([a].concat(numOpts(t.a, r).map(U.dec))), was: 'n' }); }
+  const low = x => String(x).toLowerCase().replace(/ё/g, 'е').trim(), A = String(t.a), bad = [A].concat(t.alt || []).map(low);
+  const qw = (String(t.q).replace(/<[^>]+>/g, ' ').match(/«([^»]+)»/) || [])[1] || '';
+  const fromQ = qw.split(/[\s,.;:!?—–-]+/).filter(w => w.length >= 2 && /[А-Яа-яЁёA-Za-zÀ-ÿ]/.test(w));
+  const cand = []; const add = w => { const l = low(w); if (l && !bad.includes(l) && !cand.some(x => low(x) === l)) cand.push(/^[А-ЯЁA-Z]/.test(A) ? w : (w.length > 1 && w !== w.toUpperCase() ? w.toLowerCase() : w)); };
+  if (A.split(/\s+/).length === 1 && fromQ.length) r.shuffle(fromQ).forEach(add);
+  (pool || []).forEach(x => { if (x && x !== t && x.k === 't') add(String(x.a)); });
+  if (cand.length < 1) return t; return Object.assign({}, t, { k: 'c', a: A, opts: r.shuffle([A].concat(cand.slice(0, 3))), was: 't' }); }
+function allChoice(T, seed){ return (T || []).map((t, i) => asChoice(t, (seed || 1) * 31 + i * 7, T)); }
 
 /* ===== Свои иконки вместо системных эмодзи =====
    Стиль: rounded duotone, сетка 32×32, контур 2px со скруглёнными концами, две заливки:
@@ -3415,7 +3431,8 @@ function bkTaskView(kid, b, t){
   }
   return h + '</article>';
 }
-function bkQs(t){
+function bkQs(t){ var Q = bkQs0(t); return Q.map(function(q, i){ return asChoice(q, U.h(t.id) + i, Q); }); }
+function bkQs0(t){
   var r = U.rng(t.id);
   return (t.qs || []).map(function(x){
     if (Object.prototype.toString.call(x) === '[object Array]') return { k: 'c', q: x[0], a: String(x[1]), opts: r.shuffle(x.slice(1).map(String)) };
@@ -4018,19 +4035,23 @@ ALWAYS.push({ id: 'zad', order: 40,
     if (!z) return h + '<div class="card win"><h2>Все задачи этого уровня решены!</h2><p>Скоро добавим новые.</p></div>';
     var r = cur.fq;
     h += '<article class="card task"><span class="sticker" aria-hidden="true">' + U.rng(z.id).pick(THEME[TH(kid)].pics) + '</span><div class="q">' + U.esc(z.q) + '</div>' + (typeof picWords === 'function' ? picWords(z.q) : '') + '<div class="row">' + sayGate('zd' + z.id, '<button class="btn ghost small" data-act="zdsay">🔊 Послушать</button>') + '</div>' +
-      '<form class="numf" data-form="zadf"><input id="zdin" inputmode="decimal" autocomplete="off" ' + (r ? 'disabled value="' + U.esc(r.v) + '"' : 'autofocus') + ' aria-label="Ответ"><button class="btn"' + (r ? ' disabled' : '') + '>Проверить</button></form>';
+      '<div class="opts">' + zdOpts(z).map(function(o){ var cls = r && o === U.dec(z.a) ? 'right' : r && r.v === o && !r.ok ? 'wrong' : ''; return '<button class="opt ' + cls + '" data-act="zdc" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + U.esc(o) + '</button>'; }).join('') + '</div>';
     if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Неверно. Ответ: <b>' + U.esc(z.as) + '</b>') + '</div><p class="hint">' + U.esc(z.e) + '</p>' + (r.ok ? funBurst(r.pts) : '');
     h += '</article>' + (r ? '<button class="btn big" data-act="zdnext">Следующая задача →</button>' : '');
     return h; },
   act: function(act, b){ var kid = cur.kid; if (!kid) return;
     if (act === 'zdtab') { cur.zdL = +b.getAttribute('data-l'); cur.fq = null; render(); }
     else if (act === 'zdsay') { var z = zdCur(kid); if (z) say(z.q); }
+    else if (act === 'zdc') { zdAnswer(b.getAttribute('data-v')); }
     else if (act === 'zdnext') { cur.fq = null; render(); window.scrollTo(0, 0); } },
-  form: function(k, f){ var kid = cur.kid; if (!kid || cur.fq) return; var z = zdCur(kid); if (!z) return; var el = document.getElementById('zdin'), v = String(el && el.value || '').trim(); if (!v) return alertMsg('Напиши ответ числом');
+  form: function(k, f){ var el = document.getElementById('zdin'); zdAnswer(String(el && el.value || '').trim()); }
+});
+function zdOpts(z){ var r = U.rng('zo' + z.id); return r.shuffle([U.dec(z.a)].concat(numOpts(z.a, r).map(U.dec))); }
+function zdAnswer(v){ var kid = cur.kid; if (!kid || cur.fq) return; var z = zdCur(kid); if (!z) return; if (!v) return;
     var n = Number(v.replace(',', '.').replace(/\s/g, '')); if (isNaN(n)) return alertMsg('Нужно число');
     var ok = Math.abs(n - z.a) < 1e-9, F = funK(kid); F.q[z.id] = ok ? 1 : 0; var pts = ok ? funPts(kid, 'zad', zdPts(kid, z)) : 0; cur.fq = { id: z.id, v: v, ok: ok, pts: pts };
     ev(kid, 'задача на смекалку', { subj: 'Задачи на смекалку', q: z.q, ans: v, right: z.as, ok: ok ? 'верно' : 'ошибка', coins: S.kids[kid].coins, text: pts ? '+' + pts + ' баллов' : '' }); save(); render(); }
-});
+
 
 /* ===== Викторина «Знаток Гарри Поттера» (только Аня, только семейное приложение) =====
    ПРАВА: вопросы и пояснения — своими словами, книгу не цитируем. Ссылка на книгу и номер главы — можно.
@@ -5719,7 +5740,7 @@ function hwCard(kid){ if (TEST && !cur.kid) return ''; const H = hwAll(kid); if 
    ${H.map(h => `<div class="hwrow"><div><b>${U.esc(subjName(kid, h.s, h.ds))}</b> · ${h.ds === U.today() ? 'сегодня' : U.esc(h.ds.slice(8) + '.' + h.ds.slice(5, 7))}<br><span class="hint">Исправить: ${h.n} из ${h.all}</span></div><button class="btn small" data-act="hwgo" data-s="${h.s}" data-d="${h.ds}">Делать</button></div>`).join('')}</div>`; }
 function hwNote(kid, s){ const o = hwOwed(kid, s, cur.ds); if (!o) return ''; return `<div class="note">📒 Не сделано домашнее задание по прошлому уроку (${o.n} ${U.pl(o.n, 'ошибка', 'ошибки', 'ошибок')}). Если начнёшь урок без него, баллов будет 70%. <button class="link" data-act="hwgo" data-s="${s}" data-d="${o.ds}">Сделать ДЗ →</button></div>`; }
 function hwSimilar(kid, s, L, t, n){ if (!n) return t; const u = unitById(kid, s, L.uid); if (!u || t.rev) return t; const shape = x => strip(x.q).replace(/\d+([,.]\d+)?/g, '#').slice(0, 18);
-  const c = genTasks(u, (L.seed || 1) * 13 + n * 211, 14).filter(x => x.q !== t.q); return c.find(x => shape(x) === shape(t)) || c.find(x => x.k === t.k) || t; }
+  const c = genTasks(u, (L.seed || 1) * 13 + n * 211, 14).filter(x => x.q !== t.q); const x = c.find(x => shape(x) === shape(t)) || c.find(x => x.k === (t.was || t.k)); return x ? asChoice(x, (L.seed || 1) + n * 17, c) : t; }
 function hwCur(){ const h = cur.hw, kid = cur.kid, L = h && hwLes(kid, h.ds, h.s); if (!L) return null; const W = fixList(kid, h.s, L), left = W.filter(j => !L.ans[j].fix);
   const i = h.i != null && W.includes(h.i) && (!L.ans[h.i].fix || h.done) ? h.i : left[0]; if (i == null) return { L, W, left }; const a = L.ans[i]; const t = hwSimilar(kid, h.s, L, lessonTasks(L, kid, h.s)[i], a.hwN || 0); return { L, W, left, i, a, t }; }
 function vHwFix(){ const kid = cur.kid, h = cur.hw || {}, c = hwCur(); const head = `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← К урокам</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header><section class="lesson"><p class="eyebrow">📒 Домашнее задание</p><h1>${U.esc(c ? subjName(kid, h.s, h.ds) : '')}: работа над ошибками</h1>`;
@@ -6335,10 +6356,10 @@ function startLesson(subj){
   go('lesson', { subj });
 }
 function unitById(kid, subj, uid){ const c = KIDS[kid].cur[subj]; return (c.units || []).concat(c.alt || [], c.old || []).find(u => u.id === uid); }
-function lessonTasks(L, kid, subj){ if (ITEMS(subj)) return L.items; if (!L._t) { const u = unitById(kid, subj, L.uid); let T = genTasks(u, L.seed, L.n);
+function lessonTasks(L, kid, subj){ if (ITEMS(subj)) { if (!L._c || L._c.src !== L.items) { const c = allChoice(L.items, L.seed || 3); c.src = L.items; Object.defineProperty(L, '_c', { value: c, enumerable: false, configurable: true, writable: true }); } return L._c; } if (!L._t) { const u = unitById(kid, subj, L.uid); let T = genTasks(u, L.seed, L.n);
     /* Математика: в конце урока 3 задания на повторение пройденных тем (вперемешку, со вводом ответа) */
     if (subj === 'math' && L.mix !== 0) { const list = unitsOf(kid, subj, L.tr || ''), j = list.indexOf(u); if (j > 0) { const r = U.rng(L.seed + 5); for (let k = 0; k < 3; k++) { const pu = list[r.int(Math.max(0, j - 12), j - 1)], x = genTasks(HARD[pu.id] ? { g: HARD[pu.id] } : pu, L.seed + 17 * k, 1)[0]; if (x) { x.rev = pu.t; T.push(x); } } } }
-    Object.defineProperty(L, '_t', { value: T, enumerable: false }); } return L._t; }
+    T = allChoice(T, L.seed); Object.defineProperty(L, '_t', { value: T, enumerable: false }); } return L._t; }
 
 function vLesson(){
   const kid = cur.kid, subj = cur.subj, D = dayRec(kid, cur.ds), L = D.les[subj];
@@ -6503,7 +6524,7 @@ function finishLesson(){
   let pts = q < .6 ? 0 : Math.round(M * q * q);
   /* Баллы за усилие: урок, пролетевший быстрее нормы времени, даёт меньше (норма ≈ 25–30 с на задание) */
   if (subj !== 'read' && !ITEMS(subj)) { const T0 = lessonTasks(L, kid, subj), minS = (T0.length || 5) * (TPL(kid) === 'yarik' ? 35 : 40), fk = Math.min(1, L.secs / minS); if (fk < 1) { pts = Math.round(pts * Math.max(.3, fk)); L.fastCut = fk < .9; }
-    /* Выбор из вариантов стоит меньше, чем ответ, написанный самому */ const inS = T0.filter(x => x.k !== 'c').length / Math.max(1, T0.length); pts = Math.round(pts * (.6 + .4 * inS)); }
+  }
   /* Урок, открытый не по порядку за баллы: пока день не закрыт целиком, только треть */
   if (subj !== 'read' && !ITEMS(subj)) { const ow = hwOwed(kid, subj, cur.ds); if (ow && pts > 0) { pts = Math.round(pts * HW_K); L.hwCut = ow.n; } }
   { const rk = rusK(kid, subj); if (rk < 1 && pts > 0) { L.rusCut = Math.round(rk * 100); pts = Math.round(pts * rk); } }
