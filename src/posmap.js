@@ -14,7 +14,7 @@ function posFix(kid){ const K = S.kids && S.kids[kid]; if (!K || !KIDS[kid]) ret
     if (nf && !K.posFirst[key]) { K.posFirst[key] = 1; const i = K.pos[key] || 0; if (i >= nf) { K.posResume[key] = i >= list.length ? '#end' : list[i].id; K.pos[key] = 0; } }
   }
   posMark(kid); }
-function posMark(kid){ const K = S.kids && S.kids[kid]; if (!K || !KIDS[kid] || !K.pos) return; const ids = K.posId || (K.posId = {}); const lists = posLists(kid);
+function posMark(kid){ const K = S.kids && S.kids[kid]; if (!K || !KIDS[kid] || !K.pos || !K.posId) return; const ids = K.posId; const lists = posLists(kid);
   for (const key of Object.keys(lists)) { const list = lists[key]; let i = K.pos[key] || 0; const nf = list.filter(u => u.first).length;
     const rs = K.posResume && K.posResume[key]; if (rs && nf && i >= nf) { const j = rs === '#end' ? list.length : list.findIndex(u => u.id === rs); if (j >= 0) i = K.pos[key] = j; delete K.posResume[key]; }
     ids[key] = i >= list.length ? '#end' : list[i].id; } }
