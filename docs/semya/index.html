@@ -622,7 +622,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v2ada6fe7 */
+<script>/* v7619a726 */
 var FAM = 1;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -2210,6 +2210,88 @@ const EN_A = [
    g: B(['___ do you live? — In Lisbon.|Where|When;Who;What','___ is your best friend? — Vera.|Who|What;Where;How','___ is the lesson? — At nine.|When|Where;Who;Why','___ brothers have you got? — One.|How many|How much;How;What','___ is this book? — Ten euros.|How much|How many;What;When','___ are you sad? — Because it\'s raining.|Why|What;How;Who']) }
 ];
 CUR_A.lang.alt = EN_A; CUR_A.lang.altName = 'English';
+
+/* ===== Словоход: начальные курсы французского, немецкого и испанского (объяснения по-русски) =====
+   Слова: «слово|перевод|эмодзи». Озвучка — через LCODE(kid, tr). */
+function LW(s){ return s.split(';').map(x => x.split('|')); }
+function langCourse(p, lname, T, G){
+  const v = (n, t, k, intro) => ({ id: p + '_' + n, t, th: vocabTheory(T[k], intro), g: vocabGen(T[k], lname) });
+  return [
+    v(1, T.n.hello, 'hello', T.i.hello), v(2, T.n.num, 'num'), v(3, T.n.col, 'col', T.i.col), v(4, T.n.ani, 'ani', T.i.ani),
+    { id: p + '_5', t: G[0][0], th: G[0][1], g: B(G[0][2]) },
+    v(6, T.n.fam, 'fam'), v(7, T.n.food, 'food'),
+    { id: p + '_8', t: G[1][0], th: G[1][1], g: B(G[1][2]) },
+    v(9, T.n.school, 'school'), v(10, T.n.phr, 'phr', T.i.phr),
+    { id: p + '_11', t: G[2][0], th: G[2][1], g: B(G[2][2]) },
+    v(12, T.n.verbs, 'verbs')
+  ];
+}
+const FR_T = {
+  n: { hello: 'Bonjour ! Приветствия', num: 'Числа 1–10', col: 'Цвета', ani: 'Животные', fam: 'Семья', food: 'Еда', school: 'Школа', phr: 'Фразы для общения', verbs: 'Что я умею' },
+  i: { hello: 'Французы при встрече говорят <b>bonjour</b>, а вечером <b>bonsoir</b>. Друзьям можно сказать <b>salut</b>.', col: 'Прилагательное обычно стоит <b>после</b> слова: un chat <b>noir</b> — чёрный кот.', ani: '<b>Le</b> — мужской род, <b>la</b> — женский.', phr: 'Нажми на фразу, чтобы послушать.' },
+  hello: LW('bonjour|здравствуйте|👋;salut|привет|🙂;bonsoir|добрый вечер|🌙;au revoir|до свидания|👋;merci|спасибо|🙏;s\'il te plaît|пожалуйста|🙂;oui|да|✅;non|нет|❌;Je m\'appelle…|Меня зовут…|🧒;Ça va ?|Как дела?|😊'),
+  num: LW('un|один|1;deux|два|2;trois|три|3;quatre|четыре|4;cinq|пять|5;six|шесть|6;sept|семь|7;huit|восемь|8;neuf|девять|9;dix|десять|10'),
+  col: LW('rouge|красный|🔴;bleu|синий|🔵;vert|зелёный|🟢;jaune|жёлтый|🟡;noir|чёрный|⚫;blanc|белый|⚪;orange|оранжевый|🟠;rose|розовый|🩷;marron|коричневый|🟤;gris|серый|🩶'),
+  ani: LW('le chat|кошка|🐱;le chien|собака|🐶;le poisson|рыба|🐟;l\'oiseau|птица|🐦;le cheval|лошадь|🐴;la vache|корова|🐮;le lapin|кролик|🐰;le lion|лев|🦁;la souris|мышь|🐭;l\'ours|медведь|🐻'),
+  fam: LW('la mère|мама|👩;le père|папа|👨;le frère|брат|👦;la sœur|сестра|👧;la grand-mère|бабушка|👵;le grand-père|дедушка|👴;la famille|семья|👪;l\'ami|друг|🧑‍🤝‍🧑;le bébé|малыш|👶;l\'oncle|дядя|🧔'),
+  food: LW('la pomme|яблоко|🍎;le pain|хлеб|🍞;le lait|молоко|🥛;l\'eau|вода|💧;le fromage|сыр|🧀;l\'œuf|яйцо|🥚;la glace|мороженое|🍦;le jus|сок|🧃;la soupe|суп|🍲;le gâteau|торт|🎂'),
+  school: LW('l\'école|школа|🏫;le livre|книга|📖;le crayon|карандаш|✏️;le stylo|ручка|🖊️;le cartable|портфель|🎒;le professeur|учитель|🧑‍🏫;la table|стол|🪑;la règle|линейка|📏;le cahier|тетрадь|📓;la classe|класс|🏫'),
+  phr: LW('Je ne comprends pas.|Я не понимаю.|🤔;Répète, s\'il te plaît.|Повтори, пожалуйста.|🔁;J\'ai faim.|Я хочу есть.|🍽️;J\'ai soif.|Я хочу пить.|🥤;Où sont les toilettes ?|Где туалет?|🚻;Comment ça s\'appelle ?|Как это называется?|❓;Je ne sais pas.|Я не знаю.|🤷;On joue ?|Поиграем?|⚽'),
+  verbs: LW('Je sais nager.|Я умею плавать.|🏊;J\'aime lire.|Я люблю читать.|📖;J\'habite au Portugal.|Я живу в Португалии.|🇵🇹;Je joue au football.|Я играю в футбол.|⚽;J\'ai un chien.|У меня есть собака.|🐶;Je vais à l\'école.|Я иду в школу.|🏫')
+};
+const FR_G = [
+  ['Le, la, les — артикли', 'Перед словом во французском почти всегда стоит артикль. <b>le</b> — мужской род (le chat), <b>la</b> — женский (la pomme), <b>l\'</b> — перед гласной (l\'école), <b>les</b> — множественное число (les chats).',
+    ['___ chat (кот)|le|la;les;l\'', '___ pomme (яблоко)|la|le;les;l\'', '___ école (школа)|l\'|le;la;les', '___ livres (книги)|les|le;la;l\'', '___ mère (мама)|la|le;les;l\'', '___ père (папа)|le|la;les;l\'', '___ oiseau (птица)|l\'|le;la;les']],
+  ['Être — быть', 'je <b>suis</b>, tu <b>es</b>, il/elle <b>est</b>, nous <b>sommes</b>, vous <b>êtes</b>, ils/elles <b>sont</b>.<br>Je suis content — я доволен. Elle est petite — она маленькая.',
+    ['Je ___ content.|suis|es;est;sont', 'Tu ___ mon ami.|es|suis;est;êtes', 'Elle ___ petite.|est|es;suis;sont', 'Nous ___ à l\'école.|sommes|êtes;sont;est', 'Ils ___ grands.|sont|est;sommes;es', 'Vous ___ français ?|êtes|sommes;es;est']],
+  ['Avoir — иметь', 'j\'<b>ai</b>, tu <b>as</b>, il/elle <b>a</b>, nous <b>avons</b>, vous <b>avez</b>, ils <b>ont</b>.<br>J\'ai un chat — у меня есть кот. J\'ai huit ans — мне восемь лет.',
+    ['J\'___ un chat.|ai|as;a;ont', 'Tu ___ un frère ?|as|ai;a;avez', 'Il ___ huit ans.|a|as;ai;ont', 'Nous ___ un chien.|avons|avez;ont;a', 'Elles ___ des livres.|ont|a;avons;as']]
+];
+const DE_T = {
+  n: { hello: 'Hallo! Приветствия', num: 'Числа 1–10', col: 'Цвета', ani: 'Животные', fam: 'Семья', food: 'Еда', school: 'Школа', phr: 'Фразы для общения', verbs: 'Что я умею' },
+  i: { hello: 'Немцы говорят <b>Guten Morgen</b> утром, <b>Guten Tag</b> днём, а друзьям — просто <b>Hallo</b>.', col: 'Все существительные в немецком пишутся с <b>большой буквы</b>: der Hund, die Katze.', ani: '<b>der</b> — мужской род, <b>die</b> — женский, <b>das</b> — средний.', phr: 'Нажми на фразу, чтобы послушать.' },
+  hello: LW('Hallo|привет|👋;Guten Morgen|доброе утро|🌅;Guten Tag|добрый день|☀️;Gute Nacht|спокойной ночи|🌙;Tschüss|пока|👋;danke|спасибо|🙏;bitte|пожалуйста|🙂;ja|да|✅;nein|нет|❌;Ich heiße…|Меня зовут…|🧒'),
+  num: LW('eins|один|1;zwei|два|2;drei|три|3;vier|четыре|4;fünf|пять|5;sechs|шесть|6;sieben|семь|7;acht|восемь|8;neun|девять|9;zehn|десять|10'),
+  col: LW('rot|красный|🔴;blau|синий|🔵;grün|зелёный|🟢;gelb|жёлтый|🟡;schwarz|чёрный|⚫;weiß|белый|⚪;orange|оранжевый|🟠;rosa|розовый|🩷;braun|коричневый|🟤;grau|серый|🩶'),
+  ani: LW('die Katze|кошка|🐱;der Hund|собака|🐶;der Fisch|рыба|🐟;der Vogel|птица|🐦;das Pferd|лошадь|🐴;die Kuh|корова|🐮;das Kaninchen|кролик|🐰;der Löwe|лев|🦁;die Maus|мышь|🐭;der Bär|медведь|🐻'),
+  fam: LW('die Mutter|мама|👩;der Vater|папа|👨;der Bruder|брат|👦;die Schwester|сестра|👧;die Oma|бабушка|👵;der Opa|дедушка|👴;die Familie|семья|👪;der Freund|друг|🧑‍🤝‍🧑;das Baby|малыш|👶;der Onkel|дядя|🧔'),
+  food: LW('der Apfel|яблоко|🍎;das Brot|хлеб|🍞;die Milch|молоко|🥛;das Wasser|вода|💧;der Käse|сыр|🧀;das Ei|яйцо|🥚;das Eis|мороженое|🍦;der Saft|сок|🧃;die Suppe|суп|🍲;der Kuchen|пирог|🎂'),
+  school: LW('die Schule|школа|🏫;das Buch|книга|📖;der Bleistift|карандаш|✏️;der Kuli|ручка|🖊️;die Schultasche|портфель|🎒;der Lehrer|учитель|🧑‍🏫;der Tisch|стол|🪑;das Lineal|линейка|📏;das Heft|тетрадь|📓;die Klasse|класс|🏫'),
+  phr: LW('Ich verstehe nicht.|Я не понимаю.|🤔;Noch einmal, bitte.|Ещё раз, пожалуйста.|🔁;Ich habe Hunger.|Я хочу есть.|🍽️;Ich habe Durst.|Я хочу пить.|🥤;Wo ist die Toilette?|Где туалет?|🚻;Wie heißt das?|Как это называется?|❓;Ich weiß nicht.|Я не знаю.|🤷;Spielen wir?|Поиграем?|⚽'),
+  verbs: LW('Ich kann schwimmen.|Я умею плавать.|🏊;Ich lese gern.|Я люблю читать.|📖;Ich wohne in Portugal.|Я живу в Португалии.|🇵🇹;Ich spiele Fußball.|Я играю в футбол.|⚽;Ich habe einen Hund.|У меня есть собака.|🐶;Ich gehe in die Schule.|Я иду в школу.|🏫')
+};
+const DE_G = [
+  ['Der, die, das — артикли', 'У каждого немецкого слова есть род: <b>der</b> — мужской (der Hund), <b>die</b> — женский (die Katze), <b>das</b> — средний (das Buch). Во множественном числе всегда <b>die</b>: die Bücher. Артикль лучше учить вместе со словом.',
+    ['___ Hund (собака)|der|die;das;den', '___ Katze (кошка)|die|der;das;den', '___ Buch (книга)|das|der;die;den', '___ Mutter (мама)|die|der;das;den', '___ Vater (папа)|der|die;das;den', '___ Pferd (лошадь)|das|der;die;den', '___ Schule (школа)|die|der;das;den']],
+  ['Sein — быть', 'ich <b>bin</b>, du <b>bist</b>, er/sie/es <b>ist</b>, wir <b>sind</b>, ihr <b>seid</b>, sie <b>sind</b>.<br>Ich bin acht — мне восемь. Das ist mein Hund — это моя собака.',
+    ['Ich ___ acht Jahre alt.|bin|bist;ist;sind', 'Du ___ mein Freund.|bist|bin;ist;seid', 'Das ___ meine Katze.|ist|bin;sind;bist', 'Wir ___ in der Schule.|sind|seid;ist;bin', 'Ihr ___ toll!|seid|sind;ist;bist', 'Sie ___ Geschwister.|sind|ist;seid;bin']],
+  ['Haben — иметь', 'ich <b>habe</b>, du <b>hast</b>, er/sie/es <b>hat</b>, wir <b>haben</b>, ihr <b>habt</b>, sie <b>haben</b>.<br>Ich habe einen Bruder — у меня есть брат.',
+    ['Ich ___ einen Bruder.|habe|hast;hat;haben', 'Du ___ eine Katze.|hast|habe;hat;habt', 'Sie ___ ein Fahrrad. (она)|hat|haben;hast;habe', 'Wir ___ Hunger.|haben|habt;hat;habe', 'Ihr ___ Glück!|habt|haben;hat;hast']]
+];
+const ES_T = {
+  n: { hello: '¡Hola! Приветствия', num: 'Числа 1–10', col: 'Цвета', ani: 'Животные', fam: 'Семья', food: 'Еда', school: 'Школа', phr: 'Фразы для общения', verbs: 'Что я умею' },
+  i: { hello: 'Испанцы говорят <b>buenos días</b> утром, <b>buenas tardes</b> днём и <b>buenas noches</b> вечером.', col: 'Прилагательное обычно стоит <b>после</b> слова: un gato <b>negro</b> — чёрный кот.', ani: '<b>El</b> — мужской род, <b>la</b> — женский.', phr: 'Вопрос в испанском начинается перевёрнутым знаком: <b>¿</b>Dónde…? Нажми на фразу, чтобы послушать.' },
+  hello: LW('hola|привет|👋;buenos días|доброе утро|🌅;buenas tardes|добрый день|☀️;buenas noches|добрый вечер, спокойной ночи|🌙;adiós|до свидания|👋;gracias|спасибо|🙏;por favor|пожалуйста|🙂;sí|да|✅;no|нет|❌;Me llamo…|Меня зовут…|🧒'),
+  num: LW('uno|один|1;dos|два|2;tres|три|3;cuatro|четыре|4;cinco|пять|5;seis|шесть|6;siete|семь|7;ocho|восемь|8;nueve|девять|9;diez|десять|10'),
+  col: LW('rojo|красный|🔴;azul|синий|🔵;verde|зелёный|🟢;amarillo|жёлтый|🟡;negro|чёрный|⚫;blanco|белый|⚪;naranja|оранжевый|🟠;rosa|розовый|🩷;marrón|коричневый|🟤;gris|серый|🩶'),
+  ani: LW('el gato|кошка|🐱;el perro|собака|🐶;el pez|рыба|🐟;el pájaro|птица|🐦;el caballo|лошадь|🐴;la vaca|корова|🐮;el conejo|кролик|🐰;el león|лев|🦁;el ratón|мышь|🐭;el oso|медведь|🐻'),
+  fam: LW('la madre|мама|👩;el padre|папа|👨;el hermano|брат|👦;la hermana|сестра|👧;la abuela|бабушка|👵;el abuelo|дедушка|👴;la familia|семья|👪;el amigo|друг|🧑‍🤝‍🧑;el bebé|малыш|👶;el tío|дядя|🧔'),
+  food: LW('la manzana|яблоко|🍎;el pan|хлеб|🍞;la leche|молоко|🥛;el agua|вода|💧;el queso|сыр|🧀;el huevo|яйцо|🥚;el helado|мороженое|🍦;el zumo|сок|🧃;la sopa|суп|🍲;la tarta|торт|🎂'),
+  school: LW('la escuela|школа|🏫;el libro|книга|📖;el lápiz|карандаш|✏️;el bolígrafo|ручка|🖊️;la mochila|рюкзак|🎒;el profesor|учитель|🧑‍🏫;la mesa|стол|🪑;la regla|линейка|📏;el cuaderno|тетрадь|📓;la clase|класс|🏫'),
+  phr: LW('No entiendo.|Я не понимаю.|🤔;¿Puedes repetir?|Можешь повторить?|🔁;Tengo hambre.|Я хочу есть.|🍽️;Tengo sed.|Я хочу пить.|🥤;¿Dónde está el baño?|Где туалет?|🚻;¿Cómo se llama esto?|Как это называется?|❓;No sé.|Я не знаю.|🤷;¿Jugamos?|Поиграем?|⚽'),
+  verbs: LW('Sé nadar.|Я умею плавать.|🏊;Me gusta leer.|Я люблю читать.|📖;Vivo en Portugal.|Я живу в Португалии.|🇵🇹;Juego al fútbol.|Я играю в футбол.|⚽;Tengo un perro.|У меня есть собака.|🐶;Voy a la escuela.|Я иду в школу.|🏫')
+};
+const ES_G = [
+  ['El, la, los, las — артикли', '<b>el</b> — мужской род (el perro), <b>la</b> — женский (la casa). Во множественном числе: <b>los</b> perros, <b>las</b> casas. Слова на <b>-o</b> чаще мужского рода, на <b>-a</b> — женского.',
+    ['___ perro (собака)|el|la;los;las', '___ casa (дом)|la|el;los;las', '___ libros (книги)|los|las;el;la', '___ manzanas (яблоки)|las|los;la;el', '___ madre (мама)|la|el;los;las', '___ padre (папа)|el|la;los;las', '___ niños (дети)|los|las;el;la']],
+  ['Ser и estar — быть', '<b>Ser</b> — то, что постоянно: кто ты, какой ты. Soy Lisa — я Лиза. <b>Estar</b> — состояние и место: Estoy cansado — я устал. Estoy en casa — я дома.<br>ser: soy, eres, es, somos, son. estar: estoy, estás, está, estamos, están.',
+    ['Yo ___ Lisa.|soy|estoy;es;está', 'Hoy ___ cansado.|estoy|soy;es;eres', 'Mamá ___ en casa.|está|es;soy;son', 'Nosotros ___ amigos.|somos|estamos;son;es', 'Tú ___ muy alto.|eres|estás;es;soy', 'El libro ___ en la mesa.|está|es;son;soy']],
+  ['Tener — иметь', 'yo <b>tengo</b>, tú <b>tienes</b>, él/ella <b>tiene</b>, nosotros <b>tenemos</b>, ellos <b>tienen</b>.<br>Tengo ocho años — мне восемь лет. Tengo un perro — у меня есть собака.',
+    ['Yo ___ ocho años.|tengo|tienes;tiene;tienen', 'Tú ___ un hermano.|tienes|tengo;tiene;tenemos', 'Ella ___ un gato.|tiene|tienes;tengo;tienen', 'Nosotros ___ hambre.|tenemos|tienen;tiene;tengo', 'Ellos ___ una casa grande.|tienen|tiene;tenemos;tienes']]
+];
+const FR_U = langCourse('fr', 'по-французски', FR_T, FR_G);
+const DE_U = langCourse('de', 'по-немецки', DE_T, DE_G);
+const ES_U = langCourse('es', 'по-испански', ES_T, ES_G);
 
 /* Усложнённые задания для «Уровня PRO» (по типам из учебников Моро; идеи сверены с Gemini) */
 const HARD = {
@@ -4676,6 +4758,16 @@ var FAM_Q = [
   ['er', 'Как переносит ошибки и трудные задания', ['Расстраивается и бросает', 'Злится, но продолжает', 'Спокойно пробует снова']],
   ['dk', 'Как произносит, когда читает вслух', ['Чисто', 'Есть акцент, картавит или шепелявит', 'Читает по слогам, с паузами']],
   ['mo', 'Что больше всего мотивирует', ['Награда из копилки', 'Похвала', 'Рекорды и серии дней', 'Сюжет и новое']]];
+/* Изучаемые языки: код → [название, код озвучки] и уровни владения */
+var FAM_LANGS = { pt: ['Португальский', 'pt-PT'], en: ['Английский', 'en-GB'], fr: ['Французский', 'fr-FR'], de: ['Немецкий', 'de-DE'], es: ['Испанский', 'es-ES'] };
+var FAM_LLV = ['Не знает', 'Немного говорит', 'Общается в школе', 'Говорит свободно'];
+/* Курс по языку и уровню. Начальные уровни — объяснения по-русски; «общается в школе» и «свободно» — упор на грамматику и письмо */
+function famLangCourse(code, lv, age){
+  if (code === 'pt') return lv >= 2 ? PT_NAT : lv === 1 && age >= 8 ? PT_A : PT_Y;
+  if (code === 'en') return lv >= 2 || (lv === 1 && age >= 9) ? EN_A : EN_UNITS;
+  return { fr: FR_U, de: DE_U, es: ES_U }[code];
+}
+function famLangs(c){ var lg = c.lg || {}; return Object.keys(FAM_LANGS).filter(function(k){ return lg[k] != null && lg[k] !== ''; }).slice(0, 2); }
 var FAM_QK = FAM_Q.map(function(q){ return q[0]; });
 function famQv(c, k){ var v = c[k]; return v == null || v === '' ? null : +v; }
 var FAM_RD = ['Пока не читает или читает по слогам', 'Читает медленно, с трудом', 'Читает уверенно', 'Читает много и быстро, сам выбирает книги'];
@@ -4710,11 +4802,17 @@ function famInit(){
     else if (mt === 2) { if (c.age <= 9) { mk = 'yarik'; mp = 11; } else { mk = 'anya'; mp = 0; } }
     else if (mt === 3) { if (c.age >= 8) { mk = 'anya'; mp = 0; } else { mk = 'yarik'; mp = 13; } }
     if (mk) a.cur = Object.assign({}, KIDS_TPL[a.tpl].cur, { math: KIDS_TPL[mk].cur.math });
+    var ls = famLangs(c), lset = ls.map(function(k){ return k + (+c.lg[k]); }).join(',');
+    if (ls.length) { var l0 = ls[0], l1 = ls[1], lc = { '': FAM_LANGS[l0][1] };
+      var lang = { name: FAM_LANGS[l0][0], src: 'Словоход', units: famLangCourse(l0, +c.lg[l0], c.age) };
+      if (l1) { lang.alt = famLangCourse(l1, +c.lg[l1], c.age); lang.altName = FAM_LANGS[l1][0]; lc._alt = FAM_LANGS[l1][1]; }
+      a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur, { lang: lang }); a.lc = lc; }
     a.read = famReadList(rd >= 3 && c.age >= 9 ? READ_A : rd === 0 && c.age <= 10 ? READ_Y : KIDS_TPL[a.tpl].read, c.done);
     KIDS[c.id] = Object.assign({}, KIDS_TPL[a.tpl], a, { name: c.name, grade: c.age + ' ' + U.pl(+c.age, 'год', 'года', 'лет'), look: c.look || famLookOf(c) });
     var th = famThemeOf(c); if (th) THEME['k:' + c.id] = th; else delete THEME['k:' + c.id];
     if (!S.kids[c.id]) S.kids[c.id] = newKid(); if (c.pin) S.kids[c.id].pin = c.pin;
-    var K = S.kids[c.id], ms = mk ? mt + '|' + mk : ''; if (ms && K.mathSet !== ms) { K.pos.math = mp; K.mathSet = ms; } });
+    var K = S.kids[c.id], ms = mk ? mt + '|' + mk : ''; if (ms && K.mathSet !== ms) { K.pos.math = mp; K.mathSet = ms; }
+    if ((K.langSet || '') !== lset) { delete K.pos.lang; delete K.pos.lang_alt; K.langSet = lset; } });
   if (S.fam && S.fam.ppin) S.parentPin = S.fam.ppin;
 }
 function famApi(o){
@@ -4755,9 +4853,9 @@ function vFamLogin(){
     '<p class="center"><button class="link" data-act="fkreg">Новая семья? Регистрация</button></p>' + '<p class="center"><a class="link" href="semya/ustanovka.html" target="_blank">Как установить на телефон, планшет и компьютер</a></p>');
 }
 /* Черновик списка детей на экране настройки */
-function fkDraft(){ if (!cur.fk) cur.fk = ((S.fam && S.fam.kids) || []).map(function(c){ return { id: c.id, name: c.name, age: c.age, ints: (c.ints || []).slice(), hero: c.hero || '', books: c.books || '', done: c.done || '', rd: c.rd == null ? '' : String(c.rd), color: c.color || '', has: !!c.pin, q: FAM_QK.reduce(function(o, k){ o[k] = c[k] == null ? '' : String(c[k]); return o; }, {}) }; }); if (!cur.fk.length) cur.fk.push({ id: '', name: '', age: 8, ints: [], hero: '', books: '', done: '', rd: '', color: '' }); return cur.fk; }
+function fkDraft(){ if (!cur.fk) cur.fk = ((S.fam && S.fam.kids) || []).map(function(c){ return { id: c.id, name: c.name, age: c.age, ints: (c.ints || []).slice(), hero: c.hero || '', books: c.books || '', done: c.done || '', rd: c.rd == null ? '' : String(c.rd), color: c.color || '', has: !!c.pin, lg: Object.assign({}, c.lg || {}), q: FAM_QK.reduce(function(o, k){ o[k] = c[k] == null ? '' : String(c[k]); return o; }, {}) }; }); if (!cur.fk.length) cur.fk.push({ id: '', name: '', age: 8, ints: [], hero: '', books: '', done: '', rd: '', color: '' }); return cur.fk; }
 function fkRead(){ (cur.fk || []).forEach(function(c, i){ var g = function(n){ var el = document.getElementById('fk' + n + i); return el ? el.value : null; };
-  if (g('n') != null) { c.name = g('n').trim(); c.age = +g('a'); c.hero = g('h').trim(); c.books = g('b').trim(); c.done = g('d').trim(); c.rd = g('r'); c.pinNew = g('p'); c.q = c.q || {}; FAM_QK.forEach(function(k){ var v = g('q' + k); if (v != null) c.q[k] = v; }); } }); }
+  if (g('n') != null) { c.name = g('n').trim(); c.age = +g('a'); c.hero = g('h').trim(); c.books = g('b').trim(); c.done = g('d').trim(); c.rd = g('r'); c.pinNew = g('p'); c.q = c.q || {}; FAM_QK.forEach(function(k){ var v = g('q' + k); if (v != null) c.q[k] = v; }); c.lg = c.lg || {}; Object.keys(FAM_LANGS).forEach(function(k){ var v = g('l' + k); if (v != null) { if (v === '') delete c.lg[k]; else c.lg[k] = v; } }); } }); }
 function vFamKids(){
   var L = fkDraft(), first = !S.parentPin;
   var ages = function(v){ var h = ''; for (var a = 6; a <= 13; a++) h += '<option value="' + a + '"' + (+v === a ? ' selected' : '') + '>' + a + ' ' + U.pl(a, 'год', 'года', 'лет') + '</option>'; return h; };
@@ -4768,6 +4866,7 @@ function vFamKids(){
     '<label>Любимые герои мультиков или книг<input id="fkh' + i + '" value="' + U.esc(c.hero || '') + '" maxlength="80" autocomplete="off" placeholder="Например: Гарри Поттер, Человек-паук, Колобок"></label>' +
     '<label>Как читает по-русски<select id="fkr' + i + '"><option value="">— выберите —</option>' + FAM_RD.map(function(t, k){ return '<option value="' + k + '"' + (String(c.rd) === String(k) ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></label>' +
     '<p class="fkql">Ещё несколько вопросов — чтобы задания с первого дня были по силам</p>' + FAM_Q.map(function(x){ var v = (c.q || {})[x[0]]; return '<label>' + x[1] + '<select id="fkq' + x[0] + i + '"><option value="">— выберите —</option>' + x[2].map(function(t, k){ return '<option value="' + k + '"' + (v !== '' && v != null && String(v) === String(k) ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></label>'; }).join('') +
+    '<p class="fkql">Какие языки изучать, кроме русского (до двух) и как ребёнок на них говорит</p>' + Object.keys(FAM_LANGS).map(function(k){ var v = (c.lg || {})[k]; return '<label>' + FAM_LANGS[k][0] + '<select id="fkl' + k + i + '"><option value="">— не изучать —</option>' + FAM_LLV.map(function(t, j){ return '<option value="' + j + '"' + (v != null && v !== '' && +v === j ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></label>'; }).join('') +
     '<label>Любимые книги<input id="fkb' + i + '" value="' + U.esc(c.books || '') + '" maxlength="200" autocomplete="off" placeholder="На любом языке, можно несколько"></label>' +
     '<label>Что уже прочитал(а) из русских книг<input id="fkd' + i + '" value="' + U.esc(c.done || '') + '" maxlength="300" autocomplete="off" placeholder="Например: Денискины рассказы, Каштанка"></label>' +
     '<p class="fkql">Любимый цвет</p><div class="row fkcols">' + FAM_COLORS.map(function(x){ return '<button type="button" class="fkcol' + (c.color === x[0] ? ' on' : '') + '" data-act="fkcol" data-i="' + i + '" data-k="' + x[0] + '" style="background:' + x[1] + '" aria-label="' + x[0] + '"></button>'; }).join('') + '</div>' +
@@ -4819,13 +4918,14 @@ function famForm(k, f, val){
     fkRead(); var L = cur.fk, pp = val('fkpp'), first = !S.parentPin, i, c, pins = [];
     for (i = 0; i < L.length; i++) { c = L[i];
       if (!c.name) { alertMsg('Напишите имя ребёнка ' + (i + 1)); return true; }
+      if (Object.keys(c.lg || {}).filter(function(k){ return c.lg[k] !== ''; }).length > 2) { alertMsg('Выберите не больше двух языков для ребёнка: ' + c.name); return true; }
       if (c.pinNew && !/^\d{4}$/.test(c.pinNew)) { alertMsg('Код ребёнка — четыре цифры'); return true; }
       if (!c.has && !c.pinNew) { alertMsg('Придумайте код для ребёнка: ' + c.name); return true; } }
     if ((first || pp) && !/^\d{4}$/.test(pp)) { alertMsg('Код родителя — четыре цифры'); return true; }
     var old = {}; (S.fam.kids || []).forEach(function(x){ old[x.id] = x; });
     var kids = L.map(function(c, j){ var id = c.id || ('k' + Date.now().toString(36) + j); var o = old[id] || {};
       var x = { id: id, name: c.name.slice(0, 20), age: c.age, ints: c.ints || [], hero: (c.hero || '').slice(0, 80), books: (c.books || '').slice(0, 200), done: (c.done || '').slice(0, 300), rd: c.rd === '' || c.rd == null ? null : +c.rd, color: c.color || '', pin: c.pinNew ? hashPin(c.pinNew) : o.pin };
-      FAM_QK.forEach(function(k){ var v = (c.q || {})[k]; x[k] = v === '' || v == null ? null : +v; }); return x; });
+      FAM_QK.forEach(function(k){ var v = (c.q || {})[k]; x[k] = v === '' || v == null ? null : +v; }); x.lg = {}; Object.keys(c.lg || {}).forEach(function(k){ if (FAM_LANGS[k] && c.lg[k] !== '') x.lg[k] = +c.lg[k]; }); return x; });
     var ppin = pp ? hashPin(pp) : S.fam.ppin;
     kids.forEach(function(x){ pins.push(x.pin); }); pins.push(ppin);
     if (pins.filter(function(x, j){ return pins.indexOf(x) !== j; }).length) { alertMsg('Коды должны быть разными у всех'); return true; }
@@ -5177,7 +5277,7 @@ function vLesson(){
 function vTask(kid, subj, L){
   const T = lessonTasks(L, kid, subj); if (!T.length) return vHwText(kid, L);
   const t = T[L.i], a = L.ans[L.i] || { tries: 0 }; const fin = a.final;
-  const lang = subj === 'lang' ? (L.tr === '_alt' ? 'en-GB' : 'pt-PT') : 'ru-RU';
+  const lang = subj === 'lang' ? LCODE(kid, L.tr) : 'ru-RU';
   let inp;
   if (t.k === 'c') inp = `<div class="opts">${t.opts.map(o => { const cls = fin && o === t.a ? 'right' : (a.wrong || []).includes(o) ? 'wrong' : ''; return `<button class="opt ${cls}" data-act="choose" data-v="${U.esc(o)}" ${fin || (a.wrong || []).includes(o) ? 'disabled' : ''}>${o}</button>`; }).join('')}</div>`;
   else if (t.k === 't') inp = `<form class="numf txtf" data-form="num"><input id="numin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" ${fin ? 'disabled' : 'autofocus'} value="${fin ? U.esc(a.v) : ''}" aria-label="Ответ" placeholder="Напиши ответ"><button class="btn" ${fin ? 'disabled' : ''}>Проверить</button></form>`;
@@ -5269,7 +5369,7 @@ function nextTask(){
   const kid = cur.kid, subj = cur.subj, L = dayRec(kid, cur.ds).les[subj], T = lessonTasks(L, kid, subj);
   if (L.i + 1 < T.length) { L.i++; save(); render(); return; }
   if (subj === 'hw' && S.kids[kid].hwText.some(h => !h.done && (L.txt || []).includes(h.id))) { L.items = []; save(); render(); return; }
-  if (subj === 'lang') { L.phase = 'fread'; startForeign(kid, L); save(); render(); return; }
+  if (subj === 'lang' && foreignList(L).length) { L.phase = 'fread'; startForeign(kid, L); save(); render(); return; }
   L.phase = 'survey'; save(); render();
 }
 function finishLesson(){
@@ -5589,12 +5689,15 @@ function readAnswer(v){
 }
 
 /* ----- Чтение на португальском / английском внутри урока языков ----- */
-function foreignList(L){ return L.tr === '_alt' ? READ_EN : READ_PT; }
+function foreignList(L){ const f = FLANG(cur.kid, L.tr); return f === 'en' ? READ_EN : f === 'pt' ? READ_PT : []; }
+/* Язык дорожки «Языки»: '' — основной (португальский), '_alt' — английский; в «Словоходе» задаёт анкета (KIDS[kid].lc) */
+function LCODE(kid, tr){ const lc = kid && KIDS[kid] && KIDS[kid].lc; return (lc && lc[tr || '']) || (tr === '_alt' ? 'en-GB' : 'pt-PT'); }
+function FLANG(kid, tr){ return LCODE(kid, tr).slice(0, 2); }
 function startForeign(kid, L){ const K = S.kids[kid]; const key = L.tr === '_alt' ? 'enRead' : 'ptRead'; const list = foreignList(L).filter(t => T(kid) === 'anya' || t.lvl === 1 || (K.pos[key] || 0) >= 3); const t = list[(K.pos[key] || 0) % list.length]; L.fid = t.id; L.ftitle = t.title; L.fphase = 'read'; L.fans = []; L.fq = t.qs.length; L.fi = 0; }
 function curForeign(L){ return foreignList(L).find(t => t.id === L.fid); }
 function RD_TEXT(){ const L = dayRec(cur.kid, cur.ds).les[cur.subj]; return curForeign(L).text; }
 function vForeign(kid, L){
-  const t = curForeign(L), lang = L.tr === '_alt' ? 'en-GB' : 'pt-PT';
+  const t = curForeign(L), lang = LCODE(cur.kid, L.tr);
   if (L.fphase === 'read') { rdRestore(L, t.text);
     return `<article class="card reading"><h2>${U.esc(t.title)}</h2><div class="text ftext" id="rtext">${tokensHtml(t.text, RD && RD.st, RD && RD.p)}</div><button class="btn ghost small" data-act="sayfull">🔊 Послушать, как читать</button></article>
     <div class="readbar">${readBar('startfread', `<button class="btn big mic" data-act="startfread">🎤 Прочитать вслух</button>`)}</div>`; }
@@ -5714,7 +5817,7 @@ document.addEventListener('click', e => {
     case 'saytheory': { const u = unitById(kid, cur.subj, L.uid); say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
     case 'topractice': L.phase = 'practice'; save(); render(); break;
     case 'choose': answer(b.dataset.v); break;
-    case 'sayq': { const T = lessonTasks(L, kid, cur.subj); const t = T[L.i]; say(t.sp, L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break; }
+    case 'sayq': { const T = lessonTasks(L, kid, cur.subj); const t = T[L.i]; say(t.sp, LCODE(kid, L.tr)); break; }
     case 'next': nextTask(); break;
     case 'fb': { L.fb = L.fb || {}; L.fb[b.dataset.k] = isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v; const tx = document.getElementById('fbtext'); if (tx) L.fb.text = tx.value; save(); render(); break; }
     case 'sendfb': { const tx = document.getElementById('fbtext'); if (tx) L.fb.text = tx.value.trim(); finishLesson(); break; }
@@ -5746,8 +5849,8 @@ document.addEventListener('click', e => {
     case 'wnext': L.wi = (L.wi || 0) + 1; save(); render(); break;
     case 'wdone': { const K = S.kids[kid]; K.vocab = K.vocab || []; (L.gl || []).forEach((g, k) => { if (!K.vocab.some(v => v.w === g.w)) K.vocab.push({ w: g.w, d: g.d, e: g.e, ok: !!(L.wans && L.wans[k] && L.wans[k].ok), ds: cur.ds }); }); L.phase = 'survey'; save(); render(); window.scrollTo(0, 0); break; }
     case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = L.gl && L.gl.length ? 'words' : 'survey'; L.wi = 0; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) K.pos.read = (K.pos.read || 0) + 1; } save(); render(); break; }
-    case 'startfread': if (!(RD && RD.paused)) RD = null; startRead(L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break;
-    case 'sayfull': say(curForeign(L).text, L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break;
+    case 'startfread': if (!(RD && RD.paused)) RD = null; startRead(LCODE(cur.kid, L.tr)); break;
+    case 'sayfull': say(curForeign(L).text, LCODE(cur.kid, L.tr)); break;
     case 'fq': foreignAnswer(b.dataset.v); break;
     case 'fnext': { if (L.fi + 1 < L.fq) L.fi++; else { L.phase = 'survey'; const key = L.tr === '_alt' ? 'enRead' : 'ptRead'; S.kids[kid].pos[key] = (S.kids[kid].pos[key] || 0) + 1; } save(); render(); break; }
     case 'shop': go('shop'); break;

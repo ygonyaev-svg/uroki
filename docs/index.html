@@ -570,7 +570,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* va15ed177 */
+<script>/* v8206dffe */
 var FAM = 0;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -4914,7 +4914,7 @@ function vLesson(){
 function vTask(kid, subj, L){
   const T = lessonTasks(L, kid, subj); if (!T.length) return vHwText(kid, L);
   const t = T[L.i], a = L.ans[L.i] || { tries: 0 }; const fin = a.final;
-  const lang = subj === 'lang' ? (L.tr === '_alt' ? 'en-GB' : 'pt-PT') : 'ru-RU';
+  const lang = subj === 'lang' ? LCODE(kid, L.tr) : 'ru-RU';
   let inp;
   if (t.k === 'c') inp = `<div class="opts">${t.opts.map(o => { const cls = fin && o === t.a ? 'right' : (a.wrong || []).includes(o) ? 'wrong' : ''; return `<button class="opt ${cls}" data-act="choose" data-v="${U.esc(o)}" ${fin || (a.wrong || []).includes(o) ? 'disabled' : ''}>${o}</button>`; }).join('')}</div>`;
   else if (t.k === 't') inp = `<form class="numf txtf" data-form="num"><input id="numin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" ${fin ? 'disabled' : 'autofocus'} value="${fin ? U.esc(a.v) : ''}" aria-label="Ответ" placeholder="Напиши ответ"><button class="btn" ${fin ? 'disabled' : ''}>Проверить</button></form>`;
@@ -5006,7 +5006,7 @@ function nextTask(){
   const kid = cur.kid, subj = cur.subj, L = dayRec(kid, cur.ds).les[subj], T = lessonTasks(L, kid, subj);
   if (L.i + 1 < T.length) { L.i++; save(); render(); return; }
   if (subj === 'hw' && S.kids[kid].hwText.some(h => !h.done && (L.txt || []).includes(h.id))) { L.items = []; save(); render(); return; }
-  if (subj === 'lang') { L.phase = 'fread'; startForeign(kid, L); save(); render(); return; }
+  if (subj === 'lang' && foreignList(L).length) { L.phase = 'fread'; startForeign(kid, L); save(); render(); return; }
   L.phase = 'survey'; save(); render();
 }
 function finishLesson(){
@@ -5326,12 +5326,15 @@ function readAnswer(v){
 }
 
 /* ----- Чтение на португальском / английском внутри урока языков ----- */
-function foreignList(L){ return L.tr === '_alt' ? READ_EN : READ_PT; }
+function foreignList(L){ const f = FLANG(cur.kid, L.tr); return f === 'en' ? READ_EN : f === 'pt' ? READ_PT : []; }
+/* Язык дорожки «Языки»: '' — основной (португальский), '_alt' — английский; в «Словоходе» задаёт анкета (KIDS[kid].lc) */
+function LCODE(kid, tr){ const lc = kid && KIDS[kid] && KIDS[kid].lc; return (lc && lc[tr || '']) || (tr === '_alt' ? 'en-GB' : 'pt-PT'); }
+function FLANG(kid, tr){ return LCODE(kid, tr).slice(0, 2); }
 function startForeign(kid, L){ const K = S.kids[kid]; const key = L.tr === '_alt' ? 'enRead' : 'ptRead'; const list = foreignList(L).filter(t => T(kid) === 'anya' || t.lvl === 1 || (K.pos[key] || 0) >= 3); const t = list[(K.pos[key] || 0) % list.length]; L.fid = t.id; L.ftitle = t.title; L.fphase = 'read'; L.fans = []; L.fq = t.qs.length; L.fi = 0; }
 function curForeign(L){ return foreignList(L).find(t => t.id === L.fid); }
 function RD_TEXT(){ const L = dayRec(cur.kid, cur.ds).les[cur.subj]; return curForeign(L).text; }
 function vForeign(kid, L){
-  const t = curForeign(L), lang = L.tr === '_alt' ? 'en-GB' : 'pt-PT';
+  const t = curForeign(L), lang = LCODE(cur.kid, L.tr);
   if (L.fphase === 'read') { rdRestore(L, t.text);
     return `<article class="card reading"><h2>${U.esc(t.title)}</h2><div class="text ftext" id="rtext">${tokensHtml(t.text, RD && RD.st, RD && RD.p)}</div><button class="btn ghost small" data-act="sayfull">🔊 Послушать, как читать</button></article>
     <div class="readbar">${readBar('startfread', `<button class="btn big mic" data-act="startfread">🎤 Прочитать вслух</button>`)}</div>`; }
@@ -5451,7 +5454,7 @@ document.addEventListener('click', e => {
     case 'saytheory': { const u = unitById(kid, cur.subj, L.uid); say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
     case 'topractice': L.phase = 'practice'; save(); render(); break;
     case 'choose': answer(b.dataset.v); break;
-    case 'sayq': { const T = lessonTasks(L, kid, cur.subj); const t = T[L.i]; say(t.sp, L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break; }
+    case 'sayq': { const T = lessonTasks(L, kid, cur.subj); const t = T[L.i]; say(t.sp, LCODE(kid, L.tr)); break; }
     case 'next': nextTask(); break;
     case 'fb': { L.fb = L.fb || {}; L.fb[b.dataset.k] = isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v; const tx = document.getElementById('fbtext'); if (tx) L.fb.text = tx.value; save(); render(); break; }
     case 'sendfb': { const tx = document.getElementById('fbtext'); if (tx) L.fb.text = tx.value.trim(); finishLesson(); break; }
@@ -5483,8 +5486,8 @@ document.addEventListener('click', e => {
     case 'wnext': L.wi = (L.wi || 0) + 1; save(); render(); break;
     case 'wdone': { const K = S.kids[kid]; K.vocab = K.vocab || []; (L.gl || []).forEach((g, k) => { if (!K.vocab.some(v => v.w === g.w)) K.vocab.push({ w: g.w, d: g.d, e: g.e, ok: !!(L.wans && L.wans[k] && L.wans[k].ok), ds: cur.ds }); }); L.phase = 'survey'; save(); render(); window.scrollTo(0, 0); break; }
     case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = L.gl && L.gl.length ? 'words' : 'survey'; L.wi = 0; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) K.pos.read = (K.pos.read || 0) + 1; } save(); render(); break; }
-    case 'startfread': if (!(RD && RD.paused)) RD = null; startRead(L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break;
-    case 'sayfull': say(curForeign(L).text, L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break;
+    case 'startfread': if (!(RD && RD.paused)) RD = null; startRead(LCODE(cur.kid, L.tr)); break;
+    case 'sayfull': say(curForeign(L).text, LCODE(cur.kid, L.tr)); break;
     case 'fq': foreignAnswer(b.dataset.v); break;
     case 'fnext': { if (L.fi + 1 < L.fq) L.fi++; else { L.phase = 'survey'; const key = L.tr === '_alt' ? 'enRead' : 'ptRead'; S.kids[kid].pos[key] = (S.kids[kid].pos[key] || 0) + 1; } save(); render(); break; }
     case 'shop': go('shop'); break;
