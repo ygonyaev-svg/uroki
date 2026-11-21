@@ -131,10 +131,20 @@ function sayRobot(text, lang){ try { const s = window.speechSynthesis; if (!s) r
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const normW = w => w.toLowerCase().replace(/ё/g, 'е').replace(/[^\p{L}\p{N}]/gu, '');
 function lev(a, b){ const m = a.length, n = b.length; if (!m) return n; if (!n) return m; let p = Array.from({ length: n + 1 }, (_, j) => j); for (let i = 1; i <= m; i++) { const c = [i]; for (let j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[n]; }
-function sim(a, b){ if (a === b) return true; if (Math.abs(a.length - b.length) > 2) return false; const d = lev(a, b); return d <= (b.length >= 7 ? 2 : b.length >= 4 ? 1 : 0) + (FAM && b.length >= 4 ? (KIDS[cur.kid] || {}).simPlus || 0 : 0); }
+/* Сравнение слов при чтении вслух: распознавание речи путает окончания и похожие звуки даже у взрослых — сравниваем «по звучанию». */
+function simPh(w){ return w.replace(/[ьъ]/g, '').replace(/[ёо]/g, 'а').replace(/[еэяиы]/g, 'и').replace(/ю/g, 'у').replace(/тс|дс|тьс/g, 'ц').replace(/(.)\1/g, '$1').replace(/[бвгдзж]$/, c => 'пфктсш'['бвгдзж'.indexOf(c)]); }
+function sim(a, b){ if (a === b) return true; if (Math.abs(a.length - b.length) > 3) return false; const plus = FAM && b.length >= 4 ? (KIDS[cur.kid] || {}).simPlus || 0 : 0;
+  if (lev(a, b) <= (b.length >= 7 ? 2 : b.length >= 4 ? 1 : 0) + plus) return true;
+  if (!/[а-я]/.test(b)) return false; const x = simPh(a), y = simPh(b); if (x === y) return true;
+  const sh = Math.min(x.length, y.length), lg = Math.max(x.length, y.length); if (sh >= 3 && lg - sh <= 2 && (x.startsWith(y) || y.startsWith(x))) return true;
+  return lg >= 4 && lev(x, y) <= (lg >= 7 ? 2 : 1); }
 function align(T, spoken){ const st = new Array(T.length).fill(0); let p = 0, extra = 0;
-  for (const s of spoken) { if (!s) continue; let f = -1; for (let j = p; j < Math.min(T.length, p + 5); j++) if (T[j] && sim(s, T[j])) { f = j; break; }
-    if (f < 0) { extra++; continue; } for (let k = p; k < f; k++) st[k] = T[k].length <= 2 ? 1 : 2; st[f] = 1; p = f + 1; }
+  const hit = (i, j) => { if (!T[j]) return 0; const s = spoken[i]; if (sim(s, T[j])) return 1; if (i + 1 < spoken.length && T[j].length > s.length) { const s2 = s + spoken[i + 1]; if (sim(s2, T[j])) return 2; if (i + 2 < spoken.length && sim(s2 + spoken[i + 2], T[j])) return 3; } return 0; };
+  for (let i = 0; i < spoken.length; i++) { if (!spoken[i]) continue; let f = -1, n = 0;
+    for (let j = p; j < Math.min(T.length, p + 5); j++) { n = hit(i, j); if (n) { f = j; break; } }
+    /* не застреваем: если слово не узнано, ищем дальше, но только когда и следующее сказанное слово совпадает со следующим в тексте */
+    if (f < 0) for (let j = p + 5; j < Math.min(T.length, p + 25); j++) { n = hit(i, j); if (n && i + n < spoken.length && j + 1 < T.length && hit(i + n, j + 1)) { f = j; break; } n = 0; }
+    if (f < 0) { extra++; continue; } for (let k = p; k < f; k++) st[k] = T[k].length <= 2 ? 1 : 2; st[f] = 1; p = f + 1; i += n - 1; }
   return { st, p, extra }; }
 
 /* ===== Состояние экрана ===== */
