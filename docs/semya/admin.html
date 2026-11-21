@@ -46,7 +46,7 @@ function draw(j){
   h += '<h1 style="margin-top:20px">Отзывы</h1><div class="card">' + (B.length ? B.map(function(b){ return '<div class="fb"><span class="mut">' + dt(b.t) + ' · ' + esc(b.email) + '</span><br>' + esc(b.text) + '</div>'; }).join('') : 'Пока нет.') + '</div>';
   A.innerHTML = h;
 }
-var APP = 'https://ygonyaev-svg.github.io/uroki/semya/#i=';
+var APP = 'https://slovohod.com/#i=';
 var INV_ST = { 'свободно': ['ждёт регистрации', 'on'], 'использовано': ['использовано', 'mut'], 'отозвано': ['отозвано', 'off'] };
 function invBlock(L){
   var h = '<h1 style="margin-top:20px">Приглашения</h1><div class="card"><p class="mut">Каждая ссылка — для одной регистрации. После регистрации она сгорает, неиспользованную можно отозвать.</p><input id="il" placeholder="Кому, например: Маша, мама Пети" maxlength="60" autocomplete="off"><button onclick="newInv()">Создать приглашение</button></div>';
@@ -57,7 +57,7 @@ function invBlock(L){
 }
 function newInv(){ var l = document.getElementById('il').value.trim(); if (!l) { alert('Напишите, кому приглашение'); return; } api({ op: 'inv', label: l }).then(function(j){ if (j.ok) draw(j); else alert(j.msg || 'Ошибка'); }); }
 function offInv(c){ if (!confirm('Отозвать приглашение? Ссылка перестанет работать.')) return; api({ op: 'invoff', code: c }).then(function(j){ if (j.ok) draw(j); else alert(j.msg || 'Ошибка'); }); }
-function shareInv(c, l){ var u = APP + c, t = 'Приглашение в тестовую версию «Словохода». Ссылка личная и работает для одной регистрации: ' + u;
+function shareInv(c, l){ var u = APP + c, t = 'Приглашаем вашу семью в «Словоход»: от первых слов к большим книгам. Это бесплатная тестовая версия для детей 6–13 лет: чтение, математика, языки, по 45–60 минут в день.\n\nВаша личная ссылка (на одну регистрацию): ' + u + '\n\nКак поставить на телефон или планшет: https://slovohod.com/ustanovka.html';
   if (navigator.share) navigator.share({ text: t }).catch(function(){}); else if (navigator.clipboard) navigator.clipboard.writeText(t).then(function(){ alert('Скопировано'); }); else prompt('Скопируйте', t); }
 function load(){ if (!KEY) return keyForm(); api({}).then(function(j){ if (!j.ok) return keyForm(esc(j.msg || 'Ошибка')); draw(j); }).catch(function(){ A.innerHTML = '<div class="card">Нет связи. <button class="gh" onclick="load()">Повторить</button></div>'; }); }
 function setSt(fid, on){ if (!on && !confirm('Отключить эту семью? Приложение у них перестанет открываться.')) return; api({ op: 'set', fid: fid, on: on }).then(function(j){ if (j.ok) draw(j); else alert(j.msg || 'Ошибка'); }); }
