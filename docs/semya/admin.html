@@ -28,7 +28,8 @@ function dt(s){ if (!s) return '—'; var d = new Date(s); if (isNaN(d)) return 
 function api(o){ o.fam = 'admin'; o.key = KEY; return fetch(URL_, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(o) }).then(function(r){ return r.json(); }); }
 var A = document.getElementById('app');
 var QL = { rt: ['пересказ', 'легко', 'коротко', 'по вопросам', 'не умеет'], vw: ['слова', 'почти все', 'бытовые', 'просит перевод'], wr: ['пишет', 'сам', 'по буквам', 'нет'], mt: ['математика', 'до 20', 'до 100', 'умножение', 'задачи'], at: ['внимание', '10–15 мин', '20–25 мин', '30–40 мин'], er: ['ошибки', 'бросает', 'злится', 'спокойно'], dk: ['дикция', 'чисто', 'акцент', 'по слогам'], mo: ['мотивация', 'копилка', 'похвала', 'рекорды', 'сюжет'] };
-function qs(k){ return Object.keys(QL).filter(function(x){ return k[x] != null && QL[x][k[x] + 1]; }).map(function(x){ return '; ' + QL[x][0] + ': ' + QL[x][k[x] + 1]; }).join(''); }
+var LN = { pt: 'португальский', en: 'английский', fr: 'французский', de: 'немецкий', es: 'испанский' }, LV = ['не знает', 'немного', 'в школе', 'свободно'];
+function qs(k){ return Object.keys(k.lg || {}).map(function(x){ return '; ' + (LN[x] || x) + ': ' + (LV[k.lg[x]] || ''); }).join('') + Object.keys(QL).filter(function(x){ return k[x] != null && QL[x][k[x] + 1]; }).map(function(x){ return '; ' + QL[x][0] + ': ' + QL[x][k[x] + 1]; }).join(''); }
 function keyForm(msg){ A.innerHTML = '<h1>Словоход — семьи</h1><div class="card"><p>' + (msg || 'Введите ключ администратора.') + '</p><input id="k" autocomplete="off"><button onclick="KEY=document.getElementById(\'k\').value.trim();try{localStorage.setItem(\'slovohod.admin\',KEY)}catch(e){};load()">Открыть</button></div>'; }
 function draw(j){
   var F = j.fams || [], act = F.filter(function(f){ return !f.off; }).length;
