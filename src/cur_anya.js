@@ -323,7 +323,7 @@ const PT_A = [
    g: vocabGen([['Como te chamas?','Как тебя зовут?'],['Quantos anos tens?','Сколько тебе лет?'],['Onde moras?','Где ты живёшь?'],['Não percebo.','Я не понимаю.'],['Pode repetir, por favor?','Повторите, пожалуйста.'],['Qual é a tua disciplina preferida?','Какой твой любимый предмет?'],['Hoje está a chover.','Сегодня идёт дождь.'],['Amanhã temos teste de Matemática.','Завтра у нас контрольная по математике.'],['Esqueci-me do caderno.','Я забыла тетрадь.'],['Estou atrasada.','Я опаздываю.'],['Concordo contigo.','Я с тобой согласна.'],['Quanto custa?','Сколько стоит?']]) },
  { id:'p5_11', t:'Pretérito perfeito — прошедшее время',
    th:'falar → fal<b>ei</b>, fal<b>aste</b>, fal<b>ou</b>, fal<b>ámos</b>, fal<b>aram</b>.<br>comer → com<b>i</b>, com<b>este</b>, com<b>eu</b>, com<b>emos</b>, com<b>eram</b>.<br>partir → part<b>i</b>, part<b>iste</b>, part<b>iu</b>, part<b>imos</b>, part<b>iram</b>.<br>Ontem eu <b>estudei</b> muito.',
-   g: r => { const g=r.pick(['ar','er','ir']); const [v,ru]=r.pick(PT_VERBS[g]); const st=v.slice(0,-2); const f=PT_PRET[g].map(e=>st+e); const i=r.int(0,4); return Object.assign(C(`Ontem ${PT_PRON[i]} ___ (${v} — ${ru})`, f[i], r.sample(f.filter((_,j)=>j!==i),3), `${v}: ${f.join(', ')}`), {sp:PT_PRON[i].split(' ')[0]+' '+f[i], spAfter:true}); } }
+   g: r => { const g=r.pick(['ar','er','ir']); const [v,ru]=r.pick(PT_VERBS[g]); const st=v.slice(0,-2); const f=PT_PRET[g].map(e=>(st+e).replace(/gei$/,'guei').replace(/cei$/,'quei').replace(/çei$/,'cei')); const i=r.int(0,4); return Object.assign(C(`Ontem ${PT_PRON[i]} ___ (${v} — ${ru})`, f[i], r.sample(f.filter((_,j)=>j!==i),3), `${v}: ${f.join(', ')}`), {sp:PT_PRON[i].split(' ')[0]+' '+f[i], spAfter:true}); } }
 ];
 
 /* ===== English — оба ребёнка ===== */

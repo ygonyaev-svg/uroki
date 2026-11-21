@@ -81,7 +81,7 @@ function unitAt(kid, subj, tr){ const list = unitsOf(kid, subj, tr); const K = S
 function acc(K, uid){ const s = K.stats[uid]; return s && s.n ? s.ok / s.n : 1; }
 function genTasks(unit, seed, n){ const r = U.rng(seed); const out = []; const seen = new Set(); let guard = 0;
   while (out.length < n && guard++ < n * 12) { const t = unit.g(r); t.q = agree(t.q); t.e = agree(t.e); if (t.k === 'c' && /^\d+([.,]\d+)?$/.test(t.a) && t.w.every(x => /^\d+([.,]\d+)?$/.test(String(x)))) { t.k = 'n'; t.a = Number(String(t.a).replace(',', '.')); delete t.w; } /* числа — только вводом, без угадывания */
-    else if (t.k === 'c' && /^[a-zà-üа-яё'’-]+$/i.test(String(t.a)) && (/_/.test(t.q) || new RegExp('(^|[^a-zà-üа-яё])' + String(t.a).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-zà-üа-яё]|$)', 'i').test(strip(t.q)))) { t.k = 't'; t.alt = []; t.a = String(t.a); delete t.w; } /* слово из вопроса или пропуск — пишем сами */ if (seen.has(t.q)) continue; seen.add(t.q); if (t.k === 'c') t.opts = r.shuffle([t.a, ...t.w]); out.push(t); }
+    else if (t.k === 'c' && /^[a-zà-üа-яё'’-]+$/i.test(String(t.a)) && t.w.every(x => /^[a-zà-üа-яё'’-]+$/i.test(String(x))) && !TXT_KEEP[strip(t.q)] && (/_/.test(t.q) || new RegExp('(^|[^a-zà-üа-яё])' + String(t.a).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-zà-üа-яё]|$)', 'i').test(strip(t.q)))) { t.k = 't'; t.alt = TXT_ALT[strip(t.q)] || []; t.a = String(t.a); t.wx = t.w; delete t.w; } /* слово из вопроса или пропуск — пишем сами */ if (seen.has(t.q)) continue; seen.add(t.q); if (t.k === 'c') t.opts = r.shuffle([t.a, ...t.w]); out.push(t); }
   return out; }
 function grade(x){ return x >= .9 ? 5 : x >= .75 ? 4 : x >= .5 ? 3 : 2; }
 function dayRec(kid, ds){ const K = S.kids[kid]; if (!K.days[ds]) K.days[ds] = { les:{}, bonus:false }; return K.days[ds]; }
@@ -323,8 +323,12 @@ function answer(v){
   }
   save(); render();
 }
-function txtN(x){ return String(x).toLowerCase().replace(/[«».!?]/g, '').replace(/\s+/g, ' ').trim(); }
-function txtOk(t, v){ const z = txtN(v); return z === txtN(t.a) || (t.alt || []).some(x => txtN(x) === z); }
+/* Задания со вводом, где подходит больше одного ответа: дополнительные верные ответы */
+const TXT_ALT = { 'My parents ___ at work.': ['are'], '___ the film good?': ['Is'], 'Todos os dias ele ___ à escola a pé.': ['vai'], 'A Ana é tão alta ___ a irmã.': ['quanto'], 'Wait, I ___ help you!': ['will'], 'I think Yarik ___ win the match.': ["'ll"] };
+const TXT_KEEP = { 'You ___ not run in the library.': 1 };
+function txtN(x){ return String(x).toLowerCase().replace(/[’`]/g, "'").replace(/[«».!?]/g, '').replace(/\bcan't\b|\bcannot\b/g, 'can not').replace(/\bwon't\b/g, 'will not').replace(/n't\b/g, ' not').replace(/^'ll$|\b'll\b/g, 'will').replace(/(\w)'ll\b/g, '$1 will').replace(/^'m$/, 'am').replace(/^'re$/, 'are').replace(/^'s$/, 'is').replace(/\s+/g, ' ').trim(); }
+function txtOk(t, v){ const e = x => x.length > 1 ? x.replace(/ё/g, 'е') : x, z = e(txtN(v)); if (z === e(txtN(t.a)) || (t.alt || []).some(x => e(txtN(x)) === z)) return true;
+  /* Русское слово в другом падеже («коза» вместо «козу») — засчитываем, если это не задание на правописание */ const A = e(txtN(t.a)), st = x => x.slice(0, Math.max(3, x.length - 2)); return !/_/.test(t.q || '') && /^[а-я]{4,}$/.test(A) && /^[а-я]{4,}$/.test(z) && st(A) === st(z); }
 function addSrs(kid, subj, t){ const K = S.kids[kid]; const key = U.h(t.q + t.a) + ''; if (K.srs.some(x => x.key === key)) return; const copy = JSON.parse(JSON.stringify(t)); K.srs.push({ key, task: copy, step: 0, due: U.addDays(cur.ds, 1) }); }
 function updSrs(kid, key, ok){ const K = S.kids[kid]; const x = K.srs.find(z => z.key === key); if (!x) return; if (ok) { x.step++; if (x.step >= STEPS.length) K.srs = K.srs.filter(z => z !== x); else x.due = U.addDays(cur.ds, STEPS[x.step]); } else { x.step = 0; x.due = U.addDays(cur.ds, 1); } }
 function nextTask(){
