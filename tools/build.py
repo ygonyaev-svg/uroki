@@ -24,6 +24,7 @@ html = f'''<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Nunito:wght@700;800;900&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
 <style>{css}</style></head>
 <body><div id="app"></div>
+<script>window.onerror=function(m,u,l){{var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';}};</script>
 <script>/* v{ver} */
 {js}
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js');
