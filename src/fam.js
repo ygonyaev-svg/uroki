@@ -24,12 +24,16 @@ var FAM_HERO = [[/гарри|поттер|хогвартс|волшеб|маг|�
   [/щенячий|патрул|кот|собак|пёс|пес|зверопол|король лев|симба|лунтик|смешарик/i, 'animals'], [/косм|звёздн|звездн|ракет|астронав|базз/i, 'space'], [/тачки|молни|маквин|машин|робокар|трансформ|поезд|паровоз/i, 'cars'],
   [/динозавр|рекс|юрск/i, 'dino'], [/колобок|баба.?яг|жар.?птиц|иван|сказк|буратин|чебураш|винни|маша и медвед|три кота|фиксик/i, 'fairy'], [/месси|роналду|мбаппе|футбол/i, 'football']];
 var FAM_COLORS = [['red', '#e11d48'], ['orange', '#f97316'], ['yellow', '#eab308'], ['green', '#16a34a'], ['sky', '#0ea5e9'], ['blue', '#2563eb'], ['violet', '#7c3aed'], ['pink', '#ec4899']];
-function famInts(c){ var a = (c.ints || []).slice(), h = c.hero || ''; FAM_HERO.forEach(function(x){ if (x[0].test(h) && a.indexOf(x[1]) < 0) a.push(x[1]); }); return a.filter(function(k){ return FAM_INT[k]; }); }
+function famInts(c){ var a = (c.ints || []).slice(), h = (c.hero || '') + ' ' + (c.books || '') + ' ' + (c.done || ''); FAM_HERO.forEach(function(x){ if (x[0].test(h) && a.indexOf(x[1]) < 0) a.push(x[1]); }); return a.filter(function(k){ return FAM_INT[k]; }); }
 function famLookOf(c){ var a = famInts(c), y = 0, n = 0; a.forEach(function(k){ if (FAM_INT[k][1] === 'anya') n++; else y++; }); return !a.length ? famAgeCfg(c.age).tpl : n > y ? 'anya' : 'yarik'; }
 function famThemeOf(c){ var a = famInts(c); if (!a.length) return null; var b = [], p = [], w = [];
   a.forEach(function(k){ var I = FAM_INT[k]; b = b.concat(I[2].slice(0, 4)); p = p.concat(I[2]); w.push(I[3]); });
   w = w.concat(['🌟 Молодец!', '👏 Здорово!']); var I0 = FAM_INT[a[0]];
   return { banner: b.slice(0, 8), pics: p, win: w, hello: I0[4], world: I0[0].replace(/^\S+\s/, '') }; }
+function famReadList(list, done){ var d = String(done || '').toLowerCase().replace(/ё/g, 'е'); if (d.length < 4) return list;
+  var out = list.filter(function(t){ var ti = String(t.title || '').toLowerCase().replace(/ё/g, 'е').replace(/^(глав[аы]|части?)[^.]*\.\s*/, ''); return !(ti.length >= 5 && d.indexOf(ti) >= 0); });
+  return out.length >= 5 ? out : list; }
+var FAM_RD = ['Пока не читает или читает по слогам', 'Читает медленно, с трудом', 'Читает уверенно', 'Читает много и быстро, сам выбирает книги'];
 function famColor(c){ var x = FAM_COLORS.filter(function(z){ return z[0] === c.color; })[0]; return x ? x[1] : ''; }
 function famBody(){ var c = cur.kid && famKid(cur.kid), col = c && famColor(c); if (col && document.body.className) document.body.style.setProperty('--acc', col); else document.body.style.removeProperty('--acc'); }
 function famKid(id){ return ((S.fam && S.fam.kids) || []).filter(function(c){ return c.id === id; })[0]; }
@@ -44,7 +48,10 @@ function famAgeCfg(age){
 function famInit(){
   var k; for (k in KIDS) delete KIDS[k];
   var L = (S.fam && S.fam.kids) || [];
-  L.forEach(function(c){ var a = famAgeCfg(c.age);
+  L.forEach(function(c){ var a = famAgeCfg(c.age), rd = c.rd == null || c.rd === '' ? 2 : +c.rd;
+    /* Уровень чтения: тексты и объём чтения вслух; математика остаётся по возрасту */
+    a.startWords = Math.round(a.startWords * [0.5, 0.8, 1, 1.4][rd]); a.norm = Math.round(a.norm * [0.7, 0.85, 1, 1.2][rd]);
+    a.read = famReadList(rd >= 3 && c.age >= 9 ? READ_A : rd === 0 && c.age <= 10 ? READ_Y : KIDS_TPL[a.tpl].read, c.done);
     KIDS[c.id] = Object.assign({}, KIDS_TPL[a.tpl], a, { name: c.name, grade: c.age + ' ' + U.pl(+c.age, 'год', 'года', 'лет'), look: c.look || famLookOf(c) });
     var th = famThemeOf(c); if (th) THEME['k:' + c.id] = th; else delete THEME['k:' + c.id];
     if (!S.kids[c.id]) S.kids[c.id] = newKid(); if (c.pin) S.kids[c.id].pin = c.pin; });
@@ -84,9 +91,9 @@ function vFamLogin(){
     '<p class="center"><button class="link" data-act="fkreg">Новая семья? Регистрация</button></p>');
 }
 /* Черновик списка детей на экране настройки */
-function fkDraft(){ if (!cur.fk) cur.fk = ((S.fam && S.fam.kids) || []).map(function(c){ return { id: c.id, name: c.name, age: c.age, ints: (c.ints || []).slice(), hero: c.hero || '', color: c.color || '', has: !!c.pin }; }); if (!cur.fk.length) cur.fk.push({ id: '', name: '', age: 8, ints: [], hero: '', color: '' }); return cur.fk; }
+function fkDraft(){ if (!cur.fk) cur.fk = ((S.fam && S.fam.kids) || []).map(function(c){ return { id: c.id, name: c.name, age: c.age, ints: (c.ints || []).slice(), hero: c.hero || '', books: c.books || '', done: c.done || '', rd: c.rd == null ? '' : String(c.rd), color: c.color || '', has: !!c.pin }; }); if (!cur.fk.length) cur.fk.push({ id: '', name: '', age: 8, ints: [], hero: '', books: '', done: '', rd: '', color: '' }); return cur.fk; }
 function fkRead(){ (cur.fk || []).forEach(function(c, i){ var g = function(n){ var el = document.getElementById('fk' + n + i); return el ? el.value : null; };
-  if (g('n') != null) { c.name = g('n').trim(); c.age = +g('a'); c.hero = g('h').trim(); c.pinNew = g('p'); } }); }
+  if (g('n') != null) { c.name = g('n').trim(); c.age = +g('a'); c.hero = g('h').trim(); c.books = g('b').trim(); c.done = g('d').trim(); c.rd = g('r'); c.pinNew = g('p'); } }); }
 function vFamKids(){
   var L = fkDraft(), first = !S.parentPin;
   var ages = function(v){ var h = ''; for (var a = 6; a <= 13; a++) h += '<option value="' + a + '"' + (+v === a ? ' selected' : '') + '>' + a + ' ' + U.pl(a, 'год', 'года', 'лет') + '</option>'; return h; };
@@ -95,6 +102,9 @@ function vFamKids(){
     '<label>Возраст<select id="fka' + i + '">' + ages(c.age) + '</select></label>' +
     '<p class="fkql">Что любит? Отметьте всё, что подходит — по этому подберём картинки и оформление</p><div class="row fkints">' + Object.keys(FAM_INT).map(function(k){ return '<button type="button" class="chip' + ((c.ints || []).indexOf(k) >= 0 ? ' on' : '') + '" data-act="fkint" data-i="' + i + '" data-k="' + k + '">' + FAM_INT[k][0] + '</button>'; }).join('') + '</div>' +
     '<label>Любимые герои мультиков или книг<input id="fkh' + i + '" value="' + U.esc(c.hero || '') + '" maxlength="80" autocomplete="off" placeholder="Например: Гарри Поттер, Человек-паук, Колобок"></label>' +
+    '<label>Как читает по-русски<select id="fkr' + i + '"><option value="">— выберите —</option>' + FAM_RD.map(function(t, k){ return '<option value="' + k + '"' + (String(c.rd) === String(k) ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></label>' +
+    '<label>Любимые книги<input id="fkb' + i + '" value="' + U.esc(c.books || '') + '" maxlength="200" autocomplete="off" placeholder="На любом языке, можно несколько"></label>' +
+    '<label>Что уже прочитал(а) из русских книг<input id="fkd' + i + '" value="' + U.esc(c.done || '') + '" maxlength="300" autocomplete="off" placeholder="Например: Денискины рассказы, Каштанка"></label>' +
     '<p class="fkql">Любимый цвет</p><div class="row fkcols">' + FAM_COLORS.map(function(x){ return '<button type="button" class="fkcol' + (c.color === x[0] ? ' on' : '') + '" data-act="fkcol" data-i="' + i + '" data-k="' + x[0] + '" style="background:' + x[1] + '" aria-label="' + x[0] + '"></button>'; }).join('') + '</div>' +
     '<label>Код ребёнка, 4 цифры' + (c.has ? ' (оставьте пустым, чтобы не менять)' : '') + '<input id="fkp' + i + '" inputmode="numeric" maxlength="4" autocomplete="off" value="' + U.esc(c.pinNew || '') + '"></label></fieldset>'; }).join('');
   return famWrap(famBrand(false) + '<header class="hero"><p class="eyebrow">' + U.esc((S.fam && S.fam.email) || '') + '</p><h1>' + (first ? 'Добавьте детей' : 'Дети') + '</h1><p>Программа подстраивается под возраст: 6–9 лет — младшая, 10–13 лет — старшая. Дальше сложность меняется по ответам ребёнка.</p></header>' +
@@ -111,7 +121,7 @@ function famAct(act, b){
   switch (act) {
     case 'fklogin': cur.fview = 'login'; render(); return true;
     case 'fkreg': cur.fview = 'reg'; render(); return true;
-    case 'fkadd': fkRead(); cur.fk.push({ id: '', name: '', age: 8, ints: [], hero: '', color: '' }); render(); return true;
+    case 'fkadd': fkRead(); cur.fk.push({ id: '', name: '', age: 8, ints: [], hero: '', books: '', done: '', rd: '', color: '' }); render(); return true;
     case 'fkint': { fkRead(); var c1 = cur.fk[+b.dataset.i], L1 = c1.ints = c1.ints || [], j1 = L1.indexOf(b.dataset.k); if (j1 >= 0) L1.splice(j1, 1); else L1.push(b.dataset.k); var y0 = window.scrollY; render(); window.scrollTo(0, y0); return true; }
     case 'fkcol': { fkRead(); var c2 = cur.fk[+b.dataset.i]; c2.color = c2.color === b.dataset.k ? '' : b.dataset.k; var y1 = window.scrollY; render(); window.scrollTo(0, y1); return true; }
     case 'fkdel': fkRead(); cur.fk.splice(+b.dataset.i, 1); render(); return true;
@@ -147,7 +157,7 @@ function famForm(k, f, val){
     if ((first || pp) && !/^\d{4}$/.test(pp)) { alertMsg('Код родителя — четыре цифры'); return true; }
     var old = {}; (S.fam.kids || []).forEach(function(x){ old[x.id] = x; });
     var kids = L.map(function(c, j){ var id = c.id || ('k' + Date.now().toString(36) + j); var o = old[id] || {};
-      return { id: id, name: c.name.slice(0, 20), age: c.age, ints: c.ints || [], hero: (c.hero || '').slice(0, 80), color: c.color || '', pin: c.pinNew ? hashPin(c.pinNew) : o.pin }; });
+      return { id: id, name: c.name.slice(0, 20), age: c.age, ints: c.ints || [], hero: (c.hero || '').slice(0, 80), books: (c.books || '').slice(0, 200), done: (c.done || '').slice(0, 300), rd: c.rd === '' || c.rd == null ? null : +c.rd, color: c.color || '', pin: c.pinNew ? hashPin(c.pinNew) : o.pin }; });
     var ppin = pp ? hashPin(pp) : S.fam.ppin;
     kids.forEach(function(x){ pins.push(x.pin); }); pins.push(ppin);
     if (pins.filter(function(x, j){ return pins.indexOf(x) !== j; }).length) { alertMsg('Коды должны быть разными у всех'); return true; }
