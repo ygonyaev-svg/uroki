@@ -63,6 +63,7 @@ function applyCfg(rows){
     else if (type.startsWith('сооб')) K.msgs.push({ id: row.id, text: String(row.value), seen: false });
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
     else if (type.startsWith('чтен')) { const n = Number(row.value); if (n > 0) K.readWords = n; }
+    else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     K.applied.push(row.id);
   }
   save(); if (cur.kid) render();

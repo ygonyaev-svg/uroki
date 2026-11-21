@@ -317,7 +317,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v7796d178 */
+<script>/* ve8dc2506 */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -2341,6 +2341,7 @@ function applyCfg(rows){
     else if (type.startsWith('сооб')) K.msgs.push({ id: row.id, text: String(row.value), seen: false });
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
     else if (type.startsWith('чтен')) { const n = Number(row.value); if (n > 0) K.readWords = n; }
+    else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     K.applied.push(row.id);
   }
   save(); if (cur.kid) render();
