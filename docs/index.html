@@ -356,10 +356,13 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 /* стихи */
 .ptext p{ margin:2px 0; font-size:21px; line-height:1.5; font-family:Georgia, 'Times New Roman', serif; } .ptext.syl p{ letter-spacing:.5px; }
 .pline{ font-style:italic; font-size:19px; font-family:Georgia, serif; }
-.clapline{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:12px 0; font-size:22px; }
-.clapline .cs{ padding:4px 8px; border-radius:10px; background:var(--soft); } .clapline .cs.strong{ font-weight:800; text-decoration:underline; text-underline-offset:4px; }
-.clapline .cs.hit{ background:var(--gold); color:#1f2a44; } .clapline .cs.nx{ outline:3px solid var(--acc); } .clapline .cgap{ width:10px; display:inline-block; }
-.btn.clap{ font-size:44px; display:block; margin:8px auto; min-width:160px; }
+.sline{ display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin:14px 0; font-size:24px; line-height:1.2; }
+.sline .sw{ display:inline-flex; align-items:center; white-space:nowrap; } .sline .sw.plain{ color:var(--mut,#8a8f9c); padding:6px 2px; }
+.sline .sst{ font:inherit; color:inherit; border:2px solid var(--soft); background:var(--card,#fff); padding:6px 7px; margin:0 1px; border-radius:10px; min-width:34px; cursor:pointer; -webkit-appearance:none; }
+.sline .sst.right{ background:#2e9d5b; border-color:#2e9d5b; color:#fff; font-weight:800; } .sline .sst.wrong{ background:#d9534f; border-color:#d9534f; color:#fff; text-decoration:line-through; }
+.sline .sst:disabled{ opacity:1; cursor:default; }
+.rhythm{ margin-top:12px; padding:10px 12px; border-radius:12px; background:var(--soft); } .rline{ font-size:20px; } .rline i{ font-style:normal; opacity:.4; margin:0 3px; }
+.rline .rs{ font-weight:800; color:var(--acc); } .rpat{ margin:6px 0 0; letter-spacing:.5px; }
 .poem textarea{ width:100%; font-size:18px; border-radius:12px; border:1px solid var(--line); padding:10px; background:var(--card); color:var(--ink); box-sizing:border-box; }
 .poem .row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
 /* подсказки по касанию */
@@ -393,6 +396,8 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .testbar{ position:sticky; top:0; z-index:900; background:#7a3cff; color:#fff; padding:8px 12px; font-size:15px; text-align:center; } .testbar .link{ color:#fff; text-decoration:underline; margin-left:8px; }
 .notebtn{ position:fixed; right:14px; bottom:14px; z-index:950; background:#7a3cff; color:#fff; border:0; border-radius:24px; padding:12px 16px; font-size:16px; box-shadow:0 6px 20px rgba(0,0,0,.25); cursor:pointer; }
 .testc{ border:2px dashed #7a3cff; } .tipin textarea{ width:100%; box-sizing:border-box; font-size:17px; border-radius:12px; border:1px solid var(--line); padding:10px; margin-bottom:6px; background:var(--card); color:var(--ink); }
+.rbad{ text-decoration:underline wavy #d9534f; text-decoration-thickness:2px; text-underline-offset:4px; color:#b8322e; }
+.learnt .hidmsg{ display:none; } .learnt.hid .ptext{ display:none; } .learnt.hid .hidmsg{ display:block; padding:14px; border-radius:12px; background:var(--soft); text-align:center; }
 
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
@@ -592,7 +597,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* vb15d141b */
+<script>/* v5e32c015 */
 var FAM = 0;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -4642,6 +4647,16 @@ function poemTasks(kid, p, seed){ const R = U.rng(seed), L = poemLines(p), pairs
     out.push({ k: 'stress', q: `Где ударение? Скажи слово вслух: «${low}»`, a, opts }); });
   if (girl && (p.m === 'ямб' || p.m === 'хорей')) { const li = R.int(0, Math.min(L.length, 4) - 1); out.push({ k: 'meter', q: 'Какой размер у этой строчки? Прочитай её, отстукивая ритм.', line: L[li], a: p.m, opts: ['ямб', 'хорей'] }); }
   return out; }
+/* --- ударные слоги --- */
+function stressLine(p, line){ const words = [], gs = []; let g = 0; line.split(/\s+/).filter(Boolean).forEach((tok, wi) => { const m = tok.match(/^([^А-Яа-яЁё]*)(.*?)([^А-Яа-яЁё]*)$/), core = m[2];
+    const pre = U.esc(m[1]), post = U.esc(m[3]); if (!core || !sylCount(core)) { words.push({ wi, sy: [core], k: -1, pre, post }); return; }
+    const sy = sylSplit(core), gi = sy.map(() => g++); sy.forEach((x, j) => gs.push({ sy: x, strong: meterHit(p.m, gi[j]) }));
+    let k = -1; const n = pvN(core); const yo = sy.findIndex(x => /ё/i.test(x)); const ann = (p.st || []).find(a => pvN(a) === n);
+    if (sy.length < 2) k = -1; else if (yo >= 0) k = yo; else if (ann) { const pos = ann.search(/[АЕИОУЫЭЮЯ]/); let c = 0; for (let j = 0; j < sy.length; j++) { c += sy[j].length; if (pos < c) { k = j; break; } } }
+    else { const st = gi.map((x, j) => meterHit(p.m, x) ? j : -1).filter(j => j >= 0); if (st.length === 1) k = st[0]; }
+    words.push({ wi, sy, k, pre, post }); });
+  return { words, gs }; }
+function stressLines(kid, p){ if (!p.m) return []; const L = poemLines(p), out = [], n = T(kid) === 'anya' ? 3 : 2; for (let i = 0; i < Math.min(L.length, 8) && out.length < n; i++) if (stressLine(p, L[i]).words.some(w => w.k >= 0)) out.push(i); return out; }
 /* --- сессия на день --- */
 function poemState(kid){ const K = S.kids[kid]; return K.poem || (K.poem = { i: 0, n: 0, learned: [] }); }
 function poemCur(kid){ const st = poemState(kid), list = poemList(kid); return list[st.i % list.length]; }
@@ -4652,7 +4667,7 @@ function poemTile(kid, D){ if (cur.ds !== U.today()) return ''; const P = D.poem
 function poemOpen(kid){ const D = dayRec(kid, cur.ds); if (!D.poem) { if (restLeft(kid)) { alertMsg(`Перерыв ☕ Следующее занятие откроется в ${hhmm(S.kids[kid].restUntil)}`); return; }
     const p = poemCur(kid), st = poemState(kid); st.n = (st.n || 0) + 1; D.poem = { id: p.id, phase: 'read', i: 0, ans: [], t0: Date.now(), hide: 0, seed: U.h(kid + cur.ds + p.id + st.n) }; save(); }
   go('poem'); }
-function poemSteps(kid){ return T(kid) === 'anya' ? [['read', 'Читаю'], ['tasks', 'Рифма и ритм'], ['clap', 'Ритм'], ['compose', 'Мои строки'], ['learn', 'Наизусть'], ['done', 'Итог']] : [['read', 'Читаю'], ['tasks', 'Рифма и слоги'], ['clap', 'Прохлопай'], ['learn', 'Наизусть'], ['done', 'Итог']]; }
+function poemSteps(kid){ return T(kid) === 'anya' ? [['read', 'Читаю'], ['tasks', 'Рифма и ритм'], ['stress', 'Ударение'], ['compose', 'Мои строки'], ['learn', 'Наизусть'], ['done', 'Итог']] : [['read', 'Читаю'], ['tasks', 'Рифма и слоги'], ['stress', 'Ударение'], ['learn', 'Наизусть'], ['done', 'Итог']]; }
 function vPoem(){ const kid = cur.kid, D = dayRec(kid, cur.ds), P = D.poem; if (!P) return vHome(); const p = POEMS.find(x => x.id === P.id) || poemCur(kid), L = poemLines(p), girl = T(kid) === 'anya';
   const steps = poemSteps(kid), ix = steps.findIndex(s => s[0] === P.phase);
   const head = `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← К урокам</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header><section class="lesson poem"><p class="eyebrow">🎵 Стихи</p><h1>${p.e} ${U.esc(p.t)}</h1><p class="author">${U.esc(p.a)}</p><ol class="steps">${steps.map((s, i) => `<li class="${i < ix ? 'ok' : ''} ${i === ix ? 'now' : ''}">${s[1]}</li>`).join('')}</ol>`;
@@ -4662,15 +4677,20 @@ function vPoem(){ const kid = cur.kid, D = dayRec(kid, cur.ds), P = D.poem; if (
    <article class="card"><h2>${girl ? 'Как читать стихи' : 'Как читать стихи'}</h2><p>Сначала послушай. Потом прочитай вслух <b>два раза</b>: не торопись, на конце строчки — маленькая пауза. Слова в конце строчек звучат похоже — это <b>рифма</b>.</p>${girl ? '<p class="hint">Ударные и безударные слоги в стихах чередуются ровно, как шаги. <b>Хорей</b> — ТА-та (ударный первый): «Бу́ря мгло́ю не́бо кро́ет». <b>Ямб</b> — та-ТА (ударный второй): «Моро́з и со́лнце; де́нь чуде́сный».</p>' : '<p class="hint">Слог — это кусочек слова с одной гласной. Сколько гласных — столько слогов: «ко-ров-ка» — три слога. Ударный слог мы говорим громче.</p>'}</article>
    <button class="btn big" data-act="ptasks">Я прочитал${girl ? 'а' : ''} вслух 2 раза</button>` + end;
   if (P.phase === 'tasks') { const T0 = poemTasks(kid, p, P.seed), i = P.i, q = T0[i], a = P.ans[i] || {};
-    if (!q) { P.phase = 'clap'; save(); return vPoem(); }
+    if (!q) { P.phase = 'stress'; save(); return vPoem(); }
     return head + `<div class="counter">Задание ${i + 1} из ${T0.length}</div><article class="card task"><div class="q">${U.esc(q.q)}</div>${q.line ? `<p class="pline">«${U.esc(q.line)}»</p>` : ''}${q.ctx ? `<div class="ptext">${q.ctx.map(l => `<p>${U.esc(l)}</p>`).join('')}</div>` : ''}
      <div class="opts">${q.opts.map(o => `<button class="opt ${a.v != null && o === q.a ? 'right' : a.v === o && !a.ok ? 'wrong' : ''}" data-act="pq" data-v="${U.esc(o)}" ${a.v != null ? 'disabled' : ''}>${U.esc(o)}</button>`).join('')}</div>
      ${a.v != null ? (a.ok ? `<div class="fb ok"><b>Верно!</b>${q.sy ? ' ' + U.esc(q.sy) : ''}</div>` : `<div class="fb bad"><b>Правильно: ${U.esc(q.a)}</b>${q.sy ? ' (' + U.esc(q.sy) + ')' : ''}</div>`) : '<p class="hint">Засчитывается только первый ответ.</p>'}</article>${a.v != null ? '<button class="btn big" data-act="pnext">Дальше</button>' : ''}` + end; }
-  if (P.phase === 'clap') { const li = Math.min(L.length - 1, P.cl || 0), sy = lineSyl(L[li]), k = P.ck || 0, m = p.m;
-    return head + `<article class="card"><h2>👏 Прохлопай ритм</h2><p class="hint">Нажимай на большую кнопку на каждый слог. ${m ? 'На жирных слогах хлопай громче — это сильные места стиха.' : 'Хлопай ровно, как шагаешь.'}</p>
-     <div class="clapline">${sy.map((s, i) => `${s.first && i ? ' <span class="cgap"></span>' : ''}<span class="cs ${meterHit(m, i) ? 'strong' : ''} ${i < k ? 'hit' : ''} ${i === k ? 'nx' : ''}">${U.esc(s.sy)}</span>`).join('')}</div>
-     <p class="center hint">Строчка ${li + 1} из ${Math.min(4, L.length)}</p><button class="btn big clap" data-act="pclap">👏</button></article>
-     <button class="btn ghost" data-act="pclapskip">${li + 1 >= Math.min(4, L.length) && k >= sy.length ? 'Дальше' : 'Пропустить'}</button>` + end; }
+  if (P.phase === 'clap') P.phase = 'stress';
+  if (P.phase === 'stress') { const LS = stressLines(kid, p); if (!LS.length) { P.phase = girl ? 'compose' : 'learn'; save(); return vPoem(); }
+    const li = Math.min(LS.length - 1, P.sl || 0), info = stressLine(p, L[LS[li]]), sa = P.sa || {}, need = info.words.filter(w => w.k >= 0), done = need.every(w => sa[LS[li] + ':' + w.wi]);
+    const tile = w => { if (w.k < 0) return `<span class="sw plain">${w.pre}${w.sy.map(x => U.esc(x)).join('')}${w.post}</span>`; const a = sa[LS[li] + ':' + w.wi];
+      return `<span class="sw">${w.pre}${w.sy.map((x, j) => `<button class="sst ${a ? (j === w.k ? 'right' : j === a.v ? 'wrong' : '') : ''}" data-act="pst" data-w="${w.wi}" data-s="${j}" ${a ? 'disabled' : ''}>${U.esc(x)}</button>`).join('')}${w.post}</span>`; };
+    const rh = done ? `<div class="rhythm"><div class="rline">${info.gs.map((g, i) => `<span class="${g.strong ? 'rs' : 'rw'}">${U.esc(g.strong ? g.sy.toUpperCase() : g.sy.toLowerCase())}</span>`).join('<i>·</i>')}</div><p class="rpat">${info.gs.map(g => g.strong ? '<b>ТА</b>' : 'та').join('-')}</p><p class="hint">${girl ? `Ударные слоги стоят на своих местах: это <b>${U.esc(p.m)}</b>. ${p.m === 'ямб' ? 'Ударный — каждый второй слог: та-ТА.' : p.m === 'хорей' ? 'Ударный — каждый первый из пары: ТА-та.' : 'Ударный — один слог из трёх.'}` : 'Видишь? Громкие слоги идут ровно, как шаги. Это и есть ритм стиха.'}</p></div>` : '';
+    return head + `<article class="card"><h2>🎯 Найди ударные слоги</h2><p class="hint">Нажми на слог, который в слове звучит громче (ударный). Скажи слово вслух — так легче. Серые слова пропускаем.</p>
+     <div class="sline">${info.words.map(tile).join(' ')}</div>
+     <p class="center hint">Строчка ${li + 1} из ${LS.length}</p>${sayGate('pl' + LS[li], '<button class="btn ghost small" data-act="psayline">🔊 Послушать строчку</button>')}${rh}</article>
+     ${done ? `<button class="btn big" data-act="psnext">Дальше</button>` : '<p class="hint center">Засчитывается только первое нажатие.</p>'}` + end; }
   if (P.phase === 'compose') { const pr = poemPairs(p)[0] || [0, 1], line = L[pr[0]], w = lastWord(line);
     return head + `<article class="card"><h2>✍️ Сочини свою строчку</h2><p>Придумай <b>свою</b> вторую строчку, чтобы она рифмовалась со строчкой:</p><p class="pline">«${U.esc(line)}»</p><p class="hint">Последнее слово должно звучать похоже на «${U.esc(w.toLowerCase())}». ${p.m === 'ямб' || p.m === 'хорей' ? 'Попробуй сохранить ' + p.m + '.' : ''}</p>
      <textarea id="pcomp" rows="3" placeholder="Моя строчка…">${U.esc(P.comp || '')}</textarea>${P.compRes ? `<div class="fb ${P.compRes === 'ok' ? 'ok' : 'try'}">${P.compRes === 'ok' ? '<b>Есть рифма!</b> Красиво.' : 'Рифма не слышна. Попробуй другое последнее слово — или оставь так.'}</div>` : ''}</article>
@@ -4678,24 +4698,35 @@ function vPoem(){ const kid = cur.kid, D = dayRec(kid, cur.ds), P = D.poem; if (
   if (P.phase === 'learn') { const n = poemLearnN(kid, p), LL = L.slice(0, n), h = P.hide || 0, live = RT && RT.active;
     const hideW = (w, i) => { const c = w.replace(/[^А-Яа-яЁё-]/g, ''); if (!c || h === 0) return U.esc(w); if (h === 1 && i % 3 !== 2) return U.esc(w); if (h === 2 && i % 2 === 0) return U.esc(w); return U.esc(w.replace(c, c[0] + '…')); };
     return head + `<article class="card"><h2>🧠 Учим наизусть</h2><p>Выучи ${n === L.length ? 'всё стихотворение' : 'первые ' + n + ' ' + U.pl(n, 'строчку', 'строчки', 'строчек')}. Прочитай, потом нажимай «Спрятать слова» и рассказывай по памяти.</p>
-     <div class="ptext">${LL.map(l => `<p>${l.split(/\s+/).map(hideW).join(' ')}</p>`).join('')}</div>
-     <div class="row"><button class="btn ghost small" data-act="phide">${h < 3 ? 'Спрятать слова' : 'Показать всё'}</button> <button class="btn ghost small" data-act="psayl">🔊 Послушать</button></div></article>
+     <div class="learnt ${P.reciting && !P.peek ? 'hid' : ''}"><p class="hidmsg">🙈 Текст спрятан — рассказывай по памяти.</p><div class="ptext">${LL.map((l, li) => `<p>${l.split(/\s+/).map((w, wi) => { const x = hideW(w, wi); return P.recBad && P.recBad[li] && P.recBad[li].includes(wi) ? `<span class="rbad">${x}</span>` : x; }).join(' ')}</p>`).join('')}</div>${P.recBad && Object.keys(P.recBad).length ? '<p class="hint"><span class="rbad">Подчёркнутые</span> слова не услышаны — повтори их.</p>' : ''}</div>
+     <div class="row">${P.reciting ? `<button class="btn ghost small" data-act="ppeek">${P.peek ? '🙈 Спрятать текст' : '💡 Подсказка'}</button>` : `<button class="btn ghost small" data-act="phide">${h < 3 ? 'Спрятать слова' : 'Показать всё'}</button> <button class="btn ghost small" data-act="psayl">🔊 Послушать</button>`}</div></article>
      <article class="card"><h2>Расскажи наизусть</h2><p class="hint">${SR ? 'Нажми 🎤 и расскажи. Или нажми на поле и надиктуй микрофоном на клавиатуре.' : 'Нажми на поле и надиктуй стих микрофоном на клавиатуре (кнопка 🎤 рядом с пробелом) — или напиши его.'}</p>
      <textarea id="prec" rows="5" placeholder="Расскажи стих…">${U.esc(P.rec || '')}</textarea>
      <div class="row">${SR ? `<button class="btn ${live ? 'stop' : 'mic'}" data-act="${live ? 'precstop' : 'precgo'}">${live ? '⏹ Стоп' : '🎤 Рассказать'}</button> ` : ''}<button class="btn" data-act="pcheck">Проверить</button></div>
-     ${P.recRes != null ? `<div class="fb ${P.recRes >= .85 ? 'ok' : 'try'}">${P.recRes >= .85 ? `<b>Наизусть! ${Math.round(P.recRes * 100)}%</b>` : `Совпало ${Math.round(P.recRes * 100)}% слов. Повтори ещё — нужно 85%.`}${P.recMiss && P.recMiss.length && P.recRes < .85 ? `<br><span class="hint">Пропущено: ${P.recMiss.slice(0, 8).map(U.esc).join(', ')}</span>` : ''}</div>` : ''}</article>
+     ${P.recRes != null ? `<div class="fb ${P.recRes >= .85 ? 'ok' : 'try'}">${P.recRes >= .85 ? `<b>Наизусть! ${Math.round(P.recRes * 100)}%</b>` : `Совпало ${Math.round(P.recRes * 100)}% слов. Повтори ещё — нужно 85%.`}${P.recMiss && P.recMiss.length && P.recRes < .85 ? `<br><span class="hint">Не услышано: ${P.recMiss.slice(0, 8).map(U.esc).join(', ')}</span>` : ''}</div>` : ''}</article>
      <button class="btn big" data-act="pfinish">${P.recRes >= .85 ? 'Закончить' : 'Закончить (выучу потом)'}</button>` + end; }
   /* done */
   const st = poemState(kid);
   return head + `<article class="card win"><h2>Готово!</h2><p>Задания: <b>${P.score || 0} из ${P.total || 0}</b> с первого раза.</p><p>${P.coins ? `+${P.coins} баллов в копилку 🐷` : 'В этот раз без баллов — нужно больше верных ответов.'}</p>${P.learnedNow ? `<p>🏅 Стих выучен наизусть! +10 баллов.</p>` : st.learned.includes(p.id) ? '' : '<p class="hint">Наизусть ещё не выучено — завтра продолжим этот же стих.</p>'}<p class="hint">Знаю наизусть: ${st.learned.length ? st.learned.map(id => { const q = POEMS.find(x => x.id === id); return q ? '«' + U.esc(q.t) + '»' : ''; }).join(', ') : 'пока ничего'}.</p></article>
    <button class="btn big" data-act="home">К урокам</button>` + end; }
-function poemRecScore(p, n, said){ const target = poemLines(p).slice(0, n).join(' ').split(/\s+/).map(pvN).filter(Boolean), got = String(said).split(/\s+/).map(pvN).filter(Boolean);
-  let j = 0, hit = 0; const miss = [];
-  for (const w of target) { let f = -1; for (let k = j; k < Math.min(got.length, j + 6); k++) { const g = got[k]; if (g === w || (w.length > 4 && g.slice(0, w.length - 2) === w.slice(0, w.length - 2))) { f = k; break; } } if (f >= 0) { hit++; j = f + 1; } else miss.push(w); }
-  return { s: hit / Math.max(1, target.length), miss }; }
+/* Проверка наизусть: по строкам, слова сравниваются «по звучанию» — распознавание речи часто путает окончания и похожие слова. */
+function recPh(w){ w = pvN(w).replace(/-/g, ''); return w.replace(/[ьъ]/g, '').replace(/[ёо]/g, 'а').replace(/[еэяиы]/g, 'и').replace(/ю/g, 'у').replace(/тс|дс|тьс/g, 'ц').replace(/(.)\1/g, '$1').replace(/[бвгдзж]$/, c => 'пфктсш'['бвгдзж'.indexOf(c)]); }
+function recLev(a, b){ if (Math.abs(a.length - b.length) > 3) return 9; let p = []; for (let j = 0; j <= b.length; j++) p[j] = j;
+  for (let i = 1; i <= a.length; i++) { const c = [i]; for (let j = 1; j <= b.length; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[b.length]; }
+function recSame(w, g){ if (!w || !g) return false; if (pvN(w).replace(/ё/g, 'е') === pvN(g).replace(/ё/g, 'е')) return true; const a = recPh(w), b = recPh(g); if (a === b) return true;
+  const sh = Math.min(a.length, b.length), lg = Math.max(a.length, b.length); if (sh >= 3 && lg - sh <= 3 && (a.startsWith(b) || b.startsWith(a))) return true;
+  return recLev(a, b) <= (lg <= 3 ? 0 : lg <= 4 ? 1 : a[0] === b[0] ? 2 : 1) + (sh >= 5 && a.slice(0, 3) === b.slice(0, 3) ? 1 : 0); }
+function recLcs(T, G){ const n = T.length, m = G.length, d = []; for (let i = 0; i <= n; i++) { d[i] = []; for (let j = 0; j <= m; j++) d[i][j] = i && j ? (recSame(T[i - 1], G[j - 1]) ? d[i - 1][j - 1] + 1 : Math.max(d[i - 1][j], d[i][j - 1])) : 0; }
+  const hit = new Array(n).fill(false); let i = n, j = m; while (i && j) { if (recSame(T[i - 1], G[j - 1]) && d[i][j] === d[i - 1][j - 1] + 1) { hit[i - 1] = true; i--; j--; } else if (d[i - 1][j] >= d[i][j - 1]) i--; else j--; } return hit; }
+function poemRecScore(p, n, said){ const got = String(said).split(/\s+/).map(pvN).filter(Boolean); let hit = 0, tot = 0; const miss = [], bad = {};
+  poemLines(p).slice(0, n).forEach((line, li) => { const raw = line.split(/\s+/), T0 = raw.map(pvN), idx = T0.map((w, i) => w ? i : -1).filter(i => i >= 0), T = idx.map(i => T0[i]); if (!T.length) return;
+    const W = Math.ceil(T.length * 1.6) + 3; let best = null, bn = -1;
+    for (let st = 0; st < Math.max(1, got.length - Math.min(W, got.length) + 1); st++) { const h = recLcs(T, got.slice(st, st + W)), c = h.filter(Boolean).length; if (c > bn) { bn = c; best = h; } if (c === T.length) break; }
+    tot += T.length; hit += bn; best.forEach((ok, k) => { if (!ok) { miss.push(T[k]); (bad[li] = bad[li] || []).push(idx[k]); } }); });
+  return { s: hit / Math.max(1, tot), miss, bad }; }
 function poemFinish(kid){ const D = dayRec(kid, cur.ds), P = D.poem, K = S.kids[kid], p = POEMS.find(x => x.id === P.id), st = poemState(kid);
-  const T0 = poemTasks(kid, p, P.seed), first = P.ans.filter(a => a && a.ok).length, ratio = first / Math.max(1, T0.length);
-  P.score = first; P.total = T0.length; P.grade = grade(ratio); P.secs = Math.min(1200, Math.round((Date.now() - P.t0) / 1000));
+  const T0 = poemTasks(kid, p, P.seed), first = P.ans.filter(a => a && a.ok).length + (P.sOk || 0), tot = T0.length + (P.sN || 0), ratio = first / Math.max(1, tot);
+  P.score = first; P.total = tot; P.grade = grade(ratio); P.secs = Math.min(1200, Math.round((Date.now() - P.t0) / 1000));
   let pts = ratio >= .8 ? 5 : ratio >= .6 ? 3 : 0; if (P.secs < 120) pts = Math.round(pts / 2);
   if (P.recRes >= .85 && !st.learned.includes(p.id)) { st.learned.push(p.id); pts += 10; P.learnedNow = true; ev(kid, 'стих наизусть', { subj: 'Стихи', unit: p.a + ' «' + p.t + '»', text: Math.round(P.recRes * 100) + '% слов' }); }
   if (st.learned.includes(p.id) || st.n >= 3) { st.i = (st.i || 0) + 1; st.n = 0; }
@@ -4707,21 +4738,25 @@ function poemAct(act, b){ if (cur.view !== 'poem' && act !== 'openpoem') return 
   switch (act) {
     case 'psay': say(p.text.replace(/\n/g, '. '), 'ru-RU'); break;
     case 'psayl': say(poemLines(p).slice(0, poemLearnN(kid, p)).join('. '), 'ru-RU'); break;
+    case 'ppeek': P.peek = !P.peek; if (P.peek) P.hint = (P.hint || 0) + 1; save(); render(); break;
     case 'psyl': P.syl = !P.syl; save(); render(); break;
     case 'ptasks': if (Date.now() - P.t0 < 25000) { alertMsg('Сначала прочитай стих вслух два раза 🙂'); break; } P.phase = 'tasks'; P.i = 0; save(); render(); window.scrollTo(0, 0); break;
     case 'pq': { const T0 = poemTasks(kid, p, P.seed), q = T0[P.i]; if (!q || P.ans[P.i]) break; const ok = b.dataset.v === q.a; P.ans[P.i] = { v: b.dataset.v, ok };
       ev(kid, 'ответ', { subj: 'Стихи', unit: p.t, q: q.q, ans: b.dataset.v, right: q.a, ok: ok ? 'верно' : 'ошибка' }); save(); render(); break; }
-    case 'pnext': P.i++; if (P.i >= poemTasks(kid, p, P.seed).length) { P.phase = 'clap'; P.cl = 0; P.ck = 0; } save(); render(); window.scrollTo(0, 0); break;
-    case 'pclap': { const L = poemLines(p), li = P.cl || 0, sy = lineSyl(L[li]); P.ck = (P.ck || 0) + 1; if (P.ck >= sy.length) { if (li + 1 < Math.min(4, L.length)) { P.cl = li + 1; P.ck = 0; } else { P.phase = girl ? 'compose' : 'learn'; alertMsg('Отличный ритм! 👏'); } } save(); render(); break; }
-    case 'pclapskip': P.phase = girl ? 'compose' : 'learn'; save(); render(); window.scrollTo(0, 0); break;
+    case 'pnext': P.i++; if (P.i >= poemTasks(kid, p, P.seed).length) { P.phase = 'stress'; P.sl = 0; P.sa = {}; } save(); render(); window.scrollTo(0, 0); break;
+    case 'pst': { const LS = stressLines(kid, p), li = LS[Math.min(LS.length - 1, P.sl || 0)]; if (li == null) break; const info = stressLine(p, poemLines(p)[li]), w = info.words.find(x => x.wi === +b.dataset.w); P.sa = P.sa || {};
+      const key = li + ':' + w.wi; if (!w || w.k < 0 || P.sa[key]) break; const v = +b.dataset.s, ok = v === w.k; P.sa[key] = { v, ok }; P.sN = (P.sN || 0) + 1; if (ok) P.sOk = (P.sOk || 0) + 1;
+      ev(kid, 'ответ', { subj: 'Стихи', unit: p.t, q: 'Ударный слог: ' + w.sy.join('-'), ans: w.sy[v], right: w.sy[w.k], ok: ok ? 'верно' : 'ошибка' }); save(); render(); break; }
+    case 'psayline': { const LS = stressLines(kid, p), li = LS[Math.min(LS.length - 1, P.sl || 0)]; if (li != null) say(poemLines(p)[li], 'ru-RU'); break; }
+    case 'psnext': { const LS = stressLines(kid, p); P.sl = (P.sl || 0) + 1; if (P.sl >= LS.length) { P.phase = girl ? 'compose' : 'learn'; if (P.sN) alertMsg(`Ударные слоги: ${P.sOk || 0} из ${P.sN} 🎯`); } save(); render(); window.scrollTo(0, 0); break; }
     case 'pcomp': { const el = document.getElementById('pcomp'); const v = el ? el.value.trim() : '';
       if (P.compRes) { P.phase = 'learn'; save(); render(); window.scrollTo(0, 0); break; }
       if (v.split(/\s+/).length < 3) { alertMsg('Напиши целую строчку — хотя бы 3 слова'); break; }
       const pr = poemPairs(p)[0] || [0, 1], w = lastWord(poemLines(p)[pr[0]]); P.comp = v; P.compRes = rhymes(lastWord(v), w) ? 'ok' : 'no'; save(); render(); break; }
     case 'phide': P.hide = ((P.hide || 0) + 1) % 4; save(); render(); break;
-    case 'precgo': { const el = document.getElementById('prec'); if (el) P.rec = el.value; retellStartFor('prec'); break; }
+    case 'precgo': { const el = document.getElementById('prec'); if (el) el.value = ''; P.rec = ''; P.recRes = null; P.recMiss = null; P.recBad = null; P.reciting = true; P.peek = false; save(); retellStartFor('prec'); break; }
     case 'precstop': { if (RT) { RT.active = false; try { RT.rec && RT.rec.stop(); } catch (e) {} P.rec = RT.text; RT = null; } save(); render(); break; }
-    case 'pcheck': { if (RT) { RT.active = false; try { RT.rec && RT.rec.stop(); } catch (e) {} RT = null; } const el = document.getElementById('prec'); P.rec = el ? el.value : P.rec || ''; const r = poemRecScore(p, poemLearnN(kid, p), P.rec); P.recRes = r.s; P.recMiss = r.miss; save(); render(); break; }
+    case 'pcheck': { if (RT) { RT.active = false; try { RT.rec && RT.rec.stop(); } catch (e) {} RT = null; } const el = document.getElementById('prec'); P.rec = el ? el.value : P.rec || ''; const r = poemRecScore(p, poemLearnN(kid, p), P.rec); P.recRes = r.s; P.recMiss = r.miss; P.recBad = r.bad; P.reciting = false; P.peek = false; if (P.hint) ev(kid, 'подсказка наизусть', { subj: 'Стихи', unit: p.t }); P.hint = 0; save(); render(); break; }
     case 'pfinish': { const el = document.getElementById('prec'); if (el) P.rec = el.value; if (RT) { RT.active = false; try { RT.rec && RT.rec.stop(); } catch (e) {} RT = null; } poemFinish(kid); break; }
     default: return false;
   }
@@ -4735,6 +4770,9 @@ function retellStartFor(id){ const ta = document.getElementById(id), had = ta ? 
   rec.onend = () => { R0.base += ' ' + R0.cur; R0.cur = ''; if (R0.active && !R0.denied) setTimeout(() => { try { rec.start(); } catch (e) {} }, 120); };
   try { rec.start(); } catch (e) {}
   render(); }
+
+/* Поле «Расскажи наизусть»: как только ребёнок начал отвечать — текст стиха прячется (показ только по «Подсказке»). */
+document.addEventListener('focusin', e => { if (!e.target || e.target.id !== 'prec' || cur.view !== 'poem') return; try { const P = dayRec(cur.kid, cur.ds).poem; if (P && !P.reciting) { P.reciting = true; P.peek = false; save(); const d = document.querySelector('.learnt'); if (d) d.classList.add('hid'); } } catch (x) {} });
 
 /* Подсказки по касанию: дети нажимают на непонятное (баллы, копилку, проценты…) — всплывает объяснение, можно послушать. */
 const TIPS = {
