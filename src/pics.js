@@ -125,7 +125,7 @@ function mathPic(kid, q){
   let m;
   if ((m = s.match(/(\d+)\s*ч\s*(\d+)\s*мин/))) return picClock(+m[1], +m[2]);
   if (/(^|[^а-яё])час(ов|а|ы)?([^а-яё]|$)|минут/.test(s) && !/\d+\s*[·:]/.test(s)) return picClock(3, 0);
-  if ((m = s.match(/(\d+)\s*%/)) && kid === 'anya') return picPct(+m[1]);
+  if ((m = s.match(/(\d+)\s*%/)) && T(kid) === 'anya') return picPct(+m[1]);
   if ((m = s.match(/(\d+)\s*%/))) return picPct(+m[1]);
   if ((m = s.match(/(\d+)\s+(\d+)\/(\d+)/))) return picPie(+m[1] * +m[3] + +m[2], +m[3]);
   if ((m = s.match(/(\d+)\/(\d+)/))) return picPie(+m[1], +m[2]);
@@ -142,14 +142,14 @@ function mathPic(kid, q){
   if ((m = s.match(/Сравни:\s*(\d{1,3}(?:[\s\u00a0]\d{3})+)\s*\?\s*(\d{1,3}(?:[\s\u00a0]\d{3})+)/))) return `<div class="stack">${picPlace(m[1])}${picPlace(m[2])}</div>`;
   if ((m = s.match(/(?:числе|Округли)\s*(\d{1,3}(?:[\s\u00a0]\d{3})+)/))) return picPlace(m[1]);
   if ((m = s.match(/(?:в числе|Запиши десятичной дробью:?)\s*(\d+,\d+)/))) return picPlace(m[1]);
-  if ((m = s.match(/(\d+,\d+)\s*([+−·:-])\s*(\d+(?:,\d+)?)/)) && kid === 'anya') return `<div class="pair">${picPlace(m[1])}<b>${m[2]}</b>${picPlace(m[3])}</div>`;
-  if (kid === 'yarik' && /\d+\s*(дм|см)(?![а-яё])/.test(s)) { const qs = [], re = /(\d+)\s*(м|дм|см)(?![а-яё])(?:\s*(\d+)\s*(дм|см)(?![а-яё]))?/g; let q; const cmv = (n, u) => u === 'м' ? n * 100 : u === 'дм' ? n * 10 : n;
+  if ((m = s.match(/(\d+,\d+)\s*([+−·:-])\s*(\d+(?:,\d+)?)/)) && T(kid) === 'anya') return `<div class="pair">${picPlace(m[1])}<b>${m[2]}</b>${picPlace(m[3])}</div>`;
+  if (T(kid) === 'yarik' && /\d+\s*(дм|см)(?![а-яё])/.test(s)) { const qs = [], re = /(\d+)\s*(м|дм|см)(?![а-яё])(?:\s*(\d+)\s*(дм|см)(?![а-яё]))?/g; let q; const cmv = (n, u) => u === 'м' ? n * 100 : u === 'дм' ? n * 10 : n;
     while ((q = re.exec(s))) qs.push(cmv(+q[1], q[2]) + (q[3] ? cmv(+q[3], q[4]) : 0));
     const v = Math.max(...qs); if (v > 0 && v <= 60) return picRuler(v); }
   if ((m = s.match(/^(.*?)\b(\d*)\s*x\s*([+−-])\s*(\d+)\s*=\s*(\d+)/)) || (m = s.match(/(\d+)\s*([+−-])\s*x\s*=\s*(\d+)/))) {
     const eq = s.match(/[^.:]*x[^.]*=\s*\d+/); if (eq) { const [l, r] = eq[0].split('='); return picScale(l.trim().replace(/^.*?:\s*/, '').replace(/^Реши уравнение\s*/, ''), r.trim()); } }
   if ((m = s.match(/(\d+)\s*x\s*=\s*(\d+)/))) return picScale(m[1] + 'x', m[2]);
-  if (kid === 'yarik') {
+  if (T(kid) === 'yarik') {
     if ((m = s.match(/(\d+)\s*([·:])\s*(\d+)\s*=\s*\?/))) { const a = +m[1], b = +m[3]; return m[2] === '·' ? picArray(a, b, '🔵') : picArray(a, b, '🔵', true); }
     if ((m = s.match(/(\d+)\s*·\s*(\d+)/)) && +m[1] <= 10 && +m[2] <= 10) return picArray(+m[1], +m[2], '🔵');
     if ((m = s.match(/(\d+)\s*([+−-])\s*(\d+)\s*=\s*\?/)) && +m[1] <= 100 && +m[3] <= 100) return picTens([+m[1], +m[3]], m[2]);
@@ -188,7 +188,7 @@ const SCENES = {
     () => PX.svg(400, 90, `<rect width="400" height="90" fill="#831843"/><g stroke="#fbcfe8" stroke-width="2"><line x1="0" y1="70" x2="400" y2="70"/></g><text x="30" y="62" font-size="30">🦄</text><text x="110" y="62" font-size="28">🌙</text><text x="180" y="62" font-size="28">🧙‍♀️</text><text x="250" y="62" font-size="28">🐈‍⬛</text><text x="320" y="62" font-size="28">🏰</text>`, 'scene')
   ]
 };
-function scene(kid, seed){ const S0 = SCENES[kid] || SCENES.yarik; return S0[Math.abs(seed | 0) % S0.length](); }
+function scene(kid, seed){ const S0 = SCENES[T(kid)] || SCENES.yarik; return S0[Math.abs(seed | 0) % S0.length](); }
 
 /* Обложки книг */
 const COVERS = {

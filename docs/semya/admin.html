@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Словоход — семьи</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--fg:#1d2433;--mut:#5b6478;--line:#dde2ee;--acc:#2f5bd3;--ok:#1f8a5b;--bad:#c0392b}
+@media (prefers-color-scheme:dark){:root{--bg:#12151d;--card:#1b2030;--fg:#e6e9f2;--mut:#9aa3b8;--line:#2c3347;--acc:#86a5ff;--ok:#5fd19d;--bad:#ff7b6b}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 -apple-system,system-ui,sans-serif;padding:16px}
+main{max-width:720px;margin:0 auto}
+h1{font-size:24px;margin:4px 0 2px}.mut{color:var(--mut);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:12px 0}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.st{font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.on{color:var(--ok);border:1px solid var(--ok)}.off{color:var(--bad);border:1px solid var(--bad)}
+button{font:inherit;border:0;border-radius:10px;padding:8px 14px;background:var(--acc);color:#fff;cursor:pointer}
+button.red{background:var(--bad)}button.gh{background:none;color:var(--acc);padding:4px 0}
+input{font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;width:100%;box-sizing:border-box;margin:8px 0}
+.fb{border-top:1px solid var(--line);padding:8px 0}.fb:first-child{border:0}
+</style></head>
+<body><main id="app"><p class="mut">Загрузка…</p></main>
+<script>
+var URL_ = 'https://script.google.com/macros/s/AKfycbzlcMocKjYfldhFSe25-6w9_HVEN0sXMmlJrbj1VWuqMhHvQo5Fs-M0J7zZW2sDYEM3sw/exec';
+var KEY = '';
+try { var m = location.hash.match(/k=([\w-]+)/); if (m) { localStorage.setItem('slovohod.admin', m[1]); history.replaceState(null, '', location.pathname); } KEY = localStorage.getItem('slovohod.admin') || ''; } catch (e) {}
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function dt(s){ if (!s) return '—'; var d = new Date(s); if (isNaN(d)) return '—'; return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }); }
+function api(o){ o.fam = 'admin'; o.key = KEY; return fetch(URL_, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(o) }).then(function(r){ return r.json(); }); }
+var A = document.getElementById('app');
+function keyForm(msg){ A.innerHTML = '<h1>Словоход — семьи</h1><div class="card"><p>' + (msg || 'Введите ключ администратора.') + '</p><input id="k" autocomplete="off"><button onclick="KEY=document.getElementById(\'k\').value.trim();try{localStorage.setItem(\'slovohod.admin\',KEY)}catch(e){};load()">Открыть</button></div>'; }
+function draw(j){
+  var F = j.fams || [], act = F.filter(function(f){ return !f.off; }).length;
+  var h = '<h1>Словоход — семьи</h1><p class="mut">Всего ' + F.length + ', активных ' + act + '. <button class="gh" onclick="load()">Обновить</button></p>';
+  if (!F.length) h += '<div class="card">Пока никто не зарегистрировался.</div>';
+  F.slice().reverse().forEach(function(f){
+    var kids = (f.kids || []).map(function(k){ return esc(k.name) + ', ' + esc(k.age); }).join('; ') || 'детей ещё нет';
+    h += '<div class="card"><div class="top"><div><b>' + esc(f.name || 'без имени') + '</b><br><span class="mut">' + esc(f.email) + '</span></div><span class="st ' + (f.off ? 'off">отключена' : 'on">активна') + '</span></div>' +
+      '<p>Дети: ' + kids + '</p><p class="mut">Регистрация: ' + dt(f.created) + ' · был(а): ' + dt(f.last) + ' · событий: ' + esc(f.events) + '</p>' +
+      '<button class="' + (f.off ? '' : 'red') + '" onclick="setSt(\'' + esc(f.fid) + '\',' + (f.off ? 'true' : 'false') + ')">' + (f.off ? 'Включить' : 'Отключить') + '</button></div>';
+  });
+  var B = j.fb || [];
+  h += '<h1 style="margin-top:20px">Отзывы</h1><div class="card">' + (B.length ? B.map(function(b){ return '<div class="fb"><span class="mut">' + dt(b.t) + ' · ' + esc(b.email) + '</span><br>' + esc(b.text) + '</div>'; }).join('') : 'Пока нет.') + '</div>';
+  A.innerHTML = h;
+}
+function load(){ if (!KEY) return keyForm(); api({}).then(function(j){ if (!j.ok) return keyForm(esc(j.msg || 'Ошибка')); draw(j); }).catch(function(){ A.innerHTML = '<div class="card">Нет связи. <button class="gh" onclick="load()">Повторить</button></div>'; }); }
+function setSt(fid, on){ if (!on && !confirm('Отключить эту семью? Приложение у них перестанет открываться.')) return; api({ op: 'set', fid: fid, on: on }).then(function(j){ if (j.ok) draw(j); else alert(j.msg || 'Ошибка'); }); }
+load();
+</script></body></html>

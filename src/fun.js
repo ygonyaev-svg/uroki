@@ -9,7 +9,7 @@ function funPts(kid, key, pts, cap){ if (!kid || !pts) return 0; var F = funK(ki
 function funLeft(kid, key){ var F = funK(kid); return Math.max(0, (FUN_CAP[key] || 5) - (F.got[key] || 0)); }
 function funCapNote(kid, key){ var l = funLeft(kid, key); return l ? 'Сегодня можно заработать ещё <b>' + l + '</b> ' + U.pl(l, 'балл', 'балла', 'баллов') + '.' : 'Баллы на сегодня собраны — дальше играем просто для ума 🙂'; }
 function funTab(act, cur0, list){ return '<div class="fntabs">' + list.map(function(t){ return '<button class="chip ' + (String(cur0) === String(t[0]) ? 'on' : '') + '" data-act="' + act + '" data-l="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>'; }
-function funLvl(kid){ return kid === 'anya' ? 2 : 1; }
+function funLvl(kid){ return T(kid) === 'anya' ? 2 : 1; }
 function funOrder(kid, list, salt){ var r = U.rng(kid + salt); return r.shuffle(list.map(function(x, i){ return i; })); }
 function funBurst(pts){ if (!pts) return ''; var s = ''; for (var i = 0; i < Math.min(10, 3 + pts * 2); i++) s += '<span style="--dx:' + Math.round(Math.cos(i * 2.4) * 140) + 'px;--dy:' + Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 150) + 'px;--r:' + (i * 40) + 'deg;animation-delay:' + (i * 60) + 'ms">' + (i % 3 ? '🪙' : '⭐') + '</span>'; return '<div class="burst" aria-hidden="true">' + s + '</div>'; }
 
@@ -17,7 +17,7 @@ function funBurst(pts){ if (!pts) return ''; var s = ''; for (var i = 0; i < Mat
 var ZG = ZAG.map(function(l){ var p = l.split('|'), own = p[0].charAt(0) === '*'; return { id: 'z' + U.h(p[0]), q: own ? p[0].slice(1) : p[0], own: own, a: p[1], w: p[2].split(';'), lv: +p[3], sc: p[4] }; });
 var ZG_SCENE = { les: '🍂🌳🍂', sad: '🌱🪴🌱', dom: '🪟🛋️🕰️', dvor: '🏡🌾🪵', zima: '🌨️🏠🌨️', reka: '🌊🛶🌾', kab: '📚🔍🕯️', extra: '✨🔭✨' };
 function zgList(kid, lv){ var L = ZG.filter(function(z){ return z.lv === lv; }); var o = funOrder(kid, L, 'zg' + lv); return o.map(function(i){ return L[i]; }); }
-function zgPic(kid, z){ var k = kid === 'anya' ? 'a' : 'y'; return '<div class="zgpic sc-' + z.sc + '"><span class="zgemo" aria-hidden="true">' + ZG_SCENE[z.sc] + '</span><img src="img/zg-' + k + '-' + z.sc + '.webp" alt="" onerror="this.style.display=\'none\'"><span class="zgq" aria-hidden="true">?</span></div>'; }
+function zgPic(kid, z){ var k = T(kid) === 'anya' ? 'a' : 'y'; return '<div class="zgpic sc-' + z.sc + '"><span class="zgemo" aria-hidden="true">' + ZG_SCENE[z.sc] + '</span><img src="img/zg-' + k + '-' + z.sc + '.webp" alt="" onerror="this.style.display=\'none\'"><span class="zgq" aria-hidden="true">?</span></div>'; }
 function zgOpt(w){ return '<span class="zge">' + (ZAG_EMO[w] || '❔') + '</span><span>' + U.esc(w) + '</span>'; }
 ALWAYS.push({ id: 'zag', order: 10,
   open: function(kid){ cur.fz = null; cur.zgL = funLvl(kid); },
@@ -180,7 +180,7 @@ ALWAYS.push({ id: 'zad', order: 40,
       funTab('zdtab', lv, [[1, 'Уровень 1 · 2–3 класс'], [2, 'Уровень 2 · 5 класс']]) + '<p>Решено: <b>' + solved + '</b> из ' + L.length + '</p></section>';
     if (!z) return h + '<div class="card win"><h2>Все задачи этого уровня решены!</h2><p>Скоро добавим новые.</p></div>';
     var r = cur.fq;
-    h += '<article class="card task"><span class="sticker" aria-hidden="true">' + U.rng(z.id).pick(THEME[kid].pics) + '</span><div class="q">' + U.esc(z.q) + '</div>' + (typeof picWords === 'function' ? picWords(z.q) : '') + '<div class="row"><button class="btn ghost small" data-act="zdsay">🔊 Послушать</button></div>' +
+    h += '<article class="card task"><span class="sticker" aria-hidden="true">' + U.rng(z.id).pick(THEME[LK(kid)].pics) + '</span><div class="q">' + U.esc(z.q) + '</div>' + (typeof picWords === 'function' ? picWords(z.q) : '') + '<div class="row"><button class="btn ghost small" data-act="zdsay">🔊 Послушать</button></div>' +
       '<form class="numf" data-form="zadf"><input id="zdin" inputmode="decimal" autocomplete="off" ' + (r ? 'disabled value="' + U.esc(r.v) + '"' : 'autofocus') + ' aria-label="Ответ"><button class="btn"' + (r ? ' disabled' : '') + '>Проверить</button></form>';
     if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Неверно. Ответ: <b>' + U.esc(z.as) + '</b>') + '</div><p class="hint">' + U.esc(z.e) + '</p>' + (r.ok ? funBurst(r.pts) : '');
     h += '</article>' + (r ? '<button class="btn big" data-act="zdnext">Следующая задача →</button>' : '');
