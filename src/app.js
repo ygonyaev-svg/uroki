@@ -11,6 +11,8 @@ const STEPS = [1, 3, 7];
 /* ===== Хранилище ===== */
 const KEY = 'uroki.v1';
 let S;
+/* Детям пишет Юра (отчим): «папа» в сообщениях из таблицы заменяем. */
+function noPapa(s){ return String(s).replace(/от папы/gi, 'от Юры').replace(/папа/gi, 'Юра').replace(/папы/gi, 'Юры').replace(/папе/gi, 'Юре'); }
 function newKid(){ return { pin:null, coins:0, pos:{}, lvl:{}, stats:{}, days:{}, reading:[], hard:{}, srs:[], purchases:[], words:0, texts:0, applied:[], msgs:[], hwText:[] }; }
 function defShop(){ return [
   { id:'s1', name:'15 минут игры на планшете', price:15 },
@@ -161,7 +163,7 @@ function vHome(){
   return `<main class="wrap ${kid}"><header class="bar"><button class="link" data-act="logout">Выйти</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. 1 балл = 1 минута игры, за день можно заработать до 60.</p>
    <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
-  ${msgs.map(m => `<div class="note">✉ ${U.esc(m.text)} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
+  ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}</section>
   ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
