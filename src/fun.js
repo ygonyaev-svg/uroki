@@ -15,7 +15,7 @@ function funBurst(pts){ if (!pts) return ''; var s = ''; for (var i = 0; i < Mat
 
 /* ---------- Загадки ---------- */
 var ZG = ZAG.map(function(l){ var p = l.split('|'), own = p[0].charAt(0) === '*'; return { id: 'z' + U.h(p[0]), q: own ? p[0].slice(1) : p[0], own: own, a: p[1], w: p[2].split(';'), lv: +p[3], sc: p[4] }; });
-var ZG_SCENE = { les: '🍂🌳🍂', sad: '🌱🪴🌱', dom: '🪟🛋️🕰️', dvor: '🏡🌾🪵', zima: '🌨️🏠🌨️', reka: '🌊🛶🌾', kab: '📚🔍🕯️' };
+var ZG_SCENE = { les: '🍂🌳🍂', sad: '🌱🪴🌱', dom: '🪟🛋️🕰️', dvor: '🏡🌾🪵', zima: '🌨️🏠🌨️', reka: '🌊🛶🌾', kab: '📚🔍🕯️', extra: '✨🔭✨' };
 function zgList(kid, lv){ var L = ZG.filter(function(z){ return z.lv === lv; }); var o = funOrder(kid, L, 'zg' + lv); return o.map(function(i){ return L[i]; }); }
 function zgPic(kid, z){ var k = kid === 'anya' ? 'a' : 'y'; return '<div class="zgpic sc-' + z.sc + '"><span class="zgemo" aria-hidden="true">' + ZG_SCENE[z.sc] + '</span><img src="img/zg-' + k + '-' + z.sc + '.webp" alt="" onerror="this.style.display=\'none\'"><span class="zgq" aria-hidden="true">?</span></div>'; }
 function zgOpt(w){ return '<span class="zge">' + (ZAG_EMO[w] || '❔') + '</span><span>' + U.esc(w) + '</span>'; }
