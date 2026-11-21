@@ -370,3 +370,13 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .bkbusy{ padding:24px 0; }
 .spin{ width:44px; height:44px; margin:0 auto 10px; border-radius:50%; border:5px solid var(--accsoft); border-top-color:var(--acc); animation:bkspin 1s linear infinite; }
 @keyframes bkspin{ to{ transform:rotate(360deg); } }
+/* Портрет ребёнка */
+.pfbar{ display:block; height:8px; border-radius:4px; background:var(--line); overflow:hidden; margin:6px 0 4px; }
+.pfbar i{ display:block; height:100%; background:var(--acc); border-radius:4px; }
+.pfrow{ padding:8px 0; border-bottom:1px solid var(--line); }
+.pfrow:last-of-type{ border-bottom:0; }
+.pfrow.dim b, .card.dim h2{ opacity:.6; }
+.pfrow.dim .hint{ display:block; }
+.pfprof .chip{ display:inline-block; margin:3px 2px; cursor:default; }
+.pfnote{ font-size:13px; margin:6px 4px 18px; }
+.tabs{ overflow-x:auto; -webkit-overflow-scrolling:touch; } .tabs .tab{ white-space:nowrap; flex-shrink:0; }
