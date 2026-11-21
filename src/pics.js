@@ -189,6 +189,8 @@ function mathPic(kid, q){
 
 /* Главная функция: рисунок к заданию */
 function illus(kid, subj, t){
+  /* Задание «что нарисовано»: картинка задана самим заданием (t.pic — слово из WORD_PIC) */
+  if (t.pic) { const ps = wordPics(String(t.pic), 1); return ps.length ? `<div class="illus"><div class="wpics">${ps.map(e => `<span>${e}</span>`).join('')}</div></div>` : ''; }
   const q = (t.q || '').replace(/<[^>]+>/g, ' ');
   if (/[\u{1F300}-\u{1FAFF}]{3,}/u.test(q)) return ''; /* в задании уже есть картинки */
   if (/<svg/.test(t.q || '')) return ''; /* в задании свой рисунок (фигуры, карточки, весы) */
