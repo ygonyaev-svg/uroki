@@ -47,6 +47,7 @@ ALWAYS.push({ id: 'zag', order: 10,
 
 /* ---------- Головоломки: спички и монетки ---------- */
 var EQ_SEG = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg' };
+var EQ_SP = 2.1; /* шаг между знаками равенства из спичек: широкие промежутки, чтобы цифры не слипались */
 var EQ_GEO = { a: [0, 0, 1, 0], b: [1, 0, 1, 1], c: [1, 1, 1, 2], d: [0, 2, 1, 2], e: [0, 1, 0, 2], f: [0, 0, 0, 1], g: [0, 1, 1, 1] };
 function cnTri(n){ var s = []; for (var r = 0; r < n; r++) for (var q = 0; q < n - r; q++) s.push([q, r]); return s; }
 function cnFlip(S){ return S.map(function(p){ return [p[0] + p[1], -p[1]]; }); }
@@ -69,8 +70,8 @@ function pzBoard(p){ var sl = {}, fixed = [], i, k;
       if (/\d/.test(ch)) { for (k in EQ_GEO) { var g = EQ_GEO[k]; sl[i + k] = [X + g[0], g[1], X + g[2], g[3]]; } }
       else if (ch === '+' || ch === '-') { sl[i + 'h'] = [X, 1, X + 1, 1]; sl[i + 'v'] = [X + .5, .5, X + .5, 1.5]; }
       else if (ch === '=') { fixed.push([X, .75, X + 1, .75], [X, 1.25, X + 1, 1.25]); }
-      X += 1.7; }
-    return { sl: sl, fixed: fixed, box: [0, 0, X - .7, 2] }; }
+      X += EQ_SP; }
+    return { sl: sl, fixed: fixed, box: [0, 0, X - EQ_SP + 1, 2] }; }
   /* монетки: треугольная решётка, q,r → x = q + r/2, y = r·0.87 */
   var rs = p.s.map(function(a){ return a[1]; });
   var r0 = Math.min.apply(null, rs) - 1, r1 = Math.max.apply(null, rs) + 1, minx = 1e9, maxx = -1e9;
@@ -112,8 +113,9 @@ function pzSvg(p, st, showSol){ var B = pzBoard(p), b = B.box, m = B.coin ? .7 :
       h += on ? '<g class="pzc' + (st.sel === k ? ' sel' : '') + (showSol && start.indexOf(k) < 0 ? ' new' : '') + '" data-pk="' + k + '"><circle cx="' + s[0] + '" cy="' + s[1] + '" r=".42"/><circle class="in" cx="' + s[0] + '" cy="' + s[1] + '" r=".3"/><circle class="hit" cx="' + s[0] + '" cy="' + s[1] + '" r=".5"/></g>'
         : '<circle class="pzdot" data-ps="' + k + '" cx="' + s[0] + '" cy="' + s[1] + '" r="' + (st.sel ? .22 : .1) + '"/>' + (st.sel ? '' : '') ; } }
   else { B.fixed.forEach(function(f){ h += '<line class="pzfix" x1="' + f[0] + '" y1="' + f[1] + '" x2="' + f[2] + '" y2="' + f[3] + '"/>'; });
-    for (k in B.sl) { s = B.sl[k]; var dx = s[2] - s[0], dy = s[3] - s[1], x1 = s[0] + dx * .08, y1 = s[1] + dy * .08, x2 = s[2] - dx * .08, y2 = s[3] - dy * .08;
-      if (occ.indexOf(k) >= 0) h += '<g class="pzs' + (st.sel === k ? ' sel' : '') + (showSol && start.indexOf(k) < 0 ? ' new' : '') + '" data-pk="' + k + '"><line class="hit" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><line class="wood" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><circle class="head" cx="' + x2 + '" cy="' + y2 + '" r=".085"/></g>';
+    var ins = p.t === 'eq' ? .15 : .11; /* в равенствах — зазоры в стыках, чтобы головки не сливались */
+    for (k in B.sl) { s = B.sl[k]; var dx = s[2] - s[0], dy = s[3] - s[1], x1 = s[0] + dx * ins, y1 = s[1] + dy * ins, x2 = s[2] - dx * ins, y2 = s[3] - dy * ins;
+      if (occ.indexOf(k) >= 0) h += '<g class="pzs' + (st.sel === k ? ' sel' : '') + (showSol && start.indexOf(k) < 0 ? ' new' : '') + '" data-pk="' + k + '"><line class="hit" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><line class="wood" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><circle class="head" cx="' + x2 + '" cy="' + y2 + '" r="' + (p.t === 'eq' ? .1 : .085) + '"/></g>';
       else h += '<g class="pze' + (st.sel ? ' on' : '') + (start.indexOf(k) >= 0 ? ' was' : '') + '" data-ps="' + k + '"><line class="hit" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><line class="ghost" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/></g>'; } }
   return '<svg class="pzsvg ' + (B.coin ? 'coins' : p.t) + '" viewBox="' + vb.join(' ') + '" preserveAspectRatio="xMidYMid meet">' + h + '</svg>'; }
 ALWAYS.push({ id: 'pz', order: 30,
@@ -151,7 +153,7 @@ function pzDown(e, x, y){ var el = pzEl(e.target); if (!el || cur.view !== 'alwa
   PZD = { el: el, svg: svg, x: x, y: y, drag: false, pk: el.getAttribute('data-pk') }; return true; }
 function pzDrag(x, y){ if (!PZD || !PZD.pk) return; var p = cur.kid && pzCur(cur.kid); if (!p || (p.t === 'st' && p.mode === 'r') || (cur.fp && cur.fp.res)) return;
   if (!PZD.drag && Math.abs(x - PZD.x) + Math.abs(y - PZD.y) < 8) return; PZD.drag = true;
-  var a = pzPt(PZD.svg, PZD.x, PZD.y), c = pzPt(PZD.svg, x, y); PZD.el.setAttribute('transform', 'translate(' + (c.x - a.x) + ',' + (c.y - a.y) + ')'); PZD.el.setAttribute('class', (PZD.el.getAttribute('class') || '') + ' drag'); }
+  var a = pzPt(PZD.svg, PZD.x, PZD.y), c = pzPt(PZD.svg, x, y); PZD.el.setAttribute('transform', 'translate(' + (c.x - a.x) + ',' + (c.y - a.y) + ')'); PZD.el.setAttribute('class', (PZD.el.getAttribute('class') || '') + ' drag'); if (!/ dragging/.test(PZD.svg.getAttribute('class') || '')) PZD.svg.setAttribute('class', (PZD.svg.getAttribute('class') || '') + ' dragging'); }
 function pzUp(x, y){ var D = PZD; PZD = null; if (!D) return; if (!D.drag) { pzTap(D.el); return; }
   var p = pzCur(cur.kid), B = pzBoard(p), a = pzPt(D.svg, D.x, D.y), c = pzPt(D.svg, x, y), s = B.sl[D.pk], dx = c.x - a.x, dy = c.y - a.y;
   var mx = (B.coin ? s[0] : (s[0] + s[2]) / 2) + dx, my = (B.coin ? s[1] : (s[1] + s[3]) / 2) + dy, best = null, bd = B.coin ? .55 : .5;
