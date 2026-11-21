@@ -46,7 +46,7 @@ function agree(s){ if (typeof s !== 'string') return s; return s.replace(/(^|[^\
   const v = m10 === 1 && m100 !== 11 ? f[0] : m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? f[1] : f[2]; return pre + n + sp + (w[0] === w[0].toUpperCase() ? v[0].toUpperCase() + v.slice(1) : v); }); }
 /* ===== Везде — варианты ответа крупными кнопками (правило Юры 21.11): ручной ввод заменяем выбором ===== */
 function numOpts(a, r){ a = Number(a); const isInt = Math.abs(a - Math.round(a)) < 1e-9, m = Math.abs(a), c = [];
-  if (isInt) { c.push(a + 1, a - 1, a + 10, a - 10, a + 2); if (m >= 100) c.push(a + 100, a - 100); if (m >= 1000) c.push(a + 1000, a - 1000, Math.round(a / 10), a * 10); if (m >= 20 && m < 1000) c.push(a * 10, Math.round(a / 10)); const s = String(Math.abs(a)); if (s.length >= 2) { const sw = Number(s.slice(0, -2) + s.slice(-1) + s.slice(-2, -1)) * (a < 0 ? -1 : 1); c.push(sw); } }
+  if (isInt) { c.push(a + 1, a - 1, a + 10, a - 10, a + 2); if (m >= 100) c.push(a + 100, a - 100); if (m >= 1000) c.push(a + 1000, a - 1000); if (m >= 20) c.push(a + 20, a - 20, a + 9, a - 9); /* не «×10» и «:10» — такие варианты нелепы */ const s = String(Math.abs(a)); if (s.length >= 2) { const sw = Number(s.slice(0, -2) + s.slice(-1) + s.slice(-2, -1)) * (a < 0 ? -1 : 1); c.push(sw); } }
   else c.push(a + .1, a - .1, a + 1, a - 1, a * 10, a / 10, a + .01);
   const out = []; for (const v0 of r.shuffle(c)) { const v = Math.round(v0 * 1000) / 1000; if (v !== a && (a < 0 || v >= 0) && !out.includes(v)) out.push(v); if (out.length === 3) break; }
   while (out.length < 3) { const v = a + out.length + 3; if (!out.includes(v)) out.push(v); } return out; }
