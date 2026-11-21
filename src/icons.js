@@ -141,8 +141,9 @@ var EMO_ICON = { '🎮':'game','▶️':'video','▶':'video','📺':'video','�
 var ICO_ONLY = { '♞':'knight','♙':'pawn','♚':'king' };
 var SUBJ_IC = { read:'s_read', math:'s_math', rus:'s_rus', world:'s_world', hist:'s_hist', logic:'s_logic', lang:'s_lang', hw:'s_hw' };
 function icon(name, cls){ var p = ICONS[name]; if (!p) return ''; return '<svg class="ic ic-' + name + (cls ? ' ' + cls : '') + '" viewBox="0 0 32 32" aria-hidden="true" focusable="false">' + p + '</svg>'; }
-var EMO_RE = (function(){ var ks = Object.keys(EMO_ICON).concat(Object.keys(ICO_ONLY)).sort(function(a, b){ return b.length - a.length; });
-  return new RegExp('(' + ks.map(function(k){ return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')️?', 'g'); })();
+function icoBuildRe(){ var ks = Object.keys(EMO_ICON).concat(Object.keys(ICO_ONLY)).sort(function(a, b){ return b.length - a.length; });
+  return new RegExp('(' + ks.map(function(k){ return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')️?', 'g'); }
+var EMO_RE = icoBuildRe();
 function icoSkip(el){ for (var n = el; n && n.nodeType === 1; n = n.parentNode) { var c = n.className; if (typeof c !== 'string') c = n.getAttribute && n.getAttribute('class') || '';
     var t = n.tagName; if (t === 'TEXTAREA' || t === 'INPUT' || t === 'SCRIPT' || t === 'STYLE' || t === 'OPTION' || t === 'svg' || t === 'SVG' || t === 'TITLE') return true;
     if (/(^| )(noico|ic|chboard|pc|toast)( |$)/.test(c)) return true; if (n.id === 'app') break; } return false; }
@@ -157,8 +158,25 @@ function icoize(root){ if (!root || !document.createTreeWalker) return; var w = 
     var span = document.createElement('span'); span.className = 'icw'; span.innerHTML = html;
     var frag = document.createDocumentFragment(); while (span.firstChild) frag.appendChild(span.firstChild); par.replaceChild(frag, n); }
 }
+// Эмодзи внутри SVG-сцен (<text>⚽</text>) → вложенный <svg> с нашей иконкой того же размера
+var SVGNS = 'http://www.w3.org/2000/svg';
+function icoSvgText(root){ if (!root || !root.getElementsByTagName) return; var ts = root.getElementsByTagName('text'), arr = [], i;
+  for (i = 0; i < ts.length; i++) arr.push(ts[i]);
+  for (i = 0; i < arr.length; i++) { var t = arr[i], s = t.textContent, names = [], m, rest;
+    if (!s || t.getAttribute('data-ico')) continue; EMO_RE.lastIndex = 0;
+    while ((m = EMO_RE.exec(s))) { var nm = EMO_ICON[m[1]]; if (!nm) { names = null; break; } names.push(nm); }
+    if (!names || !names.length) continue; EMO_RE.lastIndex = 0; rest = s.replace(EMO_RE, '').replace(/[\s‍️]/g, ''); if (rest) continue;
+    var fs = parseFloat(t.getAttribute('font-size')) || parseFloat((t.style && t.style.fontSize) || '') || 16, x = parseFloat(t.getAttribute('x')) || 0, y = parseFloat(t.getAttribute('y')) || 0;
+    var w = fs * 1.1, tot = w * names.length, an = t.getAttribute('text-anchor') || '';
+    var x0 = an === 'middle' ? x - tot / 2 : an === 'end' ? x - tot : x, y0 = y - fs * .92;
+    var g = document.createElementNS(SVGNS, 'g'); g.setAttribute('data-ico', '1'); var tr = t.getAttribute('transform'); if (tr) g.setAttribute('transform', tr);
+    var op = t.getAttribute('opacity'); if (op) g.setAttribute('opacity', op);
+    for (var j = 0; j < names.length; j++) { var src = '<svg xmlns="' + SVGNS + '" class="ics ic-' + names[j] + '" x="' + (x0 + j * w) + '" y="' + y0 + '" width="' + w + '" height="' + w + '" viewBox="0 0 32 32">' + ICONS[names[j]] + '</svg>';
+      try { var d = new DOMParser().parseFromString(src, 'image/svg+xml').documentElement; g.appendChild(document.importNode(d, true)); } catch (e) {} }
+    if (g.firstChild) t.parentNode.replaceChild(g, t); }
+}
 (function(){ var busy = false, sched = false;
-  function run(){ sched = false; var a = document.getElementById('app'); if (!a) return; busy = true; try { icoize(a); icoize(document.querySelector('.modal')); } catch (e) {} busy = false; }
+  function run(){ sched = false; var a = document.getElementById('app'); if (!a) return; busy = true; try { icoize(a); icoize(document.querySelector('.modal')); icoSvgText(a); icoSvgText(document.querySelector('.modal')); } catch (e) {} busy = false; }
   function start(){ var a = document.getElementById('app'); if (!a || !window.MutationObserver) return;
     new MutationObserver(function(){ if (busy) return; if (!sched) { sched = true; run(); } }).observe(document.body, { childList: true, subtree: true, characterData: true }); run(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start(); })();

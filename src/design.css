@@ -11,6 +11,8 @@ b,strong{ font-weight:800; }
 .ic{ width:1.2em; height:1.2em; vertical-align:-.22em; display:inline-block; overflow:visible; fill:none; stroke:var(--il); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
 .ic .a{ fill:var(--ia); } .ic .b{ fill:var(--ib); } .ic .w{ fill:var(--iw); } .ic .l{ fill:var(--il); stroke:none; } .ic .l2{ fill:var(--il); }
 .ic text{ fill:var(--il); }
+.ics{ overflow:visible; fill:none; stroke:var(--il); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.ics .a{ fill:var(--ia); } .ics .b{ fill:var(--ib); } .ics .w{ fill:var(--iw); } .ics .l{ fill:var(--il); stroke:none; } .ics .l2{ fill:var(--il); }
 .ic-fox{ --ia:#F08A3C; } .ic-lion{ --ia:#F6C453; --ib:#C9772B; } .ic-dog{ --ia:#E9C79A; --ib:#9A6A43; } .ic-cat{ --ia:#F3B36B; --ib:#F7A9A8; }
 .ic-frog,.ic-turtle,.ic-dino,.ic-tree,.ic-leaf,.ic-sprout{ --ia:#6CC070; } .ic-turtle{ --ib:#B5E3A1; } .ic-dolphin,.ic-fish,.ic-drop,.ic-wave{ --ia:#5AB0E8; }
 .ic-bear{ --ia:#B9875A; } .ic-wolf{ --ia:#A3AEBD; } .ic-bird{ --ia:#5AB0E8; --ib:#F5A524; } .ic-hedgehog{ --ib:#9A6A43; --ia:#E9C79A; } .ic-cap{ --ia:#2F3B55; } .ic-question{ --ia:#4C9BE8; }
