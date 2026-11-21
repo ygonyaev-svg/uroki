@@ -6,14 +6,14 @@ const PX = {
 };
 
 /* Десятки палочками, единицы кружками */
-function picTens(nums, op){
+function picTens(nums, op, hide){
   const items = []; let x = 10, H = 0;
   nums.forEach((n, k) => {
     const d = Math.floor(n / 10), e = n % 10, start = x; let g = '';
     for (let i = 0; i < d; i++) { g += `<rect x="${x}" y="10" width="12" height="100" rx="3" fill="#3b82f6"/>`; for (let j = 1; j < 10; j++) g += `<line x1="${x}" x2="${x + 12}" y1="${10 + j * 10}" y2="${10 + j * 10}" stroke="#bfdbfe" stroke-width="1"/>`; x += 16; }
     for (let i = 0; i < e; i++) { g += `<circle cx="${x + 8 + (i % 2) * 16}" cy="${102 - Math.floor(i / 2) * 18}" r="7" fill="#f59e0b"/>`; }
     if (e) x += 36;
-    g += PX.t((start + x) / 2 - 4, 132, n, 18);
+    if (!hide) g += PX.t((start + x) / 2 - 4, 132, n, 18);
     items.push(g); x += 10;
     if (k < nums.length - 1) { items.push(PX.t(x + 8, 70, op, 28)); x += 30; }
     H = 140;
@@ -56,7 +56,6 @@ function picBox(a, b, c, unit){ const g = `<path d="M30,60 L130,60 L130,140 L30,
 /* Линейка */
 function picRuler(cm){ cm = Math.min(cm, 60); const k = cm > 30 ? 8 : 14, w = cm * k + 30; let g = `<rect x="10" y="20" width="${cm * k + 10}" height="40" rx="4" fill="#fef3c7" stroke="#d97706"/>`;
   for (let i = 0; i <= cm; i++) g += `<line x1="${15 + i * k}" x2="${15 + i * k}" y1="20" y2="${i % 10 === 0 ? 48 : i % 5 === 0 ? 40 : 32}" stroke="#92400e"/>` + (i % 10 === 0 ? PX.t(15 + i * k, 76, i, 11, '#92400e') : '');
-  g += PX.t(w / 2, 14, `${cm} см = ${Math.floor(cm / 10)} дм ${cm % 10} см`, 12, '#64748b');
   return PX.svg(w, 82, g, 'ruler'); }
 /* Часы */
 function picClock(h, m){ const ha = ((h % 12) + m / 60) / 12 * 2 * Math.PI, ma = m / 60 * 2 * Math.PI; let g = `<circle cx="70" cy="70" r="60" fill="#fff" stroke="#334155" stroke-width="4"/>`;
@@ -144,8 +143,9 @@ function mathPic(kid, q){
   if ((m = s.match(/(?:числе|Округли)\s*(\d{1,3}(?:[\s\u00a0]\d{3})+)/))) return picPlace(m[1]);
   if ((m = s.match(/(?:в числе|Запиши десятичной дробью:?)\s*(\d+,\d+)/))) return picPlace(m[1]);
   if ((m = s.match(/(\d+,\d+)\s*([+−·:-])\s*(\d+(?:,\d+)?)/)) && kid === 'anya') return `<div class="pair">${picPlace(m[1])}<b>${m[2]}</b>${picPlace(m[3])}</div>`;
-  if ((m = s.match(/(\d+)\s*(дм|см)(?![а-яё])/)) && kid === 'yarik' && !/\d+\s*м(?![а-яё])/.test(s)) { const cm = m[2] === 'дм' ? +m[1] * 10 : +m[1]; const m2 = s.match(/(\d+)\s*(дм|см)(?![а-яё]).*?(\d+)\s*(дм|см)(?![а-яё])/); const v = m2 ? Math.max(...[[+m2[1], m2[2]], [+m2[3], m2[4]]].map(([n, u]) => u === 'дм' ? n * 10 : n)) : cm; if (v <= 60 && v > 0) return picRuler(v); }
-  if ((m = s.match(/(\d+)\s*(дм|см|м)(?![а-яё]).*?(\d+)\s*(дм|см|м)(?![а-яё])/)) && kid === 'yarik') { const cm = (n, u) => u === 'м' ? n * 100 : u === 'дм' ? n * 10 : n; const v = Math.max(cm(+m[1], m[2]), cm(+m[3], m[4])); if (v <= 60) return picRuler(v); }
+  if (kid === 'yarik' && /\d+\s*(дм|см)(?![а-яё])/.test(s)) { const qs = [], re = /(\d+)\s*(м|дм|см)(?![а-яё])(?:\s*(\d+)\s*(дм|см)(?![а-яё]))?/g; let q; const cmv = (n, u) => u === 'м' ? n * 100 : u === 'дм' ? n * 10 : n;
+    while ((q = re.exec(s))) qs.push(cmv(+q[1], q[2]) + (q[3] ? cmv(+q[3], q[4]) : 0));
+    const v = Math.max(...qs); if (v > 0 && v <= 60) return picRuler(v); }
   if ((m = s.match(/^(.*?)\b(\d*)\s*x\s*([+−-])\s*(\d+)\s*=\s*(\d+)/)) || (m = s.match(/(\d+)\s*([+−-])\s*x\s*=\s*(\d+)/))) {
     const eq = s.match(/[^.:]*x[^.]*=\s*\d+/); if (eq) { const [l, r] = eq[0].split('='); return picScale(l.trim().replace(/^.*?:\s*/, '').replace(/^Реши уравнение\s*/, ''), r.trim()); } }
   if ((m = s.match(/(\d+)\s*x\s*=\s*(\d+)/))) return picScale(m[1] + 'x', m[2]);
@@ -155,7 +155,7 @@ function mathPic(kid, q){
     if ((m = s.match(/(\d+)\s*([+−-])\s*(\d+)\s*=\s*\?/)) && +m[1] <= 100 && +m[3] <= 100) return picTens([+m[1], +m[3]], m[2]);
     if ((m = s.match(/Сравни числа:\s*(\d+)\s*\?\s*(\d+)/))) return picTens([+m[1], +m[2]], '?');
     if ((m = s.match(/в числе (\d+)/)) && +m[1] <= 100) return picTens([+m[1]], '');
-    if ((m = s.match(/(\d+)\s*дес\.\s*(\d+)\s*ед/))) return picTens([+m[1] * 10 + +m[2]], '');
+    if ((m = s.match(/(\d+)\s*дес\.\s*(\d+)\s*ед/))) return picTens([+m[1] * 10 + +m[2]], '', true);
     if ((m = s.match(/(\d+)\s+[а-яё]+\s+разложили[^\d]+по\s+(\d+)/))) { const e = wordPics(s, 1)[0] || '🔵'; return picArray(+m[1] / +m[2], +m[2], e); }
     const ns = (s.match(/\d+/g) || []).map(Number); const e = wordPics(s, 1)[0];
     if (e && ns.length >= 2 && ns[0] <= 20 && ns[1] <= 20) return `<div class="groups">${ns.slice(0, 2).map(n => `<span class="grp">${e.repeat(n)}</span>`).join('<b>?</b>')}</div>`;

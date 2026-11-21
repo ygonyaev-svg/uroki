@@ -6,7 +6,7 @@ src = os.path.join(root, 'src'); out = sys.argv[1] if len(sys.argv) > 1 else os.
 os.makedirs(out, exist_ok=True)
 parts = json.load(open(os.path.join(root, 'books', 'parts.json'), encoding='utf-8'))
 rd = lambda f: open(os.path.join(src, f), encoding='utf-8').read()
-js = '\n'.join([rd('core.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('app.js')])
+js = '\n'.join([rd('core.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('cur_more_y.js'), rd('cur_more_a.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('app.js')])
 import subprocess; subprocess.run([sys.executable, os.path.join(root, 'tools', 'theme_css.py')], check=True)
 css = open(os.path.join(src, 'style.css'), encoding='utf-8').read() + '\n' + open(os.path.join(src, 'theme.css'), encoding='utf-8').read()
 ver = hashlib.md5((js + css).encode()).hexdigest()[:8]

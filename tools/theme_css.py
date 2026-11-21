@@ -18,8 +18,6 @@ for row in range(9):
     for i in range(70):
         y.append(f'<circle cx="{i*14.5+R.randint(0,6)}" cy="{160+row*18+R.randint(-2,2)}" r="5" fill="{R.choice(cols)}" opacity=".85"/>')
 y.append(f'<rect y="320" width="{W}" height="38" fill="#0f172a"/>')
-for i, (t, c) in enumerate([('ГОЛ!', '#f97316'), ('УРОКИ', '#22c55e'), ('ЧЕМПИОН', '#facc15'), ('5 + 5', '#38bdf8'), ('ВПЕРЁД!', '#f43f5e')]):
-    y.append(f'<text x="{100+i*200}" y="347" font-family="Arial Black,Arial" font-weight="900" font-size="24" fill="{c}" text-anchor="middle">{t}</text>')
 for i in range(12):
     y.append(f'<rect y="{358+i*100}" width="{W}" height="100" fill="{"#3faa4a" if i%2 else "#36983f"}"/>')
 L = 'stroke="#ffffff" stroke-opacity=".75" stroke-width="7" fill="none"'
@@ -42,8 +40,6 @@ a = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" preserveAsp
 for i in range(220):
     a.append(f'<circle cx="{R.uniform(0,W):.0f}" cy="{R.uniform(0,1050):.0f}" r="{R.choice([1,1,1.5,2,2.5])}" fill="#fff" opacity="{R.uniform(.35,1):.2f}"/>')
 a.append('<circle cx="820" cy="170" r="160" fill="url(#m)"/><circle cx="820" cy="170" r="62" fill="#fff4c2"/><circle cx="845" cy="155" r="58" fill="#1a1147" opacity=".0"/>')
-for (cx, cy) in [(130,260),(260,180),(420,300),(600,220),(330,420),(700,380),(170,520),(520,500)]:
-    a.append(f'<g transform="translate({cx},{cy})"><circle cy="-14" r="20" fill="url(#f)"/><rect x="-6" y="-2" width="12" height="44" rx="3" fill="#fef3c7"/><path d="M0,-16 Q6,-6 0,-2 Q-6,-6 0,-16Z" fill="#ffb703"/></g>')
 cas = '#0d0a26'
 a.append(f'<path d="M0,1500 L0,1230 Q250,1180 500,1220 T1000,1200 L1000,1500Z" fill="#160f3a"/>')
 for (x, w, h, roof) in [(110,80,330,90),(230,120,250,0),(380,90,420,120),(500,180,300,0),(700,90,380,110),(820,110,260,0),(900,60,300,70)]:
@@ -74,6 +70,8 @@ h1,h2,.kn,.btn,.tile .sn,.bigmark+p{{ font-family:"Nunito","Arial Rounded MT Bol
 h1{{ font-weight:900; font-size:34px; }}
 /* текст прямо на фоне */
 .hero h1,.hero .eyebrow,body .wrap > .hello h1,body .wrap > .hello p,.lesson > h1,.lesson > .eyebrow,.lesson > .author,.lesson > .hint,.lesson > p,.lesson > h2,.wrap > .center,.counter,.src,.wrap > .hint{{ color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.45); }}
+.lesson > .hint,.wrap > .hint,.counter,.src,.lesson > p,.lesson > .author,.wrap > .center{{ background:rgba(15,23,42,.62); border-radius:12px; padding:6px 12px; font-size:16px; display:block; width:fit-content; max-width:100%; text-shadow:none; }}
+.shop-own{{ background:#fff; color:var(--ink); border-radius:20px; padding:12px 18px; box-shadow:var(--sh); }} .shop-own h2{{ color:var(--ink); text-shadow:none; }}
 .wrap.login .center .link,.bar .link{{ color:#fff; font-weight:800; text-shadow:0 2px 6px rgba(0,0,0,.45); }}
 .hello .eyebrow{{ color:#fde047; text-shadow:0 2px 6px rgba(0,0,0,.5); }}
 .card,.tile,.kidcard,.opt,.chip{{ border:0; box-shadow:var(--sh); }}
