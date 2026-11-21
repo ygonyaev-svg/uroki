@@ -56,6 +56,7 @@ function asChoice(t, seed, pool){ if (!t || t.k === 'c' || !(t.k === 'n' || t.k 
   const qw = (String(t.q).replace(/<[^>]+>/g, ' ').match(/«([^»]+)»/) || [])[1] || '';
   const fromQ = qw.split(/[\s,.;:!?—–-]+/).filter(w => w.length >= 2 && /[А-Яа-яЁёA-Za-zÀ-ÿ]/.test(w));
   const cand = []; const add = w => { const l = low(w); if (l && !bad.includes(l) && !cand.some(x => low(x) === l)) cand.push(/^[А-ЯЁA-Z]/.test(A) ? w : (w.length > 1 && w !== w.toUpperCase() ? w.toLowerCase() : w)); };
+  (t.wx || []).forEach(add); /* сначала — неверные варианты, которые задал автор задания */
   if (A.split(/\s+/).length === 1 && fromQ.length) r.shuffle(fromQ).forEach(add);
   (pool || []).forEach(x => { if (x && x !== t && x.k === 't') add(String(x.a)); });
   if (cand.length < 1) return t; return Object.assign({}, t, { k: 'c', a: A, opts: r.shuffle([A].concat(cand.slice(0, 3))), was: 't' }); }
