@@ -120,3 +120,4 @@
 .cgdemop{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
 .cgdb{ display:inline-flex; align-items:center; gap:4px; min-width:38px; height:38px; padding:0 6px; border-radius:10px; color:#fff; font-size:20px; font-weight:800; }
 .cgdb .cgdb{ height:30px; min-width:30px; font-size:16px; }
+.cgover{ color:#c62828; font-weight:800; }
