@@ -314,7 +314,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v117343aa */
+<script>/* v3a002f69 */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -2303,6 +2303,9 @@ S = load();
 if (!S.cfg.sync) S.cfg.sync = SYNC_URL;
 if (!S.shopV2) { const fix = { s1: ['15 минут игры', 15], s2: ['30 минут мультиков', 30], t3: ['🎮 30 минут любимой игры', 30] }; for (const it of S.shop) if (fix[it.id]) { it.name = fix[it.id][0]; it.price = fix[it.id][1]; } if (!S.shop.some(x => x.id === 'g60')) S.shop.splice(2, 0, { id: 'g60', name: '🎮 Час игры', price: 60 }); S.shopV2 = true; }
 S.shop = (S.shop || []).filter(x => !/пап/i.test(x.name));
+/* Крупные призы — примерно месяц стабильных занятий (≈50 баллов в день) */
+{ const NP = { match: [600, 1500], trip: [600, 1500], ball: [500, 800], zoo: [350, 700], cafe: [400, 600] };
+  for (const k of ['yarik', 'anya']) for (const it of (S.kids[k] && S.kids[k].shop) || []) { const r = NP[it.id]; if (r && it.price === r[0]) it.price = r[1]; } }
 const hashPin = p => String(U.h('uroki:' + p));
 
 /* ===== Синхронизация с Google Таблицей родителя ===== */
@@ -2368,7 +2371,10 @@ function align(T, spoken){ const st = new Array(T.length).fill(0); let p = 0, ex
 /* ===== Состояние экрана ===== */
 const cur = { kid:null, view:'login', subj:null, ds:U.today(), K(){ return KIDS[this.kid]; }, pinFor:null, onPin:null, parentTab:'report', parentKid:'yarik', msg:'' };
 const app = () => document.getElementById('app');
-function go(view, extra){ Object.assign(cur, { view }, extra || {}); render(); window.scrollTo(0, 0); }
+function go(view, extra){ Object.assign(cur, { view }, extra || {}); render(); window.scrollTo(0, 0);
+  if (view === 'lesson' && cur.kid && cur.subj) { const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L && L.scrollY && L.scrollY.ph === (L.phase || '') + (L.fphase || '')) { const y = L.scrollY.y; setTimeout(() => window.scrollTo(0, y), 60); } } }
+/* Запоминаем, докуда ребёнок долистал текст, чтобы вернуться на то же место */
+function rememberScroll(){ if (cur.view !== 'lesson' || !cur.kid || !cur.subj) return; const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L) { L.scrollY = { ph: (L.phase || '') + (L.fphase || ''), y: window.scrollY || 0 }; save(); } }
 function coinsHtml(n){ return `<span class="coin" aria-hidden="true"></span><b>${n}</b>`; }
 
 /* ===== Экраны ===== */
@@ -2433,10 +2439,10 @@ function vHome(){
   const streak = readStreak(kid);
   const msgs = K.msgs.filter(m => !m.seen);
   const tiles = subs.map(s => { const L = D.les[s]; const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new'; const g = L && L.grade;
-    const locked = st !== 'done' && s !== nextOpen(kid);
+    const locked = st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s);
     return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${s === 'lang' && track('lang', cur.ds) === '_alt' ? 'En' : SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && kid === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${kid}"><header class="bar"><button class="link" data-act="logout">Выйти</button><span class="coins">${coinsHtml(K.coins)}</span></header>
-  <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. 1 балл = 1 минута игры, за день можно заработать до 60.</p>
+  <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры, за день можно заработать до 60.</p>
    <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}</section>
@@ -2521,7 +2527,7 @@ function vSurvey(L){
 }
 function vResult(kid, subj, L){
   const msg = L.consolidate ? 'Хорошо! Завтра закрепим эту тему ещё раз — с новыми заданиями.' : L.passed === true ? 'Тема пройдена! Завтра — следующая.' : L.passed === false ? 'Завтра повторим эту тему с новыми заданиями.' : '';
-  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[kid].win)}</div>` : ''}<div class="bigmark m${L.grade}">${L.grade}</div><p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article><button class="btn big" data-act="home">К урокам</button>`;
+  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[kid].win)}</div>` : ''}<div class="bigmark m${L.grade}">${L.grade}</div><p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.ootCut ? '<p class="hint">Урок был не по порядку — баллов только треть.</p>' : ''}${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article><button class="btn big" data-act="home">К урокам</button>`;
 }
 
 /* ----- Ответы ----- */
@@ -2573,7 +2579,9 @@ function finishLesson(){
   if (subj === 'hw') K.hwText.forEach(h => { if ((L.txt || []).includes(h.id)) h.done = true; });
   L.secs = Math.min(1500, Math.round((Date.now() - (L.t0 || Date.now())) / 1000)); D.secs = (D.secs || 0) + L.secs;
   const subs = todaySubjects(kid), M = LESSON_POOL / Math.max(5, subs.length);
-  let pts = q < .6 ? 0 : Math.round(M * q * q); D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
+  let pts = q < .6 ? 0 : Math.round(M * q * q);
+  /* Урок, открытый не по порядку за баллы: пока день не закрыт целиком, только треть */
+  if (L.oot && !subs.every(s => s === subj || (D.les[s] && D.les[s].phase === 'done'))) { pts = Math.round(pts / 3); L.ootCut = true; } D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
   K.coins += pts; L.coins = pts; L.phase = 'done';
   if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
     if (subs.every(s => (D.les[s].q || 0) >= .9)) { const b = Math.max(0, DAY_MAX - D.pts); D.pts += b; K.coins += b; L.coins += b; L.perfect = true; D.perfect = b; }
@@ -2584,7 +2592,7 @@ function finishLesson(){
 }
 
 /* ----- Баллы: 1 балл = 1 минута игры. За день максимум 60: 50 за уроки по качеству + 10 за безупречный день ----- */
-const DAY_MAX = 60, DAY_BONUS = 10, LESSON_POOL = DAY_MAX - DAY_BONUS;
+const DAY_MAX = 60, DAY_BONUS = 10, LESSON_POOL = DAY_MAX - DAY_BONUS, SKIP_PRICE = 10;
 function lessonQuality(kid, subj, L, ratio){
   if (subj === 'hw' && !(L.items && L.items.length) && !(L.ans && L.ans.length)) return .9;
   if (subj !== 'read') return ratio;
@@ -2636,9 +2644,9 @@ function vRead(kid, L){
     <button class="btn big" data-act="toread">Начать чтение</button></section>`;
   }
   if (L.phase === 'read') {
-    const live = RD && RD.active;
+    rdRestore(L, aloud);
     return head + `<article class="card reading" lang="${L.lang || 'ru'}"><div class="text" id="rtext">${tokensHtml(aloud, RD && RD.st, RD && RD.p)}</div></article>${rest ? '<p class="hint">Это начало главы. Остальное потом дочитаешь сам(а), про себя.</p>' : ''}
-    <div class="readbar">${SR ? (live ? `<button class="btn big stop" data-act="stopread">Я дочитал(а)</button><span id="rstat" class="rstat">Слушаю…</span>` : `<button class="btn big mic" data-act="startread">🎤 Читать вслух</button>`) : (live ? `<button class="btn big stop" data-act="stopread">Я дочитал(а)</button>` : `<button class="btn big" data-act="startread">Начать (засекаю время)</button><p class="hint">На этом устройстве нет распознавания речи. Читай вслух взрослому, я засеку время.</p>`)}</div></section>`;
+    <div class="readbar">${readBar('startread', SR ? `<button class="btn big mic" data-act="startread">🎤 Читать вслух</button>` : `<button class="btn big" data-act="startread">Начать (засекаю время)</button><p class="hint">На этом устройстве нет распознавания речи. Читай вслух взрослому, я засеку время.</p>`)}</div></section>`;
   }
   if (L.phase === 'silent') {
     if (!L.st0) { L.st0 = Date.now(); save(); }
@@ -2695,16 +2703,30 @@ function startRead(lang){
   const kid = cur.kid, L = cur.subj === 'read' ? dayRec(kid, cur.ds).les.read : null;
   const text = cur.subj === 'read' ? aloudPart(readText(kid).text, readLim(kid, L)).aloud : RD_TEXT();
   const T = text.split(/\s+/).filter(Boolean).map(normW);
-  RD = { active: true, t0: Date.now(), T, st: new Array(T.length).fill(0), p: 0, base: '', cur: '', lang: lang || 'ru-RU' };
-  if (SR) {
+  const sv = RD && RD.paused && RD.T.length === T.length ? RD : null;
+  RD = { active: true, t0: Date.now(), acc: sv ? sv.acc : 0, T, st: sv ? sv.st : new Array(T.length).fill(0), p: sv ? sv.p : 0, base: sv ? sv.base : '', cur: '', lang: lang || 'ru-RU', denied: sv ? sv.denied : false };
+  if (SR && !RD.denied) {
     const rec = new SR(); rec.lang = RD.lang; rec.continuous = true; rec.interimResults = true; RD.rec = rec;
     rec.onresult = e => { let s = ''; for (let i = 0; i < e.results.length; i++) s += ' ' + e.results[i][0].transcript; RD.cur = s; updRead(); };
     rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { RD.denied = true; RD.active = true; const st = document.getElementById('rstat'); if (st) st.textContent = 'Микрофон не разрешён — читай вслух, я засеку время.'; } };
     rec.onend = () => { RD.base += ' ' + RD.cur; RD.cur = ''; if (RD.active && !RD.denied) setTimeout(() => { try { rec.start(); } catch (e) {} }, 120); };
     try { rec.start(); } catch (e) {}
   }
-  render();
+  render(); if (RD.p) rdScroll();
 }
+function rdSecs(){ return RD ? (RD.acc || 0) + (RD.active ? (Date.now() - RD.t0) / 1000 : 0) : 0; }
+function rdLesson(){ const D = dayRec(cur.kid, cur.ds); return D.les[cur.subj]; }
+/* Пауза: останавливаем микрофон и таймер, запоминаем место — потом можно продолжить, даже после выхода */
+function pauseRead(){
+  if (!RD) return; if (RD.active) { RD.acc = rdSecs(); RD.active = false; try { RD.rec && RD.rec.stop(); } catch (e) {} RD.base += ' ' + (RD.cur || ''); RD.cur = ''; }
+  RD.paused = true; const L = rdLesson(); if (L) { L.rdSave = { acc: RD.acc, p: RD.p, st: RD.st, base: RD.base, n: RD.T.length, denied: !!RD.denied }; save(); } }
+function rdRestore(L, text){ if (RD || !L || !L.rdSave) return; const T = text.split(/\s+/).filter(Boolean).map(normW); const s = L.rdSave; if (s.n !== T.length) return;
+  RD = { active: false, paused: true, acc: s.acc || 0, T, st: s.st || new Array(T.length).fill(0), p: s.p || 0, base: s.base || '', cur: '', denied: !!s.denied }; rdScroll(); }
+function rdScroll(){ setTimeout(() => { const c = document.querySelector('#rtext .w.rc'); if (c && c.scrollIntoView) c.scrollIntoView({ block: 'center' }); }, 120); }
+function readBar(startAct, startLbl){ const live = RD && RD.active, paused = RD && RD.paused && !live;
+  if (live) return `<button class="btn big stop" data-act="stopread">Я дочитал(а)</button><button class="btn ghost" data-act="pauseread">⏸ Пауза</button><span id="rstat" class="rstat">${SR && !RD.denied ? 'Слушаю…' : 'Читай вслух, время идёт'}</span>`;
+  if (paused) return `<button class="btn big mic" data-act="${startAct}">▶ Продолжить чтение</button><button class="btn ghost" data-act="stopread">Я дочитал(а)</button><span class="rstat">Пауза${RD.p ? ' · прочитано ' + RD.p + ' из ' + RD.T.length + ' слов' : ''} · читаешь ${Math.max(1, Math.round(rdSecs() / 60))} мин</span>`;
+  return startLbl; }
 function updRead(){
   const spoken = (RD.base + ' ' + RD.cur).split(/\s+/).map(normW).filter(Boolean);
   const r = align(RD.T, spoken); RD.st = r.st; RD.p = r.p; RD.extra = r.extra;
@@ -2714,11 +2736,11 @@ function updRead(){
   if (r.p >= RD.T.length) setTimeout(stopRead, 600);
 }
 function stopRead(){
-  if (!RD || !RD.active) return;
-  { const sec0 = (Date.now() - RD.t0) / 1000, minS = (RD.T || []).length / (KIDS[cur.kid].norm * 1.6) * 60; /* без распознавания речи нельзя «пролистать» текст */
+  if (!RD || !(RD.active || RD.paused)) return;
+  { const sec0 = rdSecs(), minS = (RD.T || []).length / (KIDS[cur.kid].norm * 1.6) * 60; /* без распознавания речи нельзя «пролистать» текст */
     if (!(SR && !RD.denied && RD.p > 0) && sec0 < minS) { alertMsg(`Слишком быстро 🙂 Дочитай вслух до конца, ещё примерно ${Math.max(1, Math.ceil((minS - sec0) / 60))} мин`); return; } }
-  RD.active = false; try { RD.rec && RD.rec.stop(); } catch (e) {}
-  const kid = cur.kid, K = S.kids[kid], secs = Math.max(5, (Date.now() - RD.t0) / 1000);
+  const secsAll = rdSecs(); RD.active = false; RD.paused = false; try { RD.rec && RD.rec.stop(); } catch (e) {} { const L0 = rdLesson(); if (L0) delete L0.rdSave; }
+  const kid = cur.kid, K = S.kids[kid], secs = Math.max(5, secsAll);
   const useSR = SR && !RD.denied && RD.p > 0;
   const reached = useSR ? RD.p : RD.T.length;
   const wpm = Math.round(reached / (secs / 60));
@@ -2755,9 +2777,9 @@ function curForeign(L){ return foreignList(L).find(t => t.id === L.fid); }
 function RD_TEXT(){ const L = dayRec(cur.kid, cur.ds).les[cur.subj]; return curForeign(L).text; }
 function vForeign(kid, L){
   const t = curForeign(L), lang = L.tr === '_alt' ? 'en-GB' : 'pt-PT';
-  if (L.fphase === 'read') { const live = RD && RD.active;
+  if (L.fphase === 'read') { rdRestore(L, t.text);
     return `<article class="card reading"><h2>${U.esc(t.title)}</h2><div class="text ftext" id="rtext">${tokensHtml(t.text, RD && RD.st, RD && RD.p)}</div><button class="btn ghost small" data-act="sayfull">🔊 Послушать, как читать</button></article>
-    <div class="readbar">${live ? `<button class="btn big stop" data-act="stopread">Я дочитал(а)</button><span id="rstat" class="rstat">Слушаю…</span>` : `<button class="btn big mic" data-act="startfread">🎤 Прочитать вслух</button>`}</div>`; }
+    <div class="readbar">${readBar('startfread', `<button class="btn big mic" data-act="startfread">🎤 Прочитать вслух</button>`)}</div>`; }
   const r = U.rng(U.h(L.fid + cur.ds)); const qs = t.qs.map(([q, a, ...w]) => ({ q, a, opts: r.shuffle([a, ...w]) })); const i = L.fi, q = qs[i], a = L.fans[i] || {};
   return `<div class="counter">Вопрос ${i + 1} из ${qs.length}</div><details class="peek"><summary>Посмотреть текст</summary><div class="text">${tokensHtml(t.text)}</div></details><article class="card task"><div class="q">${U.esc(q.q)}</div>${picWords(q.q)}<div class="opts">${q.opts.map(o => `<button class="opt ${a.final && o === q.a ? 'right' : (a.wrong || []).includes(o) ? 'wrong' : ''}" data-act="fq" data-v="${U.esc(o)}" ${a.final || (a.wrong || []).includes(o) ? 'disabled' : ''}>${U.esc(o)}</button>`).join('')}</div>${a.final ? (a.ok ? '<div class="fb ok"><b>Certo!</b></div>' : `<div class="fb bad"><b>${U.esc(q.a)}</b></div>`) : a.tries ? '<div class="fb try">Ещё раз.</div>' : ''}</article>${a.final ? `<button class="btn big" data-act="fnext">${i + 1 < qs.length ? 'Дальше' : 'К отзыву'}</button>` : ''}`;
 }
@@ -2779,8 +2801,8 @@ function vShop(){
 /* ----- Выбор призов: ребёнок выбирает сам, цену ставит взрослый ----- */
 function prizeIdeas(kid){
   const c = [['g15', '🎮 15 минут игры', 15], ['g30', '🎮 30 минут игры', 30], ['g60', '🎮 Час игры', 60], ['tv', '📺 30 минут мультиков или сериала', 30], ['sw', '🍬 Сладость на выбор', 30], ['late', '🌙 Лечь спать на 30 минут позже', 40],
-    ['din', '🍕 Выбрать ужин для всей семьи', 80], ['film', '🎬 Семейный вечер кино — фильм выбираю я', 60], ['cafe', '🍽️ Всей семьёй в кафе или ресторан', 400], ['trip', '🏝️ Семейная поездка — место выбираю я', 600], ['gift', '🎁 Подарок до 10 €', 400]];
-  const y = [['ball', '⚽ Новый мяч или футбольная форма', 500], ['zoo', '🐬 Всей семьёй в океанариум или зоопарк', 350], ['noclean', '🧸 День без уборки игрушек', 50], ['match', '🏟️ Сходить на футбольный матч', 600]];
+    ['din', '🍕 Выбрать ужин для всей семьи', 80], ['film', '🎬 Семейный вечер кино — фильм выбираю я', 60], ['cafe', '🍽️ Всей семьёй в кафе или ресторан', 600], ['trip', '🏝️ Семейная поездка — место выбираю я', 1500], ['gift', '🎁 Подарок до 10 €', 400]];
+  const y = [['ball', '⚽ Новый мяч или футбольная форма', 800], ['zoo', '🐬 Всей семьёй в океанариум или зоопарк', 700], ['noclean', '🧸 День без уборки игрушек', 50], ['match', '🏟️ Сходить на футбольный матч', 1500]];
   const a = [['book', '📚 Новая книга на выбор', 150], ['stick', '🦉 Наклейки или значок', 50], ['self', '💅 Что-то для себя до 5 €', 200], ['friend', '👭 Позвать подругу в гости', 120], ['nochore', '🧹 Выходной от домашних дел', 60]];
   return c.concat(kid === 'yarik' ? y : a).map(([id, name, price]) => ({ id, name, price }));
 }
@@ -2844,9 +2866,13 @@ document.addEventListener('click', e => {
     case 'parent': askPin('parent', () => go('parent', { kid: null })); break;
     case 'cancelpin': go(cur.kid ? 'home' : 'login'); break;
     case 'key': pinKey(b.dataset.k); break;
-    case 'logout': if (RD && RD.active) stopRead(); if (RT && RT.active) { RT.active = false; try { RT.rec.stop(); } catch (e) {} RT = null; } cur.kid = null; go('login'); break;
-    case 'home': if (RD && RD.active) { RD.active = false; try { RD.rec && RD.rec.stop(); } catch (x) {} } go('home'); break;
-    case 'open': { const s0 = b.dataset.subj, L0 = D.les[s0]; if (!(L0 && L0.phase === 'done') && s0 !== nextOpen(kid)) { alertMsg('Сначала закончи предыдущий урок 🔒'); break; } startLesson(s0); break; }
+    case 'logout': if (RD && (RD.active || RD.paused)) pauseRead(); RD = null; rememberScroll(); if (RT && RT.active) { RT.active = false; try { RT.rec.stop(); } catch (e) {} RT = null; } cur.kid = null; go('login'); break;
+    case 'home': if (RD && (RD.active || RD.paused)) pauseRead(); RD = null; rememberScroll(); go('home'); break;
+    case 'open': { const s0 = b.dataset.subj, L0 = D.les[s0]; if (!(L0 && L0.phase === 'done') && s0 !== nextOpen(kid) && !(D.unlock || []).includes(s0)) {
+      const K0 = S.kids[kid]; if (K0.coins < SKIP_PRICE) { alertMsg(`Сначала закончи предыдущий урок 🔒 Открыть раньше можно за ${SKIP_PRICE} баллов`); break; }
+      if (!window.confirm(`Открыть «${subjName(kid, s0, cur.ds)}» не по порядку за ${SKIP_PRICE} баллов?\nПока не сделаны все уроки дня, за такой урок дают только треть баллов.`)) break;
+      K0.coins -= SKIP_PRICE; (D.unlock = D.unlock || []).push(s0); ev(kid, 'урок не по порядку', { subj: subjName(kid, s0, cur.ds), price: -SKIP_PRICE, coins: K0.coins }); save(); }
+    startLesson(s0); if (D.les[s0] && (D.unlock || []).includes(s0)) { D.les[s0].oot = true; save(); } break; }
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
     case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); break; }
     case 'dunnotask': { L.showTh = L.i; L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid), t = lessonTasks(L, kid, cur.subj)[L.i]; ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, q: strip(t.q) }); save(); render(); break; }
@@ -2873,9 +2899,10 @@ document.addEventListener('click', e => {
     case 'burnseen': delete S.kids[kid].burnMsg; save(); render(); break;
     case 'startread': startRead('ru-RU'); break;
     case 'stopread': stopRead(); break;
+    case 'pauseread': pauseRead(); render(); break;
     case 'rq': readAnswer(b.dataset.v); break;
     case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = 'survey'; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) K.pos.read = (K.pos.read || 0) + 1; } save(); render(); break; }
-    case 'startfread': RD = null; startRead(L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break;
+    case 'startfread': if (!(RD && RD.paused)) RD = null; startRead(L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break;
     case 'sayfull': say(curForeign(L).text, L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break;
     case 'fq': foreignAnswer(b.dataset.v); break;
     case 'fnext': { if (L.fi + 1 < L.fq) L.fi++; else { L.phase = 'survey'; const key = L.tr === '_alt' ? 'enRead' : 'ptRead'; S.kids[kid].pos[key] = (S.kids[kid].pos[key] || 0) + 1; } save(); render(); break; }
