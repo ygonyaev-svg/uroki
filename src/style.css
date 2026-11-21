@@ -206,6 +206,7 @@ th{ color:var(--ink2); font-weight:600; }
 .coverwrap{ margin:0 0 14px; border-radius:16px; overflow:hidden; line-height:0; box-shadow:0 2px 10px rgba(0,0,0,.12); }
 .coverwrap .pic{ width:100%; height:auto; display:block; }
 .coverwrap.photo{ background:#1f2937 center/cover; } .coverwrap.photo img{ width:100%; aspect-ratio:3/2; max-height:340px; object-fit:cover; display:block; }
+.coverwrap.chimg img{ aspect-ratio:4/3; max-height:440px; }
 .pair{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; } .pair b{ font-size:28px; } .pic.place{ max-height:110px; } .pic.line{ max-height:110px; }
 .illus .pic{ max-width:100%; height:auto; }
 .stack{ display:flex; flex-direction:column; align-items:center; gap:6px; }

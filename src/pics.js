@@ -229,7 +229,12 @@ const COVERS = {
   'Волшебник страны Оз': () => PX.svg(400, 170, `<rect width="400" height="170" fill="#bbf7d0"/><path d="M160,170 L200,70 L240,170Z" fill="#facc15"/><g stroke="#ca8a04" stroke-width="1"><line x1="170" y1="150" x2="230" y2="150"/><line x1="178" y1="130" x2="222" y2="130"/><line x1="186" y1="110" x2="214" y2="110"/></g><g fill="#16a34a"><rect x="180" y="30" width="12" height="40"/><rect x="198" y="18" width="12" height="52"/><rect x="216" y="36" width="12" height="34"/></g><text x="60" y="140" font-size="34">👧</text><text x="100" y="140" font-size="28">🐕</text><text x="280" y="140" font-size="32">🦁</text><text x="320" y="140" font-size="30">🤖</text><text x="30" y="40" font-size="30">🌪️</text>`, 'cover'),
   'Всадник без головы': () => PX.svg(400, 170, `<rect width="400" height="170" fill="#fdba74"/><circle cx="320" cy="60" r="30" fill="#fef08a"/><path d="M0,120 Q100,105 200,118 T400,112 V170 H0Z" fill="#a16207"/><g fill="#166534"><rect x="40" y="80" width="10" height="40"/><rect x="30" y="92" width="8" height="5"/><rect x="50" y="88" width="8" height="5"/><rect x="350" y="85" width="9" height="35"/></g><text x="150" y="125" font-size="52">🏇</text><text x="240" y="128" font-size="34">🐎</text><text x="90" y="150" font-size="22">🌵</text><text x="300" y="155" font-size="22">🤠</text>`, 'cover')
 };
-function cover(t){ const s = (t.book || '') + ' ' + (t.title || ''); let k = Object.keys(COVERS).concat(Object.keys(COVER_IMG)).find(k => s.includes(k));
+/* Иллюстрации к главам (Gemini, акварель+тушь): docs/img/book/<id>.webp. Список — что уже нарисовано. */
+const CH_IMG = new Set(typeof CH_IMG_LIST !== 'undefined' ? CH_IMG_LIST : []);
+const CH_ALIAS = { a5:'bkp1', a7:'bmu1', a9:'bbl1' }; /* отрывки = начало книги */
+function chImg(t){ const id = t && (CH_IMG.has(t.id) ? t.id : CH_ALIAS[t.id]); return id && CH_IMG.has(id) ? id : ''; }
+function cover(t){ const ci = chImg(t); if (ci) return `<div class="coverwrap photo chimg" style="background-image:url(img/book/${ci}.webp)"><img src="img/book/${ci}.webp" alt="" loading="lazy" onerror="this.parentNode.remove()"></div>`;
+  const s = (t.book || '') + ' ' + (t.title || ''); let k = Object.keys(COVERS).concat(Object.keys(COVER_IMG)).find(k => s.includes(k));
   if (!k && /Холмс/.test(s)) k = 'Пёстрая лента'; if (!k && /(^|\s)Оз(\s|\.|$)|Изумруд/.test(s)) k = 'Волшебник страны Оз';
   if (!k) return ''; const f = COVER_IMG[k];
   return f ? `<div class="coverwrap photo" style="background-image:url(img/${f})"><img src="img/${f}" alt="" loading="lazy" onerror="COVERS['${k}'] ? this.parentNode.innerHTML=COVERS['${k}']() : this.parentNode.remove()"></div>` : `<div class="coverwrap">${COVERS[k]()}</div>`; }
