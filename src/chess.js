@@ -133,8 +133,9 @@ var CH = (function(){
 /* ===== Доска на экране ===== */
 var CHB = {
   /* o: { P, flip (чёрные снизу), sel, marks:{sq:'dot'|'star'|...}, last:[f,to], rot (повернуть чёрные фигуры к игроку сверху), act } */
+  zm: function(vw){ return vw >= 1250 ? 1.3 : vw >= 960 ? 1.2 : vw >= 760 ? 1.05 : 1; },
   html: function(o){
-    var vw = window.innerWidth || 800, vh = window.innerHeight || 800, W = o.rot != null ? (vw >= 700 && vw > vh * 1.15 ? Math.min(vh - 90, vw - 480) : Math.min(vw - 40, vh - 340, 760)) : Math.min(vw - 56, 560, Math.max(300, vh - 260));
+    var vw = window.innerWidth || 800, vh = window.innerHeight || 800, W = o.rot != null ? (vw >= 700 && vw > vh * 1.15 ? Math.min(vh - 90, vw - 480) : Math.min(vw - 40, vh - 340, 760)) : Math.min(vw / CHB.zm(vw) - 56, 560, Math.max(280, vh / CHB.zm(vw) - 300)); /* .wrap увеличен zoom'ом (style.css) — делим, чтобы доска с кнопками влезала по высоте (iPad 1024×768) */
     W = Math.max(240, Math.floor(W / 8) * 8);
     var P = o.P, h = '<div class="chboard' + (o.rot ? ' rot' : '') + '" style="width:' + W + 'px;font-size:' + Math.round(W / 8 * .78) + 'px">', r, c, rr, cc, i, p, cls, lg = {}, ms, k, chk = -1;
     if (o.sel != null) { ms = CH.legal(P, o.sel); for (k = 0; k < ms.length; k++) lg[ms[k].to] = ms[k].cap ? 'chx' : 'chd'; }
