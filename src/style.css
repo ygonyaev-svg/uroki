@@ -362,3 +362,11 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .tipin h3{ margin:0 0 8px; font-size:20px; } .tipin p{ font-size:18px; line-height:1.45; margin:0 0 12px; } .tiprow{ display:flex; gap:10px; flex-wrap:wrap; }
 .micbar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:6px 0 4px; } .mic2.live{ background:var(--red); color:#fff; animation:pulse 1.2s infinite; }
 @keyframes pulse{ 50%{ opacity:.7; } }
+
+.bkpic{ display:block; width:100%; max-width:440px; height:auto; margin:6px auto 10px; background:#fff; border-radius:12px; padding:6px; }
+.bkstep.got{ border-color:var(--green); }
+
+.bktext{ font-size:22px; line-height:1.7; max-height:55vh; overflow:auto; padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:var(--card); margin:8px 0; }
+.bkbusy{ padding:24px 0; }
+.spin{ width:44px; height:44px; margin:0 auto 10px; border-radius:50%; border:5px solid var(--accsoft); border-top-color:var(--acc); animation:bkspin 1s linear infinite; }
+@keyframes bkspin{ to{ transform:rotate(360deg); } }
