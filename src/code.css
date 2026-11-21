@@ -108,3 +108,15 @@
 @-webkit-keyframes cgpulse{ 50%{ -webkit-transform:scale(1.15); box-shadow:0 0 0 8px rgba(47,128,237,.35); } }
 @keyframes cgpulse{ 50%{ transform:scale(1.15); box-shadow:0 0 0 8px rgba(47,128,237,.35); } }
 .tile.code .state{ border-radius:999px; padding:4px 10px; font-size:14px; }
+.cgsp.hero.ghost{ opacity:.55; z-index:5; -webkit-filter:drop-shadow(0 0 6px #fff) saturate(.6); filter:drop-shadow(0 0 6px #fff) saturate(.6); }
+.pulse{ -webkit-animation:cgpulse2 .8s infinite; animation:cgpulse2 .8s infinite; }
+@-webkit-keyframes cgpulse2{ 50%{ -webkit-transform:scale(1.25); } } @keyframes cgpulse2{ 50%{ transform:scale(1.25); } }
+.cgcell.net.pulse{ -webkit-animation:none; animation:none; box-shadow:inset 0 0 0 4px #ffe066; }
+.cgsaybtn{ -webkit-appearance:none; appearance:none; border:0; background:#ffe9c7; border-radius:12px; font-size:22px; padding:4px 10px; margin-right:6px; cursor:pointer; vertical-align:middle; }
+.cgtop{ display:flex; justify-content:center; margin:0 0 8px; }
+.cgshow{ font-size:18px; }
+.cgdemo{ background:#fffbe6; border:2px dashed #e0a417; border-radius:14px; padding:8px 12px; margin:0 auto 10px; max-width:560px; color:#1d2433; }
+.cgdemoh{ margin:0 0 6px; font-weight:800; }
+.cgdemop{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.cgdb{ display:inline-flex; align-items:center; gap:4px; min-width:38px; height:38px; padding:0 6px; border-radius:10px; color:#fff; font-size:20px; font-weight:800; }
+.cgdb .cgdb{ height:30px; min-width:30px; font-size:16px; }

@@ -518,10 +518,22 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 @-webkit-keyframes cgpulse{ 50%{ -webkit-transform:scale(1.15); box-shadow:0 0 0 8px rgba(47,128,237,.35); } }
 @keyframes cgpulse{ 50%{ transform:scale(1.15); box-shadow:0 0 0 8px rgba(47,128,237,.35); } }
 .tile.code .state{ border-radius:999px; padding:4px 10px; font-size:14px; }
+.cgsp.hero.ghost{ opacity:.55; z-index:5; -webkit-filter:drop-shadow(0 0 6px #fff) saturate(.6); filter:drop-shadow(0 0 6px #fff) saturate(.6); }
+.pulse{ -webkit-animation:cgpulse2 .8s infinite; animation:cgpulse2 .8s infinite; }
+@-webkit-keyframes cgpulse2{ 50%{ -webkit-transform:scale(1.25); } } @keyframes cgpulse2{ 50%{ transform:scale(1.25); } }
+.cgcell.net.pulse{ -webkit-animation:none; animation:none; box-shadow:inset 0 0 0 4px #ffe066; }
+.cgsaybtn{ -webkit-appearance:none; appearance:none; border:0; background:#ffe9c7; border-radius:12px; font-size:22px; padding:4px 10px; margin-right:6px; cursor:pointer; vertical-align:middle; }
+.cgtop{ display:flex; justify-content:center; margin:0 0 8px; }
+.cgshow{ font-size:18px; }
+.cgdemo{ background:#fffbe6; border:2px dashed #e0a417; border-radius:14px; padding:8px 12px; margin:0 auto 10px; max-width:560px; color:#1d2433; }
+.cgdemoh{ margin:0 0 6px; font-weight:800; }
+.cgdemop{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.cgdb{ display:inline-flex; align-items:center; gap:4px; min-width:38px; height:38px; padding:0 6px; border-radius:10px; color:#fff; font-size:20px; font-weight:800; }
+.cgdb .cgdb{ height:30px; min-width:30px; font-size:16px; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v56680122 */
+<script>/* vc7b8063d */
 var FAM = 0;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -4008,7 +4020,23 @@ function vCode(){ const kid = cur.kid, C = cgK(kid); cgPayPending(kid);
 let CG = null, CG_VIEW = 'map'; /* { id, prog, sel:{k,i}, run, vi, step, res, hint } */
 function cgStart(id){ const lv = CG_LV[cgIdx(id)]; const C = cgK(cur.kid); const r = C.lv[id] || {};
   CG = { id: id, prog: lv.bug ? cgParse(lv.bug) : (r.prog ? JSON.parse(JSON.stringify(r.prog)) : []), sel: { k: '', i: -1 }, run: false, vi: 0, res: null, hint: 0, used: false };
-  CG.sel.i = CG.prog.length; C.last = id; save(); CG_VIEW = 'lv'; go('always', { aid: 'code' }); setTimeout(() => say(lv.say), 400); }
+  CG.sel.i = CG.prog.length; C.last = id; save(); CG_VIEW = 'lv'; go('always', { aid: 'code' }); say(lv.say);
+  if (!r.demo) { r.demo = 1; C.lv[id] = r; save(); setTimeout(() => cgDemo(), 700); } }
+/* Показ: цель мигает, полупрозрачный Тоби проходит начало пути (на новых темах — весь путь и программу) */
+const CG_DEMO_FULL = ['1.1', '2.1', '3.1', '4.1', '4.2', '4.3', '4.5', '5.1'];
+function cgDemo(){ if (!CG || CG.run || CG.demo) return; const lv = CG_LV[cgIdx(CG.id)], grid = cgGrids(lv)[CG.vi], full = CG_DEMO_FULL.indexOf(lv.id) >= 0;
+  const board = document.querySelector('.cgboard'); if (!board) return; const W = grid[0].length, H = grid.length;
+  const r = cgSim(lv, grid, cgParse(lv.sol)), tr = full ? r.tr : r.tr.slice(0, 3); const me = CG; CG.demo = true;
+  Array.prototype.forEach.call(document.querySelectorAll('.cgsp.it, .cgsp.ball, .cgcell .cgs-bone, .cgcell .cgs-house, .cgcell .cgs-flag, .cgcell.net'), el => el.classList.add('pulse'));
+  const strip = document.getElementById('cgdemo'); if (strip && full) { strip.innerHTML = '<p class="cgdemoh">👀 Смотри: вот такая программа</p><div class="cgdemop">' + cgParse(lv.sol).map(x => cgDemoBlk(x)).join('') + '</div>'; strip.style.display = 'block'; }
+  const g = document.createElement('div'); g.className = 'cgsp hero ghost'; g.innerHTML = cgSprite('toby'); board.appendChild(g);
+  let i = 0; const step = () => { if (CG !== me || !document.body.contains(g)) { me.demo = false; return; }
+    if (i < tr.length) { const t = tr[i++]; g.style.left = t.x / W * 100 + '%'; g.style.top = t.y / H * 100 + '%'; g.style.width = 100 / W + '%'; g.style.height = 100 / H + '%'; g.className = 'cgsp hero ghost d' + t.d; setTimeout(step, i === 1 ? 300 : 420); return; }
+    setTimeout(() => { if (g.parentNode) g.parentNode.removeChild(g); Array.prototype.forEach.call(document.querySelectorAll('.pulse'), el => el.classList.remove('pulse')); if (strip) strip.style.display = 'none'; me.demo = false;
+      const first = cgParse(lv.sol)[0]; const fb = first && document.querySelector('.cgpal [data-t="' + first.t + '"]'); if (fb && !me.prog.length) fb.classList.add('tut'); }, full ? 2500 : 700); };
+  step(); }
+function cgDemoBlk(x){ if (x.t === 'P') return '<span class="cgdb cgP">🔁 ' + x.n + ' × ' + x.b.map(cgDemoBlk).join('') + '</span>'; if (x.t === 'W') return '<span class="cgdb cgW">⟳ пока не 🏁: ' + x.b.map(cgDemoBlk).join('') + '</span>';
+  if (x.t === 'I') return '<span class="cgdb cgI">❓ ' + CG_COND[x.c].i + ' да: ' + (x.b.map(cgDemoBlk).join('') || '—') + ' иначе: ' + (x.e.map(cgDemoBlk).join('') || '—') + '</span>'; return '<span class="cgdb cg' + x.t + '">' + CG_BLK[x.t] + '</span>'; }
 function cgSlot(prog, k){ if (!k) return prog; let a = prog; for (const part of k.split('/')) { const m = part.split('.'); const n = a[+m[0]]; a = m[1] === 'e' ? n.e : n.b; } return a; }
 function cgBlockHtml(x, path, k, i){ const sel = CG.sel.k === k && CG.sel.i === i + 1 && CG.selB, id = path;
   const del = sel ? `<span class="cgdel" data-act="cgdel" data-k="${k}" data-i="${i}">✕</span>` : '';
@@ -4039,8 +4067,8 @@ function vCodeLv(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGri
   const tabs = grids.length > 1 ? `<div class="cgtabs">${grids.map((g, i) => `<button class="chip ${i === CG.vi ? 'on' : ''}" data-act="cgvar" data-i="${i}" ${CG.run ? 'disabled' : ''}>Улица ${i + 1}${res && res.vr && res.vr[i] != null ? (res.vr[i] ? ' ✓' : ' ✗') : ''}</button>`).join('')}</div><p class="hint center">Программа одна — она должна сработать на каждой улице.</p>` : '';
   const goal = lv.ch === 2 || cgFind(grids[0], 'N').length ? '⚽ → 🥅' : grids[0].join('').indexOf('c') >= 0 ? '🐾 → 🏁' : grids[0].join('').indexOf('*') >= 0 ? '🦴 → 🏠' : lv.ch >= 4 ? '🏁' : '🦴';
   return `<main class="wrap ${LK(kid)} cg cglvl"><header class="bar"><button class="link" data-act="code">← Уровни</button><span class="cgttl">Уровень ${lv.id} · ${goal}</span><button class="link" data-act="cgsay">🔊</button></header>
-  <p class="cgsay">${U.esc(lv.say)}</p>${tabs}
-  <div id="cgbwrap">${cgBoard(lv, grids[CG.vi])}</div>
+  <p class="cgsay"><button class="cgsaybtn" data-act="cgsay">🔊</button> ${U.esc(lv.say)}</p><div class="cgtop"><button class="btn ghost cgshow" data-act="cgdemo" ${CG.run ? 'disabled' : ''}>👀 Покажи</button></div>${tabs}
+  <div id="cgdemo" class="cgdemo" style="display:none"></div><div id="cgbwrap">${cgBoard(lv, grids[CG.vi])}</div>
   ${res && !CG.run ? `<div class="fb ${res.ok ? 'ok' : 'try'}">${res.ok ? `Ура! ${'⭐'.repeat(res.stars)} ${res.pts ? `+${res.pts} ${U.pl(res.pts, 'балл', 'балла', 'баллов')}${res.pend ? ' (придут после уроков дня)' : ''}` : ''}${res.badge ? `<div class="cgbadge big">Глава пройдена! Награда: ${U.esc(res.badge)}</div>` : ''}${res.stars < 3 && !CG.used ? `<br><small>Можно короче: попробуй уложиться в ${cgCount(cgParse(lv.sol))} ${U.pl(cgCount(cgParse(lv.sol)), 'блок', 'блока', 'блоков')}, чтобы получить 3 звезды.</small>` : ''}` : U.esc(res.msg)}</div>` : ''}
   <section class="cgprog card"><div class="cgph"><b>Программа</b><span class="hint">${lv.max ? `блоков ${n} из ${lv.max}` : `блоков: ${n}`}</span></div>${cgListHtml(CG.prog, '', '')}</section>
   <section class="cgpal">${pal}</section>
@@ -4091,6 +4119,7 @@ function codeAct(act, b){ const kid = cur.kid;
   const touch = () => { CG.res = null; };
   switch (act) {
     case 'cgsay': say(lv.say); return true;
+    case 'cgdemo': say('Смотри!'); cgDemo(); return true;
     case 'cgadd': { const t = b.dataset.t; const arr = cgSlot(CG.prog, CG.sel.k); const depth = CG.sel.k ? CG.sel.k.split('/').length : 0;
       if ((t === 'P' || t === 'W' || t === 'I') && depth >= 2) { alertMsg('Глубже класть нельзя'); return true; }
       const node = t === 'P' ? { t: 'P', n: 2, b: [] } : t === 'W' ? { t: 'W', b: [] } : t === 'I' ? { t: 'I', c: (lv.cond || 'c')[0], b: [], e: [] } : { t: t };
