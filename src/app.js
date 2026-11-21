@@ -63,7 +63,7 @@ function dripOn(kid, type, d){ const K = S.kids[kid]; if (!K) return;
   dripFly(add); }
 function dripFly(add){ try { const el = document.createElement('div'); el.className = 'dripfly'; el.textContent = '📈 +' + (Math.round(add * 10) / 10).toString().replace('.', ','); document.body.appendChild(el); setTimeout(() => el.remove(), 1600); } catch (e) {} }
 function dripCard(kid){ const K = S.kids[kid], R = K.drip; if (!R || !(R.sess >= .1)) return ''; const n = (Math.round(R.sess * 10) / 10).toString().replace('.', ',');
-  return `<div class="note dripc">💰 <b>Пока ты занимался(ась), твой капитал вырос на +${n}!</b> Каждый верный ответ с первого раза добавляет немного к накопленному, а серия из 5 и 10 верных подряд ускоряет рост. Сегодня уже +${(Math.round(R.got * 10) / 10).toString().replace('.', ',')} из ${R.cap} возможных. <button class="link" data-act="dripseen">Здорово!</button></div>`; }
+  return `<div class="note dripc tipc" data-tip="drip">💰 <b>Пока ты занимался(ась), твой капитал вырос на +${n}!</b> Каждый верный ответ с первого раза добавляет немного к накопленному, а серия из 5 и 10 верных подряд ускоряет рост. Сегодня уже +${(Math.round(R.got * 10) / 10).toString().replace('.', ',')} из ${R.cap} возможных. <button class="link" data-act="dripseen">Здорово!</button></div>`; }
 let flushT = null;
 function flushSoon(){ clearTimeout(flushT); flushT = setTimeout(flush, 4000); }
 async function flush(){
@@ -82,7 +82,7 @@ function findUnit(kid, subj, val){
   return null;
 }
 function subjByName(kid, name){ const n = String(name || '').toLowerCase(); for (const [k, c] of Object.entries(KIDS[kid].cur)) if (k === n || c.name.toLowerCase().startsWith(n) || (c.altName && c.altName.toLowerCase().startsWith(n))) return k; return null; }
-function applyCfg(rows){
+function applyCfg(rows){ let fresh = false;
   for (const row of rows) {
     const kid = /ан/i.test(row.kid) ? 'anya' : /яр/i.test(row.kid) ? 'yarik' : null; if (!kid || !row.id) continue;
     const K = S.kids[kid]; if (K.applied.includes(row.id)) continue;
@@ -93,10 +93,11 @@ function applyCfg(rows){
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
     else if (type.startsWith('чтен')) { const n = Number(row.value); if (n > 0) K.readWords = n; }
     else if (type.startsWith('книг')) bkApply(kid, row);
+    else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; }
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
-    K.applied.push(row.id);
+    K.applied.push(row.id); fresh = true;
   }
-  save(); if (cur.kid) render();
+  if (fresh) { save(); if (cur.kid) softRender(); }
 }
 
 /* ===== Помощники по программе ===== */
@@ -140,7 +141,7 @@ function go(view, extra){ try { sayStop(); } catch (e) {} Object.assign(cur, { v
   if (view === 'lesson' && cur.kid && cur.subj) { const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L && L.scrollY && L.scrollY.ph === (L.phase || '') + (L.fphase || '')) { const y = L.scrollY.y; setTimeout(() => window.scrollTo(0, y), 60); } } }
 /* Запоминаем, докуда ребёнок долистал текст, чтобы вернуться на то же место */
 function rememberScroll(){ if (cur.view !== 'lesson' || !cur.kid || !cur.subj) return; const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L) { L.scrollY = { ph: (L.phase || '') + (L.fphase || ''), y: window.scrollY || 0 }; save(); } }
-function coinsHtml(n){ return `<span class="coin" aria-hidden="true"></span><b>${n}</b>`; }
+function coinsHtml(n){ const K = cur.kid && S.kids[cur.kid]; return `<span class="tipc" data-tip="coins"><span class="coin" aria-hidden="true"></span><b>${n}</b></span>${K ? `<span class="tipc pigh" data-tip="piggy">🐷<b>${K.piggy || 0}</b></span>` : ''}`; }
 
 /* ===== Экраны ===== */
 function render(){
@@ -223,7 +224,7 @@ function vHome(){
     return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${s === 'lang' && track('lang', cur.ds) === '_alt' ? 'En' : ((s === 'world' && T(kid) === 'yarik') || (s === 'logic' && T(kid) === 'anya')) && track(s, cur.ds) === '_alt' ? '€' : SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && T(kid) === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">Выйти</button><button class="link voice" data-act="voice" title="Кто читает задания">🔊 ${K.voice === 'm' ? 'Мужской голос' : 'Женский голос'}</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <div class="banner" aria-hidden="true">${THEME[TH(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[TH(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${dripCard(kid)}${restCard(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
-   <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
+   <div class="prog tipc" data-tip="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}${poemTile(kid, D)}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
   ${alwaysTiles(kid)}
@@ -233,7 +234,7 @@ function vHome(){
   <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
 }
 function lastReading(kid){ const K = S.kids[kid], R = K.reading.filter(x => x.lang === 'ru').slice(-5); if (!R.length) return ''; const best = readBestOf(kid), lv = readLv(kid, best);
-  return `<p class="rlv"><span class="rlvb">${lv.cur[2]} ${lv.cur[1]}</span> рекорд <b>${best}</b> сл/мин${lv.next ? ` · до уровня «${lv.next[1]}» ещё ${lv.next[0] - best}` : ''}</p>${badgesRow(kid)}` + '<div class="speeds">' + R.map(x => `<span title="${U.esc(x.title)}"><b>${x.wpm}</b> сл/мин</span>`).join('') + `</div><p class="hint">Цель к концу года: ${KIDS[kid].norm} слов в минуту.</p>${vocabRow(kid)}`; }
+  return `<p class="rlv tipc" data-tip="level"><span class="rlvb">${lv.cur[2]} ${lv.cur[1]}</span> рекорд <b>${best}</b> сл/мин${lv.next ? ` · до уровня «${lv.next[1]}» ещё ${lv.next[0] - best}` : ''}</p>${badgesRow(kid)}` + '<div class="speeds">' + R.map(x => `<span title="${U.esc(x.title)}"><b>${x.wpm}</b> сл/мин</span>`).join('') + `</div><p class="hint">Цель к концу года: ${KIDS[kid].norm} слов в минуту.</p>${vocabRow(kid)}`; }
 /* ----- Темп чтения: уровни, рекорды, значки ----- */
 const READ_LV = { yarik: [[0,'Новичок','🌱'],[20,'Ученик','📖'],[30,'Читатель','📚'],[40,'Знаток слов','🔤'],[55,'Мастер чтения','🏅'],[70,'Чемпион','🏆'],[90,'Легенда','👑']],
   anya: [[0,'Ученица','🌱'],[80,'Читательница','📖'],[100,'Книжный знаток','📚'],[120,'Мастер слова','✒️'],[140,'Магистр чтения','🌟'],[160,'Архимаг книг','🔮']] };
@@ -258,12 +259,12 @@ function paceCard(kid, r){ const K = S.kids[kid], norm = KIDS[kid].norm, best = 
     : `Сегодня чуть медленнее (в прошлый раз было ${r.prev}). Ничего страшного: текст был труднее. Главное — читать чисто.`;
   const goal = lv.next ? Math.min(lv.next[0], Math.max(r.wpm, r.prev || 0) + 3) : Math.max(r.wpm, best) + 2;
   const pr = lv.next ? Math.max(4, Math.min(100, Math.round((best - lv.cur[0]) / (lv.next[0] - lv.cur[0]) * 100))) : 100;
-  return `<article class="card pace"><p class="eyebrow">Твой темп</p><div class="pbig"><b>${r.wpm}</b> слов в минуту${r.acc != null ? ` · точность ${Math.round(r.acc * 100)}%` : ''}</div>
+  return `<article class="card pace"><p class="eyebrow">Твой темп</p><div class="pbig"><span class="tipc" data-tip="wpm"><b>${r.wpm}</b> слов в минуту</span>${r.acc != null ? ` · <span class="tipc" data-tip="acc">точность ${Math.round(r.acc * 100)}%</span>` : ''}</div>
    <p class="ppr">${praise}</p>
    ${r.prev != null ? `<p>В прошлый раз: <b>${r.prev}</b>. Твой рекорд: <b>${best}</b>.</p>` : ''}
-   <p>Норма к концу года${KIDS[kid].grade ? ' (' + KIDS[kid].grade + ')' : ''} — <b>${norm}</b> слов в минуту.${r.wpm >= norm ? ' Ты уже читаешь как надо — даже быстрее!' : ` Осталось ${norm - r.wpm}.`}</p>
+   <p class="tipc" data-tip="norm">Норма к концу года${KIDS[kid].grade ? ' (' + KIDS[kid].grade + ')' : ''} — <b>${norm}</b> слов в минуту.${r.wpm >= norm ? ' Ты уже читаешь как надо — даже быстрее!' : ` Осталось ${norm - r.wpm}.`}</p>
    ${vals.length > 1 ? sparkSvg(kid, vals, norm) + '<p class="hint center">Твои последние чтения. Пунктир — норма.</p>' : ''}
-   <div class="plv"><span>${lv.cur[2]} ${lv.cur[1]}</span>${lv.next ? `<div class="pbar"><i style="width:${pr}%"></i></div><span>${lv.next[2]} ${lv.next[1]} · ${lv.next[0]}</span>` : '<span>Высший уровень!</span>'}</div>
+   <div class="plv tipc" data-tip="level"><span>${lv.cur[2]} ${lv.cur[1]}</span>${lv.next ? `<div class="pbar"><i style="width:${pr}%"></i></div><span>${lv.next[2]} ${lv.next[1]} · ${lv.next[0]}</span>` : '<span>Высший уровень!</span>'}</div>
    ${badgesRow(kid)}
    <p class="pgoal">🎯 Цель на следующий раз: <b>${goal}</b> слов в минуту${r.acc != null ? ' и без ошибок' : ''}.</p></article>
    <button class="btn big" data-act="paceok">Дальше</button>`; }
@@ -486,7 +487,7 @@ function fmtLeft(ms){ const m = Math.ceil(ms / 60000), h = Math.floor(m / 60), r
 function restTick(kid, secs){ const K = S.kids[kid], now = Date.now(); if (!K.blkAt || now - K.blkAt > REST_MS) K.blk = 0; K.blk = (K.blk || 0) + (secs || 0); K.blkAt = now;
   if (K.blk >= BLOCK_SECS) { K.blk = 0; K.restUntil = now + REST_MS; ev(kid, 'перерыв', { text: 'занимался ' + Math.round(secs / 60) + '+ мин; следующее занятие после ' + hhmm(K.restUntil) }); } }
 function restGate(kid, s){ const D = dayRec(kid, cur.ds); if (D.les[s]) return false; const ms = restLeft(kid); if (!ms) return false; alertMsg(`Перерыв ☕ Следующее занятие откроется в ${hhmm(S.kids[kid].restUntil)} (через ${fmtLeft(ms)})`); return true; }
-function restCard(kid){ const ms = restLeft(kid); if (!ms) return ''; return `<div class="note rest">☕ <b>Перерыв.</b> Ты хорошо позанимался(ась)! Следующее занятие откроется в <b>${hhmm(S.kids[kid].restUntil)}</b> (через <span id="restleft">${fmtLeft(ms)}</span>). Пройденные уроки можно открыть и повторить.</div>`; }
+function restCard(kid){ const ms = restLeft(kid); if (!ms) return ''; return `<div class="note rest tipc" data-tip="rest">☕ <b>Перерыв.</b> Ты хорошо позанимался(ась)! Следующее занятие откроется в <b>${hhmm(S.kids[kid].restUntil)}</b> (через <span id="restleft">${fmtLeft(ms)}</span>). Пройденные уроки можно открыть и повторить.</div>`; }
 setInterval(() => { const el = document.getElementById('restleft'); if (!el || !cur.kid) return; const ms = restLeft(cur.kid); if (!ms) render(); else el.textContent = fmtLeft(ms); }, 30000);
 function ITEMS(subj){ return subj === 'hw' || subj === 'extra' || subj === 'pro' || subj === 'train'; }
 /* Испытание: после PRO — сложные задачи по следующим темам программы (математика, русский, языки), одна попытка */
@@ -545,7 +546,7 @@ function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) 
 function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0) return '';
   const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'} (${K.coins}).</div>`; }
 function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
-  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span>🎮 Игры <b>${bt.game} мин</b></span><span>▶️ YouTube <b>${bt.yt} мин</b></span><span>⭐ Баллы <b>${K.coins}</b> (+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
+  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span class="tipc" data-tip="base">🎮 Игры <b>${bt.game} мин</b></span><span class="tipc" data-tip="base">▶️ YouTube <b>${bt.yt} мин</b></span><span class="tipc" data-tip="coins">⭐ Баллы <b>${K.coins}</b> (+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
 /* ----- Копилка: заработанное за неделю копится и в воскресенье переходит на счёт с прибавкой +10%. Забрать раньше можно, но без прибавки. ----- */
 const PIGGY_RATE = .10;
 function weekStart(ds){ const n = U.dayNum(ds), wd = (n + 3) % 7; /* 0 = понедельник */ return U.addDays(ds, -wd); }
@@ -554,7 +555,7 @@ function piggyCheck(kid){ const K = S.kids[kid], t = U.today(), w = weekStart(t)
   const sunday = (U.dayNum(t) + 3) % 7 === 6; if (K.piggy > 0 && (K.piggyWeek !== w || (sunday && K.piggyPaid !== K.piggyWeek))) { const bonus = K.piggyEarly === K.piggyWeek ? 0 : Math.round(K.piggy * PIGGY_RATE), tot = K.piggy + bonus; K.coins += tot; K.piggyMsg = `🐷 Копилка открыта: ${agree(K.piggy + ' баллов')}${bonus ? ` + ${bonus} за терпение (10%)` : ''} = ${tot} на счёт!`; ev(kid, 'копилка', { coins: K.coins, price: tot, text: `накоплено ${K.piggy}, процент ${bonus}` }); K.piggy = 0; K.piggyPaid = K.piggyWeek; save(); }
   if (K.piggyWeek !== w) { K.piggyWeek = w; save(); } }
 function piggyCard(kid){ const K = S.kids[kid], p = K.piggy || 0, b = Math.round(p * PIGGY_RATE);
-  return `<div class="piggy"><span class="pig" aria-hidden="true">🐷</span><span>Копилка: <b>${p}</b>${p ? ` · в воскресенье станет <b>${p + b}</b> (+10%)` : ' · заработанное за уроки копится тут до воскресенья'}</span>${p ? '<button class="link" data-act="piggyearly">Забрать сейчас без процента</button>' : ''}</div>${K.piggyMsg ? `<div class="note">${U.esc(K.piggyMsg)} <button class="link" data-act="piggyseen">Ура!</button></div>` : ''}`; }
+  return `<div class="piggy"><span class="pig" aria-hidden="true">🐷</span><span><span class="tipc" data-tip="piggy">Копилка: <b>${p}</b></span>${p ? ` · в воскресенье станет <b>${p + b}</b> <span class="tipc" data-tip="percent">(+10%)</span>` : ' · заработанное за уроки копится тут до воскресенья'}</span>${p ? '<button class="link" data-act="piggyearly">Забрать сейчас без процента</button>' : ''}</div>${K.piggyMsg ? `<div class="note">${U.esc(K.piggyMsg)} <button class="link" data-act="piggyseen">Ура!</button></div>` : ''}`; }
 
 /* ----- Чтение ----- */
 let RD = null; /* текущая сессия чтения вслух */
