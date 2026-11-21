@@ -325,3 +325,7 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .bkread{ font-size:21px; line-height:1.45; }
 .bkinp{ display:block; width:100%; margin-top:6px; padding:12px; font-size:18px; border:1.5px solid var(--line); border-radius:12px; background:var(--card); color:inherit; }
 #bkup:empty{ display:none; }
+
+.dripfly{ position:fixed; right:18px; top:64px; z-index:20; background:#1f7a3d; color:#fff; font-weight:700; padding:8px 14px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.25); animation:dripup 1.6s ease-out forwards; pointer-events:none; }
+@keyframes dripup{ 0%{ opacity:0; transform:translateY(10px); } 15%{ opacity:1; transform:translateY(0); } 80%{ opacity:1; } 100%{ opacity:0; transform:translateY(-30px); } }
+.note.dripc{ border-left:4px solid #1f7a3d; }

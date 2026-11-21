@@ -335,6 +335,10 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .bkinp{ display:block; width:100%; margin-top:6px; padding:12px; font-size:18px; border:1.5px solid var(--line); border-radius:12px; background:var(--card); color:inherit; }
 #bkup:empty{ display:none; }
 
+.dripfly{ position:fixed; right:18px; top:64px; z-index:20; background:#1f7a3d; color:#fff; font-weight:700; padding:8px 14px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.25); animation:dripup 1.6s ease-out forwards; pointer-events:none; }
+@keyframes dripup{ 0%{ opacity:0; transform:translateY(10px); } 15%{ opacity:1; transform:translateY(0); } 80%{ opacity:1; } 100%{ opacity:0; transform:translateY(-30px); } }
+.note.dripc{ border-left:4px solid #1f7a3d; }
+
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
   --blue:#2563eb; --red:#e11d48; --green:#16a34a; --gold:#f59e0b; --sh:0 6px 0 rgba(15,23,42,.10),0 10px 24px rgba(15,23,42,.12); --r:22px; }
@@ -533,7 +537,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* vfbfd318e */
+<script>/* v1f7c4a05 */
 var FAM = 0;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -4195,7 +4199,24 @@ const hashPin = p => String(U.h('uroki:' + p));
 
 /* ===== Синхронизация с Google Таблицей родителя ===== */
 function strip(h){ return String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); }
-function ev(kid, type, data){ const e = Object.assign({ t: new Date().toISOString(), kid: KIDS[kid].name, type }, data); S.queue.push(e); S.log.push(e); if (S.log.length > 1500) S.log = S.log.slice(-1500); save(); flushSoon(); }
+function ev(kid, type, data){ const e = Object.assign({ t: new Date().toISOString(), kid: KIDS[kid].name, type }, data); S.queue.push(e); S.log.push(e); if (S.log.length > 1500) S.log = S.log.slice(-1500); try { dripOn(kid, type, data || {}); } catch (x) {} save(); flushSoon(); }
+/* «Капающий процент»: каждый верный ответ с первой попытки — где угодно в приложении — немного увеличивает накопленный капитал (счёт + копилка).
+   +0,4% капитала за ответ (не меньше 0,2 балла); серия 5 верных подряд — ×1,5, серия 10 — ×2; ошибка обнуляет серию и ничего не даёт.
+   Потолок за день: 3% капитала, но не меньше 10 баллов. Капает в копилку (в воскресенье +10% сверху). */
+const DRIP_RATE = .004, DRIP_MIN = .2, DRIP_CAP = .03, DRIP_CAP_MIN = 10;
+function dripRec(K){ const d = U.today(); if (!K.drip || K.drip.d !== d) K.drip = { d, got: 0, frac: 0, streak: (K.drip && K.drip.streak) || 0, sess: (K.drip && K.drip.sess) || 0, cap: Math.max(DRIP_CAP_MIN, Math.round(((K.coins || 0) + (K.piggy || 0)) * DRIP_CAP)) }; return K.drip; }
+function dripOn(kid, type, d){ const K = S.kids[kid]; if (!K) return;
+  const chessOk = type === 'шахматы' && /с первой попытки/.test(d.text || '') && !/не с первой/.test(d.text || ''), chessBad = type === 'шахматы' && /не с первой/.test(d.text || '');
+  const ok = d.ok === 'верно' || chessOk, bad = d.ok === 'ошибка' || d.ok === 'со 2-й попытки' || chessBad; if (!ok && !bad) return;
+  const R = dripRec(K); if (bad) { R.streak = 0; return; }
+  R.streak++; if (R.got >= R.cap) return;
+  const cap0 = (K.coins || 0) + (K.piggy || 0), mult = R.streak >= 10 ? 2 : R.streak >= 5 ? 1.5 : 1;
+  const add = Math.min(R.cap - R.got, Math.max(DRIP_MIN, cap0 * DRIP_RATE) * mult); R.got += add; R.sess += add; R.frac += add;
+  const whole = Math.floor(R.frac); if (whole > 0) { R.frac -= whole; piggyAdd(K, whole); }
+  dripFly(add); }
+function dripFly(add){ try { const el = document.createElement('div'); el.className = 'dripfly'; el.textContent = '📈 +' + (Math.round(add * 10) / 10).toString().replace('.', ','); document.body.appendChild(el); setTimeout(() => el.remove(), 1600); } catch (e) {} }
+function dripCard(kid){ const K = S.kids[kid], R = K.drip; if (!R || !(R.sess >= .1)) return ''; const n = (Math.round(R.sess * 10) / 10).toString().replace('.', ',');
+  return `<div class="note dripc">💰 <b>Пока ты занимался(ась), твой капитал вырос на +${n}!</b> Каждый верный ответ с первого раза добавляет немного к накопленному, а серия из 5 и 10 верных подряд ускоряет рост. Сегодня уже +${(Math.round(R.got * 10) / 10).toString().replace('.', ',')} из ${R.cap} возможных. <button class="link" data-act="dripseen">Здорово!</button></div>`; }
 let flushT = null;
 function flushSoon(){ clearTimeout(flushT); flushT = setTimeout(flush, 4000); }
 async function flush(){
@@ -4353,7 +4374,7 @@ function vHome(){
     const locked = (st === 'new' && restLeft(kid) > 0) || (st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s));
     return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${s === 'lang' && track('lang', cur.ds) === '_alt' ? 'En' : ((s === 'world' && T(kid) === 'yarik') || (s === 'logic' && T(kid) === 'anya')) && track(s, cur.ds) === '_alt' ? '€' : SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && T(kid) === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">Выйти</button><button class="link voice" data-act="voice" title="Кто читает задания">🔊 ${K.voice === 'm' ? 'Мужской голос' : 'Женский голос'}</button><span class="coins">${coinsHtml(K.coins)}</span></header>
-  <div class="banner" aria-hidden="true">${THEME[LK(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[LK(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${restCard(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
+  <div class="banner" aria-hidden="true">${THEME[LK(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[LK(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${dripCard(kid)}${restCard(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
@@ -4937,6 +4958,7 @@ document.addEventListener('click', e => {
       K0.coins -= SKIP_PRICE; (D.unlock = D.unlock || []).push(s0); ev(kid, 'урок не по порядку', { subj: subjName(kid, s0, cur.ds), price: -SKIP_PRICE, coins: K0.coins }); save(); }
     startLesson(s0); if (D.les[s0] && (D.unlock || []).includes(s0)) { D.les[s0].oot = true; save(); } break; }
     case 'install': { const ie = window.INSTALL_EV; if (ie) { ie.prompt(); ie.userChoice.then(() => { window.INSTALL_EV = null; render(); }); } break; }
+    case 'dripseen': { const R = S.kids[kid].drip; if (R) R.sess = 0; save(); render(); break; }
     case 'norest': { const K0 = S.kids[b.dataset.k]; K0.restUntil = 0; K0.blk = 0; save(); render(); break; }
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
     case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); break; }
