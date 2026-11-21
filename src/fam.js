@@ -126,13 +126,13 @@ function famGate(){
   return null;
 }
 function famWrap(h){ return '<main class="wrap narrow famscr">' + h + '</main>'; }
-var FAM_MOTTO = 'Слово за словом, шаг за шагом — к родным корням.';
+var FAM_MOTTO = 'От первых слов — к большим книгам';
 function famBrand(big){ return '<div class="fambrand' + (big ? ' big' : '') + '"><img src="semya/logo.webp" alt="" width="' + (big ? 160 : 64) + '" height="' + (big ? 160 : 64) + '"><div><div class="famlogo">Слово<span>ход</span></div>' + (big ? '<p class="fammotto">' + FAM_MOTTO + '</p>' : '') + '</div></div>'; }
 function famIn(id, label, type, extra){ return '<label>' + label + '<input id="' + id + '" type="' + (type || 'text') + '" autocomplete="off" ' + (extra || '') + '></label>'; }
 function vFamReg(){
   if (!FAM_INV) return famWrap(famBrand(true) + '<header class="hero"><p class="eyebrow">Закрытая тестовая версия</p><h1>Только по приглашению</h1><p>Зарегистрироваться можно по личной ссылке-приглашению. Каждая ссылка действует для одной семьи. Если вы уже зарегистрированы — войдите.</p></header>' +
     '<p class="center"><button class="btn big" data-act="fklogin">Войти</button></p>' + '<p class="center"><a class="link" href="semya/ustanovka.html" target="_blank">Как установить на телефон, планшет и компьютер</a></p>');
-  return famWrap(famBrand(true) + '<header class="hero"><p class="eyebrow">Бесплатная тестовая версия</p><p class="famintro">Всё начинается со слова. Родная речь — корни, из которых растёт человек, где бы он ни жил. Русский язык, чтение вслух, математика и логика для детей 6–13 лет. 20–40 минут в день, уроки ведёт приложение, отчёт — родителю.</p></header>' +
+  return famWrap(famBrand(true) + '<header class="hero"><p class="eyebrow">Бесплатная тестовая версия</p><p class="famintro">Дома вы говорите по-русски, а в школе и с друзьями ребёнок всё чаще переходит на другой язык. Словоход каждый день по 20–40 минут читает с ним, просит пересказать и задаёт вопросы. Урок ведёт приложение, а вам приходит короткий отчёт.</p></header>' +
     '<form class="card form" data-form="freg"><h2>Регистрация семьи</h2>' + famIn('fname', 'Ваше имя') + famIn('femail', 'Email', 'email', 'inputmode="email" autocapitalize="off"') + famIn('fpass', 'Пароль (не короче 6 знаков)', 'password') +
     '<button class="btn big"' + (FAM_BUSY ? ' disabled' : '') + '>' + (FAM_BUSY ? 'Подождите…' : 'Зарегистрироваться') + '</button></form>' +
     '<p class="center"><button class="link" data-act="fklogin">Уже регистрировались? Войти</button></p>' + '<p class="center"><a class="link" href="semya/ustanovka.html" target="_blank">Как установить на телефон, планшет и компьютер</a></p>');
