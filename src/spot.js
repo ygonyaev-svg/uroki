@@ -10,8 +10,10 @@ function spotTask(kid, t, seed){ const R = U.rng(seed), S0 = spotSent(t.text), n
   const stem = w => w.toLowerCase().replace(/ё/g, 'е').slice(0, 4);
   for (let tries = 0; tries < 30; tries++) { const st = R.pick(pool), win = S0.slice(st, st + n), k = R.int(0, n - 1), words = win[k].split(' ');
     const cand = words.map((w, i) => ({ i, c: w.replace(/[^А-Яа-яЁё-]/g, '') })).filter(x => x.c.length >= 5 && !/-/.test(x.c) && x.i > 0 && words.filter(w => w.toLowerCase().includes(x.c.toLowerCase())).length === 1);
-    if (!cand.length) continue; const x = R.pick(cand), low = x.c.toLowerCase(), end = low.slice(-2);
-    const reps = all.filter(w => { const l = w.toLowerCase(); return l.slice(-2) === end && stem(l) !== stem(low) && !win[k].toLowerCase().includes(stem(l)) && (w[0] === w[0].toUpperCase()) === (x.c[0] === x.c[0].toUpperCase()); });
+    if (!cand.length) continue; const x = R.pick(cand), low = x.c.toLowerCase(), end = low.slice(-3);
+    /* замена: то же окончание из 3 букв (меньше грамматических несостыковок, которые выдают подмену), другой корень, такого слова нет в предложении, не однокоренное с приставкой */
+    const nz = v => v.toLowerCase().replace(/ё/g, 'е'), sk = nz(win[k]), lz = nz(low);
+    const reps = all.filter(w => { const l = w.toLowerCase(), l2 = nz(w); return l.slice(-3) === end && stem(l) !== stem(low) && !sk.includes(stem(l)) && !l2.includes(lz.slice(0, -3)) && !lz.includes(l2.slice(0, -3)) && (w[0] === w[0].toUpperCase()) === (x.c[0] === x.c[0].toUpperCase()); });
     if (!reps.length) continue; const r = R.pick(reps); const nw = words.slice(); nw[x.i] = words[x.i].replace(x.c, r);
     const sents = win.slice(); sents[k] = nw.join(' '); return { sents, k, wi: x.i, was: x.c, now: r }; }
   return null; }
