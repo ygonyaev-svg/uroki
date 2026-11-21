@@ -13,14 +13,7 @@ var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
   hshield: '<path class="a" d="M16 3.5l11 4V15c0 7-5 11.6-11 13.5C10 26.6 5 22 5 15V7.5z"/><path class="w" d="M16 9.5l2 4.2 4.5.6-3.3 3.1.8 4.5-4-2.2-4 2.2.8-4.5-3.3-3.1 4.5-.6z" stroke-width="1.6"/>',
   city: '<path class="a" d="M3.5 28V15h7v13M11 28V7h9v21M20.5 28V11h8v17"/><path class="b" stroke="none" d="M14 10h2v2.5h-2zM17 10h2v2.5h-2zM14 15h2v2.5h-2zM17 20h2v2.5h-2zM23 14h2v2.5h-2zM23 19h2v2.5h-2zM6 18h2v2.5H6z"/><path d="M2 28h28"/>',
   burst: '<path class="b" d="M16 2.5l2.6 6.4 6.5-3-1.8 6.8 6.4 2.6-6 3.8 3.5 6.1-7-.6-.9 7-4.3-5.6-5.2 4.7.6-7-6.9-.6L7.6 17 2.5 12.4l6.8-1L8.5 4.5l6 3.6z"/><circle class="w" cx="16" cy="16" r="5"/>',
-  /* кубический мир */
-  grassblk: '<path class="w" d="M28 10L16 16v12l12-6z"/><path class="b" d="M4 10l12 6v12L4 22z"/><path class="a" d="M16 4l12 6-12 6L4 10z"/><path class="a" d="M4 10l12 6 12-6v3l-12 6-12-6z" stroke="none" opacity=".75"/>',
-  pickaxe: '<path class="b" d="M14.5 13.5l4 4L7 29l-4-4z"/><path class="a" d="M6 9c6-6 14-7 20-3l-1.5 2.5-3-1L24 10l1 3-2.5 1.5C22 9 15 6.5 8 10.5z"/>',
-  gem: '<path class="a" d="M9 5h14l5 7-12 16L4 12z"/><path d="M4 12h24M12 5l-3 7 7 16 7-16-3-7M16 5l-4 7h8z"/><path class="w" stroke="none" d="M10 7.5l-2 3.5h3z"/>',
-  torch: '<path class="b" d="M14 14h4v15h-4z"/><path class="a" d="M16 3c4.5 3 5.5 6.5 3.2 11h-6.4C10.5 9.5 11.5 6 16 3z"/><path class="w" stroke="none" d="M16 7.5c1.8 1.5 2 3.3 1 5h-2c-1-1.7-.8-3.5 1-5z"/>',
-  chest: '<path class="a" d="M4 15h24v13H4zM4 15v-4.5A3.5 3.5 0 0 1 7.5 7h17a3.5 3.5 0 0 1 3.5 3.5V15z"/><path d="M4 15h24M9 7v21M23 7v21"/><path class="b" d="M13.5 12.5h5v6h-5z"/>',
-  pixtree: '<path class="b" d="M13 19h6v10h-6z"/><path class="a" d="M8 3h16v4h3v12H5V7h3z"/><path class="w" stroke="none" d="M10 9h3v3h-3zM18 13h3v3h-3zM14 6h2v2h-2z" opacity=".6"/>',
-  pixsword: '<path class="w" d="M27 3h2v4l-2 2-2 2-2 2-2 2-2 2-2 2-3 1-1-1 1-3 2-2 2-2 2-2 2-2 2-2 2-2z"/><path class="b" d="M7 17l2-2 8 8-2 2zM10.5 21.5l-6 6-2-2 6-6z"/>',
+  /* кубический мир — объёмные игрушечные кубики (рисуются ниже через isoC) */
   /* принцессы */
   tiara: '<path class="b" d="M4 23l2.5-11 5 6L16 7l4.5 11 5-6L28 23z"/><path class="a" d="M4 23h24v4H4z"/><circle class="w" cx="16" cy="7" r="2"/><circle class="w" cx="6.5" cy="12" r="1.6"/><circle class="w" cx="25.5" cy="12" r="1.6"/><circle class="w" cx="16" cy="17.5" r="2"/>',
   slipper: '<path class="a" d="M3.5 22c4.5 0 8-1.5 11-5 2.4-2.8 5-4.5 8.5-4.5 3.2 0 5 2 5 4.5V19H17c-3.5 0-6 3-9 3.8H4.5c-1.5 0-2-.8-1-.8z"/><path class="b" d="M24.5 19h3l-1 9h-1.5z"/><path class="w" stroke="none" d="M19 15.3c1.3-.8 2.7-1 4-.8-1.4.6-2.7 1.3-3.6 2.2z"/><path d="M9 6v4M7 8h4M24 5v3M22.5 6.5h3"/>',
@@ -37,6 +30,16 @@ var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
   hglasses: '<path class="a" d="M10 22s-6-3.5-6-7.5a3 3 0 0 1 6-1 3 3 0 0 1 6 1c0 4-6 7.5-6 7.5zM22 22s-6-3.5-6-7.5a3 3 0 0 1 6-1 3 3 0 0 1 6 1c0 4-6 7.5-6 7.5z"/><path d="M4 13.5L2.5 10M28 13.5l1.5-3.5"/><path class="w" stroke="none" d="M7 14c.3-.8 1-1.3 1.8-1.3-.5.4-.9.9-1 1.6zM19 14c.3-.8 1-1.3 1.8-1.3-.5.4-.9.9-1 1.6z"/>'
 }; for (var k in I) ICONS[k] = I[k]; })();
 
+/* изометрический кубик: верх .a, левая грань .b, правая .w */
+function isoC(cx, t, r){ var h = r / 2; return '<path class="b" d="M' + (cx - r) + ' ' + (t + h) + 'L' + cx + ' ' + (t + r) + 'V' + (t + 2 * r) + 'L' + (cx - r) + ' ' + (t + 1.5 * r) + 'z"/><path class="w" d="M' + cx + ' ' + (t + r) + 'L' + (cx + r) + ' ' + (t + h) + 'V' + (t + 1.5 * r) + 'L' + cx + ' ' + (t + 2 * r) + 'z"/><path class="a" d="M' + cx + ' ' + t + 'L' + (cx + r) + ' ' + (t + h) + 'L' + cx + ' ' + (t + r) + 'L' + (cx - r) + ' ' + (t + h) + 'z"/>'; }
+(function(){ var I = {
+  cubes: isoC(9.5, 13, 6.5) + isoC(22.5, 13, 6.5) + isoC(16, 3.5, 6.5),
+  vtree: '<g style="--ia:#C98B55;--ib:#9A6236;--iw:#7A4A26">' + isoC(16, 19, 4) + '</g>' + isoC(16, 2, 9.5),
+  vhouse: isoC(16, 10, 10) + '<path class="l" d="M18.5 27.5v-5.2l3.5-1.8v5.2z"/><path class="l" d="M9 19l2.8 1.4v2.8L9 21.8z"/>',
+  vcrystal: '<path class="a" d="M16 2.5l7 6v14l-7 7-7-7v-14z"/><path class="w" d="M16 2.5v27l7-7v-14z"/><path d="M9 8.5l7 4 7-4M16 12.5v17"/>',
+  vgear: '<path class="a" d="M14 3h4l.7 3.3 2.6 1.1 2.8-1.9 2.8 2.8-1.9 2.8 1.1 2.6L29 14v4l-3.3.7-1.1 2.6 1.9 2.8-2.8 2.8-2.8-1.9-2.6 1.1L18 29h-4l-.7-3.3-2.6-1.1-2.8 1.9-2.8-2.8 1.9-2.8-1.1-2.6L3 18v-4l3.3-.7 1.1-2.6-1.9-2.8 2.8-2.8 2.8 1.9 2.6-1.1z"/><circle class="w" cx="16" cy="16" r="4.5"/>',
+  vrocket: '<path class="w" d="M12 10h8v14h-8z"/><path class="a" d="M12 10l4-7 4 7z"/><path class="b" d="M12 18l-5 5v4l5-3zM20 18l5 5v4l-5-3z"/><path class="b" d="M14 24h4l-2 5z"/><circle class="l" cx="16" cy="14.5" r="2"/>'
+}; for (var k in I) ICONS[k] = I[k]; })();
 function lic(n){ return icon(n); }
 /* рисунок-иконка внутри SVG-сцены */
 function lsi(n, x, y, s){ return '<g transform="translate(' + x + ',' + y + ') scale(' + (s / 32) + ')"><g class="ics ic-' + n + '">' + (ICONS[n] || '') + '</g></g>'; }
@@ -45,17 +48,17 @@ function lsi(n, x, y, s){ return '<g transform="translate(' + x + ',' + y + ') s
 var LOOKS = {
   foot:  { n: 'Футбол', d: 'Стадион, мяч и своя команда', base: 'yarik', art: 'y', bi: ['ball', 'boot', 'goal', 'trophy'], sw: ['#22c55e', '#15803d', '#f97316'] },
   hero:  { n: 'Супергерои', d: 'Ночной город, плащ и своя суперсила', base: 'yarik', art: 'hero', bi: ['hmask', 'bolt', 'hshield', 'hcape'], sw: ['#E23B3B', '#1E3A8A', '#FFD23F'] },
-  cube:  { n: 'Кубический мир', d: 'Мир из блоков, кирка и свой персонаж', base: 'yarik', art: 'cube', bi: ['grassblk', 'pickaxe', 'gem', 'torch'], sw: ['#5DA130', '#8B5A2B', '#4FC3E8'] },
+  cube:  { n: 'Кубический мир', d: 'Мир из ярких кубиков и свой герой', base: 'yarik', art: 'cube', bi: ['cubes', 'vtree', 'vcrystal', 'vrocket'], sw: ['#FFB04A', '#1FB5A8', '#8B5CF6'] },
   magic: { n: 'Волшебная школа', d: 'Замок, свечи и свой факультет', base: 'anya', art: 'a', bi: ['owl', 'wand', 'potion', 'candle'], sw: ['#1e1250', '#7452B8', '#E2B04A'] },
   prin:  { n: 'Принцессы', d: 'Сказочный замок и своё королевство', base: 'anya', art: 'prin', bi: ['tiara', 'pcastle', 'slipper', 'rose'], sw: ['#F4B6CF', '#A8457F', '#E3B65B'] },
-  doll:  { n: 'Кукольный мир', d: 'Всё розовое, наряды и свой образ', base: 'yarik', art: 'doll', bi: ['heart', 'dress', 'heel', 'bow'], sw: ['#FBCFE8', '#EC4899', '#FFFFFF'] }
+  doll:  { n: 'Кукольный мир', d: 'Розовый домик у моря, наряды и свой образ', base: 'yarik', art: 'doll', bi: ['heart', 'dress', 'heel', 'bow'], sw: ['#FF8CC6', '#3CCFC0', '#FFFFFF'] }
 };
 var LOOK_ORDER = ['foot', 'hero', 'cube', 'magic', 'prin', 'doll'];
 var LOOK_THEME = {
   hero: { banner: ['hmask', 'bolt', 'hshield', 'city', 'hcape', 'burst', 'star', 'bolt'], pics: ['hmask', 'bolt', 'hshield', 'hcape', 'city', 'burst', 'star', 'medal'],
     win: ['Суперсила сработала!', 'Город спасён!', 'Геройский ответ!', 'Бах! В точку!', 'Настоящий герой!'], hello: 'Город ждёт своего героя!', world: 'Лига героев знаний' },
-  cube: { banner: ['grassblk', 'pickaxe', 'gem', 'torch', 'chest', 'pixtree', 'pixsword', 'gem'], pics: ['grassblk', 'pickaxe', 'gem', 'torch', 'chest', 'pixtree', 'pixsword'],
-    win: ['Блок добыт!', 'Нашёл алмаз!', 'Уровень пройден!', 'Крафт удался!', 'Сундук открыт!'], hello: 'Строим знания блок за блоком!', world: 'Кубический мир' },
+  cube: { banner: ['cubes', 'vtree', 'vcrystal', 'vhouse', 'vgear', 'vrocket', 'star', 'cubes'], pics: ['cubes', 'vtree', 'vcrystal', 'vhouse', 'vgear', 'vrocket'],
+    win: ['Кубик на месте!', 'Башня растёт!', 'Уровень пройден!', 'Ровно и крепко!', 'Найден кристалл!'], hello: 'Строим знания кубик за кубиком!', world: 'Кубический мир' },
   prin: { banner: ['tiara', 'pcastle', 'slipper', 'rose', 'carriage', 'mirror', 'crown', 'sparkle'], pics: ['tiara', 'pcastle', 'slipper', 'rose', 'carriage', 'mirror', 'crown'],
     win: ['Королевский ответ!', 'Бал в твою честь!', 'Волшебно верно!', 'Корона сияет!', 'Достойно королевства!'], hello: 'Добро пожаловать в сказочное королевство!', world: 'Сказочное королевство' },
   doll: { banner: ['heart', 'dress', 'heel', 'bow', 'handbag', 'hglasses', 'mirror', 'sparkle'], pics: ['heart', 'dress', 'heel', 'bow', 'handbag', 'hglasses', 'mirror'],
@@ -70,7 +73,7 @@ function lookO(kid){ var K = S.kids[kid], id = lookId(kid); if (!K.lks) K.lks = 
 
 /* Тема ребёнка для THEME[...] — с учётом его выбора в интерактиве */
 function lookTheme(kid){ var id = lookId(kid), base, key = 'p:' + kid;
-  if (id === 'foot') base = THEME.yarik; else if (id === 'magic') base = typeof HP_BASE !== 'undefined' ? HP_BASE : THEME.anya;
+  if (id === 'foot') base = { banner: ['ball', 'boot', 'goal', 'whistle', 'trophy', 'medal', 'flag', 'ball'].map(lic), pics: THEME.yarik.pics, win: THEME.yarik.win, hello: THEME.yarik.hello, world: THEME.yarik.world }; else if (id === 'magic') base = typeof HP_BASE !== 'undefined' ? HP_BASE : THEME.anya;
   else { var L = LOOK_THEME[id]; base = { banner: L.banner.map(lic), pics: L.pics.map(lic), win: L.win, hello: L.hello, world: L.world }; }
   var t = { banner: base.banner, pics: base.pics, win: base.win.slice(), hello: base.hello, world: base.world };
   if (id === 'magic') { t.hello = lookG(kid, 'Добро пожаловать в Школу волшебства, юный волшебник!', base.hello);
@@ -94,7 +97,7 @@ var HCOL = { rb: ['Красный и синий', '#D7263D', '#1F4E9E'], gp: ['�
 var HEMB = { star: 'Звезда', bolt: 'Молния', ring: 'Кольцо', wing: 'Крыло', heart: 'Сердце', eye: 'Глаз' };
 var CSKIN = { a: '#F3D3B5', b: '#E0AC7E', c: '#B97A4E', d: '#7A4B2C' }, CHAIR = { d: ['Рыжие', '#C8552B'], b: ['Светлые', '#E9C46A'], c: ['Чёрные', '#24211F'], a: ['Русые', '#7A5230'], e: ['Синие', '#3A7BD5'] };
 var CSHIRT = { d: '#F7C531', b: '#5DA130', c: '#D7263D', a: '#2FA3D9', e: '#8E44AD', f: '#ECEFF1' }, CPANT = { c: '#2B2B33', b: '#5B4636', d: '#6B8E23', a: '#33468F' };
-var CWORLD = { les: ['Лесной мир', '#5DA130', '#3F7A1F'], pes: ['Пустыня', '#E3B65B', '#B8862B'], sneg: ['Снежный мир', '#5AAFE8', '#2E7DB8'], okean: ['Океан', '#13A8B8', '#0B6E7A'], podz: ['Подземелье', '#7B8794', '#4A5561'] };
+var CWORLD = { les: ['Оранжевый остров', '#FFB04A', '#E07A12'], pes: ['Бирюзовый остров', '#3CCFC0', '#13958A'], sneg: ['Лиловый остров', '#B08CF7', '#7349D6'], okean: ['Солнечный остров', '#FFD84D', '#D9A400'], podz: ['Ледяной остров', '#8FD3FF', '#3C9BDB'] };
 var KINGS = { flower: ['Цветочное', 'Цветочного', '#E86AA6', '#A8457F', '#FCE4F0'], sea: ['Морское', 'Морского', '#3FA7D6', '#1F5F99', '#E2F3FB'], snow: ['Снежное', 'Снежного', '#9CC9F0', '#4E6FA8', '#F1F6FD'],
   forest: ['Лесное', 'Лесного', '#47A36B', '#23613D', '#E5F4EA'], sun: ['Солнечное', 'Солнечного', '#F2B33D', '#B86E12', '#FEF5E1'], star: ['Звёздное', 'Звёздного', '#8E6BD1', '#4B2A86', '#EFE9FA'] };
 var KEMB = { rose: ['Роза', 'rose'], star: ['Звезда', 'star'], moon: ['Луна', 'moon'], heart: ['Сердце', 'heart'], crown: ['Корона', 'crown'], slipper: ['Туфелька', 'slipper'] };
@@ -118,10 +121,14 @@ function heroSvg(o, sz){ var c = HCOL[o.col] || HCOL.rb, s = c[1], p = c[2], ski
     '<circle cx="60" cy="28" r="17" fill="' + skin + '"/><path d="M43 27c4-4 10-5 17-3 7-2 13-1 17 3-1 5-4 7-8 7-4 0-6-2-9-3-3 1-5 3-9 3-4 0-7-2-8-7z" fill="' + p + '"/><path d="M44 20c2-9 10-12 16-12s14 3 16 12c-6-4-26-4-32 0z" fill="#3A2A1E"/>' +
     '<rect x="50" y="94" width="20" height="5" fill="#F7C531"/></g><circle cx="53" cy="28" r="2" fill="#fff"/><circle cx="67" cy="28" r="2" fill="#fff"/>' +
     '<g transform="translate(60,66)"><circle r="13" fill="#fff" stroke="#1B2A44" stroke-width="2.5"/>' + embSvg(o.emb, p === '#F3F4F6' ? s : p) + '</g></svg>'; }
-function cubeSvg(o, sz){ var sk = CSKIN[o.skin] || CSKIN.a, hr = (CHAIR[o.hair] || CHAIR.a)[1], sh = CSHIRT[o.shirt] || CSHIRT.a, pn = CPANT[o.pant] || CPANT.a, g = '', px = function(x, y, w, h, c){ g += '<rect x="' + x * 8 + '" y="' + y * 8 + '" width="' + w * 8 + '" height="' + h * 8 + '" fill="' + c + '"/>'; };
-  px(2, 0, 8, 8, sk); px(2, 0, 8, 2, hr); px(2, 2, 1, 2, hr); px(9, 2, 1, 2, hr); px(3, 4, 2, 1, '#fff'); px(4, 4, 1, 1, '#2B3A67'); px(7, 4, 2, 1, '#fff'); px(7, 4, 1, 1, '#2B3A67'); px(4, 6, 4, 1, '#9C5B3B'); px(4, 5, 1, 1, '#9C5B3B'); px(7, 5, 1, 1, '#9C5B3B'); px(2, 1, 8, 1, 'rgba(255,255,255,.18)');
-  px(2, 8, 8, 6, sh); px(0, 8, 2, 6, sh); px(10, 8, 2, 6, sh); px(0, 14, 2, 2, sk); px(10, 14, 2, 2, sk); px(2, 14, 8, 6, pn); px(2, 20, 4, 2, '#4B4B55'); px(6, 20, 4, 2, '#4B4B55'); px(5.9, 15, .2, 5, 'rgba(0,0,0,.25)');
-  return '<svg class="lkpic noico" viewBox="-4 -4 104 184" width="' + Math.round((sz || 120) * .56) + '" height="' + (sz || 120) + '" aria-hidden="true" shape-rendering="crispEdges"><g stroke="#1B2A44" stroke-width="0">' + g + '</g><rect x="0" y="0" width="96" height="176" fill="none"/></svg>'; }
+function cubeSvg(o, sz){ var sk = CSKIN[o.skin] || CSKIN.a, hr = (CHAIR[o.hair] || CHAIR.d)[1], sh = CSHIRT[o.shirt] || CSHIRT.d, pn = CPANT[o.pant] || CPANT.c, wc = (CWORLD[o.world] || CWORLD.les)[1];
+  var blk = function(x, y, w, h, c){ return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="7" fill="' + c + '" stroke="#1B2A44" stroke-width="3"/><rect x="' + (x + w - 9) + '" y="' + (y + 5) + '" width="5" height="' + (h - 10) + '" rx="2.5" fill="#000" opacity=".12"/>'; };
+  return '<svg class="lkpic noico" viewBox="0 0 120 170" width="' + Math.round((sz || 120) * .7) + '" height="' + (sz || 120) + '" aria-hidden="true"><ellipse cx="60" cy="162" rx="40" ry="6" fill="' + wc + '" opacity=".5"/>' +
+    blk(40, 112, 18, 46, pn) + blk(62, 112, 18, 46, pn) + blk(18, 66, 18, 42, sh) + blk(84, 66, 18, 42, sh) + blk(36, 62, 48, 54, sh) +
+    '<rect x="50" y="76" width="20" height="20" rx="4" fill="#fff" opacity=".55"/>' + blk(32, 8, 56, 52, sk) +
+    '<path d="M32 30V15a7 7 0 0 1 7-7h42a7 7 0 0 1 7 7v15c-6-8-14-10-28-10s-22 2-28 10z" fill="' + hr + '" stroke="#1B2A44" stroke-width="3" stroke-linejoin="round"/>' +
+    '<circle cx="49" cy="36" r="5" fill="#fff" stroke="#1B2A44" stroke-width="2"/><circle cx="71" cy="36" r="5" fill="#fff" stroke="#1B2A44" stroke-width="2"/><circle cx="50" cy="37" r="2.4" fill="#1B2A44"/><circle cx="72" cy="37" r="2.4" fill="#1B2A44"/>' +
+    '<path d="M52 47c5 4 11 4 16 0" fill="none" stroke="#1B2A44" stroke-width="2.5" stroke-linecap="round"/><circle cx="42" cy="45" r="3" fill="#F7A9B8" opacity=".7"/><circle cx="78" cy="45" r="3" fill="#F7A9B8" opacity=".7"/></svg>'; }
 function crestSvg(kid, o, sz){ var k = KINGS[o.king] || KINGS.flower, e = (KEMB[o.emb] || KEMB.rose)[1];
   return '<svg class="lkpic noico" viewBox="0 0 120 140" width="' + Math.round((sz || 120) * .86) + '" height="' + (sz || 120) + '" aria-hidden="true"><g stroke="#1B2A44" stroke-width="3" stroke-linejoin="round">' +
     '<path d="M36 30l-6-20 15 10 15-16 15 16 15-10-6 20z" fill="#F2C14E"/><circle cx="45" cy="20" r="3" fill="' + k[2] + '"/><circle cx="60" cy="6" r="3.5" fill="#fff"/><circle cx="75" cy="20" r="3" fill="' + k[2] + '"/>' +
@@ -168,18 +175,18 @@ var LOOK_B = {
     done: function(o){ return o.pow && o.nm && o.col && o.emb; },
     say: function(kid, o){ return 'Твой герой — <b>' + U.esc(o.nm) + '</b>. Суперсила: ' + HPOW[o.pow][0].toLowerCase() + ', ' + HPOW[o.pow][2] + '.'; },
     apply: function(kid, o){ var c = HCOL[o.col]; return { hello: U.esc(o.nm) + ', город ждёт тебя!', win: [U.esc(o.nm) + ' спасает день!', 'Суперсила «' + HPOW[o.pow][0] + '» сработала!'], v: { '--acc': c[1], '--b1': c[1], '--b2': c[1], '--b3': c[2] } }; } },
-  cube: { t: 'Персонаж из блоков', sub: 'Собери себя из кубиков и выбери свой мир', ic: 'grassblk',
+  cube: { t: 'Герой из кубиков', sub: 'Собери своего героя из кубиков и выбери остров', ic: 'cubes',
     steps: [
       { k: 'skin', q: 'Цвет кожи', grid: 1, o: function(){ return lkOpts(CSKIN, function(k, x){ return [k, '<span class="lksw sq" style="background:' + x + '"></span>']; }); } },
       { k: 'hair', q: 'Волосы', grid: 1, o: function(){ return lkOpts(CHAIR, function(k, x){ return [k, '<span class="lksw sq" style="background:' + x[1] + '"></span><b>' + x[0] + '</b>']; }); } },
       { k: 'shirt', q: 'Футболка', grid: 1, o: function(){ return lkOpts(CSHIRT, function(k, x){ return [k, '<span class="lksw sq" style="background:' + x + '"></span>']; }); } },
       { k: 'pant', q: 'Штаны', grid: 1, o: function(){ return lkOpts(CPANT, function(k, x){ return [k, '<span class="lksw sq" style="background:' + x + '"></span>']; }); } },
-      { k: 'world', q: 'В каком мире ты живёшь?', o: function(){ return lkOpts(CWORLD, function(k, x){ return [k, sw2(x[1], x[2]) + '<b>' + x[0] + '</b>']; }); } }
+      { k: 'world', q: 'На каком острове живёт твой герой?', o: function(){ return lkOpts(CWORLD, function(k, x){ return [k, sw2(x[1], x[2]) + '<b>' + x[0] + '</b>']; }); } }
     ],
     live: 1, pic: function(kid, o, sz){ return cubeSvg(o, sz); },
     done: function(o){ return o.skin && o.hair && o.shirt && o.pant && o.world; },
-    say: function(kid, o){ return 'Персонаж готов! Твой мир — ' + CWORLD[o.world][0].toLowerCase() + '.'; },
-    apply: function(kid, o){ var w = CWORLD[o.world]; return { hello: w[0] + ': строим знания блок за блоком!', v: { '--acc': w[2], '--b1': w[1], '--b2': w[2] } }; } },
+    say: function(kid, o){ return 'Герой готов! Его дом — ' + CWORLD[o.world][0].toLowerCase() + '.'; },
+    apply: function(kid, o){ var w = CWORLD[o.world]; return { hello: w[0] + ': строим знания кубик за кубиком!', v: { '--acc': w[2], '--b1': w[1], '--b2': w[2] } }; } },
   prin: { t: 'Моё королевство', sub: 'Выбери королевство, его цвета и герб', ic: 'tiara',
     steps: [
       { k: 'king', q: 'Каким королевством ты правишь?', o: function(){ return lkOpts(KINGS, function(k, x){ return [k, sw2(x[2], x[3]) + '<b>' + x[0] + ' королевство</b>']; }); } },
@@ -245,12 +252,10 @@ var LOOK_SCENES = {
     function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#7FB8E6"/><path d="M0 70h400v20H0z" fill="#4A6FA5"/><g fill="#E9F2FB"><ellipse cx="80" cy="28" rx="34" ry="10"/><ellipse cx="300" cy="20" rx="40" ry="11"/></g>' + lsi('city', 20, 30, 50) + lsi('city', 320, 30, 50) + lsi('hcape', 170, 8, 52) + '<path d="M140 40h-50M150 52h-40" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".8"/>'); }
   ],
   cube: [
-    function(){ var g = '<rect width="400" height="90" fill="#8FD3F4"/>', i; for (i = 0; i < 20; i++) { var hgt = 2 + (i * 7 % 3); g += '<rect x="' + i * 20 + '" y="' + (90 - hgt * 20 + 10) + '" width="20" height="' + (hgt * 20) + '" fill="#8B5A2B" stroke="#6B4320" stroke-width="2"/><rect x="' + i * 20 + '" y="' + (90 - hgt * 20 + 10) + '" width="20" height="7" fill="#5DA130"/>'; }
-      return PX.svg(400, 90, g + '<rect x="40" y="10" width="40" height="14" fill="#fff" opacity=".9"/><rect x="290" y="16" width="56" height="14" fill="#fff" opacity=".9"/>' + lsi('pixtree', 130, 2, 40) + lsi('pixtree', 260, 10, 36)); },
-    function(){ var g = '<rect width="400" height="90" fill="#3B3F46"/>', i, j; for (i = 0; i < 20; i++) for (j = 0; j < 5; j++) g += '<rect x="' + i * 20 + '" y="' + j * 20 + '" width="20" height="20" fill="' + ((i * 3 + j * 5) % 7 ? '#596068' : '#4A5058') + '" stroke="#2F3338" stroke-width="2"/>';
-      return PX.svg(400, 90, g + lsi('gem', 60, 30, 34) + lsi('torch', 150, 22, 40) + lsi('chest', 220, 34, 40) + lsi('gem', 320, 40, 28) + lsi('pickaxe', 360, 30, 34)); },
-    function(){ var g = '<rect width="400" height="90" fill="#9EE0F2"/><rect y="56" width="400" height="34" fill="#2E8BC0"/>', i; for (i = 0; i < 20; i++) g += '<rect x="' + i * 20 + '" y="56" width="20" height="6" fill="#5AB8E0"/>';
-      return PX.svg(400, 90, g + '<rect x="120" y="36" width="80" height="20" fill="#E3C27A" stroke="#B8935A" stroke-width="2"/>' + lsi('pixtree', 140, 0, 38) + lsi('grassblk', 280, 16, 40)); }
+    function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#BDEBFF"/><rect y="74" width="400" height="16" fill="#FFE3B8"/>' + lsi('cubes', 20, 30, 46) + lsi('vtree', 90, 10, 64) + lsi('vhouse', 170, 20, 56) + lsi('vcrystal', 250, 28, 44) + lsi('cubes', 320, 26, 52)); },
+    function(){ var g = '<rect width="400" height="90" fill="#2B2350"/>', i; for (i = 0; i < 30; i++) g += '<rect x="' + (i * 37 % 400) + '" y="' + (i * 23 % 70) + '" width="3" height="3" fill="#fff" opacity=".7"/>';
+      return PX.svg(400, 90, g + lsi('vrocket', 60, 14, 60) + lsi('vcrystal', 160, 30, 40) + lsi('vgear', 240, 24, 46) + lsi('star', 320, 20, 40)); },
+    function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#FFF1D6"/><path d="M0 70h400v20H0z" fill="#9EE6DC"/>' + lsi('vtree', 20, 6, 60) + lsi('cubes', 110, 24, 50) + lsi('vhouse', 200, 14, 60) + lsi('vtree', 300, 10, 58)); }
   ],
   prin: [
     function(){ return PX.svg(400, 90, '<defs><linearGradient id="pg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FCD5E5"/><stop offset="1" stop-color="#FFF1DA"/></linearGradient></defs><rect width="400" height="90" fill="url(#pg)"/><path d="M0 90V70c60-14 120-10 200 0s140 6 200-6v26z" fill="#BFE3C4"/>' + lsi('pcastle', 160, 6, 76) + lsi('sparkle', 60, 14, 26) + lsi('sparkle', 320, 20, 22) + lsi('rose', 40, 52, 30) + lsi('rose', 330, 54, 30)); },

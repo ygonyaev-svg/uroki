@@ -3,7 +3,7 @@
 .lkrow{ display:flex; align-items:flex-start; } .lkrow > .lkprev{ margin-right:18px; }
 .lkprev{ flex:none; width:150px; display:flex; justify-content:center; padding:10px 0; border-radius:18px; background:var(--accsoft,#f1f5f9); }
 .lkmain{ flex:1; min-width:0; }
-.lkopts{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.lkopts{ display:grid; grid-template-columns:1fr 1fr; grid-gap:10px; gap:10px; }
 .lkopts.grid{ grid-template-columns:repeat(4,1fr); }
 .lkopt{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:12px 8px; min-height:64px; }
 .lkopt > * + *{ margin-top:4px; } .lkopt small{ font-weight:500; font-size:13px; opacity:.75; line-height:1.25; }
@@ -22,7 +22,7 @@
 
 /* --- выбор темы родителем --- */
 .lkset h3{ margin:16px 0 8px; }
-.lkgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.lkgrid{ display:grid; grid-template-columns:repeat(3,1fr); grid-gap:10px; gap:10px; }
 .lkcard{ display:flex; flex-direction:column; align-items:flex-start; text-align:left; padding:10px; border-radius:16px; border:3px solid transparent; background:#f8fafc; font:inherit; color:inherit; cursor:pointer; }
 .lkcard.on{ border-color:#2563eb; background:#eff6ff; }
 .lkcard > * + *{ margin-top:4px; } .lkcard b{ font-size:16px; } .lkcard small{ font-size:12.5px; opacity:.75; line-height:1.25; }
@@ -32,7 +32,7 @@
 
 /* --- вход: карточки детей --- */
 .kidcard.th-hero{ background:linear-gradient(#2B4FA8,#1E2E6E); box-shadow:0 8px 0 #121B45,0 14px 30px rgba(0,0,0,.25); }
-.kidcard.th-cube{ background:linear-gradient(#5DA130 0 22%,#8B5A2B 22%); border-radius:8px; box-shadow:0 8px 0 #5A3A1A,0 14px 30px rgba(0,0,0,.25); }
+.kidcard.th-cube{ background:linear-gradient(#FFB04A,#F28C28); box-shadow:0 8px 0 #A85A10,0 14px 30px rgba(0,0,0,.25); }
 .kidcard.th-prin{ background:linear-gradient(#E58AB8,#A8457F); box-shadow:0 8px 0 #6E2A54,0 14px 30px rgba(0,0,0,.25); }
 .kidcard.th-doll{ background:linear-gradient(#F48FC0,#E4479A); box-shadow:0 8px 0 #A3236A,0 14px 30px rgba(0,0,0,.25); }
 
@@ -52,23 +52,23 @@ body.th-hero .tile .ico{ border:3px solid #141A33; border-radius:12px; }
 body.th-hero .prog i{ background:repeating-linear-gradient(45deg,#E23B3B 0 10px,#FFD23F 10px 20px); }
 body.th-hero .wrap > .hello::after{ content:""; display:block; height:8px; margin-top:10px; background:repeating-linear-gradient(90deg,#E23B3B 0 30px,#FFD23F 30px 60px,#2B4FA8 60px 90px); border:2px solid #141A33; border-radius:4px; }
 
-/* ======================= КУБИЧЕСКИЙ МИР: блоки, пиксели ======================= */
-body.th-cube{ background:#6FB7E8; --il:#2B2B33; --ia:#5DA130; --ib:#8B5A2B; --iw:#6B4320; }
-body.th-cube::before{ background:linear-gradient(rgba(20,30,40,.35),rgba(20,30,40,.05) 300px),url(img/bg-cube.webp) center 65%/cover no-repeat,linear-gradient(#7CC4F0 0 55%,#5DA130 55% 60%,#8B5A2B 60%) !important; }
-body.th-cube .wrap{ --acc:var(--b2,#3F7A1F); --accsoft:#E9F5DF; }
-body.th-cube .ic{ stroke-linejoin:miter; stroke-linecap:square; }
-body.th-cube .hello > h1,body.th-cube .lesson > h1{ text-transform:uppercase; letter-spacing:.04em; color:#fff; text-shadow:3px 3px 0 #2B2B33; }
-body.th-cube .card,body.th-cube .tile,body.th-cube .opt,body.th-cube .note,body.th-cube .chip{ border-radius:4px !important; border:3px solid #2B2B33 !important; box-shadow:inset -5px -5px 0 rgba(0,0,0,.12),inset 5px 5px 0 rgba(255,255,255,.6),0 6px 0 rgba(0,0,0,.35) !important; }
-body.th-cube .card{ background:#F6F1E7; }
-body.th-cube .btn{ border-radius:4px; background:linear-gradient(var(--b1,#5DA130) 0 30%,#8B5A2B 30%); color:#fff; border:3px solid #2B2B33; text-shadow:2px 2px 0 rgba(0,0,0,.45); box-shadow:inset -4px -4px 0 rgba(0,0,0,.2),0 5px 0 #2B2B33; text-transform:uppercase; letter-spacing:.04em; }
-body.th-cube .btn.ghost{ background:#C9C9C9; color:#2B2B33; text-shadow:none; }
-body.th-cube .coins{ border-radius:4px; background:#2B2B33; color:#7EE0F5; border:3px solid #555; }
-body.th-cube .banner .ic{ background:#F6F1E7; border:3px solid #2B2B33; border-radius:4px; }
-body.th-cube .tile .ico{ border-radius:4px; }
-body.th-cube .prog,body.th-cube .prog i{ border-radius:2px; }
-body.th-cube .prog i{ background:repeating-linear-gradient(90deg,#5DA130 0 14px,#4C8A26 14px 16px); }
-body.th-cube .dot{ border-radius:3px; }
-body.th-cube .wrap > .hello::after{ content:""; display:block; height:14px; margin-top:10px; background:linear-gradient(#5DA130 0 40%,#8B5A2B 40%); border:3px solid #2B2B33; }
+/* ======================= КУБИЧЕСКИЙ МИР: яркие игрушечные кубики ======================= */
+body.th-cube{ background:#BDEBFF; --il:#1B2A44; --ia:#FFC46B; --ib:#F28C28; --iw:#C9661A; }
+body.th-cube::before{ background:linear-gradient(rgba(20,30,60,.35),rgba(20,30,60,.05) 300px),url(img/bg-cube.webp) center 60%/cover no-repeat,linear-gradient(#BDEBFF,#FFF1D6) !important; }
+body.th-cube .wrap{ --acc:var(--b2,#E07A12); --accsoft:#FFF1D6; }
+body.th-cube .ic-vtree{ --ia:#8EE08F; --ib:#4CB860; --iw:#2E8F48; } body.th-cube .ic-vcrystal{ --ia:#C7A8FF; --iw:#8B5CF6; } body.th-cube .ic-vrocket{ --ia:#F2545B; --ib:#1FB5A8; --iw:#fff; } body.th-cube .ic-vgear{ --ia:#3CCFC0; --iw:#fff; } body.th-cube .ic-vhouse{ --ia:#FF8FA3; --ib:#FFD84D; --iw:#E0B400; }
+body.th-cube .hello > h1,body.th-cube .lesson > h1{ color:#FFD84D; text-shadow:3px 3px 0 #1B2A44,-1px -1px 0 #1B2A44,1px -1px 0 #1B2A44,-1px 1px 0 #1B2A44; letter-spacing:.02em; }
+body.th-cube .card,body.th-cube .tile,body.th-cube .opt,body.th-cube .note,body.th-cube .chip{ border-radius:12px !important; border:3px solid #1B2A44 !important; box-shadow:0 6px 0 #1B2A44 !important; }
+body.th-cube .card{ background:#FFFDF7; }
+body.th-cube .btn{ border-radius:12px; background:var(--b1,#FFB04A); color:#1B2A44; border:3px solid #1B2A44; box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 5px 0 #1B2A44; }
+body.th-cube .btn:active{ transform:translateY(4px); box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),0 1px 0 #1B2A44; }
+body.th-cube .btn.ghost{ background:#fff; }
+body.th-cube .coins{ border-radius:10px; background:#1B2A44; color:#FFD84D; border:3px solid #1B2A44; }
+body.th-cube .banner .ic{ background:#fff; border:3px solid #1B2A44; border-radius:10px; box-shadow:0 4px 0 #1B2A44; }
+body.th-cube .bar .link{ background:rgba(27,42,68,.75); border-radius:10px; padding:6px 12px; text-shadow:none; }
+body.th-cube .tile .ico{ border-radius:10px; }
+body.th-cube .prog i{ background:repeating-linear-gradient(90deg,#FFB04A 0 16px,#3CCFC0 16px 32px,#B08CF7 32px 48px); }
+body.th-cube .wrap > .hello::after{ content:""; display:block; height:14px; margin-top:10px; border:3px solid #1B2A44; border-radius:6px; background:repeating-linear-gradient(90deg,#FFB04A 0 24px,#3CCFC0 24px 48px,#B08CF7 48px 72px,#FFD84D 72px 96px); }
 
 /* ======================= ПРИНЦЕССЫ: сказочный замок, розовое золото ======================= */
 body.th-prin{ background:#F7C9DD; --il:#5A2C52; --ia:#F4A6C8; --ib:#F2C14E; --iw:#FFF8FB; }
@@ -90,10 +90,10 @@ body.th-prin .prog i{ background:linear-gradient(90deg,#F2C14E,#F4A6C8); }
 body.th-prin .wrap > .hello::after{ height:2px; margin:12px 0 2px; background:linear-gradient(90deg,rgba(242,193,78,0),#F2C14E 15%,#F2C14E 85%,rgba(242,193,78,0)); }
 
 /* ======================= КУКОЛЬНЫЙ МИР: всё розовое ======================= */
-body.th-doll{ background:#FFD6EA; --fh:"Playfair Display",Georgia,serif; --il:#7A1F4F; --ia:#F48FC0; --ib:#FFFFFF; --iw:#FFE3F1; }
+body.th-doll{ background:#FFD6EA; --fh:"Rubik","Nunito",-apple-system,sans-serif; --il:#7A1F4F; --ia:#F48FC0; --ib:#FFFFFF; --iw:#FFE3F1; }
 body.th-doll::before{ background:linear-gradient(rgba(160,30,100,.25),rgba(160,30,100,0) 320px),url(img/bg-doll.webp) center 50%/cover no-repeat,radial-gradient(circle at 20% 15%,#fff 0 6%,transparent 7%),linear-gradient(#FFC2DF,#FFE3F1 60%,#FFD1E8) !important; }
 body.th-doll .wrap{ --acc:var(--b1,#E4479A); --accsoft:#FFE3F1; }
-body.th-doll h1,body.th-doll h2,body.th-doll .hello > h1{ font-family:var(--fh); font-style:italic; }
+body.th-doll h1,body.th-doll h2,body.th-doll .hello > h1{ font-family:var(--fh); font-weight:800; }
 body.th-doll .hello > h1,body.th-doll .lesson > h1{ color:#fff; text-shadow:0 2px 12px rgba(160,30,100,.55); }
 body.th-doll .card,body.th-doll .tile,body.th-doll .opt,body.th-doll .chip,body.th-doll .note{ background:#fff !important; color:#5A1A3E; --ink:#5A1A3E; --ink2:#9A5A7E; --soft:#FFE3F1; border:2px solid #F9B4D6 !important; border-radius:26px !important; box-shadow:0 8px 24px rgba(228,71,154,.22) !important; }
 body.th-doll .card h2,body.th-doll .card h3{ color:var(--b1,#E4479A); }
@@ -117,3 +117,19 @@ body.th-doll .hello .eyebrow,body.th-doll .hello > p{ background:rgba(184,40,122
 body.th-prin .bar .link,body.th-doll .bar .link{ background:rgba(110,42,84,.72); border-radius:999px; padding:6px 12px; text-shadow:none; }
 body.th-doll .bar .link{ background:rgba(184,40,122,.75); }
 body.th-cube .hello > p,body.th-hero .hello > p,body.th-cube .hello .eyebrow{ display:inline-block; width:auto; background:rgba(20,26,51,.7); color:#fff; text-shadow:none; border-radius:6px; padding:3px 10px; }
+
+/* правки по отзывам: маска героя не в «чужих» цветах, иконки шапки на белом */
+body.th-hero .ic-hmask{ --ia:#2BB3A6; } body.th-hero .banner .ic{ background:#fff; }
+body.th-hero .hello > h1,body.th-hero .lesson > h1{ text-shadow:3px 3px 0 #141A33,-1.5px -1.5px 0 #141A33,1.5px -1.5px 0 #141A33,-1.5px 1.5px 0 #141A33; }
+body.th-hero .bar .link{ background:rgba(20,26,51,.75); border-radius:10px; padding:6px 12px; text-shadow:none; }
+body.th-prin{ --ia:#E86AA6; --il:#5A2C52; }
+
+/* принцессы: темнее верх неба, ярче иконки */
+body.th-prin::after{ content:""; position:fixed; left:0; right:0; top:0; height:220px; z-index:-1; pointer-events:none; background:linear-gradient(rgba(90,30,80,.55),rgba(90,30,80,0)); }
+body.th-prin .banner .ic{ background:#fff; box-shadow:inset 0 0 0 2px #C9A35A,0 4px 14px rgba(90,30,70,.35); --ia:#E0559A; --ib:#E8B53A; --iw:#FFF; --il:#4A1E44; }
+/* кукольный мир: свой характер — розовый + мятный, современный округлый шрифт */
+body.th-doll .banner .ic{ background:#fff; box-shadow:0 0 0 3px #3CCFC0,0 4px 14px rgba(228,71,154,.35); --ia:#FF5FA8; --ib:#3CCFC0; --iw:#FFE3F1; --il:#5A1A3E; }
+body.th-doll::after{ content:""; position:fixed; left:0; right:0; top:0; height:200px; z-index:-1; pointer-events:none; background:linear-gradient(rgba(150,20,90,.45),rgba(150,20,90,0)); }
+body.th-doll .btn.ghost{ background:#DFF8F4; color:#0E7C72; }
+body.th-doll .wrap > .hello::after{ background:radial-gradient(circle,#fff 0 3px,transparent 3.5px) 0 0/16px 10px,linear-gradient(90deg,#FF8CC6,#3CCFC0); }
+body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
