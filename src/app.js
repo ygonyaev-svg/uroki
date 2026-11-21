@@ -30,7 +30,7 @@ function defShop(){ return [
   { id:'s4', name:'Выбрать ужин для всей семьи', price:80 },
   { id:'s6', name:'Подарок до 10 €', price:400 } ]; }
 function load(){ try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return s; } catch (e) {} return { v:1, parentPin:null, kids: FAM ? {} : { yarik:newKid(), anya:newKid() }, shop:defShop(), cfg:{ sync:'' }, queue:[], log:[] }; }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function save(){ try { if (typeof snapMark === 'function') snapMark(); localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const SYNC_URL = 'https://script.google.com/macros/s/AKfycbzlcMocKjYfldhFSe25-6w9_HVEN0sXMmlJrbj1VWuqMhHvQo5Fs-M0J7zZW2sDYEM3sw/exec';
 S = load();
 if (FAM) famInit();
@@ -838,7 +838,7 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act;
   const kid = cur.kid; const D = kid && dayRec(kid, cur.ds); const L = D && cur.subj && D.les[cur.subj];
   switch (act) {
-    case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;
+    case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; snapCheck(cur.kid); ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;
     case 'parent': askPin('parent', () => go('parent', { kid: null })); break;
     case 'cancelpin': go(cur.kid ? 'home' : 'login'); break;
     case 'always': { const F = alwaysGet(b.dataset.id); if (!F) break; if (F.open) F.open(cur.kid || null); go('always', { aid: F.id }); break; }
