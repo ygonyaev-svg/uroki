@@ -57,7 +57,7 @@ function bkHomeCard(kid){
   var a = bkK(kid).filter(function(b){ return !b.hidden; }), ready = 0, wait = 0;
   a.forEach(function(b){ if (bkCurTask(b)) ready++; else if (!b.finished) wait++; });
   var news = a.some(function(b){ return b.msg && !b.msgSeen; });
-  return '<section class="card bkhome"><h2>📚 Мои бумажные книги</h2><p>' + (kid === 'yarik' ? 'Читай настоящую книжку! Сфотографируй книгу, которая есть дома, а Claude придумает к ней задания.' : 'Читай настоящие книги. Сфотографируй обложку и оглавление — Claude составит план чтения и задания по главам.') +
+  return '<section class="card bkhome"><h2>📚 Мои бумажные книги</h2><p>' + (T(kid) === 'yarik' ? 'Читай настоящую книжку! Сфотографируй книгу, которая есть дома, а Claude придумает к ней задания.' : 'Читай настоящие книги. Сфотографируй обложку и оглавление — Claude составит план чтения и задания по главам.') +
     ' За задание по книге — до +' + BOOK_PTS + ' баллов в день.</p>' +
     (a.length ? '<p class="hint">' + (ready ? '✅ Есть задания: ' + ready + ' ' + U.pl(ready, 'книга', 'книги', 'книг') + '. ' : '') + (wait ? '⏳ Ждём задания: ' + wait + '. ' : '') + (news ? '✉ Есть сообщение по книге.' : '') + '</p>' : '') +
     '<button class="btn big" data-act="bkopen">' + (a.length ? 'Открыть мои книги' : '📷 Добавить первую книгу') + '</button></section>';
@@ -79,7 +79,7 @@ function vBkAdd(){
   return '<main class="wrap ' + kid + '">' + bkHead('bkopen') + '<section class="hello"><h1>Новая книга</h1></section>' +
     '<article class="card"><h2>1. Обложка ' + (cover ? '✅' : '') + '</h2><p>Положи книгу на стол и сфотографируй обложку целиком, чтобы было видно название.' + bkSay('Положи книгу на стол и сфотографируй обложку целиком, чтобы было видно название.') + '</p>' +
     (cover ? '<img class="bkcover" src="' + b.thumb + '" alt="обложка">' : '') + bkSnapBtn('обложка', cover ? '📷 Переснять обложку' : '📷 Сфотографировать обложку') + '</article>' +
-    (cover ? '<article class="card"><h2>2. Оглавление ' + (n2 ? '✅ ' + n2 + ' фото' : '') + '</h2><p>' + (kid === 'yarik' ? 'Найди страницу «Содержание» (обычно в конце книги) и сфотографируй. Если её нет — сфотографируй первую страницу с текстом.' : 'Сфотографируй оглавление (все его страницы по очереди). Если оглавления нет — первый разворот с текстом.') + bkSay(kid === 'yarik' ? 'Найди страницу Содержание, обычно она в конце книги, и сфотографируй. Если её нет, сфотографируй первую страницу с текстом.' : 'Сфотографируй оглавление. Если его нет, первый разворот с текстом.') + '</p>' +
+    (cover ? '<article class="card"><h2>2. Оглавление ' + (n2 ? '✅ ' + n2 + ' фото' : '') + '</h2><p>' + (T(kid) === 'yarik' ? 'Найди страницу «Содержание» (обычно в конце книги) и сфотографируй. Если её нет — сфотографируй первую страницу с текстом.' : 'Сфотографируй оглавление (все его страницы по очереди). Если оглавления нет — первый разворот с текстом.') + bkSay(T(kid) === 'yarik' ? 'Найди страницу Содержание, обычно она в конце книги, и сфотографируй. Если её нет, сфотографируй первую страницу с текстом.' : 'Сфотографируй оглавление. Если его нет, первый разворот с текстом.') + '</p>' +
       bkSnapBtn('оглавление', n2 ? '📷 Ещё страница' : '📷 Сфотографировать') +
       '<label class="hint">Как называется книга? (можно не писать)<input id="bktitle" class="bkinp" maxlength="80" value="' + U.esc((b && b.title) || '') + '"></label>' +
       '<button class="btn big" data-act="bkaddok">Готово — отправить Claude</button></article>' : '') +
@@ -181,7 +181,7 @@ document.addEventListener('click', function(e){
   switch (act) {
     case 'bkopen': if (RT && RT.active) retellStop(); go('books'); break;
     case 'bkbook': go('book', { bk: btn.getAttribute('data-id') }); break;
-    case 'bkadd': { var id = 'b' + (kid === 'yarik' ? 'y' : 'a') + Date.now().toString(36); bkK(kid).push({ id: id, title: '', added: U.today(), tasks: [], prog: {}, st: 'new', hidden: true }); cur.bkAdd = { id: id }; save(); go('bkadd', { bkAdd: { id: id } }); break; }
+    case 'bkadd': { var id = 'b' + (T(kid) === 'yarik' ? 'y' : 'a') + Date.now().toString(36); bkK(kid).push({ id: id, title: '', added: U.today(), tasks: [], prog: {}, st: 'new', hidden: true }); cur.bkAdd = { id: id }; save(); go('bkadd', { bkAdd: { id: id } }); break; }
     case 'bkaddok': { var A = cur.bkAdd && bkFind(kid, cur.bkAdd.id); if (!A || !A.thumb) { alertMsg('Сначала сфотографируй обложку'); break; } var tl = document.getElementById('bktitle'); if (tl && tl.value.trim()) A.title = tl.value.trim().slice(0, 80);
       A.hidden = false; A.st = 'wait'; ev(kid, 'книга добавлена', { subj: '📚 Книга', unit: A.id, text: (A.title || 'без названия') + '; фото оглавления: ' + (A.nToc || 0) });
       save(); cur.bk = A.id; go('book', { bk: A.id }); break; }
@@ -193,7 +193,7 @@ document.addEventListener('click', function(e){
       P.secs = Math.round(el); P.ph = t.kw && t.kw.length ? 'retell' : (t.qs || []).length ? 'qs' : t.snap ? 'snap' : 'end'; P.i = 0; save(); if (P.ph === 'end') bkFinish(kid, b, t); else render(); break; }
     case 'bkretell': { var ta = document.getElementById('rtxt'), text = ((ta && ta.value) || '').trim(); if (RT) { RT.active = false; try { RT.rec && RT.rec.stop(); } catch (x) {} RT = null; }
       P.rtDraft = text; P.rtTries = (P.rtTries || 0) + 1; var r = retellScore({ kw: t.kw }, text);
-      if (r.words < (kid === 'yarik' ? 8 : 15)) { save(); render(); alertMsg('Расскажи подробнее — хотя бы несколько предложений'); break; }
+      if (r.words < (T(kid) === 'yarik' ? 8 : 15)) { save(); render(); alertMsg('Расскажи подробнее — хотя бы несколько предложений'); break; }
       if (!P.rt || r.score > P.rt.score) P.rt = r; ev(kid, 'пересказ', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || ''), text: text.slice(0, 1500), score: r.hit.length + '/' + r.n, words: r.words }); save(); render(); break; }
     case 'bkrtadult': P.rt = { n: t.kw.length, hit: [], miss: [], score: .7, adult: true }; ev(kid, 'пересказ', { subj: '📚 Книга', unit: b.title || b.id, text: 'пересказал(а) взрослому' }); P.ph = (t.qs || []).length ? 'qs' : t.snap ? 'snap' : 'end'; save(); if (P.ph === 'end') bkFinish(kid, b, t); else render(); break;
     case 'bktoqs': P.ph = (t.qs || []).length ? 'qs' : t.snap ? 'snap' : 'end'; P.i = 0; save(); if (P.ph === 'end') bkFinish(kid, b, t); else render(); break;

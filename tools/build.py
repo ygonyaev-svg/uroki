@@ -2,38 +2,47 @@
 """Собирает приложение в папку docs/ (для GitHub Pages)."""
 import os, sys, json, hashlib
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-src = os.path.join(root, 'src'); out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(root, 'docs')
+src = os.path.join(root, 'src')
+FAM = '--fam' in sys.argv; args = [a for a in sys.argv[1:] if a != '--fam']
+out = args[0] if args else os.path.join(root, 'docs', 'semya') if FAM else os.path.join(root, 'docs')
 os.makedirs(out, exist_ok=True)
 parts = json.load(open(os.path.join(root, 'books', 'parts.json'), encoding='utf-8'))
 sys.path.insert(0, os.path.join(root, 'tools')); import meta2
 BX, _e = meta2.load()
 if _e: sys.exit('meta2: ' + '; '.join(_e))
 rd = lambda f: open(os.path.join(src, f), encoding='utf-8').read()
-js = '\n'.join([rd('core.js'), rd('cur_pt_nat.js'), rd('cur_fin.js'), rd('cur_fin_a.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('cur_more_y.js'), rd('cur_more_a.js'), rd('hard.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', 'const BOOK_X = ' + json.dumps(BX, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('mybooks.js'), rd('fun_data.js'), rd('fun_pz.js'), rd('fun.js'), rd('chess_course.js'), rd('chess_puz.js'), rd('chess.js'), rd('code.js'), rd('app.js')])
+js = '\n'.join(['var FAM = %d;' % FAM, rd('core.js'), rd('cur_pt_nat.js'), rd('cur_fin.js'), rd('cur_fin_a.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('cur_more_y.js'), rd('cur_more_a.js'), rd('hard.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', 'const BOOK_X = ' + json.dumps(BX, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('mybooks.js'), rd('fun_data.js'), rd('fun_pz.js'), rd('fun.js'), rd('chess_course.js'), rd('chess_puz.js'), rd('chess.js'), rd('code.js')] + ([rd('fam.js')] if FAM else []) + [rd('app.js')])
+if FAM:
+    import re
+    for a, b in [('Задание от Юры', 'Задание от родителей'), ('ждёт цену от Юры', 'ждёт цену от родителей'), ('цену назначит Юра', 'цену назначат родители'), ('баллы от Юры', 'баллы от родителей'), ('с Юрой', 'с папой')]: js = js.replace(a, b)
+    js = re.sub(r'(?<![А-Яа-яЁё])Юр(а|ы|е|у|ой)(?![А-Яа-яЁё])', r'пап\1', js); js = re.sub(r'(?<![А-Яа-яЁё])Ярик', 'Глеб', js); js = re.sub(r'(?<![А-Яа-яЁё])Ан(я|и|е|ю|ей)(?![А-Яа-яЁё])', r'Кат\1', js)
 import subprocess; subprocess.run([sys.executable, os.path.join(root, 'tools', 'theme_css.py')], check=True)
 css = '\n'.join(open(os.path.join(src, f), encoding='utf-8').read() for f in ('style.css', 'theme.css', 'code.css'))
 ver = hashlib.md5((js + css).encode()).hexdigest()[:8]
+TITLE = 'Словоход' if FAM else 'Уроки'; BASE = '<base href="../">' if FAM else ''; MAN = 'semya/manifest.webmanifest' if FAM else 'manifest.webmanifest'
 html = f'''<!doctype html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Уроки</title>
+<title>{TITLE}</title>{BASE}
 <meta name="theme-color" content="#38bdf8"><meta name="color-scheme" content="light">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Уроки">
-<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-title" content="{TITLE}">
+<link rel="manifest" href="{MAN}"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Nunito:wght@700;800;900&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
 <style>{css}</style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){{var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';}};</script>
 <script>/* v{ver} */
 {js}
-if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js');
+{'' if FAM else "if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js');"}
 </script></body></html>'''
 open(os.path.join(out, 'index.html'), 'w', encoding='utf-8').write(html)
-json.dump({'name': 'Уроки для Ярика и Ани', 'short_name': 'Уроки', 'start_url': './', 'display': 'standalone', 'background_color': '#fbfaf5', 'theme_color': '#2350a8', 'lang': 'ru',
+json.dump({'name': 'Словоход' if FAM else 'Уроки для Ярика и Ани', 'short_name': 'Словоход' if FAM else 'Уроки', 'start_url': './', 'display': 'standalone', 'background_color': '#fbfaf5', 'theme_color': '#2350a8', 'lang': 'ru',
            'id': './', 'scope': './', 'orientation': 'any', 'description': 'Ежедневные уроки по-русски: чтение, математика, языки',
-           'icons': [{'src': 'icon-192.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'}, {'src': 'icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'}, {'src': 'icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}]},
+           'icons': [{'src': ('../' if FAM else '') + 'icon-192.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'}, {'src': ('../' if FAM else '') + 'icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'}, {'src': ('../' if FAM else '') + 'icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}]},
           open(os.path.join(out, 'manifest.webmanifest'), 'w', encoding='utf-8'), ensure_ascii=False)
+if FAM:
+    import shutil; shutil.copy(os.path.join(root, 'tools', 'fam_admin.html'), os.path.join(out, 'admin.html')); print('ok', out, ver); sys.exit(0)
 open(os.path.join(out, 'sw.js'), 'w').write(f'''const C='uroki-{ver}';
 self.addEventListener('install',e=>{{e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icon-180.png','img/bg-yarik.webp','img/bg-anya.webp'])));self.skipWaiting();}});
 self.addEventListener('activate',e=>{{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();}});

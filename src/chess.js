@@ -198,7 +198,7 @@ function chView(kid){
 }
 function chMenu(kid){
   var C = chK(kid), h = '<section class="hello"><h1>♞ Шахматы</h1><p>Здесь можно заниматься всегда, даже в перерыв. ' + (chDayLeft(kid) ? 'За задачи, решённые с первой попытки без подсказки, — по 1 баллу в копилку (до ' + CHESS_DAY_MAX + ' в день, сегодня осталось ' + chDayLeft(kid) + ').' : 'Баллы за задачи на сегодня уже получены, но решать можно сколько хочешь.') + '</p></section>';
-  var mine = kid === 'yarik', i, L, n, tot, done;
+  var mine = T(kid) === 'yarik', i, L, n, tot, done;
   var cdone = 0; for (i = 0; i < CH_COURSE.length; i++) if (C.course[CH_COURSE[i].id]) cdone++;
   var courseTile = '<button class="tile chtile" data-act="chcourse"><span class="ico">♙</span><span class="tt"><span class="sn">Учимся играть' + (mine ? ' <em>начни здесь</em>' : '') + '</span><span class="ut">Как ходят фигуры, шах, мат, рокировка. Уроков пройдено: ' + cdone + ' из ' + CH_COURSE.length + '</span></span></button>';
   var tableTile = '<button class="tile chtile" data-act="chtable"><span class="ico">♚</span><span class="tt"><span class="sn">Играть вдвоём</span><span class="ut">Положите планшет между собой: у каждого свои фигуры лицом к себе</span></span></button>';
@@ -408,7 +408,7 @@ var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
 ALWAYS.push({ id:'chess', order:20, login:true, full:true,
   tile: function(kid){
     if (!kid) return '<button class="tile always chtile" data-act="always" data-id="chess"><span class="ico">♞</span><span class="tt"><span class="sn">Шахматы вдвоём</span><span class="ut">Партия на одном экране: у каждого свои фигуры лицом к себе</span></span></button>';
-    var C = chK(kid); return '<button class="tile always chtile" data-act="always" data-id="chess"><span class="ico">♞</span><span class="tt"><span class="sn">Шахматы</span><span class="ut">' + (kid === 'yarik' ? 'Учимся играть, задачи и игра вдвоём' : 'Задачи на мат и тактику, игра вдвоём') + (C.n ? ' · решено задач: ' + C.n : '') + '</span></span></button>'; },
+    var C = chK(kid); return '<button class="tile always chtile" data-act="always" data-id="chess"><span class="ico">♞</span><span class="tt"><span class="sn">Шахматы</span><span class="ut">' + (T(kid) === 'yarik' ? 'Учимся играть, задачи и игра вдвоём' : 'Задачи на мат и тактику, игра вдвоём') + (C.n ? ' · решено задач: ' + C.n : '') + '</span></span></button>'; },
   open: function(kid){ chOpen(kid); },
   view: function(kid){ return chView(kid); },
   act: function(a, el){ chAct(a, el); }
