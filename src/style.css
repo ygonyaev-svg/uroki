@@ -103,6 +103,7 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 .author{ color:var(--ink2); margin-top:-8px; }
 .counter{ font-size:15px; color:var(--ink2); margin-top:8px; }
 .task .q{ font-size:24px; line-height:1.4; margin:4px 0 14px; }
+.bw{ font-size:1.35em; font-weight:800; letter-spacing:.04em; } /* крупные буквы и слова для «Учимся читать» */
 .gap{ display:inline-block; min-width:44px; border-bottom:2px solid var(--acc); color:var(--acc); text-align:center; }
 .opts{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
 .opt{ appearance:none; border:2px solid var(--line); background:var(--card); border-radius:14px; padding:14px; min-height:60px; font-size:21px; cursor:pointer; }
@@ -163,7 +164,7 @@ th{ color:var(--ink2); font-weight:600; }
 .form input,.form select,.shoprow input{ display:block; width:100%; margin-top:4px; padding:10px 12px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); font-size:18px; color:var(--ink); }
 .shoprow{ display:grid; grid-template-columns:1fr 90px auto; gap:8px; align-items:center; margin:6px 0; }
 .shoprow input{ margin:0; }
-.toast{ position:fixed; left:50%; bottom:30px; transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:12px 20px; border-radius:12px; z-index:9; }
+.toast{ position:fixed; left:50%; bottom:30px; transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:12px 20px; border-radius:12px; z-index:2000; }
 
 @media (max-width:520px){
   body{ font-size:17px; } h1{ font-size:25px; }
@@ -303,6 +304,16 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .pzsvg g.pze.was .ghost{ stroke:#e74c3c; }
 .anya .pzsvg .ghost{ stroke:#6d5fa0; }
 .pzsvg .pzfix{ stroke:#8a7a5a; stroke-width:.12; stroke-linecap:round; }
+/* Равенства из спичек: пустые места не видны (иначе пунктир «достраивает» цифры: 0 похож на 8), появляются только когда спичка выбрана или её тащат */
+.pzsvg.eq .wood{ stroke-width:.17; }
+.pzsvg.eq g.sel .wood{ stroke-width:.2; }
+.pzsvg.eq .pzfix{ stroke-width:.17; }
+.pzsvg.eq g.pze .ghost{ stroke:transparent; }
+/* Квадраты из спичек: пунктир пустых мест не рисует «лишние квадраты» — виден только при выборе/перетаскивании; убранные спички — бледный пунктир (на него можно нажать, чтобы вернуть) */
+.pzsvg.st g.pze .ghost{ stroke:transparent; }
+.pzsvg.st g.pze.was .ghost{ stroke:#c9bfa8; opacity:.6; }
+.pzsvg.st g.pze.on .ghost, .pzsvg.st.dragging g.pze .ghost{ stroke:#f39c12; stroke-width:.05; opacity:.75; }
+.pzsvg.eq g.pze.on .ghost, .pzsvg.eq.dragging g.pze .ghost{ stroke:#f39c12; stroke-width:.05; stroke-dasharray:.1 .08; opacity:.75; }
 .anya .pzsvg .pzfix{ stroke:#cbb9ff; }
 .pzsvg.coins .pzc circle{ fill:#e8b923; stroke:#a67c00; stroke-width:.05; }
 .pzsvg.coins .pzc circle.in{ fill:none; stroke:#c99a10; stroke-width:.04; }
@@ -347,17 +358,20 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 /* стихи */
 .ptext p{ margin:2px 0; font-size:21px; line-height:1.5; font-family:Georgia, 'Times New Roman', serif; } .ptext.syl p{ letter-spacing:.5px; }
 .pline{ font-style:italic; font-size:19px; font-family:Georgia, serif; }
-.clapline{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:12px 0; font-size:22px; }
-.clapline .cs{ padding:4px 8px; border-radius:10px; background:var(--soft); } .clapline .cs.strong{ font-weight:800; text-decoration:underline; text-underline-offset:4px; }
-.clapline .cs.hit{ background:var(--gold); color:#1f2a44; } .clapline .cs.nx{ outline:3px solid var(--acc); } .clapline .cgap{ width:10px; display:inline-block; }
-.btn.clap{ font-size:44px; display:block; margin:8px auto; min-width:160px; }
+.sline{ display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin:14px 0; font-size:24px; line-height:1.2; }
+.sline .sw{ display:inline-flex; align-items:center; white-space:nowrap; } .sline .sw.plain{ color:var(--mut,#8a8f9c); padding:6px 2px; }
+.sline .sst{ font:inherit; color:inherit; border:2px solid var(--soft); background:var(--card,#fff); padding:6px 7px; margin:0 1px; border-radius:10px; min-width:34px; cursor:pointer; -webkit-appearance:none; }
+.sline .sst.right{ background:#2e9d5b; border-color:#2e9d5b; color:#fff; font-weight:800; } .sline .sst.wrong{ background:#d9534f; border-color:#d9534f; color:#fff; text-decoration:line-through; }
+.sline .sst:disabled{ opacity:1; cursor:default; }
+.rhythm{ margin-top:12px; padding:10px 12px; border-radius:12px; background:var(--soft); } .rline{ font-size:20px; } .rline i{ font-style:normal; opacity:.4; margin:0 3px; }
+.rline .rs{ font-weight:800; color:var(--acc); } .rpat{ margin:6px 0 0; letter-spacing:.5px; }
 .poem textarea{ width:100%; font-size:18px; border-radius:12px; border:1px solid var(--line); padding:10px; background:var(--card); color:var(--ink); box-sizing:border-box; }
 .poem .row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
 /* подсказки по касанию */
 .tipc{ cursor:help; text-decoration:underline dotted; text-underline-offset:3px; text-decoration-thickness:1px; }
 .note.tipc, .prog.tipc, .plv.tipc{ text-decoration:none; }
 .coins .tipc{ text-decoration:none; display:inline-flex; align-items:center; gap:4px; } .coins .pigh{ margin-left:10px; }
-.tipbox{ position:fixed; inset:0; background:rgba(10,15,30,.45); z-index:1000; display:flex; align-items:flex-end; justify-content:center; padding:16px; }
+.tipbox{ position:fixed; top:0; right:0; bottom:0; left:0; background:rgba(10,15,30,.45); z-index:1000; display:flex; align-items:flex-end; justify-content:center; padding:16px; }
 .tipin{ background:var(--card); color:var(--ink); border-radius:18px; padding:18px 18px 14px; max-width:520px; width:100%; box-shadow:0 10px 40px rgba(0,0,0,.3); margin-bottom:env(safe-area-inset-bottom); }
 .tipin h3{ margin:0 0 8px; font-size:20px; } .tipin p{ font-size:18px; line-height:1.45; margin:0 0 12px; } .tiprow{ display:flex; gap:10px; flex-wrap:wrap; }
 .micbar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:6px 0 4px; } .mic2.live{ background:var(--red); color:#fff; animation:pulse 1.2s infinite; }
@@ -370,3 +384,26 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .bkbusy{ padding:24px 0; }
 .spin{ width:44px; height:44px; margin:0 auto 10px; border-radius:50%; border:5px solid var(--accsoft); border-top-color:var(--acc); animation:bkspin 1s linear infinite; }
 @keyframes bkspin{ to{ transform:rotate(360deg); } }
+/* Портрет ребёнка */
+.pfbar{ display:block; height:8px; border-radius:4px; background:var(--line); overflow:hidden; margin:6px 0 4px; }
+.pfbar i{ display:block; height:100%; background:var(--acc); border-radius:4px; }
+.pfrow{ padding:8px 0; border-bottom:1px solid var(--line); }
+.pfrow:last-of-type{ border-bottom:0; }
+.pfrow.dim b, .card.dim h2{ opacity:.6; }
+.pfrow.dim .hint{ display:block; }
+.pfprof .chip{ display:inline-block; margin:3px 2px; cursor:default; }
+.pfnote{ font-size:13px; margin:6px 4px 18px; }
+.tabs{ overflow-x:auto; -webkit-overflow-scrolling:touch; } .tabs .tab{ white-space:nowrap; flex-shrink:0; }
+/* тестовый режим */
+.testbar{ position:sticky; top:0; z-index:900; background:#7a3cff; color:#fff; padding:8px 12px; font-size:15px; text-align:center; } .testbar .link{ color:#fff; text-decoration:underline; margin-left:8px; }
+.notebtn{ position:fixed; right:14px; bottom:14px; z-index:950; background:#7a3cff; color:#fff; border:0; border-radius:24px; padding:12px 16px; font-size:16px; box-shadow:0 6px 20px rgba(0,0,0,.25); cursor:pointer; }
+.testc{ border:2px dashed #7a3cff; } .tipin textarea{ width:100%; box-sizing:border-box; font-size:17px; border-radius:12px; border:1px solid var(--line); padding:10px; margin-bottom:6px; background:var(--card); color:var(--ink); }
+.rbad{ text-decoration:underline wavy #d9534f; text-decoration-thickness:2px; text-underline-offset:4px; color:#b8322e; }
+.learnt .hidmsg{ display:none; } .learnt.hid .ptext{ display:none; } .learnt.hid .hidmsg{ display:block; padding:14px; border-radius:12px; background:var(--soft); text-align:center; }
+.spot .spt p{ font-size:20px; line-height:2; margin:6px 0; } .spw{ font:inherit; color:inherit; background:none; border:0; padding:2px 3px; border-radius:8px; cursor:pointer; -webkit-appearance:none; }
+.spw:active{ background:var(--soft); } .spw.wrong{ background:#f3d3d2; text-decoration:line-through; } .spw.right{ background:#2e9d5b; color:#fff; font-weight:700; } .spw.miss{ background:#d9534f; color:#fff; font-weight:700; } .spw:disabled{ opacity:1; cursor:default; }
+.askrest, .askrest p, .askrest h2{ color:#2a2622 !important; } .askrest .hint{ color:#5a524a !important; } .askrest{ border:2px solid var(--acc); }
+.hwc .hwrow{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px solid var(--soft); }
+.hwc, .hwc p, .hwc b{ color:#2a2622; } .hwc .hint{ color:#5a524a !important; } .hwc{ border:2px solid var(--acc); }
+.restscr h1, .restscr p, .restscr h3, .restscr li{ color:#2a2622; } .restscr .hint{ color:#5a524a !important; } .tmr{ text-align:left; margin:8px 0 12px; padding-left:20px; } .tmr li{ margin:6px 0; }
+.xtrow{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:8px 0; }

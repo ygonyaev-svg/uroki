@@ -1,7 +1,7 @@
 /* ===== Мои книги: бумажные книги из дома =====
    Ребёнок фотографирует обложку, оборот титульного листа (издательство, год, тираж, ISBN), заднюю обложку со штрихкодом, по желанию оглавление; для незнакомых книг — страницы главы → фото уходят в скрипт таблицы → папка «Уроки — фото книг» на Диске
    и строка в листе «Фото книг». Вечером Claude смотрит фото, узнаёт книгу и присылает задания строкой в «Указания»:
-   тип «книга», значение — JSON { book, title, author, msg, tasks:[{ id, title, read, min, qs, kw, snap }] }.
+   тип «книга», значение — JSON { book, title, author, msg, hidden, tasks:[{ id, title, read, min, qs, kw, snap }] }.
    qs: ["вопрос","верно","неверно1","неверно2"] — выбор; { q, a, alt:[...] } — ответ словом.
    Чтение — по бумаге, вне экрана: таймер идёт, даже если айпад отложили. До +10 баллов в день за книги. */
 var BOOK_PTS = 10;
@@ -49,6 +49,7 @@ function bkApply(kid, row){
   if (d.replace) b.tasks = [];
   (d.tasks || []).forEach(function(t){ if (!t || !t.id) return; var have = false; for (var i = 0; i < b.tasks.length; i++) if (b.tasks[i].id === t.id) { b.tasks[i] = t; have = true; } if (!have) b.tasks.push(t); });
   if (d.finished) b.finished = true;
+  if (d.hidden) b.hidden = true;
   b.st = 'ready'; b.upd = U.today();
 }
 
@@ -168,7 +169,8 @@ function bkTaskView(kid, b, t){
   }
   return h + '</article>';
 }
-function bkQs(t){
+function bkQs(t){ var Q = bkQs0(t); return Q.map(function(q, i){ return asChoice(q, U.h(t.id) + i, Q); }); }
+function bkQs0(t){
   var r = U.rng(t.id);
   return (t.qs || []).map(function(x){
     if (Object.prototype.toString.call(x) === '[object Array]') return { k: 'c', q: x[0], a: String(x[1]), opts: r.shuffle(x.slice(1).map(String)) };
@@ -191,7 +193,7 @@ function bkFinish(kid, b, t){
   var accs = (P.sp || []).filter(function(r){ return r.acc != null; }); if (accs.length) q = .8 * q + .2 * accs.reduce(function(a, r){ return a + r.acc; }, 0) / accs.length;
   var pts = q < .6 ? 0 : Math.round(BOOK_PTS * q * q);
   var D = dayRec(kid, U.today()); D.bookPts = D.bookPts || 0; pts = Math.max(0, Math.min(pts, BOOK_PTS - D.bookPts)); D.bookPts += pts;
-  var K = S.kids[kid]; piggyAdd(K, pts); P.pts = pts; P.ph = 'done'; P.end = Date.now(); K.texts = (K.texts || 0) + 1;
+  var K = S.kids[kid]; pts = piggyAdd(K, pts); P.pts = pts; P.ph = 'done'; P.end = Date.now(); K.texts = (K.texts || 0) + 1;
   ev(kid, 'книга: задание', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || ''), score: ok + '/' + n, secs: P.secs || '', coins: K.coins, text: '+' + pts + ' баллов' + (P.rt ? '; пересказ ' + P.rt.hit.length + '/' + P.rt.n : '') });
   save(); render(); alertMsg(pts ? 'Задание по книге сделано: +' + pts + ' 🐷' : (D.bookPts >= BOOK_PTS ? 'Сделано! Баллы за книги сегодня уже получены' : 'Сделано! В следующий раз читай внимательнее'));
 }

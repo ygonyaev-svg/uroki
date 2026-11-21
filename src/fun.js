@@ -5,9 +5,9 @@ var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
 var FUN_CAP = { zag: 5, pz: 6, zad: 6 };
 function funK(kid){ var K = S.kids[kid]; if (!K.fun) K.fun = { z: {}, p: {}, q: {}, day: '', got: {} }; var F = K.fun; if (F.day !== U.today()) { F.day = U.today(); F.got = {}; } return F; }
 /* Общая функция для всех «всегда доступных» разделов (и шахмат): начисляет не больше дневного лимита, возвращает реально начисленное */
-function funPts(kid, key, pts, cap){ if (!kid || !pts) return 0; var F = funK(kid), got = F.got[key] || 0; var add = Math.max(0, Math.min(pts, (cap || FUN_CAP[key] || 5) - got)); if (add) { F.got[key] = got + add; piggyAdd(S.kids[kid], add); } save(); return add; }
+function funPts(kid, key, pts, cap){ if (!kid || !pts) return 0; var F = funK(kid), got = F.got[key] || 0; var add = Math.max(0, Math.min(pts, (cap || FUN_CAP[key] || 5) - got)); if (add) { add = piggyAdd(S.kids[kid], add); F.got[key] = got + add; } save(); return add; }
 function funLeft(kid, key){ var F = funK(kid); return Math.max(0, (FUN_CAP[key] || 5) - (F.got[key] || 0)); }
-function funCapNote(kid, key){ var l = funLeft(kid, key); return l ? 'Сегодня можно заработать ещё <b>' + l + '</b> ' + U.pl(l, 'балл', 'балла', 'баллов') + '.' : 'Баллы на сегодня собраны — дальше играем просто для ума 🙂'; }
+function funCapNote(kid, key){ var l = Math.min(funLeft(kid, key), capLeft(S.kids[kid])); return l ? 'Сегодня можно заработать ещё <b>' + l + '</b> ' + U.pl(l, 'балл', 'балла', 'баллов') + '.' : 'Баллы на сегодня собраны — дальше играем просто для ума 🙂'; }
 function funTab(act, cur0, list){ return '<div class="fntabs">' + list.map(function(t){ return '<button class="chip ' + (String(cur0) === String(t[0]) ? 'on' : '') + '" data-act="' + act + '" data-l="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>'; }
 function funLvl(kid){ return T(kid) === 'anya' ? 2 : 1; }
 function funOrder(kid, list, salt){ var r = U.rng(kid + salt); return r.shuffle(list.map(function(x, i){ return i; })); }
@@ -33,7 +33,7 @@ ALWAYS.push({ id: 'zag', order: 10,
     h += '<article class="card task zgcard">' + zgPic(kid, z) + '<div class="q zgtext">' + U.esc(z.q).replace(/\. /g, '.<br>') + '</div><div class="row">' + sayGate('zg' + z.id, '<button class="btn ghost small" data-act="zgsay">🔊 Послушать</button>') + '</div>' +
       '<div class="opts zgopts">' + opts.map(function(o){ var cls = r ? (o === z.a ? 'right' : o === r.v ? 'wrong' : '') : ''; return '<button class="opt ' + cls + '" data-act="zgans" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + zgOpt(o) + '</button>'; }).join('') + '</div>';
     if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! Это ' + U.esc(z.a.toLowerCase()) + '. ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Не угадал(а). Правильный ответ: <b>' + U.esc(z.a) + '</b> ' + (ZAG_EMO[z.a] || '')) + '</div>' + (r.pts ? funBurst(r.pts) : '');
-    h += (z.own ? '<p class="src">Загадка придумана для этого приложения.</p>' : '<p class="src">Русская народная загадка.</p>') + '</article>';
+    h += (z.own ? '<p class="src">Загадка придумана для этого приложения.</p>' : '<p class="src">Народная загадка.</p>') + '</article>';
     if (r) h += '<button class="btn big" data-act="zgnext">Следующая загадка →</button>';
     return h; },
   act: function(act, b){ var kid = cur.kid; if (!kid) return;
@@ -47,6 +47,7 @@ ALWAYS.push({ id: 'zag', order: 10,
 
 /* ---------- Головоломки: спички и монетки ---------- */
 var EQ_SEG = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg' };
+var EQ_SP = 2.1; /* шаг между знаками равенства из спичек: широкие промежутки, чтобы цифры не слипались */
 var EQ_GEO = { a: [0, 0, 1, 0], b: [1, 0, 1, 1], c: [1, 1, 1, 2], d: [0, 2, 1, 2], e: [0, 1, 0, 2], f: [0, 0, 0, 1], g: [0, 1, 1, 1] };
 function cnTri(n){ var s = []; for (var r = 0; r < n; r++) for (var q = 0; q < n - r; q++) s.push([q, r]); return s; }
 function cnFlip(S){ return S.map(function(p){ return [p[0] + p[1], -p[1]]; }); }
@@ -69,8 +70,8 @@ function pzBoard(p){ var sl = {}, fixed = [], i, k;
       if (/\d/.test(ch)) { for (k in EQ_GEO) { var g = EQ_GEO[k]; sl[i + k] = [X + g[0], g[1], X + g[2], g[3]]; } }
       else if (ch === '+' || ch === '-') { sl[i + 'h'] = [X, 1, X + 1, 1]; sl[i + 'v'] = [X + .5, .5, X + .5, 1.5]; }
       else if (ch === '=') { fixed.push([X, .75, X + 1, .75], [X, 1.25, X + 1, 1.25]); }
-      X += 1.7; }
-    return { sl: sl, fixed: fixed, box: [0, 0, X - .7, 2] }; }
+      X += EQ_SP; }
+    return { sl: sl, fixed: fixed, box: [0, 0, X - EQ_SP + 1, 2] }; }
   /* монетки: треугольная решётка, q,r → x = q + r/2, y = r·0.87 */
   var rs = p.s.map(function(a){ return a[1]; });
   var r0 = Math.min.apply(null, rs) - 1, r1 = Math.max.apply(null, rs) + 1, minx = 1e9, maxx = -1e9;
@@ -112,8 +113,9 @@ function pzSvg(p, st, showSol){ var B = pzBoard(p), b = B.box, m = B.coin ? .7 :
       h += on ? '<g class="pzc' + (st.sel === k ? ' sel' : '') + (showSol && start.indexOf(k) < 0 ? ' new' : '') + '" data-pk="' + k + '"><circle cx="' + s[0] + '" cy="' + s[1] + '" r=".42"/><circle class="in" cx="' + s[0] + '" cy="' + s[1] + '" r=".3"/><circle class="hit" cx="' + s[0] + '" cy="' + s[1] + '" r=".5"/></g>'
         : '<circle class="pzdot" data-ps="' + k + '" cx="' + s[0] + '" cy="' + s[1] + '" r="' + (st.sel ? .22 : .1) + '"/>' + (st.sel ? '' : '') ; } }
   else { B.fixed.forEach(function(f){ h += '<line class="pzfix" x1="' + f[0] + '" y1="' + f[1] + '" x2="' + f[2] + '" y2="' + f[3] + '"/>'; });
-    for (k in B.sl) { s = B.sl[k]; var dx = s[2] - s[0], dy = s[3] - s[1], x1 = s[0] + dx * .08, y1 = s[1] + dy * .08, x2 = s[2] - dx * .08, y2 = s[3] - dy * .08;
-      if (occ.indexOf(k) >= 0) h += '<g class="pzs' + (st.sel === k ? ' sel' : '') + (showSol && start.indexOf(k) < 0 ? ' new' : '') + '" data-pk="' + k + '"><line class="hit" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><line class="wood" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><circle class="head" cx="' + x2 + '" cy="' + y2 + '" r=".085"/></g>';
+    var ins = p.t === 'eq' ? .15 : .11; /* в равенствах — зазоры в стыках, чтобы головки не сливались */
+    for (k in B.sl) { s = B.sl[k]; var dx = s[2] - s[0], dy = s[3] - s[1], x1 = s[0] + dx * ins, y1 = s[1] + dy * ins, x2 = s[2] - dx * ins, y2 = s[3] - dy * ins;
+      if (occ.indexOf(k) >= 0) h += '<g class="pzs' + (st.sel === k ? ' sel' : '') + (showSol && start.indexOf(k) < 0 ? ' new' : '') + '" data-pk="' + k + '"><line class="hit" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><line class="wood" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><circle class="head" cx="' + x2 + '" cy="' + y2 + '" r="' + (p.t === 'eq' ? .1 : .085) + '"/></g>';
       else h += '<g class="pze' + (st.sel ? ' on' : '') + (start.indexOf(k) >= 0 ? ' was' : '') + '" data-ps="' + k + '"><line class="hit" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><line class="ghost" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/></g>'; } }
   return '<svg class="pzsvg ' + (B.coin ? 'coins' : p.t) + '" viewBox="' + vb.join(' ') + '" preserveAspectRatio="xMidYMid meet">' + h + '</svg>'; }
 ALWAYS.push({ id: 'pz', order: 30,
@@ -151,7 +153,7 @@ function pzDown(e, x, y){ var el = pzEl(e.target); if (!el || cur.view !== 'alwa
   PZD = { el: el, svg: svg, x: x, y: y, drag: false, pk: el.getAttribute('data-pk') }; return true; }
 function pzDrag(x, y){ if (!PZD || !PZD.pk) return; var p = cur.kid && pzCur(cur.kid); if (!p || (p.t === 'st' && p.mode === 'r') || (cur.fp && cur.fp.res)) return;
   if (!PZD.drag && Math.abs(x - PZD.x) + Math.abs(y - PZD.y) < 8) return; PZD.drag = true;
-  var a = pzPt(PZD.svg, PZD.x, PZD.y), c = pzPt(PZD.svg, x, y); PZD.el.setAttribute('transform', 'translate(' + (c.x - a.x) + ',' + (c.y - a.y) + ')'); PZD.el.setAttribute('class', (PZD.el.getAttribute('class') || '') + ' drag'); }
+  var a = pzPt(PZD.svg, PZD.x, PZD.y), c = pzPt(PZD.svg, x, y); PZD.el.setAttribute('transform', 'translate(' + (c.x - a.x) + ',' + (c.y - a.y) + ')'); PZD.el.setAttribute('class', (PZD.el.getAttribute('class') || '') + ' drag'); if (!/ dragging/.test(PZD.svg.getAttribute('class') || '')) PZD.svg.setAttribute('class', (PZD.svg.getAttribute('class') || '') + ' dragging'); }
 function pzUp(x, y){ var D = PZD; PZD = null; if (!D) return; if (!D.drag) { pzTap(D.el); return; }
   var p = pzCur(cur.kid), B = pzBoard(p), a = pzPt(D.svg, D.x, D.y), c = pzPt(D.svg, x, y), s = B.sl[D.pk], dx = c.x - a.x, dy = c.y - a.y;
   var mx = (B.coin ? s[0] : (s[0] + s[2]) / 2) + dx, my = (B.coin ? s[1] : (s[1] + s[3]) / 2) + dy, best = null, bd = B.coin ? .55 : .5;
@@ -166,7 +168,7 @@ document.addEventListener('mousemove', function(e){ if (PZD) pzDrag(e.clientX, e
 document.addEventListener('mouseup', function(e){ if (PZD) pzUp(e.clientX, e.clientY); });
 
 /* ---------- Задачи на смекалку ---------- */
-function zdParse(l, lv){ var p = l.split('|'); return { id: 'q' + U.h(p[0]), q: p[0], a: Number(p[1].replace(',', '.')), as: p[1], e: p[2], lv: lv }; }
+function zdParse(l, lv){ var p = l.split('|'); return { id: 'q' + U.h(p[0]), q: p[0], a: Number(p[1].replace(',', '.')), as: p[1], e: p[2], w: p[3] ? p[3].split(';').map(function(x){ return Number(x.replace(',', '.')); }) : null, lv: lv }; }
 var ZD = ZAD1.map(function(l){ return zdParse(l, 1); }).concat(ZAD2.map(function(l){ return zdParse(l, 2); }));
 function zdList(kid, lv){ var L = ZD.filter(function(z){ return z.lv === lv; }); var o = funOrder(kid, L, 'zd' + lv); return o.map(function(i){ return L[i]; }); }
 function zdPts(kid, z){ var my = funLvl(kid); return z.lv > my ? 3 : z.lv < my ? 1 : 2; }
@@ -181,16 +183,20 @@ ALWAYS.push({ id: 'zad', order: 40,
     if (!z) return h + '<div class="card win"><h2>Все задачи этого уровня решены!</h2><p>Скоро добавим новые.</p></div>';
     var r = cur.fq;
     h += '<article class="card task"><span class="sticker" aria-hidden="true">' + U.rng(z.id).pick(THEME[TH(kid)].pics) + '</span><div class="q">' + U.esc(z.q) + '</div>' + (typeof picWords === 'function' ? picWords(z.q) : '') + '<div class="row">' + sayGate('zd' + z.id, '<button class="btn ghost small" data-act="zdsay">🔊 Послушать</button>') + '</div>' +
-      '<form class="numf" data-form="zadf"><input id="zdin" inputmode="decimal" autocomplete="off" ' + (r ? 'disabled value="' + U.esc(r.v) + '"' : 'autofocus') + ' aria-label="Ответ"><button class="btn"' + (r ? ' disabled' : '') + '>Проверить</button></form>';
+      '<div class="opts">' + zdOpts(z).map(function(o){ var cls = r && o === U.dec(z.a) ? 'right' : r && r.v === o && !r.ok ? 'wrong' : ''; return '<button class="opt ' + cls + '" data-act="zdc" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + U.esc(o) + '</button>'; }).join('') + '</div>';
     if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Неверно. Ответ: <b>' + U.esc(z.as) + '</b>') + '</div><p class="hint">' + U.esc(z.e) + '</p>' + (r.ok ? funBurst(r.pts) : '');
     h += '</article>' + (r ? '<button class="btn big" data-act="zdnext">Следующая задача →</button>' : '');
     return h; },
   act: function(act, b){ var kid = cur.kid; if (!kid) return;
     if (act === 'zdtab') { cur.zdL = +b.getAttribute('data-l'); cur.fq = null; render(); }
     else if (act === 'zdsay') { var z = zdCur(kid); if (z) say(z.q); }
+    else if (act === 'zdc') { zdAnswer(b.getAttribute('data-v')); }
     else if (act === 'zdnext') { cur.fq = null; render(); window.scrollTo(0, 0); } },
-  form: function(k, f){ var kid = cur.kid; if (!kid || cur.fq) return; var z = zdCur(kid); if (!z) return; var el = document.getElementById('zdin'), v = String(el && el.value || '').trim(); if (!v) return alertMsg('Напиши ответ числом');
+  form: function(k, f){ var el = document.getElementById('zdin'); zdAnswer(String(el && el.value || '').trim()); }
+});
+function zdOpts(z){ var r = U.rng('zo' + z.id); return r.shuffle([U.dec(z.a)].concat((z.w || numOpts(z.a, r)).map(U.dec))); }
+function zdAnswer(v){ var kid = cur.kid; if (!kid || cur.fq) return; var z = zdCur(kid); if (!z) return; if (!v) return;
     var n = Number(v.replace(',', '.').replace(/\s/g, '')); if (isNaN(n)) return alertMsg('Нужно число');
     var ok = Math.abs(n - z.a) < 1e-9, F = funK(kid); F.q[z.id] = ok ? 1 : 0; var pts = ok ? funPts(kid, 'zad', zdPts(kid, z)) : 0; cur.fq = { id: z.id, v: v, ok: ok, pts: pts };
     ev(kid, 'задача на смекалку', { subj: 'Задачи на смекалку', q: z.q, ans: v, right: z.as, ok: ok ? 'верно' : 'ошибка', coins: S.kids[kid].coins, text: pts ? '+' + pts + ' баллов' : '' }); save(); render(); }
-});
+
