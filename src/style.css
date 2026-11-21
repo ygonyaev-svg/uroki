@@ -273,6 +273,47 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .stp{ appearance:none; -webkit-appearance:none; border:0; background:none; color:inherit; font:inherit; padding:10px 14px; min-height:40px; cursor:pointer; text-decoration:underline; text-underline-offset:3px; touch-action:manipulation; }
 .note.rest{ border-left:4px solid var(--acc); font-size:18px; }
 
+/* ===== Всегда доступно: загадки, головоломки, задачи ===== */
+.alwh{ margin:26px 0 0; font-size:20px; }
+.tiles.always{ margin-top:10px; }
+.tile.fun .ico{ font-size:30px; }
+.tile.fun{ border-style:dashed; }
+.fntabs{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px; }
+.zgpic{ position:relative; height:200px; border-radius:16px; overflow:hidden; margin:-4px 0 14px; background:linear-gradient(160deg,#e8f3ff,#fdf6e3); display:flex; align-items:center; justify-content:center; }
+.anya .zgpic{ background:linear-gradient(160deg,#2a1d4a,#5b3b8c); }
+.zgpic img{ position:absolute; left:0; top:0; width:100%; height:100%; object-fit:cover; }
+.zgpic .zgemo{ font-size:56px; letter-spacing:12px; opacity:.8; }
+.zgpic .zgq{ position:absolute; right:14px; bottom:8px; font:900 64px/1 Nunito,sans-serif; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,.25),0 0 18px rgba(0,0,0,.35); }
+.zgtext{ font-size:24px; line-height:1.45; }
+.zgopts .opt{ display:flex; align-items:center; gap:10px; justify-content:flex-start; font-size:20px; }
+.zgopts .zge{ font-size:30px; line-height:1; }
+.pzwrap{ background:#fbf6ea; border:1.5px solid #e6dcc4; border-radius:16px; padding:10px; margin:12px 0; touch-action:none; -webkit-user-select:none; user-select:none; }
+.anya .pzwrap{ background:#21183a; border-color:#5b4a8a; }
+.pzwrap.sol{ opacity:.95; }
+.pzsvg{ display:block; width:100%; max-height:52vh; }
+.pzsvg .hit{ stroke:transparent; stroke-width:.5; fill:transparent; }
+.pzsvg .wood{ stroke:#e0b062; stroke-width:.12; stroke-linecap:round; }
+.pzsvg .head{ fill:#c0392b; }
+.pzsvg g.pzs, .pzsvg g.pzc{ cursor:grab; }
+.pzsvg g.sel .wood{ stroke:#f39c12; stroke-width:.16; }
+.pzsvg g.drag{ opacity:.85; }
+.pzsvg g.new .wood{ stroke:#27ae60; }
+.pzsvg .ghost{ stroke:#c9bfa8; stroke-width:.04; stroke-dasharray:.08 .08; }
+.pzsvg g.pze.on .ghost{ stroke:#f39c12; stroke-width:.06; }
+.pzsvg g.pze.was .ghost{ stroke:#e74c3c; }
+.anya .pzsvg .ghost{ stroke:#6d5fa0; }
+.pzsvg .pzfix{ stroke:#8a7a5a; stroke-width:.12; stroke-linecap:round; }
+.anya .pzsvg .pzfix{ stroke:#cbb9ff; }
+.pzsvg.coins .pzc circle{ fill:#e8b923; stroke:#a67c00; stroke-width:.05; }
+.pzsvg.coins .pzc circle.in{ fill:none; stroke:#c99a10; stroke-width:.04; }
+.pzsvg.coins .pzc circle.hit{ fill:transparent; stroke:none; }
+.pzsvg.coins .pzc.sel circle{ fill:#ffd54f; stroke:#e67e22; }
+.pzsvg.coins .pzc.new circle{ fill:#7bd389; stroke:#27ae60; }
+.pzsvg .pzdot{ fill:#d8ccb0; }
+.anya .pzsvg .pzdot{ fill:#6d5fa0; }
+.pzcount{ font-size:17px; }
+.card.task .burst{ position:relative; height:0; }
+.pzwrap .pzsvg{ border:0 !important; border-radius:0 !important; background:none !important; box-shadow:none !important; outline:0 !important; }
 /* Мои книги */
 .bkhome h2{ margin-top:0; }
 .bkthumb{ overflow:hidden; padding:0; }
