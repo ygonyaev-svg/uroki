@@ -282,6 +282,59 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .stp{ appearance:none; -webkit-appearance:none; border:0; background:none; color:inherit; font:inherit; padding:10px 14px; min-height:40px; cursor:pointer; text-decoration:underline; text-underline-offset:3px; touch-action:manipulation; }
 .note.rest{ border-left:4px solid var(--acc); font-size:18px; }
 
+/* ===== Всегда доступно: загадки, головоломки, задачи ===== */
+.alwh{ margin:26px 0 0; font-size:20px; }
+.tiles.always{ margin-top:10px; }
+.tile.fun .ico{ font-size:30px; }
+.tile.fun{ border-style:dashed; }
+.fntabs{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px; }
+.zgpic{ position:relative; height:260px; border-radius:16px; overflow:hidden; margin:-4px 0 14px; background:linear-gradient(160deg,#e8f3ff,#fdf6e3); display:flex; align-items:center; justify-content:center; }
+.anya .zgpic{ background:linear-gradient(160deg,#2a1d4a,#5b3b8c); }
+.zgpic img{ position:absolute; left:0; top:0; width:100%; height:100%; object-fit:cover; object-position:50% 70%; }
+.zgpic .zgemo{ font-size:56px; letter-spacing:12px; opacity:.8; }
+.zgpic .zgq{ position:absolute; right:14px; bottom:8px; font:900 64px/1 Nunito,sans-serif; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,.25),0 0 18px rgba(0,0,0,.35); }
+.zgtext{ font-size:24px; line-height:1.45; }
+.zgopts .opt{ display:flex; align-items:center; gap:10px; justify-content:flex-start; font-size:20px; }
+.zgopts .zge{ font-size:30px; line-height:1; }
+.pzwrap{ background:#fbf6ea; border:1.5px solid #e6dcc4; border-radius:16px; padding:10px; margin:12px 0; touch-action:none; -webkit-user-select:none; user-select:none; }
+.anya .pzwrap{ background:#21183a; border-color:#5b4a8a; }
+.pzwrap.sol{ opacity:.95; }
+.pzsvg{ display:block; width:100%; max-height:52vh; }
+.pzsvg .hit{ stroke:transparent; stroke-width:.5; fill:transparent; }
+.pzsvg .wood{ stroke:#e0b062; stroke-width:.12; stroke-linecap:round; }
+.pzsvg .head{ fill:#c0392b; }
+.pzsvg g.pzs, .pzsvg g.pzc{ cursor:grab; }
+.pzsvg g.sel .wood{ stroke:#f39c12; stroke-width:.16; }
+.pzsvg g.drag{ opacity:.85; }
+.pzsvg g.new .wood{ stroke:#27ae60; }
+.pzsvg .ghost{ stroke:#c9bfa8; stroke-width:.04; stroke-dasharray:.08 .08; }
+.pzsvg g.pze.on .ghost{ stroke:#f39c12; stroke-width:.06; }
+.pzsvg g.pze.was .ghost{ stroke:#e74c3c; }
+.anya .pzsvg .ghost{ stroke:#6d5fa0; }
+.pzsvg .pzfix{ stroke:#8a7a5a; stroke-width:.12; stroke-linecap:round; }
+.anya .pzsvg .pzfix{ stroke:#cbb9ff; }
+.pzsvg.coins .pzc circle{ fill:#e8b923; stroke:#a67c00; stroke-width:.05; }
+.pzsvg.coins .pzc circle.in{ fill:none; stroke:#c99a10; stroke-width:.04; }
+.pzsvg.coins .pzc circle.hit{ fill:transparent; stroke:none; }
+.pzsvg.coins .pzc.sel circle{ fill:#ffd54f; stroke:#e67e22; }
+.pzsvg.coins .pzc.new circle{ fill:#7bd389; stroke:#27ae60; }
+.pzsvg .pzdot{ fill:#d8ccb0; }
+.anya .pzsvg .pzdot{ fill:#6d5fa0; }
+.pzcount{ font-size:17px; }
+.card.task .burst{ position:relative; height:0; }
+.pzwrap .pzsvg{ border:0 !important; border-radius:0 !important; background:none !important; box-shadow:none !important; outline:0 !important; }
+/* Мои книги */
+.bkhome h2{ margin-top:0; }
+.bkthumb{ overflow:hidden; padding:0; }
+.bkthumb img{ width:100%; height:100%; object-fit:cover; }
+.bkcover{ display:block; max-width:180px; max-height:240px; border-radius:10px; margin:10px 0; box-shadow:var(--sh); }
+.bkcover.sm{ max-width:90px; max-height:120px; margin:0 16px 0 0; }
+.bkhead{ display:flex; align-items:center; }
+.bksnap{ position:relative; overflow:hidden; text-align:center; background:var(--green); }
+.bkread{ font-size:21px; line-height:1.45; }
+.bkinp{ display:block; width:100%; margin-top:6px; padding:12px; font-size:18px; border:1.5px solid var(--line); border-radius:12px; background:var(--card); color:inherit; }
+#bkup:empty{ display:none; }
+
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
   --blue:#2563eb; --red:#e11d48; --green:#16a34a; --gold:#f59e0b; --sh:0 6px 0 rgba(15,23,42,.10),0 10px 24px rgba(15,23,42,.12); --r:22px; }
@@ -468,7 +521,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v98ad183f */
+<script>/* v1deda112 */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -2677,6 +2730,1137 @@ const COVER_IMG = { 'Пёстрая лента':'cover-holmes.webp', 'Серая
   'Городок в табакерке':'cover-tabakerka.webp', 'Мороз Иванович':'cover-moroz.webp', 'Алёнушкины сказки':'cover-alenushka.webp', 'Сказка о рыбаке и рыбке':'cover-rybka.webp',
   'Сказка о мёртвой царевне':'cover-carevna.webp', 'Филипок':'cover-filipok.webp' };
 
+/* ===== Мои книги: бумажные книги из дома =====
+   Ребёнок фотографирует обложку и оглавление (или страницы) → фото уходят в скрипт таблицы → папка «Уроки — фото книг» на Диске
+   и строка в листе «Фото книг». Вечером Claude смотрит фото, узнаёт книгу и присылает задания строкой в «Указания»:
+   тип «книга», значение — JSON { book, title, author, msg, tasks:[{ id, title, read, min, qs, kw, snap }] }.
+   qs: ["вопрос","верно","неверно1","неверно2"] — выбор; { q, a, alt:[...] } — ответ словом.
+   Чтение — по бумаге, вне экрана: таймер идёт, даже если айпад отложили. До +10 баллов в день за книги. */
+var BOOK_PTS = 10;
+var BK_UPQ = [], BK_SENDING = false, BK_SEQ = 0;
+function bkK(kid){ var K = S.kids[kid]; if (!K.books) K.books = []; return K.books; }
+function bkFind(kid, id){ var a = bkK(kid); for (var i = 0; i < a.length; i++) if (a[i].id === id) return a[i]; return null; }
+function bkProg(b, tid){ if (!b.prog) b.prog = {}; if (!b.prog[tid]) b.prog[tid] = { ph: 'intro', ans: [] }; return b.prog[tid]; }
+function bkCurTask(b){ var t = b.tasks || []; for (var i = 0; i < t.length; i++) { var p = b.prog && b.prog[t[i].id]; if (!p || p.ph !== 'done') return t[i]; } return null; }
+function bkMins(ms){ return Math.max(0, Math.floor(ms / 60000)); }
+
+/* --- фото: сжать и отправить --- */
+function bkPrep(file, max, q, cb){
+  var url = null, done = false;
+  function fin(x){ if (done) return; done = true; try { if (url && window.URL && URL.revokeObjectURL) URL.revokeObjectURL(url); } catch (e) {} cb(x); }
+  var img = new Image();
+  img.onload = function(){ try { var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height, s = Math.min(1, max / Math.max(w, h)); var c = document.createElement('canvas'); c.width = Math.round(w * s); c.height = Math.round(h * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); fin(c.toDataURL('image/jpeg', q)); } catch (e) { fin(null); } };
+  img.onerror = function(){ fin(null); };
+  try { if (window.URL && URL.createObjectURL) { url = URL.createObjectURL(file); img.src = url; return; } } catch (e) {}
+  var fr = new FileReader(); fr.onload = function(){ img.src = fr.result; }; fr.onerror = function(){ fin(null); }; fr.readAsDataURL(file);
+}
+function bkSend(kid, book, kind, task, note, data){
+  BK_UPQ.push({ photo: { kid: KIDS[kid].name, book: book, kind: kind, task: task || '', note: note || '', n: ++BK_SEQ, data: data } });
+  bkFlush();
+}
+function bkFlush(){
+  if (BK_SENDING || !BK_UPQ.length || !S.cfg.sync) return;
+  if (navigator.onLine === false) { setTimeout(bkFlush, 20000); return; }
+  BK_SENDING = true; bkStatus();
+  fetch(S.cfg.sync, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(BK_UPQ[0]) })
+    .then(function(){ BK_UPQ.shift(); BK_SENDING = false; bkStatus(); bkFlush(); })
+    .catch(function(){ BK_SENDING = false; bkStatus(); setTimeout(bkFlush, 20000); });
+}
+function bkStatus(){ var el = document.getElementById('bkup'); if (el) el.innerHTML = bkUpHtml(); }
+function bkUpHtml(){ var n = BK_UPQ.length; return n ? '⏳ Отправляется ' + n + ' ' + U.pl(n, 'фото', 'фото', 'фото') + '… Не закрывай приложение.' : ''; }
+function bkSnapBtn(kind, label, extra){ return '<label class="btn big bksnap">' + label + '<input type="file" accept="image/*" capture="environment" data-bkkind="' + kind + '"' + (extra || '') + ' style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"></label>'; }
+function bkSay(text){ return ' <button class="link" data-act="bksay" data-t="' + U.esc(text) + '" title="Прочитать вслух">🔊</button>'; }
+
+/* --- задания от Claude из листа «Указания» --- */
+function bkApply(kid, row){
+  var d; try { d = JSON.parse(String(row.value)); } catch (e) { return; }
+  var id = d.book || row.subj; if (!id) return;
+  var b = bkFind(kid, id);
+  if (!b) { b = { id: id, title: '', added: U.today(), tasks: [], prog: {} }; bkK(kid).push(b); }
+  if (d.title) b.title = d.title; if (d.author) b.author = d.author; if (d.msg) { b.msg = d.msg; b.msgSeen = false; }
+  if (d.replace) b.tasks = [];
+  (d.tasks || []).forEach(function(t){ if (!t || !t.id) return; var have = false; for (var i = 0; i < b.tasks.length; i++) if (b.tasks[i].id === t.id) { b.tasks[i] = t; have = true; } if (!have) b.tasks.push(t); });
+  if (d.finished) b.finished = true;
+  b.st = 'ready'; b.upd = U.today();
+}
+
+/* --- экраны --- */
+function bkHomeCard(kid){
+  var a = bkK(kid).filter(function(b){ return !b.hidden; }), ready = 0, wait = 0;
+  a.forEach(function(b){ if (bkCurTask(b)) ready++; else if (!b.finished) wait++; });
+  var news = a.some(function(b){ return b.msg && !b.msgSeen; });
+  return '<section class="card bkhome"><h2>📚 Мои бумажные книги</h2><p>' + (kid === 'yarik' ? 'Читай настоящую книжку! Сфотографируй книгу, которая есть дома, а Claude придумает к ней задания.' : 'Читай настоящие книги. Сфотографируй обложку и оглавление — Claude составит план чтения и задания по главам.') +
+    ' За задание по книге — до +' + BOOK_PTS + ' баллов в день.</p>' +
+    (a.length ? '<p class="hint">' + (ready ? '✅ Есть задания: ' + ready + ' ' + U.pl(ready, 'книга', 'книги', 'книг') + '. ' : '') + (wait ? '⏳ Ждём задания: ' + wait + '. ' : '') + (news ? '✉ Есть сообщение по книге.' : '') + '</p>' : '') +
+    '<button class="btn big" data-act="bkopen">' + (a.length ? 'Открыть мои книги' : '📷 Добавить первую книгу') + '</button></section>';
+}
+function bkHead(back){ return '<header class="bar"><button class="link" data-act="' + back + '">← Назад</button><span class="coins">' + coinsHtml(S.kids[cur.kid].coins) + '</span></header>'; }
+function vBooks(){
+  var kid = cur.kid, a = bkK(kid).filter(function(b){ return !b.hidden; });
+  var list = a.map(function(b){ var t = bkCurTask(b), n = (b.tasks || []).length, dn = n - (b.tasks || []).filter(function(x){ var p = b.prog && b.prog[x.id]; return !p || p.ph !== 'done'; }).length;
+    var st = b.finished && !t ? '🏁 Прочитана!' : t ? '✅ Задание: ' + U.esc(t.title || 'читать') : '⏳ Claude смотрит фото. Задания появятся завтра.';
+    return '<button class="tile bk ' + (t ? 'go' : 'new') + '" data-act="bkbook" data-id="' + b.id + '"><span class="ico bkthumb">' + (b.thumb ? '<img src="' + b.thumb + '" alt="">' : '📖') + '</span><span class="tt"><span class="sn">' + U.esc(b.title || 'Новая книга') + (b.author ? ' <em>' + U.esc(b.author) + '</em>' : '') + '</span><span class="ut">' + st + (n ? ' · сделано ' + dn + ' из ' + n : '') + '</span></span>' + (b.msg && !b.msgSeen ? '<span class="state">✉</span>' : '') + '</button>'; }).join('');
+  return '<main class="wrap ' + kid + '">' + bkHead('home') + '<section class="hello"><h1>📚 Мои книги</h1><p>Книги, которые ты читаешь на бумаге. Айпад нужен только чтобы сфотографировать и ответить на вопросы.</p></section>' +
+    '<p id="bkup" class="hint">' + bkUpHtml() + '</p>' +
+    (list ? '<section class="tiles">' + list + '</section>' : '<div class="card"><p>Пока книг нет. Найди дома книгу, которую хочешь прочитать, и сфотографируй её.</p></div>') +
+    '<button class="btn big ghost" data-act="bkadd">📷 Добавить книгу</button></main>';
+}
+function vBkAdd(){
+  var kid = cur.kid, A = cur.bkAdd || {}, b = bkFind(kid, A.id);
+  var cover = b && b.thumb, n2 = (b && b.nToc) || 0;
+  return '<main class="wrap ' + kid + '">' + bkHead('bkopen') + '<section class="hello"><h1>Новая книга</h1></section>' +
+    '<article class="card"><h2>1. Обложка ' + (cover ? '✅' : '') + '</h2><p>Положи книгу на стол и сфотографируй обложку целиком, чтобы было видно название.' + bkSay('Положи книгу на стол и сфотографируй обложку целиком, чтобы было видно название.') + '</p>' +
+    (cover ? '<img class="bkcover" src="' + b.thumb + '" alt="обложка">' : '') + bkSnapBtn('обложка', cover ? '📷 Переснять обложку' : '📷 Сфотографировать обложку') + '</article>' +
+    (cover ? '<article class="card"><h2>2. Оглавление ' + (n2 ? '✅ ' + n2 + ' фото' : '') + '</h2><p>' + (kid === 'yarik' ? 'Найди страницу «Содержание» (обычно в конце книги) и сфотографируй. Если её нет — сфотографируй первую страницу с текстом.' : 'Сфотографируй оглавление (все его страницы по очереди). Если оглавления нет — первый разворот с текстом.') + bkSay(kid === 'yarik' ? 'Найди страницу Содержание, обычно она в конце книги, и сфотографируй. Если её нет, сфотографируй первую страницу с текстом.' : 'Сфотографируй оглавление. Если его нет, первый разворот с текстом.') + '</p>' +
+      bkSnapBtn('оглавление', n2 ? '📷 Ещё страница' : '📷 Сфотографировать') +
+      '<label class="hint">Как называется книга? (можно не писать)<input id="bktitle" class="bkinp" maxlength="80" value="' + U.esc((b && b.title) || '') + '"></label>' +
+      '<button class="btn big" data-act="bkaddok">Готово — отправить Claude</button></article>' : '') +
+    '<p id="bkup" class="hint">' + bkUpHtml() + '</p></main>';
+}
+function vBook(){
+  var kid = cur.kid, b = bkFind(kid, cur.bk); if (!b) return vBooks();
+  var t = bkCurTask(b), tasks = b.tasks || [];
+  var head = '<section class="hello bkhead">' + (b.thumb ? '<img class="bkcover sm" src="' + b.thumb + '" alt="">' : '') + '<div><h1>' + U.esc(b.title || 'Новая книга') + '</h1>' + (b.author ? '<p>' + U.esc(b.author) + '</p>' : '') + '</div></section>';
+  var msg = b.msg ? '<div class="note">✉ ' + U.esc(noPapa(b.msg)) + bkSay(noPapa(b.msg)) + (b.msgSeen ? '' : ' <button class="link" data-act="bkmsgseen">Понятно</button>') + '</div>' : '';
+  var body = '';
+  if (!tasks.length) body = '<div class="card"><h2>⏳ Claude смотрит твои фото</h2><p>Вечером он узнает книгу и придумает задания. Загляни сюда завтра!</p></div>';
+  else if (!t) body = b.finished ? '<div class="card win"><h2>🏁 Книга прочитана!</h2><p>Молодец! Выбери следующую книгу и сфотографируй её.</p></div>' : '<div class="card"><h2>Все задания сделаны 👍</h2><p>Новые появятся завтра. А пока можно читать дальше просто так.</p></div>';
+  else body = bkTaskView(kid, b, t);
+  var done = tasks.filter(function(x){ var p = b.prog && b.prog[x.id]; return p && p.ph === 'done'; }).map(function(x){ var p = b.prog[x.id]; return '<li>✅ ' + U.esc(x.title || x.read || '') + (p.pts != null ? ' · +' + p.pts : '') + '</li>'; }).join('');
+  return '<main class="wrap ' + kid + '">' + bkHead('bkopen') + head + msg + '<p id="bkup" class="hint">' + bkUpHtml() + '</p>' + body +
+    (done ? '<details class="card"><summary>Сделано: ' + tasks.filter(function(x){ var p = b.prog && b.prog[x.id]; return p && p.ph === 'done'; }).length + '</summary><ul>' + done + '</ul></details>' : '') +
+    '<div class="card"><p class="hint">Claude не узнал книгу или нужны другие страницы? Сфотографируй ещё.</p>' + bkSnapBtn('страницы', '📷 Добавить фото страниц', ' data-bk="' + b.id + '"') + '</div></main>';
+}
+function bkTaskView(kid, b, t){
+  var P = bkProg(b, t.id), now = Date.now();
+  var steps = ['Читаю'].concat(t.kw && t.kw.length ? ['Пересказ'] : [], (t.qs || []).length ? ['Вопросы'] : [], t.snap ? ['Фото'] : []);
+  var cur0 = { intro: 0, read: 0, retell: 1, qs: steps.indexOf('Вопросы'), snap: steps.length - 1 }[P.ph] || 0;
+  var sbar = '<ul class="steps">' + steps.map(function(s, i){ return '<li class="' + (i < cur0 ? 'ok' : i === cur0 ? 'now' : '') + '">' + s + '</li>'; }).join('') + '</ul>';
+  var h = '<article class="card"><h2>' + U.esc(t.title || 'Задание') + '</h2>' + sbar;
+  if (P.ph === 'intro' || P.ph === 'read') {
+    h += '<p class="bkread">' + U.esc(t.read || '') + bkSay(t.read || '') + '</p>' + (t.min ? '<p class="hint">Читай спокойно, примерно ' + t.min + ' ' + U.pl(t.min, 'минуту', 'минуты', 'минут') + '. Айпад можно отложить.</p>' : '');
+    if (P.ph === 'intro') h += '<button class="btn big" data-act="bkstart">📖 Начинаю читать</button>';
+    else h += '<p class="center">Читаешь уже <b>' + bkMins(now - P.t0) + ' мин</b></p><button class="btn big" data-act="bkreaddone">✅ Я прочитал(а)</button>';
+  } else if (P.ph === 'retell') {
+    var live = RT && RT.active;
+    h += '<p>Перескажи своими словами, что ты прочитал(а): кто там был, что случилось, чем закончилось.' + bkSay('Перескажи своими словами, что ты прочитал. Кто там был, что случилось, чем закончилось.') + '</p>' +
+      '<textarea id="rtxt" class="rtxt" rows="6" placeholder="Здесь появится твой пересказ…">' + U.esc(live ? RT.text : (P.rtDraft || '')) + '</textarea><div class="row">' +
+      (SR ? (live ? '<button class="btn stop" data-act="retellstop">⏹ Стоп</button><span class="rstat">Слушаю…</span>' : '<button class="btn mic" data-act="retellstart">🎤 Надиктовать</button>') : '') +
+      '<button class="btn big" data-act="bkretell">Проверить пересказ</button></div>' + (P.rt ? retellResHtml(P.rt) + '<button class="btn big" data-act="bktoqs">Дальше — вопросы</button>' : '') +
+      ((P.rtTries || 0) >= 2 && !P.rt ? '<p class="hint"><button class="link" data-act="bkrtadult">Пересказал(а) взрослому</button></p>' : '') +
+      (!SR ? '<p class="hint">Нажми на поле, потом на 🎤 на клавиатуре и рассказывай.</p>' : '');
+  } else if (P.ph === 'qs') {
+    var qs = bkQs(t), i = P.i || 0, q = qs[i], a = P.ans[i] || {};
+    h += '<p class="hint">Вопрос ' + (i + 1) + ' из ' + qs.length + '. Можно заглянуть в книгу — ответ там! Ответ даётся один раз.</p><div class="q">' + U.esc(q.q) + bkSay(q.q) + '</div>';
+    if (q.k === 'c') h += '<div class="opts">' + q.opts.map(function(o){ return '<button class="opt ' + (a.final && o === q.a ? 'right' : a.v === o ? 'wrong' : '') + '" data-act="bkq" data-v="' + U.esc(o) + '" ' + (a.final ? 'disabled' : '') + '>' + U.esc(o) + '</button>'; }).join('') + '</div>';
+    else h += a.final ? '<p>Твой ответ: <b>' + U.esc(a.v) + '</b></p>' : '<form data-form="bkt" class="numf txtf"><input id="bktin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Напиши ответ" autofocus><button class="btn">Ответить</button></form>';
+    if (a.final) h += '<div class="fb ' + (a.ok ? 'ok">Верно! 👍' : 'bad">Правильно: <b>' + U.esc(q.a) + '</b>') + '</div><button class="btn big" data-act="bknext">Дальше</button>';
+  } else if (P.ph === 'snap') {
+    h += '<p>' + U.esc(t.snap) + bkSay(t.snap) + '</p><p class="hint">Так Claude приготовит задание на следующий раз.</p>' + bkSnapBtn('страницы', '📷 Сфотографировать', ' data-bk="' + b.id + '" data-task="' + t.id + '"') +
+      ((P.snaps || 0) ? '<p>✅ Отправлено фото: ' + P.snaps + '</p><button class="btn big" data-act="bkfinish">Готово</button>' : '<p class="hint"><button class="link" data-act="bkfinish">Пропустить</button></p>');
+  }
+  return h + '</article>';
+}
+function bkQs(t){
+  var r = U.rng(t.id);
+  return (t.qs || []).map(function(x){
+    if (Object.prototype.toString.call(x) === '[object Array]') return { k: 'c', q: x[0], a: String(x[1]), opts: r.shuffle(x.slice(1).map(String)) };
+    if (x.w && x.w.length) return { k: 'c', q: x.q, a: String(x.a), opts: r.shuffle([String(x.a)].concat(x.w.map(String))) };
+    return { k: 't', q: x.q, a: String(x.a), alt: x.alt || [] };
+  });
+}
+function bkNorm(s){ return String(s || '').toLowerCase().replace(/ё/g, 'е').replace(/[«»"'.,!?:;()\-–—]/g, ' ').replace(/\s+/g, ' ').trim(); }
+function bkAnswer(v){
+  var kid = cur.kid, b = bkFind(kid, cur.bk), t = b && bkCurTask(b); if (!t) return;
+  var P = bkProg(b, t.id), qs = bkQs(t), i = P.i || 0, q = qs[i]; if (!q || (P.ans[i] && P.ans[i].final)) return;
+  var ok = q.k === 'c' ? v === q.a : [q.a].concat(q.alt).some(function(x){ return bkNorm(x) === bkNorm(v); });
+  P.ans[i] = { v: v, ok: ok, final: true };
+  ev(kid, 'ответ', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || ''), q: q.q, ans: v, right: q.a, ok: ok ? 'верно' : 'ошибка' });
+  save(); render();
+}
+function bkFinish(kid, b, t){
+  var P = bkProg(b, t.id), qs = bkQs(t), n = qs.length, ok = P.ans.filter(function(a){ return a && a.ok; }).length;
+  var ratio = n ? ok / n : 1, q = t.kw && t.kw.length ? (n ? .65 * ratio + .35 * ((P.rt && P.rt.score) || 0) : ((P.rt && P.rt.score) || 0)) : ratio;
+  var pts = q < .6 ? 0 : Math.round(BOOK_PTS * q * q);
+  var D = dayRec(kid, U.today()); D.bookPts = D.bookPts || 0; pts = Math.max(0, Math.min(pts, BOOK_PTS - D.bookPts)); D.bookPts += pts;
+  var K = S.kids[kid]; piggyAdd(K, pts); P.pts = pts; P.ph = 'done'; P.end = Date.now(); K.texts = (K.texts || 0) + 1;
+  ev(kid, 'книга: задание', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || ''), score: ok + '/' + n, secs: P.secs || '', coins: K.coins, text: '+' + pts + ' баллов' + (P.rt ? '; пересказ ' + P.rt.hit.length + '/' + P.rt.n : '') });
+  save(); render(); alertMsg(pts ? 'Задание по книге сделано: +' + pts + ' 🐷' : (D.bookPts >= BOOK_PTS ? 'Сделано! Баллы за книги сегодня уже получены' : 'Сделано! В следующий раз читай внимательнее'));
+}
+function bkPhoto(input){
+  var kid = cur.kid, f = input.files && input.files[0], kind = input.getAttribute('data-bkkind'); if (!f || !kid) return;
+  var bid = input.getAttribute('data-bk') || (cur.bkAdd && cur.bkAdd.id), tid = input.getAttribute('data-task') || '';
+  if (!bid) return; alertMsg('Готовлю фото…');
+  bkPrep(f, 1600, .8, function(data){
+    if (!data) { alertMsg('Не получилось прочитать фото, попробуй ещё раз'); return; }
+    var b = bkFind(kid, bid); if (!b) return;
+    var note = kind === 'страницы' && tid ? (function(){ for (var i = 0; i < b.tasks.length; i++) if (b.tasks[i].id === tid) return b.tasks[i].snap || ''; return ''; })() : '';
+    bkSend(kid, bid, kind, tid, note, data);
+    if (kind === 'обложка') bkPrep(f, 220, .7, function(th){ if (th) { b.thumb = th; save(); render(); } });
+    if (kind === 'оглавление') b.nToc = (b.nToc || 0) + 1;
+    if (tid) { var P = bkProg(b, tid); P.snaps = (P.snaps || 0) + 1; }
+    if (kind === 'страницы' && !tid) { b.st = 'wait'; b.morePics = U.today(); }
+    ev(kid, 'книга: фото', { subj: '📚 Книга', unit: b.title || bid, text: kind + (note ? ': ' + note : '') });
+    save(); render(); alertMsg('Фото отправлено 👍');
+  });
+  try { input.value = ''; } catch (e) {}
+}
+document.addEventListener('change', function(e){ var el = e.target; if (el && el.getAttribute && el.getAttribute('data-bkkind')) bkPhoto(el); });
+document.addEventListener('submit', function(e){ var f = e.target; if (!f || !f.getAttribute || f.getAttribute('data-form') !== 'bkt') return; e.preventDefault(); var el = document.getElementById('bktin'), v = el ? el.value.trim() : ''; if (v) bkAnswer(v); });
+document.addEventListener('click', function(e){
+  var btn = e.target.closest ? e.target.closest('[data-act]') : null; if (!btn) return; var act = btn.getAttribute('data-act'); if (act.indexOf('bk') !== 0) return;
+  var kid = cur.kid; if (!kid) return; var b = cur.bk ? bkFind(kid, cur.bk) : null, t = b ? bkCurTask(b) : null, P = t ? bkProg(b, t.id) : null;
+  switch (act) {
+    case 'bkopen': if (RT && RT.active) retellStop(); go('books'); break;
+    case 'bkbook': go('book', { bk: btn.getAttribute('data-id') }); break;
+    case 'bkadd': { var id = 'b' + (kid === 'yarik' ? 'y' : 'a') + Date.now().toString(36); bkK(kid).push({ id: id, title: '', added: U.today(), tasks: [], prog: {}, st: 'new', hidden: true }); cur.bkAdd = { id: id }; save(); go('bkadd', { bkAdd: { id: id } }); break; }
+    case 'bkaddok': { var A = cur.bkAdd && bkFind(kid, cur.bkAdd.id); if (!A || !A.thumb) { alertMsg('Сначала сфотографируй обложку'); break; } var tl = document.getElementById('bktitle'); if (tl && tl.value.trim()) A.title = tl.value.trim().slice(0, 80);
+      A.hidden = false; A.st = 'wait'; ev(kid, 'книга добавлена', { subj: '📚 Книга', unit: A.id, text: (A.title || 'без названия') + '; фото оглавления: ' + (A.nToc || 0) });
+      save(); cur.bk = A.id; go('book', { bk: A.id }); break; }
+    case 'bksay': say(btn.getAttribute('data-t'), 'ru-RU'); break;
+    case 'bkmsgseen': if (b) { b.msgSeen = true; save(); render(); } break;
+    case 'bkstart': if (P) { P.ph = 'read'; P.t0 = Date.now(); ev(kid, 'книга: читаю', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || '') }); save(); render(); } break;
+    case 'bkreaddone': { if (!P) break; var el = (Date.now() - (P.t0 || Date.now())) / 1000, need = (t.min || 5) * 60 * .6;
+      if (el < need) { alertMsg('Слишком быстро 🙂 Почитай ещё примерно ' + Math.max(1, Math.ceil((need - el) / 60)) + ' мин'); break; }
+      P.secs = Math.round(el); P.ph = t.kw && t.kw.length ? 'retell' : (t.qs || []).length ? 'qs' : t.snap ? 'snap' : 'end'; P.i = 0; save(); if (P.ph === 'end') bkFinish(kid, b, t); else render(); break; }
+    case 'bkretell': { var ta = document.getElementById('rtxt'), text = ((ta && ta.value) || '').trim(); if (RT) { RT.active = false; try { RT.rec && RT.rec.stop(); } catch (x) {} RT = null; }
+      P.rtDraft = text; P.rtTries = (P.rtTries || 0) + 1; var r = retellScore({ kw: t.kw }, text);
+      if (r.words < (kid === 'yarik' ? 8 : 15)) { save(); render(); alertMsg('Расскажи подробнее — хотя бы несколько предложений'); break; }
+      if (!P.rt || r.score > P.rt.score) P.rt = r; ev(kid, 'пересказ', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || ''), text: text.slice(0, 1500), score: r.hit.length + '/' + r.n, words: r.words }); save(); render(); break; }
+    case 'bkrtadult': P.rt = { n: t.kw.length, hit: [], miss: [], score: .7, adult: true }; ev(kid, 'пересказ', { subj: '📚 Книга', unit: b.title || b.id, text: 'пересказал(а) взрослому' }); P.ph = (t.qs || []).length ? 'qs' : t.snap ? 'snap' : 'end'; save(); if (P.ph === 'end') bkFinish(kid, b, t); else render(); break;
+    case 'bktoqs': P.ph = (t.qs || []).length ? 'qs' : t.snap ? 'snap' : 'end'; P.i = 0; save(); if (P.ph === 'end') bkFinish(kid, b, t); else render(); break;
+    case 'bkq': bkAnswer(btn.getAttribute('data-v')); break;
+    case 'bknext': { var n = bkQs(t).length; if ((P.i || 0) + 1 < n) { P.i = (P.i || 0) + 1; save(); render(); } else if (t.snap) { P.ph = 'snap'; save(); render(); } else bkFinish(kid, b, t); window.scrollTo(0, 0); break; }
+    case 'bkfinish': bkFinish(kid, b, t); break;
+  }
+});
+setInterval(function(){ if (cur.view === 'book' && cur.kid) { var b = bkFind(cur.kid, cur.bk), t = b && bkCurTask(b), P = t && b.prog && b.prog[t.id]; if (P && P.ph === 'read' && !(document.activeElement && document.activeElement.tagName === 'INPUT')) render(); } }, 30000);
+
+/* ===== Загадки, задачи: данные =====
+   Загадки — русские народные (фольклор, общественное достояние; по сборникам XIX века, напр. Д. Н. Садовников, «Загадки русского народа», 1876)
+   и несколько своих (помечены *). Задачи — свои, в духе старых сборников «на смекалку»; две — из «Арифметики» Л. Ф. Магницкого (1703, общественное достояние).
+   Формат загадки: "текст|ответ|неверный1;неверный2;неверный3|уровень|сцена"
+   Уровень: 1 — лёгкая (7–9 лет), 2 — трудная (10–12 лет). Сцена — фон-картинка, на которой нет ответа. */
+var ZAG_EMO = { 'Ёлка':'🎄','Берёза':'🌳','Дуб':'🌳','Клён':'🍁','Лук':'🧅','Чеснок':'🧄','Капуста':'🥬','Картошка':'🥔','Лампочка':'💡','Груша':'🍐','Свеча':'🕯️','Огурец':'🥒','Помидор':'🍅','Тыква':'🎃','Морковь':'🥕','Свёкла':'🟣','Редиска':'🔴','Замок':'🔒','Ключ':'🔑','Дверь':'🚪','Собака':'🐕','Ножницы':'✂️','Очки':'👓','Вилка':'🍴','Гриб':'🍄','Ягода':'🍓','Шишка':'🌰','Заяц':'🐇','Белка':'🐿️','Медведь':'🐻','Лиса':'🦊','Волк':'🐺','Ёж':'🦔','Мышь':'🐭','Крот':'🦫','Река':'🏞️','Дорога':'🛣️','Ручей':'💧','Ветер':'🌬️','Дождь':'🌧️','Гром':'⛈️','Мороз':'🥶','Снег':'❄️','Солнце':'☀️','Луна':'🌙','Звезда':'⭐','Арбуз':'🍉','Дыня':'🍈','Яблоко':'🍎','Гнездо':'🪺','Дупло':'🕳️','Нора':'🕳️','Коза':'🐐','Корова':'🐄','Овца':'🐑','Петух':'🐓','Курица':'🐔','Индюк':'🦃','Свинья':'🐖','Лошадь':'🐴','Кошка':'🐈','Жук':'🪲','Паук':'🕷️','Муха':'🪰','Бабочка':'🦋','Стрекоза':'🪰','Пчела':'🐝','Муравейник':'🐜','Улей':'🍯','Комар':'🦟','Колос':'🌾','Подсолнух':'🌻','Ромашка':'🌼','Стул':'🪑','Стол':'🍽️','Шкаф':'🗄️','Кровать':'🛏️','Глаза':'👀','Уши':'👂','Язык':'👅','Зубы':'🦷','Пальцы':'🖐️','Улитка':'🐌','Черепаха':'🐢','Рак':'🦞','Крапива':'🌿','Колючка':'🌵','Радуга':'🌈','Мост':'🌉','Сова':'🦉','Воробей':'🐦','Ворона':'🐦‍⬛','Дятел':'🐦','Олень':'🦌','Лось':'🫎','Гусь':'🪿','Утка':'🦆','Лебедь':'🦢','Мяч':'⚽','Ворота':'🥅','Свисток':'📣','Часы':'⏰','Календарь':'📅','Весы':'⚖️','Облака':'☁️','Птицы':'🐦','Самолёт':'✈️','Лист':'🍂','Цветок':'🌷','Сосулька':'🧊','Лёд':'🧊','Топор':'🪓','Пила':'🪚','Молоток':'🔨','Клубок':'🧶','Пуговица':'🔘','Варежка':'🧤','Книга':'📖','Письмо':'✉️','Карандаш':'✏️','Тень':'👤','Эхо':'🗣️','Сон':'💤','Имя':'🏷️','Тишина':'🤫','Время':'⏳','Яма':'🕳️','Пух':'🪶','Камень':'🪨','Перо':'🪶','Крышка':'🍲','Якорь':'⚓','Парус':'⛵','Запах':'👃','Болото':'🐸','Море':'🌊','Озеро':'🏞️','Млечный Путь':'🌌','Шахматист':'♟️','Бегун':'🏃','Шофёр':'🚗','Дерево':'🌳','Трава':'🌱','Сено':'🌾','Ночь':'🌃','День':'🌤️','Утро':'🌅','Год':'📅','Зима':'⛄','Весна':'🌱','Осень':'🍁','Тетрадь':'📓','Ручка':'🖊️','Иголка':'🪡','Нитка':'🧵','Гвоздь':'🔩','Чайник':'🫖','Самовар':'🫖','Ложка':'🥄','Сковорода':'🍳','Кастрюля':'🍲','Колесо':'🛞','Санки':'🛷','Лыжи':'🎿','Коньки':'⛸️','Велосипед':'🚲','Носки':'🧦','Шапка':'🧢','Мишень':'🎯','Смородина':'🍇','Вишня':'🍒','Малина':'🍓','Орех':'🌰','Число 6':'6️⃣','Число 9':'9️⃣','Число 8':'8️⃣','Число 0':'0️⃣','Ни одной':'🚫','Трое':'3️⃣','Три':'3️⃣','Четыре':'4️⃣','Пять':'5️⃣','Шесть':'6️⃣','Две':'2️⃣','Один':'1️⃣','Семь':'7️⃣','На мокрое':'💦','На сухое':'🌵','На высокое':'🗼','На берёзу':'🌳','Губы':'👄','Нос':'👃','Руки':'🙌','Ноги':'🦶','Сердце':'❤️','Мысль':'💭','Секрет':'🤐','Слово':'💬','Буква':'🔤','Песок':'⏳','Вода':'💧','Огонь':'🔥','Дым':'💨','Туман':'🌫️','Иней':'❄️','Роса':'💧' };
+
+var ZAG = [
+/* ---------- лёгкие ---------- */
+'Зимой и летом — одним цветом.|Ёлка|Берёза;Дуб;Клён|1|zima',
+'Сидит дед, во сто шуб одет. Кто его раздевает, тот слёзы проливает.|Лук|Капуста;Чеснок;Картошка|1|sad',
+'Висит груша — нельзя скушать.|Лампочка|Груша;Свеча;Яблоко|1|dvor',
+'Без окон, без дверей — полна горница людей.|Огурец|Морковь;Лук;Картошка|1|sad',
+'Красна девица сидит в темнице, а коса на улице.|Морковь|Свёкла;Редиска;Лук|1|sad',
+'Не лает, не кусает, а в дом не пускает.|Замок|Собака;Ключ;Дверь|1|dvor',
+'Два кольца, два конца, посредине — гвоздик.|Ножницы|Очки;Вилка;Ключ|1|kab',
+'Маленький, удаленький, сквозь землю прошёл, красну шапочку нашёл.|Гриб|Ягода;Шишка;Крот|1|les',
+'Летом серый, зимой белый.|Заяц|Белка;Медведь;Лиса|1|les',
+'Хвост пушистый, мех золотистый, в лесу живёт, в деревне кур крадёт.|Лиса|Белка;Волк;Ёж|1|les',
+'Серый, зубастый, по полю рыщет, телят, ягнят ищет.|Волк|Лиса;Медведь;Заяц|1|zima',
+'Не портной, а всю жизнь с иголками ходит.|Ёж|Ёлка;Мышь;Белка|1|les',
+'Бежит, бежит — не выбежит; течёт, течёт — не вытечет.|Река|Дорога;Ручей;Ветер|1|dvor',
+'Без рук, без ног, а ворота открывает.|Ветер|Дождь;Гром;Мороз|1|dvor',
+'Без рук, без топорёнка построена избёнка.|Гнездо|Дупло;Нора;Муравейник|1|dvor',
+'Бел, как мел, с неба прилетел. Зиму пролежал — в землю убежал.|Снег|Дождь;Лёд;Облака|1|dom',
+'Без рук, без ног, а рисовать умеет.|Мороз|Ветер;Снег;Дождь|1|dom',
+'Шёл долговяз, в сыру землю увяз.|Дождь|Снег;Гром;Ветер|1|dom',
+'Что выше леса, краше света, без огня горит?|Солнце|Облака;Звезда;Радуга|1|kab',
+'Сам алый, сахарный; кафтан зелёный, бархатный.|Арбуз|Огурец;Дыня;Яблоко|1|dvor',
+'Маленький, серенький, по полу шныряет, кошки стережётся.|Мышь|Крот;Ёж;Белка|1|dvor',
+'С бородой, а не старик; с рогами, а не бык; доят, а не корова.|Коза|Овца;Лошадь;Олень|1|sad',
+'Хвост с узорами, сапоги со шпорами, ночью распевает, время считает.|Петух|Курица;Индюк;Гусь|1|sad',
+'Сама пёстрая, ест зелёное, даёт белое.|Корова|Коза;Курица;Овца|1|les',
+'Хвостик крючком, нос пятачком.|Свинья|Собака;Мышь;Коза|1|les',
+'Мохнатенька, усатенька, молочко пьёт, песенки поёт.|Кошка|Собака;Мышь;Белка|1|sad',
+'С хозяином дружит, дом сторожит, живёт под крылечком, хвост колечком.|Собака|Кошка;Свинья;Коза|1|les',
+'Чёрен, да не ворон; рогат, да не бык; шесть ног без копыт.|Жук|Паук;Муха;Корова|1|dom',
+'Не птица, а с крыльями; не пчела, а над цветами летает.|Бабочка|Стрекоза;Комар;Птицы|1|zima',
+'Много мастеров срубили избу без углов.|Муравейник|Гнездо;Улей;Дупло|1|dom',
+'Летит — пищит, ножки длинные тащит; случай не упустит — сядет и укусит.|Комар|Муха;Пчела;Жук|1|zima',
+'Вырос в поле дом, полон дом зерном.|Колос|Подсолнух;Арбуз;Улей|1|dom',
+'Стоит Антошка на одной ножке; где солнце станет, туда он и глянет.|Подсолнух|Ромашка;Гриб;Колос|1|zima',
+'Есть спина, а не лежит никогда; есть четыре ноги, а не ходит.|Стул|Стол;Шкаф;Кровать|1|reka',
+'Всегда во рту, а не проглотишь.|Язык|Зубы;Губы;Нос|1|kab',
+'Пять братьев: годами равные, ростом разные.|Пальцы|Зубы;Глаза;Уши|1|kab',
+'Кто свой дом на себе носит?|Улитка|Черепаха;Рак;Ёж|1|zima',
+'Не огонь, а жжётся.|Крапива|Ромашка;Колючка;Трава|1|zima',
+'Красное коромысло через реку повисло.|Радуга|Мост;Солнце;Облака|1|dom',
+'Днём спит, ночью летает, прохожих пугает.|Сова|Воробей;Ворона;Дятел|1|zima',
+'Маленький мальчишка в сером армячишке по дворам шныряет, крохи собирает.|Воробей|Мышь;Ворона;Ёж|1|zima',
+'В воде купался, а сух остался.|Гусь|Рак;Лебедь;Камень|1|zima',
+'Сто одёжек — и все без застёжек.|Капуста|Шкаф;Кукуруза;Морковь|1|dvor',
+'Маленький, кругленький, а за хвост не поднять.|Клубок|Мяч;Пуговица;Мышь|1|reka',
+'*Круглый, а не колобок; его пинают, а он не плачет — только выше скачет.|Мяч|Клубок;Колесо;Арбуз|1|kab',
+'*Сетка есть, а рыбы нет; мяч влетит — все кричат: «Гол!»|Ворота|Мишень;Окно;Свисток|1|kab',
+'*Сам маленький, а свистнет — весь стадион остановится.|Свисток|Мяч;Часы;Гром|1|kab',
+'Без ног, а ходят; без рук, а показывают.|Часы|Календарь;Весы;Облака|1|kab',
+'Кланяется, кланяется, придёт домой — растянется.|Топор|Пила;Молоток;Лошадь|1|reka',
+'На ночь два оконца сами закрываются, а с восходом солнца сами открываются.|Глаза|Уши;Двери;Окна|1|kab',
+'Кто на себе лес носит?|Олень|Лось;Медведь;Ёж|1|dvor',
+/* ---------- трудные ---------- */
+'Весной веселит, летом холодит, осенью питает, зимой согревает.|Дерево|Солнце;Трава;Огонь|2|kab',
+'Без крыльев летят, без ног бегут, без паруса плывут.|Облака|Птицы;Реки;Время|2|kab',
+'Сидит — зеленеет, падает — желтеет, лежит — чернеет.|Лист|Трава;Яблоко;Гриб|2|zima',
+'Зелёный, а не луг; белый, а не снег; кудрявый, а без волос.|Берёза|Капуста;Облака;Ёлка|2|reka',
+'Растёт она вниз головою, не летом растёт, а зимою. Чуть солнце её припечёт — заплачет она и умрёт.|Сосулька|Снег;Свеча;Луна|2|dvor',
+'В огне не горит, в воде не тонет.|Лёд|Камень;Песок;Дым|2|kab',
+'Не море, не земля, корабли не плавают, а ходить нельзя.|Болото|Озеро;Туман;Лёд|2|dom',
+'Кругом вода, а с питьём беда.|Море|Болото;Пустыня;Колодец|2|dom',
+'В лесу родится, никого не боится; ни с кем не говорит, а всем отвечает.|Эхо|Сова;Ветер;Дятел|2|les',
+'Вокруг носа вьётся, а в руки не даётся.|Запах|Муха;Дым;Ветер|2|kab',
+'Что у тебя есть, а другие пользуются этим чаще, чем ты?|Имя|Книга;Тень;Слово|2|kab',
+'Что можно увидеть с закрытыми глазами?|Сон|Тень;Ночь;Мысль|2|kab',
+'Чем больше из неё берёшь, тем больше она становится.|Яма|Тень;Река;Ночь|2|dvor',
+'Что с земли легко поднимешь, но далеко не закинешь?|Пух|Камень;Перо;Лист|2|dvor',
+'Что не войдёт даже в самую большую кастрюлю?|Крышка|Огонь;Ложка;Вода|2|dom',
+'Что бросают, когда оно нужно, и поднимают, когда не нужно?|Якорь|Парус;Ключ;Мяч|2|reka',
+'На какое дерево садится ворона во время проливного дождя?|На мокрое|На сухое;На высокое;На берёзу|2|les',
+'Какая цифра становится больше, если её перевернуть вверх ногами?|Число 6|Число 9;Число 8;Число 0|2|extra',
+'Сколько горошин может войти в один пустой стакан?|Ни одной|Сто;Тысяча;Пять|2|extra',
+'Шли муж с женою, брат с сестрою да зять с шурином. Сколько всего человек?|Трое|Шесть;Четыре;Пять|2|extra',
+'Летели гуси: один впереди, а два позади; один позади, а два впереди; один между двумя. Сколько было гусей?|Три|Пять;Четыре;Шесть|2|reka',
+'Без ног и без крыльев оно — быстро летит, не догонишь его.|Время|Ветер;Облака;Эхо|2|extra',
+'Что у вас есть такое: стоит его назвать — и оно исчезнет?|Тишина|Тень;Секрет;Сон|2|extra',
+'Кто ходит сидя?|Шахматист|Шофёр;Бегун;Самолёт|2|kab',
+'Две сестры летом зелены, к осени одна краснеет, другая чернеет.|Смородина|Вишня;Малина;Берёза|2|sad',
+'Один льёт, другой пьёт, третий растёт. Кто третий?|Трава|Дождь;Солнце;Земля|2|dvor',
+'Один говорит, двое глядят, двое слушают. Кто «двое слушают»?|Уши|Глаза;Руки;Губы|2|kab',
+'Стоит дуб, на нём двенадцать гнёзд, в каждом гнезде по четыре синицы, в каждой синице — по семи яиц. Что такое синица?|Неделя|Месяц;Год;День|2|kab',
+'Стоит дуб, на нём двенадцать гнёзд, в каждом гнезде по четыре синицы. Что такое гнездо?|Месяц|Неделя;Год;Час|2|kab',
+'Не конь, а бежит; не лес, а шумит.|Река|Ветер;Дорога;Поезд|2|les',
+'Утром — на четырёх, днём — на двух, вечером — на трёх. Кто это?|Человек|Собака;Стул;Курица|2|kab',
+'По какой дороге никто не ходил и не ездил?|Млечный Путь|Радуга;Река;Мост|2|kab',
+'Чёрный конь прыгает в огонь.|Кочерга|Уголь;Котёл;Дым|2|dom'
+];
+ZAG_EMO['Человек'] = '🧍'; ZAG_EMO['Неделя'] = '📅'; ZAG_EMO['Месяц'] = '🗓️'; ZAG_EMO['Печь'] = '🔥'; ZAG_EMO['Кочерга'] = '🪝'; ZAG_EMO['Уголь'] = '⚫'; ZAG_EMO['Котёл'] = '🍲'; ZAG_EMO['Губка'] = '🧽'; ZAG_EMO['Земля'] = '🌍'; ZAG_EMO['Поезд'] = '🚂'; ZAG_EMO['Пустыня'] = '🏜️'; ZAG_EMO['Колодец'] = '🪣'; ZAG_EMO['Реки'] = '🏞️'; ZAG_EMO['Двери'] = '🚪'; ZAG_EMO['Окна'] = '🪟'; ZAG_EMO['Окно'] = '🪟'; ZAG_EMO['Кукуруза'] = '🌽'; ZAG_EMO['Сто'] = '💯'; ZAG_EMO['Тысяча'] = '🔢'; ZAG_EMO['Час'] = '🕐';
+
+/* ===== Задачи на смекалку: "условие|ответ|пояснение" ===== */
+var ZAD1 = [
+'На ветке сидели 6 воробьёв. 2 улетели, потом прилетели ещё 3. Сколько воробьёв стало на ветке?|7|6 − 2 = 4, 4 + 3 = 7.',
+'У трёх братьев по одной сестре. Сколько всего детей в семье?|4|Сестра у них одна и та же: 3 брата и 1 сестра — 4.',
+'Бревно распилили на 4 части. Сколько сделали распилов?|3|Распилов всегда на один меньше, чем частей.',
+'Футбольный матч: два тайма по 45 минут и перерыв 15 минут. Сколько минут проходит от начала до конца матча?|105|45 + 15 + 45 = 105 (без добавленного времени).',
+'В футбольной команде на поле 11 игроков. Сколько игроков на поле, когда играют две команды?|22|11 + 11 = 22.',
+'Гусь стоит на одной ноге и весит 4 кг. Сколько килограммов он будет весить, если встанет на две ноги?|4|Вес не зависит от того, на скольких ногах стоишь.',
+'Пять кошек за 5 минут ловят 5 мышей. Сколько мышей поймают эти 5 кошек за 10 минут?|10|Времени в 2 раза больше — и мышей в 2 раза больше.',
+'У Маши 3 яблока, а у Пети на 2 больше. Сколько яблок у них вместе?|8|У Пети 3 + 2 = 5, вместе 3 + 5 = 8.',
+'Я задумал число, прибавил к нему 9 и получил 20. Какое число я задумал?|11|20 − 9 = 11.',
+'Чтобы подняться на 2-й этаж, надо пройти 18 ступенек. Сколько ступенек до 4-го этажа?|54|До 4-го этажа 3 пролёта: 18 × 3 = 54.',
+'Сколько концов у трёх с половиной палок?|8|У каждой палки 2 конца, у половинки — тоже 2: 2 + 2 + 2 + 2 = 8.',
+'В комнате 4 угла. В каждом углу сидит кошка. Напротив каждой кошки сидят 3 кошки. Сколько всего кошек в комнате?|4|Это одни и те же 4 кошки.',
+'Тройка лошадей пробежала 30 км. Сколько километров пробежала каждая лошадь?|30|Они бежали вместе — каждая по 30 км.',
+'Книгу прочитали за 3 дня: в первый день 10 страниц, во второй — на 5 больше, в третий — 7. Сколько страниц в книге?|32|10 + 15 + 7 = 32.',
+'Сколько лап у 3 собак и 2 гусей вместе?|16|3 × 4 = 12, 2 × 2 = 4, 12 + 4 = 16.',
+'Мяч и насос вместе стоят 12 €. Мяч дороже насоса на 8 €. Сколько евро стоит насос?|2|Без разницы осталось 12 − 8 = 4, это два одинаковых насоса: 4 : 2 = 2.',
+'Какое самое большое двузначное число, у которого цифры разные?|98|99 не подходит — цифры одинаковые.',
+'Сколько есть двузначных чисел, у которых обе цифры одинаковые?|9|11, 22, 33, 44, 55, 66, 77, 88, 99.',
+'Вася старше Пети на 3 года. На сколько лет Вася будет старше Пети через 5 лет?|3|Оба станут старше на 5 лет, разница не меняется.',
+'В автобусе ехали 15 человек. На остановке 6 вышли и 4 вошли. Сколько человек стало в автобусе?|13|15 − 6 + 4 = 13.',
+'Одно яйцо варится 4 минуты. Сколько минут нужно варить 3 яйца в одной кастрюле?|4|Они варятся одновременно.',
+'Улитка ползёт по столбу высотой 10 м. Днём поднимается на 5 м, ночью сползает на 4 м. На какой день она доберётся до верха?|6|Каждые сутки +1 м. К утру 6-го дня она на 5 м, а за 6-й день поднимется ещё на 5 — до 10 м.',
+'Сумма двух чисел 10, одно больше другого на 4. Чему равно меньшее число?|3|10 − 4 = 6, 6 : 2 = 3. Проверка: 3 + 7 = 10.',
+'Батон разрезали на 3 части, а потом каждую часть ещё пополам. Сколько получилось кусков?|6|3 × 2 = 6.',
+'Сколько будет 2 + 2 × 2?|6|Сначала умножение: 2 × 2 = 4, потом 2 + 4 = 6.',
+'Во дворе гуляют куры и кролики: всего 5 голов и 14 ног. Сколько кроликов?|2|Если бы все были курами — 10 ног. Лишние 4 ноги — по 2 у каждого кролика: 2 кролика.',
+'Сколько секунд в 2 минутах?|120|60 + 60 = 120.',
+'Чему равна половина от половины числа 20?|5|Половина 20 — это 10, половина 10 — это 5.',
+'Задумали число, умножили на 3, отняли 4 — получилось 11. Какое число задумали?|5|Идём назад: 11 + 4 = 15, 15 : 3 = 5.',
+'Мама старше дочки на 25 лет. Сейчас дочке 8 лет. Сколько лет будет маме через 2 года?|35|Сейчас маме 33, через 2 года — 35.',
+'Сколько раз надо разрезать ленту, чтобы получилось 6 кусков?|5|Разрезов на один меньше, чем кусков.',
+'Сколько дней в трёх неделях?|21|7 × 3 = 21.',
+'Ребята стоят в ряд. Коля — 4-й слева и 6-й справа. Сколько всего ребят в ряду?|9|Слева от Коли 3, справа 5, и сам Коля: 3 + 5 + 1 = 9.',
+'Вратарь за игру пропустил 4 мяча, во втором тайме — на 2 больше, чем в первом. Сколько мячей он пропустил в первом тайме?|1|В первом 1, во втором 3: 1 + 3 = 4.',
+'На столе 5 стаканов, в двух есть вода. Сколько пустых стаканов?|3|5 − 2 = 3.',
+'Брат на 2 года старше сестры, а сестра на 3 года старше младшего брата. На сколько лет старший брат старше младшего?|5|2 + 3 = 5.',
+'Девочка поднималась на горку 12 минут, а скатилась на санках за 2 минуты. Во сколько раз быстрее она спустилась?|6|12 : 2 = 6.',
+'Петя задумал число. Если к нему прибавить 15, будет столько же, сколько 40 без 5. Какое число?|20|40 − 5 = 35, 35 − 15 = 20.',
+'В забеге 7 мальчиков. Миша обогнал бегуна, который был вторым. Каким Миша стал?|2|Он занял место второго — стал вторым, а не первым!',
+'В пакете 3 яблока. Как разделить их между тремя детьми так, чтобы одно яблоко осталось в пакете? Сколько яблок получит каждый ребёнок?|1|Каждый получит по яблоку, а последний возьмёт своё яблоко вместе с пакетом.',
+'На берёзе росли 3 яблока, а на дубе — 2. Сколько всего яблок?|0|На берёзе и дубе яблоки не растут!',
+'Сколько месяцев в году имеют 28 дней?|12|28 дней есть в каждом месяце.'
+];
+var ZAD2 = [
+'Кирпич весит 1 кг и ещё полкирпича. Сколько килограммов весит кирпич?|2|Полкирпича = 1 кг, значит весь кирпич — 2 кг.',
+'Бутылка с пробкой стоит 1 € 10 центов. Бутылка дороже пробки на 1 €. Сколько центов стоит пробка?|5|Пробка 5 ц, бутылка 1 € 05 ц, вместе 1 € 10 ц. (Ответ «10» — ловушка.)',
+'Поезд длиной 300 м едет со скоростью 450 м в минуту. За сколько минут он целиком пройдёт туннель длиной 600 м?|2|Голове нужно проехать 600 м туннеля и ещё 300 м длины поезда: 900 : 450 = 2.',
+'Сумма трёх последовательных чисел равна 72. Чему равно наибольшее из них?|25|Среднее 72 : 3 = 24, числа 23, 24, 25.',
+'Отцу 36 лет, сыну 12. Через сколько лет отец будет вдвое старше сына?|12|36 + 12 = 48, 12 + 12 = 24, 48 = 2 × 24.',
+'Велосипедист за 2 часа проехал 30 км. За сколько часов он с той же скоростью проедет 75 км?|5|Скорость 15 км/ч, 75 : 15 = 5.',
+'Половина числа на 12 больше его четверти. Что это за число?|48|Половина минус четверть — это четверть, она равна 12. Число 48.',
+'7 лягушек за 7 минут съедают 7 комаров. За сколько минут 100 лягушек съедят 100 комаров?|7|Каждая лягушка ест одного комара за 7 минут.',
+'Сколько нулей в конце произведения 1 · 2 · 3 · … · 20?|4|Нули дают пары 2 · 5. Пятёрок четыре: в 5, 10, 15, 20.',
+'Яблоки раскладывают по 2, по 3 или по 4 — всегда остаётся одно. А по 5 — не остаётся ни одного. Какое наименьшее число яблок?|25|Число на 1 больше кратного 12: 13, 25, 37… Первое, что делится на 5, — 25.',
+'Сколько раз за сутки часовая и минутная стрелки совпадают?|22|За 12 часов — 11 раз, за сутки — 22.',
+'Квадратный участок огородили столбами, на каждой стороне по 10 столбов (считая угловые). Сколько всего столбов?|36|4 × 10 = 40, но 4 угловых посчитаны дважды: 36.',
+'Страницы книги пронумерованы от 1 до 120. Сколько всего цифр напечатано?|252|1–9: 9 цифр, 10–99: 180, 100–120: 63. Всего 252.',
+'Два велосипедиста выехали навстречу друг другу из городов на расстоянии 60 км со скоростями 12 и 18 км/ч. Через сколько часов они встретятся?|2|Сближаются на 30 км в час: 60 : 30 = 2.',
+'В той же задаче с велосипедистами муха летает от одного к другому со скоростью 30 км/ч, пока они не встретятся. Сколько километров пролетит муха?|60|Муха летает 2 часа: 30 × 2 = 60.',
+'Улитка ползёт по столбу высотой 20 м: днём поднимается на 5 м, ночью сползает на 3 м. На какой день она окажется на вершине?|9|За 8 суток она поднимется на 16 м, а за 9-й день — ещё на 5 м.',
+'Какое наименьшее число делится и на 2, и на 3, и на 4, и на 5, и на 6?|60|НОК(2, 3, 4, 5, 6) = 60.',
+'3 курицы за 3 дня несут 3 яйца. Сколько яиц снесут 12 кур за 12 дней?|48|Одна курица — одно яйцо за 3 дня. 12 кур за 12 дней: 12 × 4 = 48.',
+'Путник прошёл треть пути и ещё 2 км, и тогда ему осталась ровно половина пути. Какова длина пути в км?|12|Половина минус треть — шестая часть — это 2 км. Весь путь 12 км.',
+'Отцу и сыну вместе 44 года, отец старше сына на 26 лет. Сколько лет сыну?|9|(44 − 26) : 2 = 9.',
+'Цена 100 € сначала выросла на 10 %, а потом снизилась на 10 %. Сколько евро стала цена?|99|110 €, а 10 % от 110 — это 11: 110 − 11 = 99.',
+'Сколько существует трёхзначных чисел, у которых все цифры чётные?|100|Первая цифра: 2, 4, 6, 8 (4 варианта), вторая и третья — по 5: 4 × 5 × 5 = 100.',
+'Сколько диагоналей у шестиугольника?|9|Из каждой вершины по 3, 6 × 3 = 18, каждая посчитана дважды: 9.',
+'Какое наименьшее число при делении на 2, 3, 4, 5 и 6 даёт в остатке 1?|61|60 + 1.',
+'Периметр прямоугольника 30 см, длина вдвое больше ширины. Какова его площадь в см²?|50|Ширина 5, длина 10, площадь 50.',
+'Деревянный куб 3 × 3 × 3 покрасили снаружи и распилили на кубики 1 × 1 × 1. Сколько кубиков окрашено ровно с двух сторон?|12|Это кубики в серединах рёбер: у куба 12 рёбер.',
+'5 мастеров за 5 дней делают 5 столов. Сколько столов сделают 10 мастеров за 10 дней?|20|Мастер делает стол за 5 дней. 10 мастеров × 2 стола = 20.',
+'Часы отстают на 2 минуты в сутки. Через сколько суток они снова покажут точное время (циферблат на 12 часов)?|360|Нужно отстать на 12 часов = 720 минут: 720 : 2 = 360.',
+'Двое отцов и двое сыновей съели 3 яйца, каждому досталось по целому яйцу. Сколько их было?|3|Дед, отец и сын: два отца и два сына.',
+'В ящике 10 чёрных и 10 белых носков. Сколько носков нужно взять в темноте, чтобы среди них точно была пара одного цвета?|3|Из трёх носков два обязательно одного цвета.',
+'В том же ящике (10 чёрных, 10 белых). Сколько носков нужно взять, чтобы точно было 2 чёрных?|12|В худшем случае сначала попадутся все 10 белых.',
+'Задумали число, прибавили 15, результат умножили на 2 и получили 50. Какое число задумали?|10|50 : 2 = 25, 25 − 15 = 10.',
+'Чему равна сумма 1 + 2 + 3 + … + 20?|210|Пары 1 + 20, 2 + 19… по 21, их 10: 210.',
+'Сколько раз цифра 7 встречается в записи всех чисел от 1 до 100?|20|10 раз в единицах (7, 17…97) и 10 раз в десятках (70–79).',
+'3 яблока и 2 груши весят 800 г, а 2 яблока и 3 груши — 700 г. Сколько граммов весит одно яблоко?|200|Вместе 5 яблок и 5 груш = 1500 г, яблоко + груша = 300 г. Яблоко тяжелее груши на 100 г: 200 г.',
+'Старинная задача (Магницкий, 1703). Летела стая гусей, навстречу один гусь: «Здравствуйте, сто гусей!» — «Нас не сто. Вот если бы нас было столько, да ещё столько, да полстолька, да четверть столька, да ты, гусь, — тогда было бы сто». Сколько гусей было в стае?|36|36 + 36 + 18 + 9 + 1 = 100.',
+'Старинная задача (Магницкий, 1703). Работника наняли на год за 12 рублей и кафтан. Он проработал 7 месяцев и получил кафтан и 5 рублей. Сколько рублей стоил кафтан? (Ответ может быть дробным, пиши через запятую.)|4,8|За 5 месяцев недоплатили 7 рублей — значит месяц стоит 1,4 рубля. За 7 месяцев — 9,8 рубля = кафтан + 5. Кафтан 4,8 рубля.',
+'Сколько всего квадратов (любого размера) на шахматной доске 8 × 8?|204|64 + 49 + 36 + 25 + 16 + 9 + 4 + 1 = 204.',
+'Сын спросил отца, сколько ему лет. Отец ответил: «Если к моим годам прибавить половину их и ещё четверть, будет 77». Сколько лет отцу?|44|Годы × 1¾ = 77, годы = 44.',
+'Мальчик прошёл половину пути пешком, а половину проехал на велосипеде в 4 раза быстрее. Весь путь занял 50 минут. Сколько минут он шёл пешком?|40|Пешком 4 части времени, на велосипеде 1 часть: 50 : 5 × 4 = 40.'
+];
+
+/* Головоломки (проверены перебором: решение существует). st — спички на клетках, eq — равенство из спичек. mode r — убрать, m — переложить */
+var PZ_DATA = [{"t":"st","w":3,"h":1,"mode":"r","n":2,"goal":2,"s":["v2_0","v3_0","h0_0","v1_0","h2_0","h1_1","h0_1","v0_0","h2_1","h1_0"],"sol":["h0_0","h2_0","h0_1","h2_1","v0_0","v1_0","v2_0","v3_0"],"lv":1},{"t":"st","w":4,"h":3,"mode":"r","n":2,"goal":3,"s":["v2_0","v2_1","h0_0","h1_2","v1_0","h0_2","h1_1","v0_1","h0_1","v0_0","v1_1","h1_0"],"sol":["h1_0","h0_1","h1_1","h0_2","h1_2","v1_0","v2_0","v0_1","v1_1","v2_1"],"lv":1},{"t":"st","w":4,"h":3,"mode":"r","n":1,"goal":4,"s":["v2_0","v3_0","v2_1","h0_0","h1_2","v2_2","v1_0","h2_0","h1_3","h1_1","v1_1","v1_2","h0_1","v0_0","h2_1","h1_0"],"sol":["h0_0","h2_0","h0_1","h1_1","h2_1","h1_2","h1_3","v0_0","v1_0","v2_0","v3_0","v1_1","v2_1","v1_2","v2_2"],"lv":1},{"t":"st","w":4,"h":3,"mode":"r","n":1,"goal":5,"s":["v2_0","v3_0","h2_1","h0_2","h1_1","v0_1","h2_2","v2_1","v3_1","h1_2","h0_0","v1_0","h2_0","h0_1","v0_0","v1_1","h1_0"],"sol":["h0_0","h2_0","h0_1","h1_1","h2_1","h0_2","h1_2","h2_2","v0_0","v1_0","v2_0","v3_0","v0_1","v1_1","v2_1","v3_1"],"lv":1},{"t":"st","w":4,"h":3,"mode":"r","n":1,"goal":5,"s":["h0_2","v0_1","h1_1","v1_2","h2_2","v2_1","h0_3","h1_2","h0_0","v0_2","h2_3","v2_2","v1_0","v3_2","h0_1","v0_0","v1_1","h1_3"],"sol":["h0_0","h0_1","h1_1","h0_2","h1_2","h2_2","h0_3","h2_3","v0_0","v1_0","v0_1","v1_1","v2_1","v0_2","v1_2","v2_2","v3_2"],"lv":1},{"t":"st","w":4,"h":3,"mode":"m","n":3,"goal":3,"s":["v2_0","v2_1","h0_0","h1_2","v1_0","h0_2","h1_1","v0_1","h0_1","v0_0","v1_1","h1_0"],"sol":["h1_0","h0_1","h1_1","h2_1","h0_2","h2_2","v1_0","v2_0","v0_1","v1_1","v2_1","v3_1"],"lv":1},{"t":"st","w":4,"h":3,"mode":"r","n":4,"goal":2,"s":["v2_0","v2_1","h0_0","h1_2","v1_0","h0_2","h1_1","v0_1","h0_1","v0_0","v1_1","h1_0"],"sol":["h1_0","h0_1","h1_1","h0_2","v1_0","v2_0","v0_1","v1_1"],"lv":2},{"t":"st","w":3,"h":3,"mode":"r","n":3,"goal":6,"s":["v2_0","v3_0","h2_1","h0_2","v0_1","h1_1","v1_2","h2_2","v2_1","v3_1","h0_3","v0_2","h0_0","h1_2","h2_3","v2_2","v1_0","h2_0","v3_2","h1_3","h0_1","v0_0","v1_1","h1_0"],"sol":["h0_0","h2_0","h0_1","h1_1","h2_1","h0_2","h1_2","h2_2","h0_3","h2_3","v0_0","v1_0","v2_0","v3_0","v1_1","v2_1","v3_1","v0_2","v1_2","v2_2","v3_2"],"lv":2},{"t":"st","w":3,"h":3,"mode":"r","n":4,"goal":5,"s":["v2_0","v3_0","h2_1","h0_2","v0_1","h1_1","v1_2","h2_2","v2_1","v3_1","h0_3","v0_2","h0_0","h1_2","h2_3","v2_2","v1_0","h2_0","v3_2","h1_3","h0_1","v0_0","v1_1","h1_0"],"sol":["h0_0","h2_0","h0_1","h1_1","h2_1","h0_2","h1_2","h2_2","h0_3","h2_3","v0_0","v1_0","v2_0","v3_0","v1_1","v2_1","v0_2","v1_2","v2_2","v3_2"],"lv":2},{"t":"st","w":4,"h":3,"mode":"r","n":4,"goal":3,"s":["v2_0","v2_1","h1_2","h2_1","v2_2","v1_0","v1_2","h0_2","h1_1","v0_1","h2_2","h0_1","h1_0","v3_1","v1_1","h1_3"],"sol":["h0_1","h2_1","h0_2","h1_2","h2_2","h1_3","v0_1","v1_1","v2_1","v3_1","v1_2","v2_2"],"lv":2},{"t":"st","w":4,"h":3,"mode":"m","n":2,"goal":5,"s":["h0_2","v0_1","h1_1","v1_2","h2_2","v2_1","h0_3","h1_2","h0_0","v0_2","h2_3","v2_2","v1_0","v3_2","h0_1","v0_0","v1_1","h1_3"],"sol":["h0_0","h1_0","h0_1","h1_1","h0_2","h1_2","h2_2","h0_3","h2_3","v0_0","v1_0","v2_0","v1_1","v2_1","v0_2","v1_2","v2_2","v3_2"],"lv":2},{"t":"st","w":4,"h":3,"mode":"m","n":3,"goal":4,"s":["v2_0","v3_0","v2_1","h0_0","h1_2","v2_2","v1_0","h2_0","h1_3","h1_1","v1_1","v1_2","h0_1","v0_0","h2_1","h1_0"],"sol":["h0_0","h2_0","h0_1","h1_1","h2_1","h1_2","h2_2","h2_3","v0_0","v1_0","v2_0","v3_0","v1_1","v2_1","v2_2","v3_2"],"lv":2},{"t":"st","w":4,"h":3,"mode":"m","n":3,"goal":4,"s":["v2_0","v2_1","h1_2","h2_1","v2_2","v1_0","v1_2","h0_2","h1_1","v0_1","h2_2","h0_1","h1_0","v3_1","v1_1","h1_3"],"sol":["h1_0","h0_1","h1_1","h3_1","h0_2","h1_2","h3_2","h1_3","v1_0","v2_0","v0_1","v1_1","v3_1","v4_1","v1_2","v2_2"],"lv":2},{"t":"st","w":4,"h":3,"mode":"m","n":3,"goal":5,"s":["v2_0","v3_0","h2_1","h0_2","h1_1","v0_1","h2_2","v2_1","v3_1","h1_2","h0_0","v1_0","h2_0","h0_1","v0_0","v1_1","h1_0"],"sol":["h1_0","h3_0","h0_1","h1_1","h2_1","h3_1","h0_2","h1_2","h2_2","v1_0","v2_0","v3_0","v4_0","v0_1","v1_1","v2_1","v3_1"],"lv":2},{"t":"eq","lv":1,"n":1,"e":"3-9=4","sol":"9-5=4"},{"t":"eq","lv":1,"n":1,"e":"2+1=4","sol":"3+1=4"},{"t":"eq","lv":1,"n":1,"e":"5+0=9","sol":"9-0=9"},{"t":"eq","lv":1,"n":1,"e":"7+6=1","sol":"1+6=7"},{"t":"eq","lv":1,"n":1,"e":"0-6=5","sol":"0+5=5"},{"t":"eq","lv":1,"n":1,"e":"1+2=2","sol":"1+2=3"},{"t":"eq","lv":1,"n":1,"e":"9+1=0","sol":"9-1=8"},{"t":"eq","lv":1,"n":1,"e":"6+2=6","sol":"8-2=6"},{"t":"eq","lv":1,"n":1,"e":"1+7=0","sol":"7-7=0"},{"t":"eq","lv":1,"n":1,"e":"4-2=3","sol":"4-2=2"},{"t":"eq","lv":2,"n":1,"e":"40+7=53","sol":"46+7=53"},{"t":"eq","lv":2,"n":1,"e":"47-3=39","sol":"41-3=38"},{"t":"eq","lv":2,"n":1,"e":"48+2=56","sol":"48+2=50"},{"t":"eq","lv":2,"n":1,"e":"30+3=83","sol":"90+3=93"},{"t":"eq","lv":2,"n":1,"e":"35-7=18","sol":"25-7=18"},{"t":"eq","lv":2,"n":1,"e":"22-0=13","sol":"22-9=13"},{"t":"eq","lv":2,"n":1,"e":"11-3=6","sol":"11-5=6"},{"t":"eq","lv":2,"n":1,"e":"18+1=17","sol":"10+7=17"},{"t":"eq","lv":2,"n":2,"e":"2+5=1","sol":"6-5=1"},{"t":"eq","lv":2,"n":2,"e":"0+5=1","sol":"2+5=7"},{"t":"eq","lv":2,"n":2,"e":"3+2=2","sol":"3+2=5"},{"t":"eq","lv":2,"n":2,"e":"2-1=4","sol":"5-1=4"},{"t":"eq","lv":2,"n":2,"e":"4+0=7","sol":"4-0=4"},{"t":"eq","lv":2,"n":2,"e":"2+0=1","sol":"2+5=7"},{"t":"eq","lv":2,"n":2,"e":"0+0=1","sol":"9-8=1"},{"t":"eq","lv":2,"n":2,"e":"3+4=3","sol":"9-4=5"}];
+
+/* ===== Всегда доступно: Загадки, Головоломки, Задачи на смекалку =====
+   Подключается через ALWAYS (см. app.js: alwaysTiles / vAlways). Стиль ES5 — для старого Safari.
+   Баллы маленькие, с дневным лимитом на каждый раздел; идут в копилку, как PRO. Засчитывается первый ответ. */
+var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
+var FUN_CAP = { zag: 5, pz: 6, zad: 6 };
+function funK(kid){ var K = S.kids[kid]; if (!K.fun) K.fun = { z: {}, p: {}, q: {}, day: '', got: {} }; var F = K.fun; if (F.day !== U.today()) { F.day = U.today(); F.got = {}; } return F; }
+/* Общая функция для всех «всегда доступных» разделов (и шахмат): начисляет не больше дневного лимита, возвращает реально начисленное */
+function funPts(kid, key, pts, cap){ if (!kid || !pts) return 0; var F = funK(kid), got = F.got[key] || 0; var add = Math.max(0, Math.min(pts, (cap || FUN_CAP[key] || 5) - got)); if (add) { F.got[key] = got + add; piggyAdd(S.kids[kid], add); } save(); return add; }
+function funLeft(kid, key){ var F = funK(kid); return Math.max(0, (FUN_CAP[key] || 5) - (F.got[key] || 0)); }
+function funCapNote(kid, key){ var l = funLeft(kid, key); return l ? 'Сегодня можно заработать ещё <b>' + l + '</b> ' + U.pl(l, 'балл', 'балла', 'баллов') + '.' : 'Баллы на сегодня собраны — дальше играем просто для ума 🙂'; }
+function funTab(act, cur0, list){ return '<div class="fntabs">' + list.map(function(t){ return '<button class="chip ' + (String(cur0) === String(t[0]) ? 'on' : '') + '" data-act="' + act + '" data-l="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>'; }
+function funLvl(kid){ return kid === 'anya' ? 2 : 1; }
+function funOrder(kid, list, salt){ var r = U.rng(kid + salt); return r.shuffle(list.map(function(x, i){ return i; })); }
+function funBurst(pts){ if (!pts) return ''; var s = ''; for (var i = 0; i < Math.min(10, 3 + pts * 2); i++) s += '<span style="--dx:' + Math.round(Math.cos(i * 2.4) * 140) + 'px;--dy:' + Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 150) + 'px;--r:' + (i * 40) + 'deg;animation-delay:' + (i * 60) + 'ms">' + (i % 3 ? '🪙' : '⭐') + '</span>'; return '<div class="burst" aria-hidden="true">' + s + '</div>'; }
+
+/* ---------- Загадки ---------- */
+var ZG = ZAG.map(function(l){ var p = l.split('|'), own = p[0].charAt(0) === '*'; return { id: 'z' + U.h(p[0]), q: own ? p[0].slice(1) : p[0], own: own, a: p[1], w: p[2].split(';'), lv: +p[3], sc: p[4] }; });
+var ZG_SCENE = { les: '🍂🌳🍂', sad: '🌱🪴🌱', dom: '🪟🛋️🕰️', dvor: '🏡🌾🪵', zima: '🌨️🏠🌨️', reka: '🌊🛶🌾', kab: '📚🔍🕯️', extra: '✨🔭✨' };
+function zgList(kid, lv){ var L = ZG.filter(function(z){ return z.lv === lv; }); var o = funOrder(kid, L, 'zg' + lv); return o.map(function(i){ return L[i]; }); }
+function zgPic(kid, z){ var k = kid === 'anya' ? 'a' : 'y'; return '<div class="zgpic sc-' + z.sc + '"><span class="zgemo" aria-hidden="true">' + ZG_SCENE[z.sc] + '</span><img src="img/zg-' + k + '-' + z.sc + '.webp" alt="" onerror="this.style.display=\'none\'"><span class="zgq" aria-hidden="true">?</span></div>'; }
+function zgOpt(w){ return '<span class="zge">' + (ZAG_EMO[w] || '❔') + '</span><span>' + U.esc(w) + '</span>'; }
+ALWAYS.push({ id: 'zag', order: 10,
+  open: function(kid){ cur.fz = null; cur.zgL = funLvl(kid); },
+  tile: function(kid){ if (!kid) return ''; var F = funK(kid), n = 0; for (var k in F.z) if (F.z[k]) n++;
+    return '<button class="tile fun zag" data-act="always" data-id="zag"><span class="ico">🦉</span><span class="tt"><span class="sn">Загадки</span><span class="ut">Народные загадки — лёгкие и трудные. Отгадано: ' + n + ' из ' + ZG.length + '. До +' + FUN_CAP.zag + ' в день</span></span></button>'; },
+  view: function(kid){ var F = funK(kid), lv = cur.zgL || funLvl(kid), L = zgList(kid, lv), z = cur.fz && ZG.filter(function(x){ return x.id === cur.fz.id; })[0];
+    if (!z) z = L.filter(function(x){ return !(x.id in F.z); })[0];
+    var solved = L.filter(function(x){ return F.z[x.id]; }).length, seen = L.filter(function(x){ return x.id in F.z; }).length;
+    var h = '<section class="hello"><p class="eyebrow">Всегда доступно</p><h1>🦉 Загадки</h1><p class="hint">Народные загадки. Подумай как следует: засчитывается только первый ответ. Лёгкая — 1 балл, трудная — 2. ' + funCapNote(kid, 'zag') + '</p>' +
+      funTab('zgtab', lv, [[1, '🙂 Лёгкие · 7–9 лет'], [2, '🧠 Трудные · 10–12 лет']]) + '<p>Отгадано: <b>' + solved + '</b> из ' + L.length + (seen > solved ? ' · не угадано: ' + (seen - solved) : '') + '</p></section>';
+    if (!z) return h + '<div class="card win"><h2>Все загадки этого уровня пройдены!</h2><p>Попробуй другой уровень. Скоро добавим новые.</p></div>';
+    var r = cur.fz && cur.fz.id === z.id ? cur.fz : null, opts = U.rng(z.id + kid).shuffle([z.a].concat(z.w));
+    h += '<article class="card task zgcard">' + zgPic(kid, z) + '<div class="q zgtext">' + U.esc(z.q).replace(/\. /g, '.<br>') + '</div><div class="row"><button class="btn ghost small" data-act="zgsay">🔊 Послушать</button></div>' +
+      '<div class="opts zgopts">' + opts.map(function(o){ var cls = r ? (o === z.a ? 'right' : o === r.v ? 'wrong' : '') : ''; return '<button class="opt ' + cls + '" data-act="zgans" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + zgOpt(o) + '</button>'; }).join('') + '</div>';
+    if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! Это ' + U.esc(z.a.toLowerCase()) + '. ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Не угадал(а). Правильный ответ: <b>' + U.esc(z.a) + '</b> ' + (ZAG_EMO[z.a] || '')) + '</div>' + (r.pts ? funBurst(r.pts) : '');
+    h += (z.own ? '<p class="src">Загадка придумана для этого приложения.</p>' : '<p class="src">Русская народная загадка.</p>') + '</article>';
+    if (r) h += '<button class="btn big" data-act="zgnext">Следующая загадка →</button>';
+    return h; },
+  act: function(act, b){ var kid = cur.kid; if (!kid) return;
+    if (act === 'zgtab') { cur.zgL = +b.getAttribute('data-l'); cur.fz = null; render(); }
+    else if (act === 'zgsay') { var F = funK(kid), lv = cur.zgL || funLvl(kid); var z = cur.fz ? ZG.filter(function(x){ return x.id === cur.fz.id; })[0] : zgList(kid, lv).filter(function(x){ return !(x.id in F.z); })[0]; if (z) say(z.q); }
+    else if (act === 'zgans') { if (cur.fz) return; var F2 = funK(kid), lv2 = cur.zgL || funLvl(kid), z2 = zgList(kid, lv2).filter(function(x){ return !(x.id in F2.z); })[0]; if (!z2) return;
+      var v = b.getAttribute('data-v'), ok = v === z2.a; F2.z[z2.id] = ok ? 1 : 0; var pts = ok ? funPts(kid, 'zag', z2.lv === 2 ? 2 : 1) : 0;
+      cur.fz = { id: z2.id, v: v, ok: ok, pts: pts }; ev(kid, 'загадка', { subj: 'Загадки', q: z2.q, ans: v, right: z2.a, ok: ok ? 'верно' : 'ошибка', coins: S.kids[kid].coins, text: pts ? '+' + pts + ' баллов' : '' }); save(); render(); }
+    else if (act === 'zgnext') { cur.fz = null; render(); window.scrollTo(0, 0); } }
+});
+
+/* ---------- Головоломки: спички и монетки ---------- */
+var EQ_SEG = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg' };
+var EQ_GEO = { a: [0, 0, 1, 0], b: [1, 0, 1, 1], c: [1, 1, 1, 2], d: [0, 2, 1, 2], e: [0, 1, 0, 2], f: [0, 0, 0, 1], g: [0, 1, 1, 1] };
+function cnTri(n){ var s = []; for (var r = 0; r < n; r++) for (var q = 0; q < n - r; q++) s.push([q, r]); return s; }
+function cnFlip(S){ return S.map(function(p){ return [p[0] + p[1], -p[1]]; }); }
+var CN = [
+  { t: 'cn', lv: 1, n: 1, s: cnTri(2), g: cnFlip(cnTri(2)), txt: 'Треугольник из 3 монеток смотрит вершиной вверх. Передвинь <b>1</b> монетку, чтобы он смотрел вершиной вниз.' },
+  { t: 'cn', lv: 1, n: 1, s: [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1]], g: cnTri(3), txt: 'Из 6 монеток сложен ромбик-параллелограмм. Передвинь <b>1</b> монетку, чтобы получился треугольник.' },
+  { t: 'cn', lv: 1, n: 2, s: cnTri(3), g: cnFlip(cnTri(3)), txt: 'Треугольник из 6 монеток. Передвинь <b>2</b> монетки, чтобы он «перевернулся» вершиной вниз.' },
+  { t: 'cn', lv: 2, n: 2, s: [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1]], g: [[1,0],[2,0],[0,1],[2,1],[0,2],[1,2]], txt: 'Передвинь <b>2</b> монетки, чтобы 6 монеток встали кольцом (шестиугольником с пустой серединой).' },
+  { t: 'cn', lv: 2, n: 3, s: cnTri(4), g: cnFlip(cnTri(4)), txt: 'Старинная головоломка. Треугольник из 10 монеток смотрит вершиной вверх. Передвинь всего <b>3</b> монетки, чтобы он смотрел вершиной вниз.' }
+];
+var PZ = PZ_DATA.concat(CN).map(function(p, i){ p.id = 'p' + U.h(JSON.stringify(p.s || p.e) + p.t + p.n + (p.goal || '')); return p; });
+function pzTxt(p){ if (p.txt) return p.txt; var w = function(n){ return n + ' ' + U.pl(n, 'спичку', 'спички', 'спичек'); };
+  if (p.t === 'eq') return 'Равенство из спичек неверное. ' + (p.n === 1 ? 'Переложи <b>одну</b> спичку' : 'Переложи <b>' + w(p.n) + '</b>') + ', чтобы оно стало верным. Знак «=» не трогаем.';
+  return (p.mode === 'r' ? 'Убери <b>' + w(p.n) + '</b>' : 'Переложи <b>' + w(p.n) + '</b>') + ', чтобы получилось ровно <b>' + p.goal + '</b> ' + U.pl(p.goal, 'одинаковый квадрат', 'одинаковых квадрата', 'одинаковых квадратов') + '. Лишних спичек оставаться не должно — каждая спичка должна быть стороной квадрата.'; }
+function pzPts(p){ return p.n >= 3 ? 3 : p.n; }
+/* Поле: слоты (места) и их геометрия */
+function pzBoard(p){ var sl = {}, fixed = [], i, k;
+  if (p.t === 'st') { for (var y = 0; y <= p.h; y++) for (var x = 0; x < p.w; x++) sl['h' + x + '_' + y] = [x, y, x + 1, y]; for (y = 0; y < p.h; y++) for (x = 0; x <= p.w; x++) sl['v' + x + '_' + y] = [x, y, x, y + 1]; return { sl: sl, fixed: fixed, box: [0, 0, p.w, p.h] }; }
+  if (p.t === 'eq') { var X = 0; for (i = 0; i < p.e.length; i++) { var ch = p.e.charAt(i);
+      if (/\d/.test(ch)) { for (k in EQ_GEO) { var g = EQ_GEO[k]; sl[i + k] = [X + g[0], g[1], X + g[2], g[3]]; } }
+      else if (ch === '+' || ch === '-') { sl[i + 'h'] = [X, 1, X + 1, 1]; sl[i + 'v'] = [X + .5, .5, X + .5, 1.5]; }
+      else if (ch === '=') { fixed.push([X, .75, X + 1, .75], [X, 1.25, X + 1, 1.25]); }
+      X += 1.7; }
+    return { sl: sl, fixed: fixed, box: [0, 0, X - .7, 2] }; }
+  /* монетки: треугольная решётка, q,r → x = q + r/2, y = r·0.87 */
+  var rs = p.s.map(function(a){ return a[1]; });
+  var r0 = Math.min.apply(null, rs) - 1, r1 = Math.max.apply(null, rs) + 1, minx = 1e9, maxx = -1e9;
+  p.s.forEach(function(a){ var xx = a[0] + a[1] / 2; minx = Math.min(minx, xx); maxx = Math.max(maxx, xx); });
+  var yr = [r0, r1]; for (var r = r0; r <= r1; r++) for (var q = -8; q <= 10; q++) { var cx = q + r / 2; if (cx >= minx - 1.1 && cx <= maxx + 1.1) sl[q + "_" + r] = [cx, -r * .87]; }
+  var xs = [], ys = []; for (k in sl) { xs.push(sl[k][0]); ys.push(sl[k][1]); }
+  return { sl: sl, fixed: [], box: [Math.min.apply(null, xs), Math.min.apply(null, ys), Math.max.apply(null, xs), Math.max.apply(null, ys)], coin: true }; }
+function pzStart(p){ if (p.t === 'st') return p.s.slice(); if (p.t === 'cn') return p.s.map(function(a){ return a[0] + '_' + a[1]; });
+  var o = []; for (var i = 0; i < p.e.length; i++) { var ch = p.e.charAt(i); if (/\d/.test(ch)) EQ_SEG[ch].split('').forEach(function(c){ o.push(i + c); }); else if (ch === '+') o.push(i + 'h', i + 'v'); else if (ch === '-') o.push(i + 'h'); } return o; }
+function pzMoved(p, occ){ var st = pzStart(p); return st.filter(function(k){ return occ.indexOf(k) < 0; }).length; }
+function eqRead(p, occ){ var s = ''; for (var i = 0; i < p.e.length; i++) { var ch = p.e.charAt(i);
+    if (ch === '=') { s += '='; continue; }
+    var on = occ.filter(function(k){ return k.indexOf(i + '') === 0 && /^[a-z]$/.test(k.slice(String(i).length)); }).map(function(k){ return k.slice(String(i).length); }).sort().join('');
+    if (/\d/.test(ch)) { var d = null; for (var n in EQ_SEG) if (EQ_SEG[n].split('').sort().join('') === on) d = n; if (d === null) return null; s += d; }
+    else { if (on === 'h') s += '-'; else if (on === 'hv') s += '+'; else return null; } }
+  return s; }
+function eqTrue(s){ if (!s) return false; var m = s.split('='); if (m.length !== 2) return false; var parts = m[0].split(/[+-]/).concat([m[1]]); if (parts.some(function(x){ return !x || (x.length > 1 && x.charAt(0) === '0'); })) return false;
+  var ops = m[0].match(/[+-]/g) || [], v = parseInt(parts[0], 10); for (var i = 0; i < ops.length; i++) v = ops[i] === '+' ? v + parseInt(parts[i + 1], 10) : v - parseInt(parts[i + 1], 10); return v === parseInt(m[1], 10); }
+function cnNorm(keys){ var P = keys.map(function(k){ var a = k.split('_'); return [+a[0], +a[1]]; }); var m = P.slice().sort(function(a, b){ return a[1] - b[1] || a[0] - b[0]; })[0]; return P.map(function(a){ return (a[0] - m[0]) + '_' + (a[1] - m[1]); }).sort().join(' '); }
+function pzSolved(p, occ){ var mv = pzMoved(p, occ);
+  if (p.t === 'eq') return mv >= 1 && mv <= p.n && eqTrue(eqRead(p, occ));
+  if (p.t === 'cn') return mv >= 1 && mv <= p.n && cnNorm(occ) === cnNorm(p.g.map(function(a){ return a[0] + '_' + a[1]; }));
+  if (p.mode === 'r' ? mv !== p.n || occ.length !== p.s.length - p.n : mv < 1 || mv > p.n) return false;
+  var c = 0, used = {}; for (var y = 0; y < p.h; y++) for (var x = 0; x < p.w; x++) { var e = ['h' + x + '_' + y, 'h' + x + '_' + (y + 1), 'v' + x + '_' + y, 'v' + (x + 1) + '_' + y]; if (e.every(function(k){ return occ.indexOf(k) >= 0; })) { c++; e.forEach(function(k){ used[k] = 1; }); } }
+  return c === p.goal && occ.every(function(k){ return used[k]; }); }
+function cnSolution(p, B){ var T = p.g, best = null, bc = 1e9, st = pzStart(p);
+  for (var dq = -8; dq <= 8; dq++) for (var dr = -6; dr <= 6; dr++) { var ks = T.map(function(a){ return (a[0] + dq) + '_' + (a[1] + dr); }); if (!ks.every(function(k){ return B.sl[k]; })) continue; var c = st.filter(function(k){ return ks.indexOf(k) < 0; }).length; if (c < bc) { bc = c; best = ks; } }
+  return best || []; }
+function pzSol(p, B){ if (p.t === 'cn') return cnSolution(p, B); if (p.t === 'st') return p.sol;
+  var o = []; for (var i = 0; i < p.sol.length; i++) { var ch = p.sol.charAt(i); if (/\d/.test(ch)) EQ_SEG[ch].split('').forEach(function(c){ o.push(i + c); }); else if (ch === '+') o.push(i + 'h', i + 'v'); else if (ch === '-') o.push(i + 'h'); } return o; }
+function pzList(kid, lv){ var L = PZ.filter(function(p){ return p.lv === lv; }); var o = funOrder(kid, L, 'pz' + lv), out = o.map(function(i){ return L[i]; });
+  /* сначала проще: по числу ходов */ return out.sort(function(a, b){ return a.n - b.n; }); }
+function pzCur(kid){ var F = funK(kid), lv = cur.pzL || funLvl(kid), L = pzList(kid, lv); if (cur.fp && cur.fp.lv === lv) { var x = PZ.filter(function(p){ return p.id === cur.fp.id; })[0]; if (x) return x; }
+  var skip = cur.pzSkip || []; var p = L.filter(function(x){ return !(x.id in F.p) && skip.indexOf(x.id) < 0; })[0] || L.filter(function(x){ return !(x.id in F.p); })[0]; if (!p) return null;
+  cur.fp = { id: p.id, lv: lv, occ: pzStart(p), sel: null, res: null }; return p; }
+function pzSvg(p, st, showSol){ var B = pzBoard(p), b = B.box, m = B.coin ? .7 : .45, vb = [b[0] - m, b[1] - m, b[2] - b[0] + 2 * m, b[3] - b[1] + 2 * m], h = '', k, s;
+  var occ = showSol ? pzSol(p, B) : st.occ, start = pzStart(p);
+  if (B.coin) { for (k in B.sl) { s = B.sl[k]; var on = occ.indexOf(k) >= 0;
+      h += on ? '<g class="pzc' + (st.sel === k ? ' sel' : '') + (showSol && start.indexOf(k) < 0 ? ' new' : '') + '" data-pk="' + k + '"><circle cx="' + s[0] + '" cy="' + s[1] + '" r=".42"/><circle class="in" cx="' + s[0] + '" cy="' + s[1] + '" r=".3"/><circle class="hit" cx="' + s[0] + '" cy="' + s[1] + '" r=".5"/></g>'
+        : '<circle class="pzdot" data-ps="' + k + '" cx="' + s[0] + '" cy="' + s[1] + '" r="' + (st.sel ? .22 : .1) + '"/>' + (st.sel ? '' : '') ; } }
+  else { B.fixed.forEach(function(f){ h += '<line class="pzfix" x1="' + f[0] + '" y1="' + f[1] + '" x2="' + f[2] + '" y2="' + f[3] + '"/>'; });
+    for (k in B.sl) { s = B.sl[k]; var dx = s[2] - s[0], dy = s[3] - s[1], x1 = s[0] + dx * .08, y1 = s[1] + dy * .08, x2 = s[2] - dx * .08, y2 = s[3] - dy * .08;
+      if (occ.indexOf(k) >= 0) h += '<g class="pzs' + (st.sel === k ? ' sel' : '') + (showSol && start.indexOf(k) < 0 ? ' new' : '') + '" data-pk="' + k + '"><line class="hit" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><line class="wood" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><circle class="head" cx="' + x2 + '" cy="' + y2 + '" r=".085"/></g>';
+      else h += '<g class="pze' + (st.sel ? ' on' : '') + (start.indexOf(k) >= 0 ? ' was' : '') + '" data-ps="' + k + '"><line class="hit" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/><line class="ghost" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/></g>'; } }
+  return '<svg class="pzsvg ' + (B.coin ? 'coins' : p.t) + '" viewBox="' + vb.join(' ') + '" preserveAspectRatio="xMidYMid meet">' + h + '</svg>'; }
+ALWAYS.push({ id: 'pz', order: 30,
+  open: function(kid){ cur.fp = null; cur.pzL = funLvl(kid); cur.pzSkip = []; },
+  tile: function(kid){ if (!kid) return ''; var F = funK(kid), n = 0; for (var k in F.p) if (F.p[k]) n++;
+    return '<button class="tile fun pz" data-act="always" data-id="pz"><span class="ico">🧩</span><span class="tt"><span class="sn">Головоломки</span><span class="ut">Спички и монетки: передвинь, чтобы сложилось. Решено: ' + n + ' из ' + PZ.length + '. До +' + FUN_CAP.pz + ' в день</span></span></button>'; },
+  view: function(kid){ var F = funK(kid), lv = cur.pzL || funLvl(kid), L = pzList(kid, lv), p = pzCur(kid), solved = L.filter(function(x){ return F.p[x.id]; }).length;
+    var h = '<section class="hello"><p class="eyebrow">Всегда доступно</p><h1>🧩 Головоломки</h1><p class="hint">Перетащи спичку или монетку пальцем на новое место (или нажми на неё, а потом на пустое место). Когда всё готово — «Проверить». Проверка одна, как в уроках. ' + funCapNote(kid, 'pz') + '</p>' +
+      funTab('pztab', lv, [[1, '🙂 Уровень 1'], [2, '🧠 Уровень 2']]) + '<p>Решено: <b>' + solved + '</b> из ' + L.length + '</p></section>';
+    if (!p) return h + '<div class="card win"><h2>Все головоломки этого уровня пройдены!</h2><p>Попробуй другой уровень.</p></div>';
+    var st = cur.fp, mv = pzMoved(p, st.occ), need = p.t === 'st' && p.mode === 'r';
+    h += '<article class="card task pzcard"><div class="q">' + pzTxt(p) + '</div><div class="pzwrap" id="pzwrap">' + pzSvg(p, st, false) + '</div>';
+    if (!st.res) h += '<p class="pzcount">' + (need ? 'Убрано' : 'Передвинуто') + ': <b>' + mv + '</b> из ' + p.n + (need ? ' · нажми на спичку, чтобы убрать её (нажми на пустое место — вернуть)' : '') + '</p><div class="row"><button class="btn" data-act="pzcheck"' + ((need ? mv === p.n : mv >= 1) ? '' : ' disabled') + '>Проверить</button><button class="btn ghost" data-act="pzreset">↺ Начать заново</button>' + (mv ? '' : '<button class="link" data-act="pzskip">Отложить, другая</button>') + '</div>';
+    else h += '<div class="fb ' + (st.res.ok ? 'ok' : 'try') + '">' + (st.res.ok ? 'Получилось! ' + (st.res.pts ? '+' + st.res.pts + ' ' + U.pl(st.res.pts, 'балл', 'балла', 'баллов') : '') : 'Не получилось. Вот одно из решений (новые места — зелёные):') + '</div>' + (st.res.ok ? funBurst(st.res.pts) : '<div class="pzwrap sol">' + pzSvg(p, st, true) + '</div>');
+    h += '</article>' + (st.res ? '<button class="btn big" data-act="pznext">Следующая головоломка →</button>' : '');
+    return h; },
+  act: function(act, b){ var kid = cur.kid; if (!kid) return; var p = pzCur(kid);
+    if (act === 'pztab') { cur.pzL = +b.getAttribute('data-l'); cur.fp = null; render(); }
+    else if (act === 'pzreset' && p && !cur.fp.res) { cur.fp.occ = pzStart(p); cur.fp.sel = null; render(); }
+    else if (act === 'pzskip' && p) { cur.pzSkip = (cur.pzSkip || []).concat([p.id]); cur.fp = null; render(); }
+    else if (act === 'pznext') { cur.fp = null; render(); window.scrollTo(0, 0); }
+    else if (act === 'pzcheck' && p && !cur.fp.res) { var F = funK(kid), ok = pzSolved(p, cur.fp.occ); F.p[p.id] = ok ? 1 : 0; var pts = ok ? funPts(kid, 'pz', pzPts(p)) : 0; cur.fp.res = { ok: ok, pts: pts }; cur.fp.sel = null;
+      ev(kid, 'головоломка', { subj: 'Головоломки', q: strip(pzTxt(p)) + (p.e ? ' ' + p.e : ''), ans: p.t === 'eq' ? (eqRead(p, cur.fp.occ) || '?') : '', ok: ok ? 'верно' : 'ошибка', coins: S.kids[kid].coins, text: pts ? '+' + pts + ' баллов' : '' }); save(); render(); } }
+});
+/* Перетаскивание (касание и мышь). На SVG-элементах не используем data-act/dataset — старый Safari. */
+var PZD = null, PZ_TAPT = 0;
+function pzEl(t){ while (t && t.getAttribute) { if (t.getAttribute('data-pk') || t.getAttribute('data-ps')) return t; t = t.parentNode; } return null; }
+function pzPt(svg, x, y){ try { var pt = svg.createSVGPoint(); pt.x = x; pt.y = y; return pt.matrixTransform(svg.getScreenCTM().inverse()); } catch (e) { return { x: 0, y: 0 }; } }
+function pzMove(from, to){ var st = cur.fp; if (!st || st.res) return; var i = st.occ.indexOf(from); if (i < 0 || st.occ.indexOf(to) >= 0) return; var p = pzCur(cur.kid);
+  if (p.t === 'st' && p.mode === 'r') return; st.occ[i] = to; st.sel = null; render(); }
+function pzTap(el){ var st = cur.fp, p = cur.kid && pzCur(cur.kid); if (!st || st.res || !p) return; var pk = el.getAttribute('data-pk'), ps = el.getAttribute('data-ps');
+  if (p.t === 'st' && p.mode === 'r') { if (pk) { if (pzMoved(p, st.occ) < p.n) st.occ.splice(st.occ.indexOf(pk), 1); else alertMsg('Уже убрано ' + p.n + '. Верни одну, если передумал(а).'); } else if (ps && p.s.indexOf(ps) >= 0) st.occ.push(ps); render(); return; }
+  if (pk) { st.sel = st.sel === pk ? null : pk; render(); } else if (ps && st.sel) pzMove(st.sel, ps); }
+function pzDown(e, x, y){ var el = pzEl(e.target); if (!el || cur.view !== 'always' || cur.aid !== 'pz') return false; var svg = el.ownerSVGElement; if (!svg) return false;
+  PZD = { el: el, svg: svg, x: x, y: y, drag: false, pk: el.getAttribute('data-pk') }; return true; }
+function pzDrag(x, y){ if (!PZD || !PZD.pk) return; var p = cur.kid && pzCur(cur.kid); if (!p || (p.t === 'st' && p.mode === 'r') || (cur.fp && cur.fp.res)) return;
+  if (!PZD.drag && Math.abs(x - PZD.x) + Math.abs(y - PZD.y) < 8) return; PZD.drag = true;
+  var a = pzPt(PZD.svg, PZD.x, PZD.y), c = pzPt(PZD.svg, x, y); PZD.el.setAttribute('transform', 'translate(' + (c.x - a.x) + ',' + (c.y - a.y) + ')'); PZD.el.setAttribute('class', (PZD.el.getAttribute('class') || '') + ' drag'); }
+function pzUp(x, y){ var D = PZD; PZD = null; if (!D) return; if (!D.drag) { pzTap(D.el); return; }
+  var p = pzCur(cur.kid), B = pzBoard(p), a = pzPt(D.svg, D.x, D.y), c = pzPt(D.svg, x, y), s = B.sl[D.pk], dx = c.x - a.x, dy = c.y - a.y;
+  var mx = (B.coin ? s[0] : (s[0] + s[2]) / 2) + dx, my = (B.coin ? s[1] : (s[1] + s[3]) / 2) + dy, best = null, bd = B.coin ? .55 : .5;
+  for (var k in B.sl) { if (cur.fp.occ.indexOf(k) >= 0) continue; var t = B.sl[k], tx = B.coin ? t[0] : (t[0] + t[2]) / 2, ty = B.coin ? t[1] : (t[1] + t[3]) / 2, d = Math.sqrt((tx - mx) * (tx - mx) + (ty - my) * (ty - my)); if (d < bd) { bd = d; best = k; } }
+  if (best) pzMove(D.pk, best); else render(); }
+document.addEventListener('touchstart', function(e){ if (e.touches.length !== 1) return; var t = e.touches[0]; if (pzDown(e, t.clientX, t.clientY)) e.preventDefault(); }, { passive: false });
+document.addEventListener('touchmove', function(e){ if (!PZD) return; var t = e.touches[0]; pzDrag(t.clientX, t.clientY); if (PZD && PZD.drag) e.preventDefault(); }, { passive: false });
+document.addEventListener('touchend', function(e){ if (!PZD) return; var t = e.changedTouches[0]; PZ_TAPT = Date.now(); pzUp(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
+document.addEventListener('touchcancel', function(){ if (PZD) { PZD = null; render(); } });
+document.addEventListener('mousedown', function(e){ if (Date.now() - PZ_TAPT < 800) return; if (pzDown(e, e.clientX, e.clientY)) e.preventDefault(); });
+document.addEventListener('mousemove', function(e){ if (PZD) pzDrag(e.clientX, e.clientY); });
+document.addEventListener('mouseup', function(e){ if (PZD) pzUp(e.clientX, e.clientY); });
+
+/* ---------- Задачи на смекалку ---------- */
+function zdParse(l, lv){ var p = l.split('|'); return { id: 'q' + U.h(p[0]), q: p[0], a: Number(p[1].replace(',', '.')), as: p[1], e: p[2], lv: lv }; }
+var ZD = ZAD1.map(function(l){ return zdParse(l, 1); }).concat(ZAD2.map(function(l){ return zdParse(l, 2); }));
+function zdList(kid, lv){ var L = ZD.filter(function(z){ return z.lv === lv; }); var o = funOrder(kid, L, 'zd' + lv); return o.map(function(i){ return L[i]; }); }
+function zdPts(kid, z){ var my = funLvl(kid); return z.lv > my ? 3 : z.lv < my ? 1 : 2; }
+function zdCur(kid){ var F = funK(kid), lv = cur.zdL || funLvl(kid); if (cur.fq) return ZD.filter(function(x){ return x.id === cur.fq.id; })[0]; return zdList(kid, lv).filter(function(x){ return !(x.id in F.q); })[0]; }
+ALWAYS.push({ id: 'zad', order: 40,
+  open: function(kid){ cur.fq = null; cur.zdL = funLvl(kid); },
+  tile: function(kid){ if (!kid) return ''; var F = funK(kid), n = 0; for (var k in F.q) if (F.q[k]) n++;
+    return '<button class="tile fun zad" data-act="always" data-id="zad"><span class="ico">🧮</span><span class="tt"><span class="sn">Задачи на смекалку</span><span class="ut">Хитрые задачи в духе старых сборников. Уровень ' + funLvl(kid) + '. Решено: ' + n + '. До +' + FUN_CAP.zad + ' в день</span></span></button>'; },
+  view: function(kid){ var F = funK(kid), lv = cur.zdL || funLvl(kid), L = zdList(kid, lv), z = zdCur(kid), solved = L.filter(function(x){ return F.q[x.id]; }).length;
+    var h = '<section class="hello"><p class="eyebrow">Всегда доступно</p><h1>🧮 Задачи на смекалку</h1><p class="hint">Читай внимательно — в задачах бывают ловушки. Засчитывается первый ответ. ' + funCapNote(kid, 'zad') + '</p>' +
+      funTab('zdtab', lv, [[1, 'Уровень 1 · 2–3 класс'], [2, 'Уровень 2 · 5 класс']]) + '<p>Решено: <b>' + solved + '</b> из ' + L.length + '</p></section>';
+    if (!z) return h + '<div class="card win"><h2>Все задачи этого уровня решены!</h2><p>Скоро добавим новые.</p></div>';
+    var r = cur.fq;
+    h += '<article class="card task"><span class="sticker" aria-hidden="true">' + U.rng(z.id).pick(THEME[kid].pics) + '</span><div class="q">' + U.esc(z.q) + '</div>' + (typeof picWords === 'function' ? picWords(z.q) : '') + '<div class="row"><button class="btn ghost small" data-act="zdsay">🔊 Послушать</button></div>' +
+      '<form class="numf" data-form="zadf"><input id="zdin" inputmode="decimal" autocomplete="off" ' + (r ? 'disabled value="' + U.esc(r.v) + '"' : 'autofocus') + ' aria-label="Ответ"><button class="btn"' + (r ? ' disabled' : '') + '>Проверить</button></form>';
+    if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Неверно. Ответ: <b>' + U.esc(z.as) + '</b>') + '</div><p class="hint">' + U.esc(z.e) + '</p>' + (r.ok ? funBurst(r.pts) : '');
+    h += '</article>' + (r ? '<button class="btn big" data-act="zdnext">Следующая задача →</button>' : '');
+    return h; },
+  act: function(act, b){ var kid = cur.kid; if (!kid) return;
+    if (act === 'zdtab') { cur.zdL = +b.getAttribute('data-l'); cur.fq = null; render(); }
+    else if (act === 'zdsay') { var z = zdCur(kid); if (z) say(z.q); }
+    else if (act === 'zdnext') { cur.fq = null; render(); window.scrollTo(0, 0); } },
+  form: function(k, f){ var kid = cur.kid; if (!kid || cur.fq) return; var z = zdCur(kid); if (!z) return; var el = document.getElementById('zdin'), v = String(el && el.value || '').trim(); if (!v) return alertMsg('Напиши ответ числом');
+    var n = Number(v.replace(',', '.').replace(/\s/g, '')); if (isNaN(n)) return alertMsg('Нужно число');
+    var ok = Math.abs(n - z.a) < 1e-9, F = funK(kid); F.q[z.id] = ok ? 1 : 0; var pts = ok ? funPts(kid, 'zad', zdPts(kid, z)) : 0; cur.fq = { id: z.id, v: v, ok: ok, pts: pts };
+    ev(kid, 'задача на смекалку', { subj: 'Задачи на смекалку', q: z.q, ans: v, right: z.as, ok: ok ? 'верно' : 'ошибка', coins: S.kids[kid].coins, text: pts ? '+' + pts + ' баллов' : '' }); save(); render(); }
+});
+
+/* ===== Курс «Учимся играть в шахматы» (свои тексты) =====
+   Шаги: text — объяснение (фигуру можно нажать и увидеть её ходы); quiz — вопрос; stars — собери звёзды (best — наименьшее число ходов);
+   move — сделай ход: goal = 'check' | 'mate' | 'escape' | 'promo' | 'best' (съесть фигуру ценностью ≥ v) | список ходов 'e2e4,d2d4'. */
+var CH_START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+var CH_COURSE = [
+  { id:'board', ico:'▦', t:'Шахматная доска', d:'Клетки, их имена и начальная расстановка', steps:[
+    { t:'text', fen:'8/8/8/8/8/8/8/8', mk:['h1'], h:'Шахматная доска — это 64 клетки: 8 рядов по 8 клеток. Клетки бывают светлые и тёмные. Доску кладут так, чтобы <b>в правом нижнем углу была светлая клетка</b> (она отмечена кружком).' },
+    { t:'text', fen:'8/8/8/8/8/8/8/8', mk:['e4'], h:'У каждой клетки есть имя: <b>буква</b> столбца (от a до h) и <b>цифра</b> ряда (от 1 до 8). Буквы написаны внизу доски, цифры — слева. Отмеченная клетка называется <b>e4</b>.' },
+    { t:'quiz', fen:'8/8/8/8/8/2N5/8/8', q:'', h:'Как называется клетка, на которой стоит конь?', o:['c3', 'd3', 'c4', 'b3'], a:'c3', e:'Верно: столбец c, ряд 3.' },
+    { t:'text', fen:CH_START, h:'Так фигуры стоят в начале партии. У каждого игрока 16 фигур: король, ферзь, 2 ладьи, 2 слона, 2 коня и 8 пешек. <b>Белые всегда ходят первыми.</b> Запомни: ферзь любит свой цвет — белый ферзь стоит на светлой клетке d1, чёрный — на тёмной d8.' },
+    { t:'quiz', h:'Сколько клеток на шахматной доске?', o:['32', '48', '64', '100'], a:'64', e:'Да, 8 × 8 = 64.' }
+  ]},
+  { id:'rook', ico:'♜', t:'Ладья', d:'Ходит по прямой линии', steps:[
+    { t:'text', fen:'8/8/8/8/3R4/8/8/8', h:'Ладья ходит <b>по прямой</b>: вперёд, назад, вправо и влево — на сколько угодно клеток, если путь свободен. Нажми на ладью: точками покажутся клетки, куда она может пойти.' },
+    { t:'stars', fen:'8/8/8/8/8/8/8/R7', stars:['a5', 'e5', 'e8', 'h8'], best:4, h:'Собери ладьёй все звёзды. Нажми на ладью, потом на клетку, куда идти. Постарайся за 4 хода.' },
+    { t:'stars', fen:'8/8/8/8/8/8/8/7R', stars:['b1', 'b7', 'g7', 'g3'], best:4, h:'Ещё звёзды! Собери их за 4 хода.' },
+    { t:'quiz', h:'Может ли ладья перепрыгнуть через другую фигуру?', o:['Да', 'Нет'], a:'Нет', e:'Правильно. Перепрыгивать умеет только конь.' },
+    { t:'move', fen:'8/8/8/3n4/8/8/8/3R4', goal:'d1d5', h:'Фигуры бьют (съедают) так же, как ходят: встают на клетку чужой фигуры, а её убирают с доски. Съешь ладьёй чёрного коня.', ok:'Отлично! Конь снят с доски.' }
+  ]},
+  { id:'bishop', ico:'♝', t:'Слон', d:'Ходит по диагонали', steps:[
+    { t:'text', fen:'8/8/8/8/3B4/8/8/8', h:'Слон ходит <b>по диагонали</b> — наискосок, на сколько угодно клеток. Поэтому слон всю партию остаётся на клетках одного цвета. Нажми на слона и посмотри его ходы.' },
+    { t:'stars', fen:'8/8/8/8/8/8/8/2B5', stars:['e3', 'h6', 'f8'], best:3, h:'Собери слоном все звёзды за 3 хода.' },
+    { t:'quiz', h:'Слон стоит на тёмной клетке. Может ли он когда-нибудь попасть на светлую?', o:['Да, если сходит много раз', 'Нет, никогда'], a:'Нет, никогда', e:'Верно! Поэтому говорят «светлопольный» и «чернопольный» слон.' },
+    { t:'move', fen:'8/6r1/8/8/3B4/8/8/n7', goal:'d4g7', h:'Слон может съесть ладью или коня. Ладья ценнее — съешь её!', ok:'Молодец! Ладья ценнее коня.', no:'Ладья стоит дороже коня. Ищи ладью.' }
+  ]},
+  { id:'queen', ico:'♛', t:'Ферзь', d:'Самая сильная фигура', steps:[
+    { t:'text', fen:'8/8/8/8/3Q4/8/8/8', h:'Ферзь — <b>самая сильная фигура</b>. Он ходит и как ладья, и как слон: по прямым и по диагоналям, на любое число клеток. Нажми на ферзя.' },
+    { t:'stars', fen:'8/8/8/8/8/8/8/3Q4', stars:['a4', 'd7', 'h3'], best:3, h:'Собери ферзём звёзды за 3 хода.' },
+    { t:'move', fen:'8/3n2r1/8/8/3Q4/8/1p6/8', goal:'best', v:5, h:'Ферзь может съесть одну из трёх фигур. Съешь самую ценную.', ok:'Верно, ладья самая ценная из них!', no:'Можно взять фигуру поценнее. Ладья дороже коня и пешки.' }
+  ]},
+  { id:'king', ico:'♚', t:'Король', d:'Главная фигура', steps:[
+    { t:'text', fen:'8/8/8/8/4K3/8/8/8', h:'Король — <b>главная фигура</b>. Если короля поймали — партия проиграна. Король ходит на <b>одну клетку</b> в любую сторону. Нажми на короля.' },
+    { t:'stars', fen:'8/8/8/8/8/8/8/4K3', stars:['e3', 'g4'], best:4, h:'Собери королём звёзды за 4 хода.' },
+    { t:'move', fen:'8/8/8/8/8/8/r7/4K3', goal:'escape', h:'Короля <b>нельзя</b> ставить на клетку, которую бьёт фигура соперника. Чёрная ладья бьёт весь второй ряд. Сделай любой ход королём — приложение не даст сделать неправильный.', ok:'Верно! На второй ряд нельзя: там бьёт ладья.' }
+  ]},
+  { id:'knight', ico:'♞', t:'Конь', d:'Ходит буквой «Г» и прыгает', steps:[
+    { t:'text', fen:'8/8/8/8/3N4/8/8/8', h:'Конь ходит <b>буквой «Г»</b>: две клетки прямо и одну в сторону. Конь — единственная фигура, которая умеет <b>перепрыгивать</b> через другие. Нажми на коня.' },
+    { t:'stars', fen:'8/8/8/8/8/8/8/1N6', stars:['c3', 'e4', 'f6'], best:3, h:'Собери конём звёзды за 3 хода.' },
+    { t:'stars', fen:'8/8/8/8/8/8/8/6N1', stars:['g3', 'h5'], best:3, h:'Хитрая задача: конь не может сразу попасть на g3. Собери звёзды за 3 хода.' },
+    { t:'move', fen:'8/8/8/8/8/8/PPPPPPPP/6N1', goal:'g1f3,g1h3', h:'Конь перепрыгивает через пешки. Сделай ход конём g1.', ok:'Отлично! Конь перепрыгнул через пешку.' }
+  ]},
+  { id:'pawn', ico:'♟', t:'Пешка', d:'Ходит вперёд, бьёт наискосок', steps:[
+    { t:'text', fen:'8/8/8/8/8/8/4P3/8', h:'Пешка ходит <b>только вперёд</b> на одну клетку. С начального места (второй ряд) — можно сразу на две. Назад пешки не ходят. Нажми на пешку.' },
+    { t:'move', fen:'8/8/8/3np3/4P3/8/8/8', goal:'e4d5', h:'А бьёт пешка <b>наискосок</b> — на одну клетку вперёд по диагонали. Съешь пешкой коня.', no:'Пешка ходит прямо, а бьёт наискосок!', ok:'Верно! Пешка бьёт наискосок.' },
+    { t:'move', fen:'8/3P4/8/8/8/8/8/8', goal:'promo', h:'Пешка, которая дошла до последнего ряда, <b>превращается</b> в любую фигуру, кроме короля. Чаще всего — в ферзя! Проведи пешку на 8-й ряд и выбери фигуру.', ok:'Ура, пешка стала новой фигурой!' }
+  ]},
+  { id:'value', ico:'⚖', t:'Сколько стоят фигуры', d:'Кого выгодно менять', steps:[
+    { t:'text', fen:CH_START, h:'Фигуры стоят по-разному. Считают в пешках: <b>пешка — 1, конь — 3, слон — 3, ладья — 5, ферзь — 9</b>. Король бесценен: без него партия проиграна. Отдавать дорогую фигуру за дешёвую невыгодно.' },
+    { t:'quiz', h:'Сколько пешек стоит ферзь?', o:['3', '5', '9', '12'], a:'9', e:'Верно! Ферзь — самая дорогая фигура.' },
+    { t:'quiz', h:'Выгодно ли отдать ладью за коня?', o:['Да', 'Нет'], a:'Нет', e:'Правильно: ладья (5) дороже коня (3).' },
+    { t:'move', fen:'8/8/5q2/2p5/4N3/8/3r4/8', goal:'best', v:9, h:'Конь может съесть пешку, ладью или ферзя. Выбери самый выгодный ход.', ok:'Отлично! Съесть ферзя — лучший ход.', no:'Можно взять фигуру поценнее. Посмотри все ходы коня.' }
+  ]},
+  { id:'check', ico:'♔', t:'Шах', d:'Нападение на короля', steps:[
+    { t:'text', fen:'4k3/8/8/8/8/8/8/4R1K1 b - - 0 1', h:'<b>Шах</b> — это когда фигура нападает на короля. Здесь белая ладья объявила шах чёрному королю. От шаха <b>обязательно</b> нужно защититься: уйти королём, закрыться другой фигурой или съесть ту, что напала.' },
+    { t:'move', fen:'4k3/8/8/8/8/8/8/R6K w - - 0 1', goal:'check', h:'Объяви шах чёрному королю ладьёй.', ok:'Шах! Ладья нападает на короля.' },
+    { t:'move', fen:'7k/8/8/8/4r3/8/2B5/4K3 w - - 0 1', goal:'c2e4', h:'Тебе шах от чёрной ладьи! Можно уйти королём, но есть ход лучше: <b>съешь ладью</b>.', ok:'Отлично! Ты защитился и выиграл ладью.', no:'Это защищает короля, но есть ход сильнее. Какая фигура может съесть ладью?' }
+  ]},
+  { id:'mate', ico:'#', t:'Мат и пат', d:'Как закончить партию', steps:[
+    { t:'text', fen:'3R2k1/5ppp/8/8/8/8/8/6K1 b - - 0 1', h:'<b>Мат</b> — это шах, от которого нельзя защититься. Мат — конец партии: кто поставил мат, тот победил. Здесь чёрному королю мат: уйти некуда (мешают свои пешки), закрыться нечем.' },
+    { t:'move', fen:'6k1/5ppp/8/8/8/8/8/3R2K1 w - - 0 1', goal:'mate', h:'Поставь мат одним ходом.', ok:'Мат! Это называется «мат по последней горизонтали».' },
+    { t:'text', fen:'k7/2Q5/1K6/8/8/8/8/8 b - - 0 1', h:'<b>Пат</b> — когда игроку нечем ходить, но шаха нет. Пат — это <b>ничья</b>! Здесь ход чёрных: король не под шахом, но любая клетка под ударом. Когда выигрываешь, будь осторожен — не поставь пат.' },
+    { t:'quiz', h:'Пат — это…', o:['победа', 'ничья', 'поражение'], a:'ничья', e:'Да, пат — ничья.' },
+    { t:'move', fen:'k7/8/1K6/8/8/8/8/2Q5 w - - 0 1', goal:'mate', h:'Поставь ферзём мат. Осторожно, не поставь пат!', ok:'Мат! Ферзь и король работают вместе.' }
+  ]},
+  { id:'castle', ico:'♖', t:'Рокировка', d:'Особый ход короля и ладьи', steps:[
+    { t:'text', fen:'r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1', h:'<b>Рокировка</b> — особый ход: король идёт на две клетки в сторону ладьи, а ладья перепрыгивает через него. Так король прячется в угол. Можно, если король и эта ладья ещё не ходили, между ними пусто, и король не под шахом и не проходит через битую клетку.' },
+    { t:'move', fen:'r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1', goal:'e1g1', h:'Сделай короткую рокировку: нажми на короля, а потом на клетку g1.', ok:'Отлично! Король спрятался, ладья вышла в игру.' },
+    { t:'quiz', h:'Можно ли сделать рокировку, когда тебе шах?', o:['Да', 'Нет'], a:'Нет', e:'Верно: сначала нужно защититься от шаха.' }
+  ]},
+  { id:'ep', ico:'⇢', t:'Взятие на проходе', d:'Хитрое правило пешек', steps:[
+    { t:'text', fen:'4k3/3p4/8/4P3/8/8/8/4K3 b - - 0 1', h:'Есть хитрое правило. Если пешка соперника прыгнула на две клетки и встала <b>рядом</b> с твоей пешкой, ты можешь съесть её так, будто она сходила только на одну. Но только <b>сразу</b>, следующим ходом!' },
+    { t:'move', fen:'4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1', goal:'e5d6', h:'Чёрная пешка только что сходила d7–d5. Съешь её на проходе: пешкой e5 на клетку d6.', ok:'Отлично! Это и есть взятие на проходе.' }
+  ]},
+  { id:'start', ico:'♘', t:'Как начинать партию', d:'Пять простых советов', steps:[
+    { t:'text', fen:CH_START, h:'Советы для начала партии: <b>1.</b> Займи центр пешками (e4, d4). <b>2.</b> Выведи коней и слонов. <b>3.</b> Сделай рокировку. <b>4.</b> Не гоняй ферзя в самом начале. <b>5.</b> Перед каждым ходом спроси себя: на что нападает соперник?' },
+    { t:'move', fen:CH_START, goal:'e2e4,d2d4', h:'Сделай хороший первый ход: пешкой в центр.', ok:'Отлично! Пешка заняла центр.', no:'Ход возможен, но лучше занять центр: пешкой e2 или d2 на две клетки.' },
+    { t:'quiz', h:'Что лучше сделать в начале партии?', o:['Вывести коней и слонов', 'Ходить только пешками a и h', 'Сразу ходить королём'], a:'Вывести коней и слонов', e:'Верно! Фигуры должны быстро вступить в игру.' },
+    { t:'text', fen:CH_START, h:'Ты знаешь все правила! 🎉 Теперь решай задачи «Мат в 1 ход» и играй вдвоём в режиме «Играть вдвоём».' }
+  ]}
+];
+
+/* Шахматные задачи: позиции сгенерированы и проверены движком Stockfish (свои, не из сборников). Белые всегда начинают. s — решение (ходы в формате e2e4). */
+var CHESS_PUZ = {"m1e":[{"f":"4k3/8/4K3/8/8/8/6R1/8 w - - 0 1","s":["g2g8"]},{"f":"k7/2K5/8/8/8/8/8/7R w - - 0 1","s":["h1a1"]},{"f":"8/8/8/6Q1/8/4K3/8/4k3 w - - 0 1","s":["g5g1"]},{"f":"k7/8/K7/8/8/8/2Q5/8 w - - 0 1","s":["c2c8"]},{"f":"1k6/6Q1/K7/8/8/8/8/8 w - - 0 1","s":["g7b7"]},{"f":"7k/8/6K1/8/8/8/8/4Q3 w - - 0 1","s":["e1e8"]},{"f":"3k4/8/3K4/8/8/2Q5/8/8 w - - 0 1","s":["c3h8"]},{"f":"8/8/8/8/4R3/5n2/8/k1K5 w - - 0 1","s":["e4a4"]},{"f":"8/4B3/8/8/8/8/2K5/kB6 w - - 0 1","s":["e7f6"]},{"f":"3k1K2/8/8/8/8/7B/8/6B1 w - - 0 1","s":["g1b6"]},{"f":"8/8/6R1/8/8/5K2/3b4/4k3 w - - 0 1","s":["g6g1"]},{"f":"8/8/8/8/8/K5RN/8/k7 w - - 0 1","s":["g3g1"]},{"f":"8/8/8/5B2/8/K7/8/k1B5 w - - 0 1","s":["c1b2"]},{"f":"8/8/8/8/8/BR1K4/8/3k4 w - - 0 1","s":["b3b1"]},{"f":"2N5/5K1k/8/8/8/5R2/8/8 w - - 0 1","s":["f3h3"]},{"f":"8/1R6/8/8/8/8/1N3K2/7k w - - 0 1","s":["b7h7"]},{"f":"2Nk4/8/3K4/8/8/8/8/6R1 w - - 0 1","s":["g1g8"]},{"f":"8/8/5K1k/8/8/8/6N1/R7 w - - 0 1","s":["a1h1"]},{"f":"5K2/7k/1R6/8/6N1/8/8/8 w - - 0 1","s":["b6h6"]},{"f":"3N4/8/6R1/8/8/k1K5/8/8 w - - 0 1","s":["g6a6"]},{"f":"3k4/8/N2K4/8/8/8/8/1R6 w - - 0 1","s":["b1b8"]},{"f":"6N1/8/8/5R2/8/8/2K5/k7 w - - 0 1","s":["f5a5"]},{"f":"8/6N1/k1K5/8/8/1R6/8/8 w - - 0 1","s":["b3a3"]},{"f":"2k5/8/PK6/8/Q7/8/8/8 w - - 0 1","s":["a4e8"]},{"f":"8/8/N1K5/k7/8/8/3R4/8 w - - 0 1","s":["d2a2"]},{"f":"3R2R1/8/8/8/8/8/3K1k2/8 w - - 0 1","s":["d8f8"]},{"f":"3Q4/5K2/7k/8/8/3P4/8/8 w - - 0 1","s":["d8h4"]},{"f":"5B2/k1K5/8/7R/8/8/8/8 w - - 0 1","s":["h5a5"]},{"f":"8/8/1B6/6R1/8/8/5K1k/8 w - - 0 1","s":["g5h5"]},{"f":"8/2P3Q1/8/8/8/2K5/8/2k5 w - - 0 1","s":["g7g1"]},{"f":"8/2K5/k1B5/8/8/8/8/2R5 w - - 0 1","s":["c1a1"]},{"f":"8/k7/P7/8/1Q6/8/8/1K6 w - - 0 1","s":["b4b7"]},{"f":"7k/8/5K2/2R2B2/8/8/8/8 w - - 0 1","s":["c5c8"]},{"f":"8/8/7k/7P/5K2/8/8/Q7 w - - 0 1","s":["a1h8"]},{"f":"k1K5/7R/8/8/8/8/8/7R w - - 0 1","s":["h1a1"]},{"f":"8/8/8/8/k1K5/5R2/8/2R5 w - - 0 1","s":["c1a1"]},{"f":"8/8/8/8/3B4/1B4K1/8/7k w - - 0 1","s":["b3d5"]},{"f":"4k3/6R1/4K3/4B3/8/8/8/8 w - - 0 1","s":["g7g8"]},{"f":"7k/8/6RK/8/2R5/8/8/8 w - - 0 1","s":["c4c8"]},{"f":"k7/5R2/1K6/8/6B1/8/8/8 w - - 0 1","s":["f7f8"]},{"f":"6Q1/3k4/6R1/3K4/8/8/8/8 w - - 0 1","s":["g6g7"]},{"f":"3k4/8/2K5/8/8/7Q/P7/8 w - - 0 1","s":["h3d7"]},{"f":"8/k7/P1Q5/8/8/8/8/1K6 w - - 0 1","s":["c6b7"]},{"f":"8/7k/5P2/8/8/8/6Q1/1K6 w - - 0 1","s":["g2g7"]},{"f":"8/8/8/8/8/1R5R/4K1k1/8 w - - 0 1","s":["b3g3"]},{"f":"8/8/4R3/8/K1k5/8/8/3R4 w - - 0 1","s":["e6c6"]},{"f":"8/8/8/8/3K4/3R4/1R6/7k w - - 0 1","s":["d3d1"]},{"f":"8/5Q2/8/8/8/8/1PK5/k7 w - - 0 1","s":["f7a7"]},{"f":"7k/8/1K4R1/8/8/8/8/1R6 w - - 0 1","s":["b1h1"]},{"f":"2K5/8/2R5/8/7k/8/6R1/8 w - - 0 1","s":["c6h6"]},{"f":"8/8/1R6/8/8/2R1K3/8/k7 w - - 0 1","s":["c3a3"]},{"f":"8/7k/8/2R5/8/K5R1/8/8 w - - 0 1","s":["c5h5"]},{"f":"8/8/8/1R5K/5R2/8/k7/8 w - - 0 1","s":["f4a4"]},{"f":"6K1/8/8/7k/8/8/3R4/6R1 w - - 0 1","s":["d2h2"]},{"f":"3R4/8/2K3R1/8/8/8/7k/8 w - - 0 1","s":["d8h8"]},{"f":"3k4/R7/8/5R2/8/7K/8/8 w - - 0 1","s":["f5f8"]},{"f":"8/8/2K4R/8/8/8/5R2/3k4 w - - 0 1","s":["h6h1"]},{"f":"7k/2R5/8/K7/8/8/1R6/8 w - - 0 1","s":["b2b8"]},{"f":"8/8/5R2/8/K7/8/3R4/7k w - - 0 1","s":["f6f1"]},{"f":"1k6/6R1/8/8/7K/4R3/8/8 w - - 0 1","s":["e3e8"]}],"m1":[{"f":"5k2/8/6K1/p5Bp/P6p/6P1/3R1P2/8 w - - 5 60","s":["d2d8"]},{"f":"5k2/8/6K1/p5Bp/P7/6Pp/2R2P2/8 w - - 0 61","s":["c2c8"]},{"f":"7k/3R4/P4PB1/1p5P/1P6/6P1/8/7K w - - 5 61","s":["d7d8"]},{"f":"6k1/8/P4PB1/1p5P/1P6/6P1/3R4/7K w - - 7 62","s":["d2d8"]},{"f":"7k/P2R3B/5P2/1p5P/1P6/6P1/8/7K w - - 3 65","s":["a7a8q"]},{"f":"8/3b1Q2/8/2K5/2P1Np1k/5P2/P5P1/8 w - - 19 53","s":["f7h7"]},{"f":"8/RP3k2/2R5/2P4p/1K6/4p1p1/7P/8 w - - 0 57","s":["b7b8q"]},{"f":"3k4/2R5/P4P2/1p3B2/1P5P/6P1/8/7K w - - 3 57","s":["c7c8"]},{"f":"6k1/P2R4/5P2/1p3B1P/1P6/6P1/8/7K w - - 5 66","s":["a7a8q"]},{"f":"7k/2R5/3b2P1/4p3/2B5/5P2/1KP4P/8 w - - 3 65","s":["c7h7"]},{"f":"6k1/R7/6P1/4B2p/4P3/3P2P1/6P1/5K2 w - - 1 49","s":["a7a8"]},{"f":"8/8/4bQ2/2K4k/P1P1Np2/5P2/6P1/8 w - - 1 55","s":["f6g5"]},{"f":"k7/8/1Q2B3/PP6/6p1/3Kp3/1P5P/8 w - - 3 44","s":["e6d5"]},{"f":"4k3/P7/4BP2/1p5P/1P6/3R2P1/8/7K w - - 9 68","s":["a7a8q"]},{"f":"8/3b4/5Q2/2K4k/2P1Np2/5P2/P5P1/8 w - - 17 52","s":["f6g5"]},{"f":"8/4N3/7k/1p2p2B/4P2P/8/N2K2Q1/8 w - - 3 54","s":["g2g6"]},{"f":"2k5/5Q2/4N3/4P2P/1PN5/4p3/7P/6K1 w - - 4 60","s":["f7c7"]},{"f":"8/8/k2NN3/4P2P/1P6/8/4pQ1P/6K1 w - - 6 64","s":["e6c7"]},{"f":"7R/7b/p7/2B4k/5K2/P5R1/1P5P/8 w - - 1 45","s":["h8h7"]},{"f":"6Q1/7R/2B3n1/6kP/1p6/1P1p2K1/8/8 w - - 1 68","s":["g8g6"]},{"f":"3k4/5Q2/8/2N1P2P/1PN5/4p3/7P/6K1 w - - 2 59","s":["f7d7"]},{"f":"3R4/7R/k5p1/3P2B1/1P2P3/N7/K7/8 w - - 1 49","s":["d8d6"]},{"f":"8/7R/2B2kn1/3Q3P/1p6/1P1p2K1/8/8 w - - 3 69","s":["h7f7"]},{"f":"8/8/8/4RPB1/5K1P/2Q3p1/P5P1/3k4 w - - 0 51","s":["e5e1"]},{"f":"8/8/8/2R2PB1/5K1P/1Q4p1/P5P1/k7 w - - 6 54","s":["g5f6"]},{"f":"6R1/4R2R/1p6/3K1k2/2B5/Pp6/6P1/8 w - - 1 46","s":["h7f7"]},{"f":"6k1/5p2/R4P2/Pp6/1P5P/3B2P1/8/7K w - - 7 52","s":["a6a8"]},{"f":"7k/R4p2/5P2/Pp6/1P5P/3B2P1/8/7K w - - 9 53","s":["a7a8"]},{"f":"3nBR2/8/4N1Pk/7P/1p1p4/1P6/7K/8 w - - 1 59","s":["f8h8"]},{"f":"3nBR2/7k/4N3/6PP/1p1p4/1P6/7K/8 w - - 5 58","s":["e8g6"]},{"f":"7k/2P3R1/8/p4N1P/P6P/3KP3/1B6/8 w - - 5 50","s":["c7c8q"]},{"f":"6k1/2PR4/8/p4N1P/P6P/3KP3/1B6/8 w - - 7 51","s":["c7c8q"]},{"f":"k1B5/4Q3/8/PP6/3pp1p1/8/1P1K3P/8 w - - 0 38","s":["e7b7"]},{"f":"k1B5/4Q3/8/PP6/3p2p1/4p3/1P2K2P/8 w - - 0 39","s":["e7b7"]},{"f":"1kB5/4Q3/8/PP6/3p2p1/3Kp3/1P5P/8 w - - 2 40","s":["e7b7"]},{"f":"8/2r5/k1n5/2QNp3/8/1P4PP/6RK/8 w - - 2 60","s":["c5b6"]},{"f":"k1B5/4Q3/8/1P1p4/P3p1p1/8/1P1K3P/8 w - - 0 37","s":["e7b7"]},{"f":"2Q5/8/p3rB2/5kP1/3R1N2/2P5/3K4/r7 w - - 0 58","s":["c8e6"]},{"f":"2Q5/8/p3rB2/5kP1/3R1N2/2P5/p7/2K5 w - - 7 57","s":["c8e6"]},{"f":"5Q2/4B3/4P3/7k/2PNBP1p/4K2P/8/8 w - - 3 65","s":["f8h8"]},{"f":"5R2/5R2/7k/P7/2R3pP/2N3N1/2P5/6K1 w - - 0 49","s":["c4c6"]},{"f":"7k/5R2/5R2/P7/2R3pP/2N3N1/2P5/6K1 w - - 4 51","s":["c4c8"]},{"f":"5R2/7k/5R2/P7/2R3pP/2N3N1/2P5/6K1 w - - 2 50","s":["c4c7"]},{"f":"Q7/4B3/4P2k/8/2PNBP1p/4K2P/8/8 w - - 1 64","s":["a8h8"]},{"f":"4k1qR/R7/8/2p5/P2p3P/3P2P1/8/5BK1 w - - 7 53","s":["h8g8"]},{"f":"k1B5/4Q3/8/3pp3/6p1/PP6/1P2K2P/6b1 w - - 0 33","s":["e7b7"]},{"f":"k1B5/4Q3/8/3pp3/PP4p1/8/1P2K2P/4b3 w - - 1 35","s":["e7b7"]},{"f":"k1B5/4Q3/8/3pp3/P5p1/1P6/1P2Kb1P/8 w - - 1 34","s":["e7b7"]},{"f":"2Q1n1k1/3R4/8/6pp/3P4/7P/PP3P2/6K1 w - - 0 36","s":["c8e8"]},{"f":"k1B5/4Q3/8/1P1pp3/P5p1/8/1P1bK2P/8 w - - 1 36","s":["e7b7"]},{"f":"3Q4/r5p1/2p5/1p2p3/8/p6k/P4P2/2K3R1 w - - 4 45","s":["d8h8"]},{"f":"5k2/3R2p1/p3p1Q1/1p6/1p6/P2R4/3K4/2r5 w - - 8 44","s":["g6f7"]},{"f":"8/r5p1/2p5/1p2p3/7k/p2Q4/P4P2/2K3R1 w - - 2 44","s":["d3h7"]},{"f":"5R2/2p5/p6k/8/1pb5/P1B1K1R1/1P5P/8 w - - 0 40","s":["f8h8"]},{"f":"8/1B5k/5B1p/4P3/3N4/2P4P/P4P2/4K1R1 w - - 11 44","s":["b7e4"]},{"f":"8/1B5R/5Bk1/P3P3/3N3p/2P4P/3K1P2/8 w - - 3 49","s":["b7e4"]},{"f":"4R3/7k/2P2Bp1/8/2P5/1P1B4/rP3R1K/8 w - - 3 43","s":["e8h8"]},{"f":"3k4/6Q1/R1p5/R2p3B/8/2N3p1/1PP5/3K4 w - - 3 43","s":["a6a8"]},{"f":"2Q5/3B2k1/3R3N/4Pp2/r7/8/5P1P/5RK1 w - - 0 40","s":["c8g8"]},{"f":"2BN4/8/3k4/pQ4pp/P1p5/8/1P3K2/4R3 w - - 0 50","s":["b5c6"]},{"f":"2k5/8/R2Q4/5P2/Pp4p1/8/2P4P/5RKB w - - 0 52","s":["a6a8"]},{"f":"5R2/7k/5R1B/P7/2R3pP/2N5/2P1N3/6K1 w - - 0 47","s":["c4c7"]},{"f":"1R6/2pk4/8/1P3R2/3N1B1p/1P5P/6K1/R7 w - - 1 44","s":["f5f7"]},{"f":"8/1B3RR1/P1p4k/5p1P/3P2P1/1P6/8/4bK2 w - - 0 51","s":["g7g6"]},{"f":"6k1/7R/6p1/p5Np/7P/P5P1/1p2RP2/5K2 w - - 2 54","s":["e2e8"]},{"f":"7k/5R2/6p1/p5Np/7P/P5P1/1p2RP2/5K2 w - - 0 53","s":["e2e8"]},{"f":"5k2/8/1p2BB2/p3PP1p/3P2R1/8/PP1K4/8 w - - 0 45","s":["g4g8"]},{"f":"k1B5/4Q3/8/3pp2p/8/PP6/1P2K1PP/6b1 w - - 2 32","s":["e7b7"]},{"f":"k7/1r6/1Q2N3/6P1/p7/4P2p/7P/1RN2KR1 w - - 0 52","s":["b6b7"]},{"f":"k7/1r6/NQ6/6P1/p7/4P2p/7P/1RN2KR1 w - - 4 54","s":["b6b7"]},{"f":"2k5/1p1R2P1/2p5/4B3/1P2P3/1b4PB/4N3/6K1 w - - 1 41","s":["d7d5"]},{"f":"5Q2/3RP3/p5p1/P7/4k1p1/5N1r/1P5P/4K3 w - - 3 38","s":["e7e8q"]},{"f":"1k6/1rN5/1Q6/6P1/p7/4P2p/7P/1RN2KR1 w - - 2 53","s":["b6b7"]},{"f":"5Q2/3RP3/p5p1/P3k1N1/6p1/7r/1P5P/4K3 w - - 1 37","s":["e7e8q"]},{"f":"4R3/2k1N3/3N4/1R6/1BpP3p/7P/1P3PK1/8 w - - 0 41","s":["b5b7"]},{"f":"2Q5/1B3p2/3k3p/p3R3/5P1P/P5p1/7P/5K2 w - - 0 43","s":["c8c6"]},{"f":"2k5/8/R1BQ4/p4P2/PP4p1/8/2P4P/5RK1 w - - 7 51","s":["a6a8"]},{"f":"5R2/7k/5R2/P6p/2R4P/2N5/2P1NBP1/6K1 w - - 1 42","s":["c4c7"]},{"f":"6RR/5k2/8/3PPN2/pp6/P7/1PP2K2/7R w - - 0 44","s":["g8g7"]},{"f":"5R2/7k/5R1B/P6p/2R4P/2N5/2P1N1P1/6K1 w - - 9 46","s":["c4c7"]}],"hang":[{"f":"8/6k1/8/5pPp/7P/8/4K3/3b1B2 w - - 0 61","s":["e2d1","g7g6","d1d2"]},{"f":"b4r2/8/4k3/8/pK6/P7/1P6/5R2 w - - 20 75","s":["f1f8","a8c6","f8c8"]},{"f":"4b3/8/P5kP/2n2p1n/3K4/8/8/2B5 w - - 5 72","s":["d4c5","h5f6","a6a7"]},{"f":"8/8/4Pkp1/bR3p2/5K1p/8/6P1/8 w - - 0 62","s":["b5a5","g6g5","f4e3"]},{"f":"8/4Bb2/1p4P1/2pk4/p5P1/8/5K2/8 w - - 1 51","s":["g6f7","a4a3","f7f8r"]},{"f":"4Q3/2k5/p6p/P3q3/2P5/8/8/1Kn5 w - - 1 61","s":["e8e5","c7c8","e5c5"]},{"f":"8/5R2/3kp2R/b2n4/5P2/3r4/4K3/8 w - - 3 71","s":["e2d3","d5b4","d3e4"]},{"f":"8/7k/2b2R2/6r1/3p1p1P/3P4/2P5/5K2 w - - 1 53","s":["h4g5","c6a4","f1e2"]},{"f":"3r4/Rn6/5k2/3p4/B2P2Kp/8/5P2/8 w - - 3 61","s":["a7b7","d8h8","b7b6"]},{"f":"8/6kp/7p/1p2Pr2/6p1/1R1B2K1/8/8 w - - 4 47","s":["d3f5","b5b4","b3b4"]},{"f":"8/8/6p1/3p1pP1/3P4/1k1bK2p/7P/4B3 w - - 14 66","s":["e3d3","b3a4","d3e3"]},{"f":"8/5p2/4k3/p1r4p/3BK2P/1P3P2/6P1/8 w - - 15 54","s":["d4c5","a5a4","b3a4"]},{"f":"8/p3k3/8/N1r5/3n2Pp/8/5P1P/2R3K1 w - - 0 45","s":["c1c5","d4f3","g1g2"]},{"f":"2Q1r3/8/5k2/p3b3/P5Pp/7P/8/5K1b w - - 1 69","s":["c8e8","e5g3","e8h8"]},{"f":"r7/8/5p2/R2p4/2p1nk1p/R7/2P4P/4K3 w - - 16 58","s":["a5a8","f6f5","a8c8"]},{"f":"k6r/8/1Bp5/P2b4/3R4/K3B2P/1P6/6r1 w - - 0 60","s":["e3g1","h8h3","a3a4"]},{"f":"2r5/b7/8/P7/4p2r/2B1P2K/2NPk1P1/R7 w - - 0 53","s":["h3h4","e2d3","c2b4"]},{"f":"5n2/8/2pk1n2/p4PN1/2bP4/2K3PB/1P6/8 w - - 7 49","s":["c3c4","f8d7","h3g2"]},{"f":"6k1/3Np2p/p3p3/4b3/8/3p4/PP3P1P/5K2 w - - 0 33","s":["d7e5","d3d2","f1e2"]},{"f":"r7/p3P1k1/3n1p2/8/2p1P3/BP5B/2K3P1/8 w - - 0 34","s":["a3d6","c4b3","c2b3"]},{"f":"8/R1q2p2/3rk3/4n1p1/4Q3/4P2P/2p5/2R3K1 w - - 4 49","s":["a7c7","f7f5","e4c2"]},{"f":"6k1/8/1p1p2p1/p2N3p/P2q3P/4P1P1/1P5K/8 w - - 7 38","s":["e3d4","b6b5","a4b5"]},{"f":"r7/4R2p/2k1P1p1/8/2p2P1P/p7/P2K2R1/4r3 w - - 3 46","s":["d2e1","c6d6","e7h7"]},{"f":"6r1/6p1/1r3k2/p2Bp3/2P5/6P1/1P3P1P/5K1R w - - 4 40","s":["d5g8","a5a4","f1g2"]},{"f":"8/k3pp1p/p6p/5b2/5PP1/2K4P/P2r4/4R3 w - - 3 33","s":["c3d2","f5e6","a2a3"]},{"f":"7R/2k2pp1/8/p1p5/3p4/Pb1K1P2/4N1P1/2b5 w - - 4 38","s":["e2c1","b3a4","c1e2"]},{"f":"r3R3/1n3pk1/5bp1/1B1p2N1/P6K/7P/5P2/8 w - - 2 48","s":["e8a8","b7c5","f2f4"]},{"f":"r7/1p4k1/6p1/6n1/P3p2Q/4P1P1/1q6/2N2RK1 w - - 2 49","s":["h4g5","a8c8","g5b5"]},{"f":"8/ppp4k/4nr1p/4PN2/1P6/1K5R/PP6/8 w - - 9 33","s":["e5f6","h7g6","h3h6"]},{"f":"8/6pk/5p1p/1p3P1P/p7/P3r1P1/2P2P2/3R2K1 w - - 0 46","s":["f2e3","h7g8","d1b1"]},{"f":"5k2/4bp2/2B4p/p1P5/5Pp1/P5P1/7P/1r1R1K2 w - - 0 34","s":["d1b1","e7c5","a3a4"]},{"f":"8/5kp1/5p2/pr5P/2np1P2/2pK3P/4N1B1/2B5 w - - 0 44","s":["d3c4","b5h5","e2d4"]},{"f":"1r4nk/p7/1p2bp2/5P2/2P1P3/1P6/3PB1P1/2BK4 w - - 0 25","s":["f5e6","b8e8","e2g4"]},{"f":"R1b5/p3p1k1/5p2/P1p3r1/2r4p/Q3P2P/2P5/1K6 w - - 2 38","s":["a8c8","g5g1","b1b2"]},{"f":"5k2/5pp1/7p/2p1p3/BP6/3r3N/2n1PP1P/2B2K2 w - - 0 29","s":["e2d3","c2b4","c1a3"]},{"f":"6r1/2p4p/2k4P/4b2R/p1PrP3/P7/1P1B1N2/4K3 w - - 0 43","s":["h5e5","d4c4","e5e7"]},{"f":"2k1r3/1q6/p1p5/3bN2B/1P5p/P7/1B1N1P2/R3K3 w - - 0 37","s":["h5e8","b7g7","e8d7"]},{"f":"1nb1k3/7p/3p3P/2p3p1/1N3B2/8/1PP1K1P1/r4R2 w - - 0 28","s":["f1a1","g5f4","b4d5"]},{"f":"4k2r/1r3p2/B3p1n1/5n2/1P6/2P3P1/P4K1P/1R5R w - - 0 27","s":["a6b7","g6e5","b1d1"]},{"f":"r7/1Q6/1pnk2p1/p1bp1b2/4pN2/P6P/8/3K1R2 w - - 8 44","s":["b7a8","d5d4","f4g6"]},{"f":"8/1pkb4/2pp4/5pp1/3R3P/1P1B1P2/P1P5/1K2r2R w - - 2 34","s":["h1e1","c6c5","d4d5"]},{"f":"5k2/1r2bp2/2B4p/p1P5/5Pp1/P5P1/7P/R1Rr1K2 w - - 1 32","s":["c1d1","b7c7","c6e4"]},{"f":"2k5/8/ppn2p1b/q3p3/P1Q1P3/6Pp/5P1P/5K1R w - - 0 43","s":["c4c6","c8b8","c6d6"]},{"f":"2q5/1kpp3R/4r1p1/3b4/1PPP4/N3P3/3KB1P1/2B5 w - - 1 33","s":["c4d5","e6f6","d2c3"]},{"f":"3k3r/pp4N1/2p5/3p1q1p/6rp/8/PP2R1P1/3Q2K1 w - - 2 38","s":["g7f5","h8f8","f5h6"]},{"f":"2r5/3p2k1/7p/p2bp1p1/P4p2/1q6/5Q1P/1NR1RK2 w - - 0 39","s":["c1c8","b3h3","f1e2"]},{"f":"4r3/npQ3bk/7q/4Nr1p/1p1p4/3P4/7P/5RRK w - - 0 49","s":["f1f5","e8e5","f5e5"]},{"f":"8/1k3N2/2p2pp1/1pPp1P1p/r6P/6P1/2P2rK1/1RB5 w - - 0 39","s":["g2f2","g6f5","f7d6"]},{"f":"8/p1k2p2/p3b2p/2P4n/2p4b/P1P3P1/1P1N1P2/R5K1 w - - 0 32","s":["g3h4","h5f4","d2f3"]},{"f":"B1b2bk1/7p/p3p1p1/3pB3/2p4P/P5P1/1P3n2/R5K1 w - - 0 26","s":["g1f2","f8c5","f2g2"]},{"f":"4r3/6bp/1p1pkpp1/p7/P4P2/4BB1P/1P3R1K/5b2 w - - 0 31","s":["f2f1","e6d7","e3b6"]},{"f":"3r4/pR3pk1/1p4p1/5b1p/P3r2P/2b3P1/1P6/R4Q1K w - - 0 32","s":["b2c3","e4e3","a1d1"]},{"f":"2k2br1/1p2pp1p/2p4p/3b3P/Pn5R/4Q3/1PP1K3/8 w - - 4 29","s":["h4b4","e7e5","c2c4"]},{"f":"r2k3r/pP2pR2/3p1bp1/3P2N1/6b1/R4NK1/1P4q1/2Q5 w - - 0 25","s":["g3g2","a8b8","f7f6"]},{"f":"8/1p2k1pp/4pp2/bP6/4P1nP/P2N4/2rN1PP1/3K1R2 w - - 0 27","s":["d1c2","a5d2","c2d2"]},{"f":"4r1k1/p2p3p/1q6/n5p1/P5P1/3n4/1P1BP1KP/3Q1BR1 w - - 0 27","s":["e2d3","a5b3","g2h1"]},{"f":"1r4k1/3p3p/3Rp1p1/5p2/p6P/P3P1P1/1b3PB1/3n2NK w - - 0 33","s":["d6d1","d7d5","g1f3"]},{"f":"6k1/1pp1n1p1/4r3/p2p2Np/P2P2nP/N1P3P1/3K4/5R2 w - - 0 30","s":["g5e6","g4f6","d2c1"]},{"f":"2r4r/1N2p1k1/p1p5/1p6/1P3Rp1/P1PR3b/3B3P/4b2K w - - 1 41","s":["d2e1","c8f8","b7c5"]},{"f":"1nb1r3/1ppk4/r5N1/pN1P2pP/1p6/6P1/6K1/2RR1n2 w - - 4 30","s":["d1f1","b4b3","b5c7"]}],"m2":[{"f":"5k2/8/8/7K/8/8/8/4R3 w - - 8 72","s":["h5g6","f8g8","e1e8"]},{"f":"8/5K2/7k/8/8/4R3/8/8 w - - 18 77","s":["e3e5","h6h7","e5h5"]},{"f":"4k3/8/8/5K2/8/3R1P2/8/8 w - - 5 65","s":["f5f6","e8f8","d3d8"]},{"f":"7k/3R4/8/5K2/8/5P2/8/8 w - - 19 72","s":["f5g6","h8g8","d7d8"]},{"f":"3k4/P7/8/8/8/8/1R6/4K3 w - - 1 66","s":["b2b7","d8c8","a7a8q"]},{"f":"k7/8/P7/1K6/8/5P2/8/7R w - - 5 74","s":["b5b6","a8b8","h1h8"]},{"f":"3Q4/8/4P3/N7/k7/6K1/8/8 w - - 0 62","s":["d8b6","a4a3","b6b3"]},{"f":"8/8/8/P7/1N4P1/6Q1/3k4/6K1 w - - 3 79","s":["g3d3","d2e1","b4c2"]},{"f":"8/P7/k7/7N/7P/2Q5/7K/8 w - - 1 72","s":["a7a8q","a6b5","a8a5"]},{"f":"5k2/7Q/8/B7/2K5/1p6/P7/8 w - - 0 73","s":["a5b4","f8e8","h7e7"]},{"f":"3k4/6K1/R3PP2/P7/8/3P4/8/8 w - - 1 63","s":["a6c6","d8e8","c6c8"]},{"f":"1k6/5R2/1P6/3pN3/3P4/1K6/8/8 w - - 7 78","s":["e5c6","b8c8","b6b7"]},{"f":"8/8/4P3/3N4/5P1k/R7/8/1B5K w - - 3 71","s":["b1f5","h4h5","a3h3"]},{"f":"8/8/8/3NP3/5P1k/R7/8/1B4K1 w - - 1 69","s":["b1f5","h4h5","a3h3"]},{"f":"8/4N3/6Q1/r7/5k2/2P5/4KP2/8 w - - 11 54","s":["g6g3","f4e4","g3e3"]},{"f":"4k3/1P2N3/5P1Q/8/P7/2K5/8/8 w - - 7 69","s":["b7b8q","e8f7","b8g8"]},{"f":"5k2/8/pR2P1K1/P4P2/8/3P4/8/8 w - - 5 58","s":["f5f6","f8e8","b6b8"]},{"f":"5k2/R7/7P/8/3P1P2/5p2/N7/7K w - - 1 48","s":["h6h7","f3f2","h7h8q"]},{"f":"2k5/3R4/5P2/8/6B1/4p1P1/1p6/1K6 w - - 11 74","s":["f6f7","c8b8","f7f8q"]},{"f":"8/8/7p/6k1/3R2p1/3B2P1/6P1/1K6 w - - 3 64","s":["d4d6","h6h5","d6g6"]},{"f":"5R2/7k/8/7N/6KP/4P3/5PP1/8 w - - 5 62","s":["g4f5","h7h6","f8h8"]},{"f":"1Q6/8/2b5/P5P1/2PK4/4R3/6k1/8 w - - 3 72","s":["b8g3","g2h1","e3e1"]},{"f":"8/4P3/6R1/1k2p3/2nb4/pK6/2r5/8 w - - 3 64","s":["e7e8q","b5c5","e8c6"]},{"f":"6R1/3P4/8/7k/p7/K4p2/P4P1p/8 w - - 0 62","s":["d7d8q","h2h1q","d8g5"]},{"f":"8/2R5/Pk6/2NB4/2K1P3/6r1/4p3/8 w - - 2 63","s":["c7b7","b6a5","b7b5"]},{"f":"8/8/4bQ2/2K4k/P1P5/5Pp1/6P1/8 w - - 0 56","s":["f3f4","e6c8","f6g5"]},{"f":"4N3/8/4R3/5k2/PB5p/2P1P2K/8/8 w - - 1 56","s":["e8g7","f5g5","b4e7"]},{"f":"4Q3/7k/7r/pp5R/8/3P2P1/8/7K w - - 3 57","s":["e8f7","h7h8","h5h6"]},{"f":"1B2k3/1R6/6P1/8/4P2P/3P4/6P1/5K2 w - - 7 54","s":["g6g7","e8d8","g7g8q"]},{"f":"6Q1/1P6/3k4/3N3p/bK5P/6P1/8/8 w - - 3 74","s":["b7b8q","d6c6","b8c7"]},{"f":"1kN5/8/2Q5/2p5/p7/P3p2P/2K5/8 w - - 0 58","s":["c8d6","c5c4","c6b7"]},{"f":"6k1/8/p3N3/P5P1/4N3/7P/5R2/6K1 w - - 7 65","s":["g5g6","g8h8","f2f8"]},{"f":"3R4/6B1/8/8/5N1k/2P3R1/1p5p/7K w - - 4 51","s":["h1h2","b2b1q","g7f6"]},{"f":"6k1/5R2/5P2/Pp6/1P5P/3B2P1/8/7K w - - 1 54","s":["d3g6","g8h8","f7f8"]},{"f":"4k3/8/6K1/p5Bp/P6p/6P1/2R2P2/8 w - - 3 59","s":["c2d2","e8f8","d2d8"]},{"f":"5k2/2R5/5P2/Pp6/1P5P/3B2P1/8/7K w - - 3 55","s":["d3g6","f8g8","c7c8"]},{"f":"7k/2R5/7N/p5P1/8/P4p2/1P2PK2/8 w - - 0 50","s":["g5g6","f3e2","c7h7"]},{"f":"4R3/2P3k1/7p/7B/4pP1N/4P3/6K1/8 w - - 3 62","s":["c7c8q","g7f6","c8c3"]},{"f":"8/2R3Pk/3b4/4p3/2B5/5P2/1KP4P/8 w - - 1 66","s":["g7g8q","h7h6","c7h7"]},{"f":"8/3R2Pk/3b4/8/2B1p3/5P2/1KP4P/8 w - - 0 67","s":["g7g8q","h7h6","d7h7"]},{"f":"1k6/4P3/8/3R4/2B5/2P4P/1P1K1P1P/8 w - - 1 53","s":["d5d7","b8a8","e7e8q"]},{"f":"2R1N3/8/5p1P/1k3K2/8/2p2P2/6P1/3R4 w - - 8 59","s":["d1b1","b5a4","c8a8"]},{"f":"3k4/8/2Q5/7p/r1B4P/5PR1/6P1/6K1 w - - 3 47","s":["g3g8","d8e7","g8e8"]},{"f":"8/1P6/k7/5pP1/PPN4p/3KP2P/8/8 w - - 0 55","s":["b7b8q","f5f4","b4b5"]},{"f":"6k1/6p1/6Np/5R1P/3p4/3P4/5KP1/1B6 w - - 1 50","s":["f5f8","g8h7","f8h8"]},{"f":"3k4/6P1/3B4/5p2/PPN4p/3KP2P/8/8 w - - 1 63","s":["c4b6","d8e8","g7g8q"]},{"f":"3nB1k1/5R2/4N3/6PP/1p1p4/1P6/7K/8 w - - 3 57","s":["f7f8","g8h7","e8g6"]},{"f":"2n2k2/7Q/4p1p1/p3P3/8/6P1/1P3K2/7R w - - 3 55","s":["h7h8","f8f7","h1h7"]},{"f":"2k5/4r3/8/2N3QP/1P1Pp3/4N3/7P/6K1 w - - 1 55","s":["g5e7","c8b8","e7b7"]},{"f":"8/8/p1P5/4B3/5pp1/1P1K1k2/P6R/7R w - - 4 56","s":["h1f1","f3g3","e5f4"]},{"f":"5r2/4k3/2Q5/1p6/7P/1p3P1P/b2R4/7K w - - 14 63","s":["d2d7","e7e8","c6c8"]},{"f":"8/5Q2/7k/p3p3/P5p1/4R2p/7P/1N3K2 w - - 0 56","s":["e3e5","g4g3","e5h5"]},{"f":"k7/3B1R2/1r6/P1N5/2K1P3/6BP/4p3/8 w - - 7 57","s":["a5b6","e2e1r","f7f8"]},{"f":"8/8/p1P5/4B3/5pp1/1P1K1k2/P6R/6R1 w - - 0 54","s":["g1f1","f3g3","e5f4"]},{"f":"2B5/5pk1/7R/3P4/8/5NPP/3Q1PK1/8 w - - 1 39","s":["d2g5","g7f8","h6h8"]},{"f":"2Q5/3R4/p4B2/5kP1/5N2/2P1r3/p7/2K5 w - - 5 56","s":["d7d4","e3e6","c8e6"]},{"f":"8/7R/k7/ppPb4/5B2/P7/1KB5/7R w - - 4 46","s":["h1h6","d5c6","h6c6"]},{"f":"4k3/RP6/3R4/K1P2p1p/1r6/4p1P1/7P/8 w - - 1 54","s":["a5b4","e3e2","b7b8q"]},{"f":"5k2/1R6/5B2/3p4/P2Pp3/1pP1P2B/8/5K2 w - - 3 50","s":["h3e6","b3b2","b7b8"]},{"f":"1k6/5R2/8/p2P2B1/P4K1p/3p4/1P5P/3R4 w - - 0 50","s":["d1e1","b8a8","e1e8"]},{"f":"8/4pk2/4N3/3PP2p/2p3nP/1R6/2B1K3/8 w - - 1 52","s":["b3b8","g4e5","b8f8"]},{"f":"8/4Q3/5p1k/1P4p1/p1Pp4/p7/P7/2K1R3 w - - 3 43","s":["e1h1","h6g6","e7h7"]},{"f":"8/4PP2/1p4B1/6P1/pP6/2k4P/8/1K1R2R1 w - - 0 47","s":["g1g4","a4a3","d1d3"]},{"f":"8/3r1R2/1p6/4k1P1/2Bp4/Pp1K4/6P1/7R w - - 2 35","s":["f7f6","d7d6","h1e1"]},{"f":"3k4/8/NR6/8/3P4/1P2P2p/P3KP1n/6R1 w - - 3 47","s":["g1g7","d8c8","b6b8"]},{"f":"1R1r4/k7/p1p5/5p2/4B2p/3Q3P/P7/7K w - - 2 57","s":["d3d8","f5e4","d8b6"]},{"f":"8/5R2/k2N3R/p3B3/P1p1p3/2P4r/8/4K3 w - - 5 52","s":["d6c8","h3h6","f7a7"]},{"f":"7R/8/4P3/1K1P4/3Nr3/p2k2P1/P6R/Q7 w - - 2 48","s":["a1d1","d3c3","d1d2"]},{"f":"8/kP4p1/5p1p/5P1P/pR2P1P1/P4K2/8/8 w - - 1 68","s":["b7b8q","a7a6","b4a4"]},{"f":"2k4N/2p5/1PB2P2/3N3p/4K2P/p7/P6P/8 w - - 1 52","s":["f6f7","c7b6","f7f8q"]},{"f":"2b5/R7/B3k1N1/1pP5/1P2PK2/8/1P1B2P1/8 w - - 3 43","s":["g6f8","e6f6","d2c3"]},{"f":"5nk1/p5P1/8/8/8/2p3pN/2r3BP/2B2R1K w - - 0 36","s":["g7f8q","g8h7","g2e4"]},{"f":"8/r5p1/2p1Q3/1p2p3/6Pk/p7/P4P2/2KR4 w - - 1 41","s":["d1h1","h4g5","e6f5"]},{"f":"8/5rk1/2R4R/1p1NpP1p/4P2P/P7/8/2K5 w - - 5 50","s":["c6g6","g7f8","h6h8"]},{"f":"8/1BP2p2/3k3p/p3R3/5PpP/P7/7P/5K2 w - - 3 42","s":["c7c8q","h6h5","c8d8"]},{"f":"8/r7/4N2k/p4R2/P7/5pRP/1P3P2/5RK1 w - - 1 47","s":["e6f4","h6h7","f5h5"]},{"f":"4R3/5pk1/2p2p2/3p3Q/2b5/4P1P1/3K1P1P/8 w - - 0 36","s":["e8h8","c6c5","h5h7"]},{"f":"3k4/5R2/3N1nP1/P7/3R4/1P1P3p/4PN1K/8 w - - 3 68","s":["d6b7","d8c8","d4d8"]},{"f":"4R3/8/6p1/2p4k/P4P1p/2B5/1PPK3P/7B w - - 2 36","s":["h1f3","h5h6","e8h8"]},{"f":"6k1/1p2r3/8/p4Q2/P5n1/8/1PP2P2/R5KR w - - 7 33","s":["f5g6","e7g7","g6e8"]}],"tac":[{"f":"8/1P6/3k1p2/2N5/7p/5P2/7K/r7 w - - 2 66","s":["b7b8q","d6c5","b8f8"]},{"f":"b4r2/8/8/5k2/pK6/P7/1P6/2R5 w - - 18 74","s":["c1f1","f5g6","f1f8"]},{"f":"8/4P3/2k5/p4N2/3p4/2p5/2P3p1/1K6 w - - 0 62","s":["e7e8q","c6d5","e8b5"]},{"f":"8/4k3/NP3p2/2N5/7p/5P2/7K/1r6 w - - 3 63","s":["b6b7","b1b7","c5b7"]},{"f":"8/5pk1/4r2p/8/2B2KPP/4P3/8/8 w - - 4 37","s":["c4e6","f7e6","f4e5"]},{"f":"8/2k1P3/6p1/2B3P1/8/3n4/8/r2N3K w - - 0 59","s":["e7e8q","d3c5","e8e5"]},{"f":"8/3N4/2p5/5pk1/1P3n2/7r/6P1/4RK2 w - - 0 52","s":["g2h3","f4d5","f1g2"]},{"f":"3r4/1n4k1/R7/3p4/B2P2Kp/8/5P2/8 w - - 1 60","s":["a6a7","g7f6","a7b7"]},{"f":"1R6/3N4/4p3/4r1r1/p5k1/P7/P3KP2/5B2 w - - 0 49","s":["d7e5","g5e5","e2d2"]},{"f":"R7/2q1kp2/3r4/6p1/3Q2n1/4P2P/2p5/2R3K1 w - - 0 47","s":["a8a7","c7a7","d4a7"]},{"f":"2B5/p3b1k1/1p6/3pr1n1/P4P2/2P2K2/3B3R/8 w - - 0 49","s":["f4g5","e7c5","h2h3"]},{"f":"5k2/6bR/6p1/3p1p1P/5P2/p1r1P1P1/4N3/7K w - - 0 40","s":["e2c3","g7c3","h7a7"]},{"f":"2k5/2p5/2p4P/p1P2b2/P7/3r2B1/2pN4/2K1N3 w - - 1 46","s":["e1d3","f5d3","d2f3"]},{"f":"8/2p1k3/p1bb4/2p4R/P5B1/5p1N/5P2/n1K5 w - - 2 30","s":["c1b2","a6a5","b2a1"]},{"f":"r7/1p6/6pk/6n1/P3p1Q1/4P1P1/1q6/2N2RK1 w - - 0 48","s":["g4h4","h6g7","h4g5"]},{"f":"4R3/p2k2r1/P7/2P2p1p/8/2K1p1P1/1r5P/R7 w - - 4 46","s":["e8a8","d7c6","c3b2"]},{"f":"5k2/3b4/4qn1n/8/1R2p3/4P2P/1B3PP1/3R2K1 w - - 1 32","s":["b2f6","e6c6","b4b8"]},{"f":"5k2/2pn1p2/1p1P4/2n4p/p2R3P/P1P5/5P2/5K2 w - - 1 41","s":["d6c7","f8g7","c7c8q"]},{"f":"8/k2p1p2/p1rr4/1p1NPB2/5P2/1P2K3/P1P5/8 w - - 4 32","s":["e5d6","c6d6","e3d4"]},{"f":"4r3/p1k5/Qr4q1/2b1N3/P3N2p/1P5P/2K5/4R3 w - - 0 41","s":["a6a7","b6b7","a7c5"]},{"f":"1n6/5p1k/3ppp2/1r5B/3bP2P/6R1/R4P2/5K2 w - - 0 35","s":["h5f7","b8c6","f7e6"]},{"f":"1r5k/2RR2p1/p6p/8/P3prq1/6P1/2Q4P/4K3 w - - 0 35","s":["d7g7","f4f1","e1f1"]},{"f":"1q4r1/2k5/R4p2/4pPp1/2PpP3/3P4/4N1K1/1R6 w - - 0 41","s":["b1b8","g8b8","a6f6"]},{"f":"2b5/2q2k2/1n2p1p1/4b3/2p2P1p/7P/2QB2P1/2R4K w - - 6 38","s":["f4e5","f7g7","d2a5"]},{"f":"5k2/3pq2r/6p1/p2QB2p/1p6/1P4PP/P4P2/3K4 w - - 1 29","s":["e5d6","h7f7","d6e7"]},{"f":"5k2/1r2bp2/7p/p1Pr2p1/B7/P5P1/5P1P/R1R2K2 w - - 0 30","s":["a4c6","d5c5","c6b7"]},{"f":"3r4/1p3pkp/8/2P1pp2/rP2B1bR/6P1/5P2/R3K3 w Q - 0 31","s":["h4g4","f5g4","a1a4"]},{"f":"1nbkr3/1pR5/2r3N1/1N1P2pP/pp6/6P1/6K1/2R5 w - - 1 33","s":["d5c6","b7c6","c7c8"]},{"f":"3k3r/pp1q2p1/6pp/8/bpB1R2P/6P1/2PQ4/2K5 w - - 3 37","s":["e4d4","h8e8","d4d7"]},{"f":"2r5/3rkp2/4pbn1/p5P1/PpB1P3/1P6/2K5/1RB4R w - - 1 36","s":["g5f6","e7f6","c1b2"]},{"f":"2kn1R2/1p2p1r1/3p4/1B1N2Qp/P1Pqp3/3p3P/8/7K w - - 1 38","s":["d5e7","g7e7","g5e7"]},{"f":"4r1k1/ppp5/2b3pb/1P2p3/6P1/3p1P1N/P2P1K2/1RB5 w - - 1 29","s":["b5c6","b7b6","c1b2"]},{"f":"8/5p2/n1r1k3/ppP1p2r/P3P1p1/B5P1/P4K1P/2R4R w - b6 0 40","s":["a4b5","c6c8","b5a6"]},{"f":"4k3/p7/p1n2npb/8/b2P1P2/Pr1R2P1/1P2P2N/2R1K3 w - - 3 29","s":["d3b3","g6g5","e2e3"]},{"f":"8/1pp1nnk1/3b1p2/p2p3Q/3P1P2/1PN3q1/PB6/R6K w - - 0 28","s":["a1g1","g3g1","h1g1"]},{"f":"1rb2bk1/p5p1/8/2N2p1Q/3np3/1p2B1q1/PP6/1R3B1K w - - 0 32","s":["f1c4","c8e6","c5e6"]},{"f":"1r2r3/1p1qnpk1/5n2/P1Q3p1/3p2P1/B2P1R2/5PK1/7R w - - 1 36","s":["c5g5","e7g6","g5f6"]},{"f":"1n3bk1/3p1p2/4pp2/1P5p/1r2P3/1r3B2/5PPP/2NR1KR1 w - - 0 23","s":["c1b3","b4b3","f3e2"]},{"f":"1r4kN/2p1n1p1/3b3p/p2b4/8/2P3P1/P3PP1P/R1BR2K1 w - - 0 22","s":["h8g6","d5e4","g6e7"]},{"f":"3n1k2/1p2r3/4b2p/1p1NPpp1/5P1P/PP2P1P1/2P5/3R2K1 w - - 0 31","s":["d5e7","f8e7","d1d6"]},{"f":"3Q2bk/6p1/1p4Pp/P2q1p2/3p1P2/bp1P3P/1N2P3/R5K1 w - - 0 44","s":["d8d5","a3b2","d5b5"]},{"f":"B1k2bnR/8/pq1Pp3/1p6/2pP4/P1B5/1PnKbP2/R7 w - - 1 29","s":["a1g1","b6d6","g1g8"]},{"f":"1rr5/p2p1k2/4qp2/3b4/R1P2Pp1/1PQ3P1/1B2Pb2/5K1R w - - 0 31","s":["h1h6","d5g2","f1f2"]},{"f":"1r2kn1r/p3pp1p/8/q4P2/P1nNQ1P1/7P/4P1K1/2B4R w k - 0 28","s":["d4c6","a5c7","c6b8"]},{"f":"2b3k1/3p2q1/1p1Np1Rp/3n1p2/rnp5/4P3/5P2/R1BQK3 w Q - 0 28","s":["g6g7","g8g7","d1a4"]},{"f":"1rbr1k2/p5bp/6p1/3P4/2ppN2P/5PP1/PB2P3/1R1K1R2 w - - 0 23","s":["b2a3","f8e8","b1b8"]},{"f":"5rk1/pp5r/8/P1pp1q2/1n3N2/R2BP3/1PP3PP/3N1RK1 w - - 0 24","s":["d3f5","f8f5","e3e4"]},{"f":"r3kr2/1bpn4/p5p1/R4nBp/B3p3/8/1PP2PPP/2K4R w q - 6 23","s":["a5e5","e8f7","a4d7"]},{"f":"7r/1bpk4/q1n1np2/2Qp3p/3P3P/1P2PPNB/1BP2K2/8 w - - 0 32","s":["c5d5","d7c8","d5e6"]},{"f":"2R2q1k/r2p3B/2p5/p3p1Np/P2P3P/2PN1rp1/4n1K1/5R2 w - - 1 34","s":["c8f8","f3f8","f1f8"]},{"f":"1r5k/3q2b1/1n2r1pp/p2nP1N1/2R2P2/P5P1/4QB1P/1R4K1 w - - 1 32","s":["g5e6","d7e6","b1b5"]},{"f":"rn2kb2/1pp5/p7/4p1pr/4P3/2PP2K1/P2N2P1/R1Bn1BR1 w q - 1 20","s":["f1e2","h5h8","g1d1"]},{"f":"1r6/3nk3/1ppbp2p/3p2p1/3N4/2P1P1PP/rP2BP2/1R3RK1 w - - 6 28","s":["d4c6","e7f7","c6b8"]},{"f":"5rk1/2p1bpp1/4bn2/2p4p/2B5/1Q2PN2/3P1PPP/qN3RK1 w - - 0 21","s":["c4e6","e7d6","e6c4"]},{"f":"6r1/1b2kp2/p4pp1/8/1qp1P3/1p1rQ3/PPB1NPP1/1R3K1R w - - 0 30","s":["c2d3","b3a2","b1a1"]},{"f":"r3r1k1/1p3pp1/p1p1n3/2qp3p/3P4/PQ1RBB1P/P4PN1/2K5 w - - 4 25","s":["d4c5","a8d8","g2f4"]},{"f":"5b1r/pkp2pp1/1pn3p1/4p3/N3Pr2/4B1P1/PP1K1P1P/5R1R w - - 4 26","s":["g3f4","h8h4","f4e5"]},{"f":"1kr4r/p1q1npbp/p3p3/B1p1P3/5P2/PP6/2PQ1P2/2KR3R w - - 2 24","s":["a5c7","c8c7","d2e2"]},{"f":"4kb1r/r4pp1/2p1p3/q1Pn3p/PRNP4/7P/3BBPP1/4K2R w Kk - 1 27","s":["c4a5","d5b4","d2b4"]},{"f":"r4bk1/pp1q3r/5p1p/3PB1p1/1p2N3/8/1PP2PPP/1N1RR1K1 w - - 0 23","s":["e4f6","g8f7","f6d7"]},{"f":"1br3kr/1b1N1ppp/1p6/pB4q1/P2P4/1QP4P/5PP1/4RRK1 w - - 4 24","s":["f2f3","h7h5","d7b8"]},{"f":"r1b3k1/pp1n2p1/3p1r2/3pqp2/P6Q/2B1P2P/R1P3P1/1N1R2K1 w - - 2 24","s":["c3e5","d7e5","c2c3"]},{"f":"r3kn1r/1b1n4/pp4q1/3p1Q1p/P2b4/2N1B3/1P2BPP1/3RK2R w Kkq - 0 23","s":["f5g6","f8g6","e3d4"]},{"f":"r4k2/pp2ppbp/8/2p2P2/P1Pn4/2NPpNrP/1PK1P3/6RR w - - 5 23","s":["f3d4","g3g1","h1g1"]},{"f":"3bk3/1p3pp1/r2pb1r1/P1pnp2n/4P3/2BP2PR/2P2P2/R3KQ2 w - - 0 27","s":["e4d5","e6g4","f1h1"]},{"f":"3qk2r/3b1p1n/6n1/1p1p1pBQ/2pPp2P/P1P1P1P1/6B1/4RNK1 w k - 1 24","s":["g5d8","e8d8","h5e2"]},{"f":"r3nrk1/4pp2/p4q2/1ppP2Pp/8/3P1Pp1/PPQ3P1/1R2KB1R w - - 1 28","s":["g5f6","e8f6","c2d2"]},{"f":"3q3r/1p3k1P/r1b5/2n2Pb1/ppPp1B2/P2P2p1/3Q2B1/RN3RK1 w - - 4 28","s":["f4g5","d8d7","d2e2"]},{"f":"r4knr/ppp2p2/n5q1/1B1P4/6pN/2bP2P1/PP2KP2/R1BQ4 w - - 1 15","s":["h4g6","f7g6","b2c3"]},{"f":"4rrk1/1p3qpp/2p5/p1P1b3/Nn3P2/4p1PP/PP4B1/1R1Q1RK1 w - - 1 26","s":["f4e5","f7g6","d1b3"]}],"m3":[{"f":"8/5P2/8/k1P5/8/1K6/8/8 w - - 1 69","s":["f7f8q","a5a6","f8b8","a6a5","b8b6"]},{"f":"6k1/3R4/8/5K2/5P2/8/8/8 w - - 1 73","s":["f5f6","g8h8","f6g6","h8g8","d7d8"]},{"f":"8/5R2/8/8/8/3B4/8/4K1k1 w - - 11 72","s":["d3f1","g1h1","e1f2","h1h2","f7h7"]},{"f":"4k3/8/5K1P/8/3P4/8/6P1/1R6 w - - 3 65","s":["f6e6","e8d8","b1c1","d8e8","c1c8"]},{"f":"8/8/P7/1k5N/7P/2Q5/7K/8 w - - 4 71","s":["a6a7","b5b6","a7a8q","b6b5","a8a5"]},{"f":"8/8/3N4/2k5/7P/8/3K2Q1/R7 w - - 9 70","s":["a1a6","c5d4","g2e4","d4c5","a6c6"]},{"f":"7k/8/4p3/4P2K/8/p5R1/P7/8 w - - 13 72","s":["h5g6","h8g8","g3f3","g8h8","f3f8"]},{"f":"3Q4/2p5/p3k2P/P7/6K1/8/8/8 w - - 7 64","s":["h6h7","e6f7","h7h8q","c7c6","d8e8"]},{"f":"8/8/8/1R6/7R/4PP1P/2k5/6K1 w - - 1 53","s":["g1f2","c2c3","f2e2","c3c2","h4c4"]},{"f":"8/8/7q/7k/3R4/2P3R1/4N2K/8 w - - 2 55","s":["e2f4","h6f4","d4f4","h5h6","f4h4"]},{"f":"6k1/3R4/p7/2P5/P2K3p/7P/8/8 w - - 9 66","s":["c5c6","a6a5","c6c7","g8f8","c7c8q"]},{"f":"4k3/R7/B6p/1P4PP/8/2K5/8/8 w - - 1 60","s":["g5h6","e8d8","h6h7","d8e8","h7h8q"]},{"f":"8/1R6/3P2pk/7p/7P/6P1/5K2/8 w - - 5 64","s":["d6d7","g6g5","d7d8q","g5h4","d8f6"]},{"f":"7k/8/8/5R1N/6KP/4P3/5PP1/8 w - - 3 61","s":["f5f8","h8h7","g4f5","h7h6","f8h8"]},{"f":"4k3/8/7P/2P5/3K1P1P/R7/1P6/8 w - - 1 61","s":["a3a7","e8d8","h6h7","d8c8","h7h8q"]},{"f":"8/5Q2/7P/1Pp1k3/2P1p3/8/4K3/8 w - - 1 67","s":["h6h7","e4e3","h7h8q","e5e4","f7f3"]},{"f":"5R2/1k6/8/5N2/2P1PN2/3P4/6K1/8 w - - 1 59","s":["f4d5","b7c6","f8f7","c6c5","f7c7"]},{"f":"8/8/R7/8/4P2Q/5P2/2P3P1/K2k4 w - - 1 61","s":["h4f2","d1c1","a6h6","c1d1","h6h1"]},{"f":"8/8/3R4/8/4P2Q/5P2/2P1k1P1/K7 w - - 3 62","s":["h4g3","e2f1","d6d1","f1e2","g3e1"]},{"f":"6Q1/2p5/8/4nkn1/8/6p1/3Q2K1/8 w - - 11 61","s":["g8g5","f5e6","d2d8","e5f7","g5f6"]},{"f":"8/8/4Q3/2N4P/1P1k4/5PP1/5K2/8 w - - 5 72","s":["c5a4","d4d3","e6e2","d3d4","e2e4"]},{"f":"7k/5R2/7N/p5P1/8/PP6/5K2/4b3 w - - 0 52","s":["f2e1","a5a4","g5g6","a4b3","f7h7"]},{"f":"4N3/4R3/8/6k1/PB5p/2P1P2K/8/8 w - - 3 57","s":["e7e6","g5f5","e8g7","f5g5","b4e7"]},{"f":"3k4/7R/8/P3N3/1pP3pp/1K6/8/8 w - - 0 62","s":["a5a6","d8c8","a6a7","g4g3","a7a8q"]},{"f":"4k3/3R4/8/P3N3/1pP3pp/1K6/8/8 w - - 2 63","s":["a5a6","g4g3","a6a7","g3g2","a7a8q"]},{"f":"8/8/3p1k2/1P3P2/R3K2P/4B3/5P2/8 w - - 1 56","s":["a4a7","d6d5","e4f4","d5d4","e3d4"]},{"f":"5N2/6k1/p7/P5P1/4N3/7P/5R2/6K1 w - - 9 66","s":["g5g6","g7h8","f8e6","h8g8","f2f8"]},{"f":"8/1R3pk1/8/5B2/p1P2K2/P7/2P5/8 w - - 1 55","s":["f4g5","g7f8","g5f6","f8g8","b7b8"]},{"f":"3Q3R/8/8/8/p5k1/K4p2/P4P2/7n w - - 0 64","s":["d8f6","h1f2","h8g8","g4h5","f6g5"]},{"f":"3R4/5P2/6K1/p7/kpP3p1/8/8/7R w - - 0 67","s":["d8d3","b4b3","f7f8q","b3b2","f8a3"]},{"f":"k7/2R5/8/PPN5/5N1p/7P/8/2Kr4 w - - 7 56","s":["c1d1","a8b8","b5b6","b8a8","c7c8"]},{"f":"k7/2R5/8/PPN5/5N1p/7P/2Kr4/8 w - - 5 55","s":["c2d2","a8b8","b5b6","b8a8","c7c8"]},{"f":"4N3/8/1R2p3/B5k1/P6p/2P1P2K/8/8 w - - 4 52","s":["b6e6","g5h5","e8g7","h5g5","a5d8"]},{"f":"7Q/5p2/8/6kP/3Ppp2/4P2P/8/2K5 w - - 3 55","s":["h8g7","g5h5","e3f4","e4e3","g7g5"]},{"f":"8/R6P/3k1N2/p4K2/3P4/ppP5/8/8 w - - 4 64","s":["h7h8q","d6c6","h8b8","b3b2","a7a6"]},{"f":"7k/2R5/7N/p7/5pP1/P7/1P2PK2/8 w - - 1 49","s":["g4g5","a5a4","g5g6","f4f3","c7h7"]},{"f":"k7/8/4P3/3R4/2B5/2P4P/1P1K1P1P/8 w - - 3 52","s":["d5d7","a8b8","e6e7","b8a8","e7e8q"]},{"f":"1r1R4/5k2/3P1p2/5B2/5P1P/6RK/8/8 w - - 3 52","s":["d8d7","f7f8","f5e6","b8b3","d7d8"]},{"f":"6k1/3b4/5Q2/2K5/2P1Np2/5P2/P5P1/8 w - - 11 49","s":["f6e7","d7e8","e4f6","g8h8","e7f8"]},{"f":"6k1/5r2/4p2K/P3Q3/1p4P1/3B4/6n1/8 w - - 5 47","s":["e5g5","g8h8","g5d8","f7f8","d8f8"]},{"f":"1r6/8/1k6/1p6/7P/Qp3P1P/b7/4R2K w - - 2 57","s":["e1e6","b6b7","a3e7","b7c8","e6c6"]},{"f":"4R3/1kp5/5B2/1PP1NB2/4b3/8/PK6/8 w - - 0 38","s":["f5e4","c7c6","e4c6","b7c7","b5b6"]},{"f":"6k1/8/5B2/3p4/PR1Pp3/1pP1P2B/8/5K2 w - - 5 51","s":["b4b7","b3b2","h3e6","g8f8","b7b8"]},{"f":"r3Q3/p6p/6p1/7b/1kN5/8/1PP3P1/1K6 w - - 9 43","s":["e8c6","a8c8","c2c3","b4b3","c4a5"]},{"f":"2N1Q3/1k6/1p6/p1b2R2/4p3/P2p3P/3K4/8 w - - 4 52","s":["f5f7","c5e7","f7e7","b7a6","e7a7"]},{"f":"8/2k5/3RR3/5P1p/7p/4p3/PP2B1P1/6K1 w - - 5 49","s":["e2b5","e3e2","d6d7","c7b8","e6e8"]},{"f":"5R2/4k1p1/p3p3/1p1R4/1p2Q3/P7/3K4/1r6 w - - 0 40","s":["f8e8","e7e8","e4e6","e8f8","d5d8"]},{"f":"4Rbk1/7R/6P1/4p3/2p1P1r1/3p4/3P1P2/5K2 w - - 0 46","s":["h7f7","g4g1","f1g1","c4c3","e8f8"]},{"f":"Rr4k1/4p3/4N3/3P3p/2p1P1nP/8/2B1K3/8 w - - 6 49","s":["a8b8","g8f7","e4e5","g4e5","b8f8"]},{"f":"8/2r5/2n5/P2rp3/1k6/1PN3PP/2Q3RK/8 w - - 2 58","s":["c3d5","b4b5","c2c4","b5a5","g2a2"]},{"f":"5k2/1p2r3/8/p1Q5/P5n1/8/1PP2P2/R5KR w - - 5 32","s":["h1h7","f8g8","c5e7","g4h2","e7f7"]},{"f":"6R1/2k4p/4Q1p1/pp6/P6P/5b1K/2r5/4R3 w - - 4 47","s":["g8g7","c7b8","e6b6","b8c8","e1e8"]},{"f":"7r/1pp2k2/2B1R3/1pP2p2/5N1P/6K1/8/3R4 w - - 5 40","s":["d1d7","f7f8","f4g6","f8g8","e6e8"]},{"f":"3R3r/1pp2k2/2B1R3/1pP2p2/5N1P/6K1/8/8 w - - 9 42","s":["d8d7","f7f8","f4g6","f8g8","e6e8"]},{"f":"1k2r3/5p2/2R2R2/1PN4P/8/4P2P/PP3P2/2K5 w - - 9 35","s":["f6f7","b8a8","f7b7","e8h8","c6a6"]},{"f":"5k2/R3r3/1P1p2p1/3Q4/4P2P/2pP1K2/P5P1/8 w - - 0 50","s":["d5d6","f8g7","d6e7","g7h6","e7g5"]},{"f":"4k1r1/5p1p/6pq/2Q5/4P3/PPN2P1B/8/K7 w - - 3 48","s":["c5c8","e8e7","c3d5","e7d6","c8c7"]},{"f":"7k/3r1r1p/p1R3bB/6P1/PP2P2R/8/3n4/6K1 w - - 1 50","s":["c6c8","d7d8","c8d8","f7f8","d8f8"]},{"f":"8/2p2pk1/2q5/p3PQ2/6NN/2PP4/r6P/5RK1 w - - 3 38","s":["f5f7","g7h8","f7f8","h8h7","f1f7"]},{"f":"3k2r1/1pR4R/8/1NP3P1/p7/4p3/Pb2P1K1/6N1 w - - 0 35","s":["h7d7","d8e8","b5d6","e8f8","c7c8"]}]};
+
+/* ===== Шахматы: правила, задачи, курс для начинающих, игра вдвоём за одним экраном =====
+   Написано на ES5 (var, function), чтобы работало на старом Safari. */
+var CH = (function(){
+  var FILES = 'abcdefgh';
+  var GL = { k:'♚', q:'♛', r:'♜', b:'♝', n:'♞', p:'♟' };
+  var NAME = { k:'король', q:'ферзь', r:'ладья', b:'слон', n:'конь', p:'пешка' };
+  var NAME_V = { k:'короля', q:'ферзя', r:'ладью', b:'слона', n:'коня', p:'пешку' };
+  var VAL = { p:1, n:3, b:3, r:5, q:9, k:0 };
+  function sqName(i){ return FILES.charAt(i & 7) + ((i >> 3) + 1); }
+  function sqIdx(s){ return (parseInt(s.charAt(1), 10) - 1) * 8 + FILES.indexOf(s.charAt(0)); }
+  function colorOf(p){ return !p ? '' : (p === p.toUpperCase() ? 'w' : 'b'); }
+  function typeOf(p){ return p ? p.toLowerCase() : ''; }
+  function other(c){ return c === 'w' ? 'b' : 'w'; }
+
+  /* ---- позиция ---- */
+  function parse(fen){
+    var f = fen.split(' '), rows = f[0].split('/'), b = [], i, r, c, ch, j;
+    for (i = 0; i < 64; i++) b.push('');
+    for (r = 0; r < 8; r++) { c = 0; for (j = 0; j < rows[r].length; j++) { ch = rows[r].charAt(j);
+      if (/\d/.test(ch)) c += +ch; else { b[(7 - r) * 8 + c] = ch; c++; } } }
+    return { b:b, t:f[1] || 'w', c:(f[2] && f[2] !== '-') ? f[2] : '', ep:(f[3] && f[3] !== '-') ? sqIdx(f[3]) : -1, h:+(f[4] || 0), n:+(f[5] || 1) };
+  }
+  function fen(P){
+    var s = '', r, c, e, p;
+    for (r = 7; r >= 0; r--) { e = 0; for (c = 0; c < 8; c++) { p = P.b[r * 8 + c]; if (!p) e++; else { if (e) s += e; e = 0; s += p; } } if (e) s += e; if (r) s += '/'; }
+    return s + ' ' + P.t + ' ' + (P.c || '-') + ' ' + (P.ep >= 0 ? sqName(P.ep) : '-') + ' ' + P.h + ' ' + P.n;
+  }
+  function clone(P){ return { b:P.b.slice(), t:P.t, c:P.c, ep:P.ep, h:P.h, n:P.n }; }
+  function kingSq(P, col){ var k = col === 'w' ? 'K' : 'k'; for (var i = 0; i < 64; i++) if (P.b[i] === k) return i; return -1; }
+
+  var ND = [[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]];
+  var KD = [[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
+  var RD = [[1,0],[-1,0],[0,1],[0,-1]], BD = [[1,1],[1,-1],[-1,1],[-1,-1]];
+  function on(f, r){ return f >= 0 && f < 8 && r >= 0 && r < 8; }
+
+  function attacked(P, sq, by){
+    var f = sq & 7, r = sq >> 3, i, d, ff, rr, p, t;
+    var pr = by === 'w' ? r - 1 : r + 1, pw = by === 'w' ? 'P' : 'p';
+    if (on(f - 1, pr) && P.b[pr * 8 + f - 1] === pw) return true;
+    if (on(f + 1, pr) && P.b[pr * 8 + f + 1] === pw) return true;
+    for (i = 0; i < 8; i++) { ff = f + ND[i][0]; rr = r + ND[i][1]; if (on(ff, rr)) { p = P.b[rr * 8 + ff]; if (p && colorOf(p) === by && typeOf(p) === 'n') return true; } }
+    for (i = 0; i < 8; i++) { ff = f + KD[i][0]; rr = r + KD[i][1]; if (on(ff, rr)) { p = P.b[rr * 8 + ff]; if (p && colorOf(p) === by && typeOf(p) === 'k') return true; } }
+    for (i = 0; i < 8; i++) { d = KD[i]; ff = f + d[0]; rr = r + d[1];
+      while (on(ff, rr)) { p = P.b[rr * 8 + ff]; if (p) { if (colorOf(p) === by) { t = typeOf(p); if (t === 'q' || (t === 'r' && (d[0] === 0 || d[1] === 0)) || (t === 'b' && d[0] !== 0 && d[1] !== 0)) return true; } break; } ff += d[0]; rr += d[1]; } }
+    return false;
+  }
+  function inCheck(P, col){ var k = kingSq(P, col || P.t); return k >= 0 && attacked(P, k, other(col || P.t)); }
+
+  function pseudo(P, onlyFrom){
+    var out = [], me = P.t, i, p, t, f, r, d, ff, rr, q, dir, start, last, k, j, x;
+    function add(a, b, extra){ var m = { f:a, to:b, cap:P.b[b] }; if (extra) for (var z in extra) m[z] = extra[z]; out.push(m); }
+    for (i = 0; i < 64; i++) {
+      if (onlyFrom != null && i !== onlyFrom) continue;
+      p = P.b[i]; if (!p || colorOf(p) !== me) continue; t = typeOf(p); f = i & 7; r = i >> 3;
+      if (t === 'p') {
+        dir = me === 'w' ? 1 : -1; start = me === 'w' ? 1 : 6; last = me === 'w' ? 7 : 0;
+        rr = r + dir;
+        if (on(f, rr) && !P.b[rr * 8 + f]) {
+          if (rr === last) { for (j = 0; j < 4; j++) add(i, rr * 8 + f, { pr:'qrbn'.charAt(j) }); } else add(i, rr * 8 + f);
+          if (r === start && !P.b[(r + 2 * dir) * 8 + f]) add(i, (r + 2 * dir) * 8 + f, { dbl:1 });
+        }
+        for (j = -1; j <= 1; j += 2) { ff = f + j; if (!on(ff, rr)) continue; q = rr * 8 + ff;
+          if (P.b[q] && colorOf(P.b[q]) !== me) { if (rr === last) { for (k = 0; k < 4; k++) add(i, q, { pr:'qrbn'.charAt(k) }); } else add(i, q); }
+          else if (q === P.ep) add(i, q, { ep:1, cap: me === 'w' ? 'p' : 'P' }); }
+      } else if (t === 'n' || t === 'k') {
+        x = t === 'n' ? ND : KD;
+        for (j = 0; j < 8; j++) { ff = f + x[j][0]; rr = r + x[j][1]; if (!on(ff, rr)) continue; q = rr * 8 + ff; if (!P.b[q] || colorOf(P.b[q]) !== me) add(i, q); }
+        if (t === 'k') {
+          var home = me === 'w' ? 4 : 60, opp = other(me);
+          if (i === home && P.c) {
+            var KS = me === 'w' ? 'K' : 'k', QS = me === 'w' ? 'Q' : 'q', R = me === 'w' ? 'R' : 'r';
+            if (P.c.indexOf(KS) >= 0 && P.b[home + 3] === R && !P.b[home + 1] && !P.b[home + 2] && !attacked(P, home, opp) && !attacked(P, home + 1, opp) && !attacked(P, home + 2, opp)) add(i, home + 2, { cs:1 });
+            if (P.c.indexOf(QS) >= 0 && P.b[home - 4] === R && !P.b[home - 1] && !P.b[home - 2] && !P.b[home - 3] && !attacked(P, home, opp) && !attacked(P, home - 1, opp) && !attacked(P, home - 2, opp)) add(i, home - 2, { cs:2 });
+          }
+        }
+      } else {
+        x = t === 'r' ? RD : t === 'b' ? BD : KD;
+        for (j = 0; j < x.length; j++) { d = x[j]; ff = f + d[0]; rr = r + d[1];
+          while (on(ff, rr)) { q = rr * 8 + ff; if (P.b[q]) { if (colorOf(P.b[q]) !== me) add(i, q); break; } add(i, q); ff += d[0]; rr += d[1]; } }
+      }
+    }
+    return out;
+  }
+  function make(P, m){
+    var N = clone(P), p = N.b[m.f], me = P.t, t = typeOf(p);
+    N.b[m.to] = m.pr ? (me === 'w' ? m.pr.toUpperCase() : m.pr) : p; N.b[m.f] = '';
+    if (m.ep) N.b[m.to + (me === 'w' ? -8 : 8)] = '';
+    if (m.cs === 1) { N.b[m.to - 1] = N.b[m.to + 1]; N.b[m.to + 1] = ''; }
+    if (m.cs === 2) { N.b[m.to + 1] = N.b[m.to - 2]; N.b[m.to - 2] = ''; }
+    N.ep = m.dbl ? (m.f + m.to) / 2 : -1;
+    if (t === 'k') N.c = N.c.replace(me === 'w' ? /[KQ]/g : /[kq]/g, '');
+    function rk(sq, ch){ if (m.f === sq || m.to === sq) N.c = N.c.replace(ch, ''); }
+    rk(0, 'Q'); rk(7, 'K'); rk(56, 'q'); rk(63, 'k');
+    N.h = (t === 'p' || m.cap) ? 0 : P.h + 1; if (me === 'b') N.n++; N.t = other(me);
+    return N;
+  }
+  /* без короля (упражнения курса) ходы проверяются только по правилам фигур */
+  function legal(P, onlyFrom){
+    var me = P.t, res = [], ms = pseudo(P, onlyFrom), i, N;
+    if (kingSq(P, me) < 0) return ms;
+    for (i = 0; i < ms.length; i++) { N = make(P, ms[i]); if (!inCheck(N, me)) res.push(ms[i]); }
+    return res;
+  }
+  function uci(m){ return sqName(m.f) + sqName(m.to) + (m.pr || ''); }
+  function findMove(P, u){ var ms = legal(P), i; for (i = 0; i < ms.length; i++) if (uci(ms[i]) === u) return ms[i]; return null; }
+  function insufficient(P){
+    var minors = 0, i, t, bish = [];
+    for (i = 0; i < 64; i++) { t = typeOf(P.b[i]); if (!t || t === 'k') continue; if (t === 'p' || t === 'r' || t === 'q') return false; minors++; if (t === 'b') bish.push(((i & 7) + (i >> 3)) % 2); }
+    if (minors <= 1) return true;
+    if (minors === bish.length) { for (i = 1; i < bish.length; i++) if (bish[i] !== bish[0]) return false; return true; }
+    return false;
+  }
+  function status(P, hist){
+    var ms = legal(P), chk = inCheck(P);
+    if (!ms.length) return chk ? 'mate' : 'stalemate';
+    if (insufficient(P)) return 'material';
+    if (P.h >= 100) return 'fifty';
+    if (hist) { var key = fen(P).split(' ').slice(0, 4).join(' '), n = 0; for (var i = 0; i < hist.length; i++) if (hist[i] === key) n++; if (n >= 3) return 'repeat'; }
+    return chk ? 'check' : '';
+  }
+  function posKey(P){ return fen(P).split(' ').slice(0, 4).join(' '); }
+  function moveText(P, m){
+    var p = P.b[m.f], t = typeOf(p), s;
+    if (m.cs) return m.cs === 1 ? 'короткая рокировка' : 'длинная рокировка';
+    s = (t === 'p' ? 'пешка' : NAME[t]) + ' ' + sqName(m.f) + (m.cap ? ' бьёт ' + sqName(m.to) : ' — ' + sqName(m.to));
+    if (m.pr) s += ', превращение в ' + NAME_V[m.pr];
+    return s;
+  }
+  return { parse:parse, fen:fen, clone:clone, legal:legal, make:make, inCheck:inCheck, status:status, uci:uci, findMove:findMove, sqName:sqName, sqIdx:sqIdx,
+    colorOf:colorOf, typeOf:typeOf, other:other, GL:GL, NAME:NAME, NAME_V:NAME_V, VAL:VAL, kingSq:kingSq, posKey:posKey, moveText:moveText, attacked:attacked };
+})();
+
+/* ===== Доска на экране ===== */
+var CHB = {
+  /* o: { P, flip (чёрные снизу), sel, marks:{sq:'dot'|'star'|...}, last:[f,to], rot (повернуть чёрные фигуры к игроку сверху), act } */
+  html: function(o){
+    var vw = window.innerWidth || 800, vh = window.innerHeight || 800, W = o.rot != null ? (vw >= 700 && vw > vh * 1.15 ? Math.min(vh - 90, vw - 480) : Math.min(vw - 40, vh - 340, 760)) : Math.min(vw - 56, 560, Math.max(300, vh - 260));
+    W = Math.max(240, Math.floor(W / 8) * 8);
+    var P = o.P, h = '<div class="chboard' + (o.rot ? ' rot' : '') + '" style="width:' + W + 'px;font-size:' + Math.round(W / 8 * .78) + 'px">', r, c, rr, cc, i, p, cls, lg = {}, ms, k, chk = -1;
+    if (o.sel != null) { ms = CH.legal(P, o.sel); for (k = 0; k < ms.length; k++) lg[ms[k].to] = ms[k].cap ? 'chx' : 'chd'; }
+    if (!o.noCheck && CH.inCheck(P)) chk = CH.kingSq(P, P.t);
+    for (r = 7; r >= 0; r--) for (c = 0; c < 8; c++) {
+      rr = o.flip ? 7 - r : r; cc = o.flip ? 7 - c : c; i = rr * 8 + cc; p = P.b[i];
+      cls = 'sq ' + ((rr + cc) % 2 ? 'l' : 'd');
+      if (o.sel === i) cls += ' sel';
+      if (o.last && (o.last[0] === i || o.last[1] === i)) cls += ' last';
+      if (chk === i) cls += ' chk';
+      if (o.hint === i) cls += ' hnt';
+      h += '<button class="' + cls + '" data-act="' + (o.act || 'chsq') + '" data-sq="' + i + '">';
+      if ((o.flip ? r === 0 : r === 0) && !o.noCoord) h += '<i class="cf">' + 'abcdefgh'.charAt(cc) + '</i>';
+      if (c === 0 && !o.noCoord) h += '<i class="cr">' + (rr + 1) + '</i>';
+      if (o.marks && o.marks[i]) h += '<i class="mk ' + o.marks[i] + '"></i>';
+      if (p) h += '<span class="pc ' + CH.colorOf(p) + '">' + CH.GL[CH.typeOf(p)] + '︎</span>';
+      if (lg[i]) h += '<i class="' + lg[i] + '"></i>';
+      h += '</button>';
+    }
+    return h + '</div>';
+  },
+  promo: function(col, act){ var h = '<div class="chpromo">', s = 'qrbn', i; for (i = 0; i < 4; i++) h += '<button class="btn ghost" data-act="' + act + '" data-p="' + s.charAt(i) + '"><span class="pc ' + col + '">' + CH.GL[s.charAt(i)] + '︎</span></button>'; return h + '</div>'; }
+};
+
+/* ===== Состояние и баллы ===== */
+var CHESS_DAY_MAX = 5;
+function chK(kid){ var K = S.kids[kid]; if (!K.chess) K.chess = { solved:{}, pos:{}, course:{}, day:'', pts:0, n:0 }; return K.chess; }
+function chPts(kid, n){
+  if (!kid || !n) return 0;
+  if (typeof funPts === 'function') return funPts(kid, 'chess', n, CHESS_DAY_MAX) || 0;
+  var C = chK(kid), t = U.today(); if (C.day !== t) { C.day = t; C.pts = 0; }
+  var g = Math.max(0, Math.min(n, CHESS_DAY_MAX - C.pts)); if (!g) return 0; C.pts += g;
+  piggyAdd(S.kids[kid], g); return g;
+}
+function chDayLeft(kid){ if (typeof funLeft === 'function') return funLeft(kid, 'chess'); var C = chK(kid); return C.day === U.today() ? Math.max(0, CHESS_DAY_MAX - C.pts) : CHESS_DAY_MAX; }
+
+/* ===== Уровни задач ===== */
+var CH_LEVELS = [
+  { id:'m1e', t:'Мат в 1 ход: первые шаги', d:'Мало фигур, нужно найти один матующий ход', y:1 },
+  { id:'hang', t:'Забери фигуру', d:'У соперника фигура без защиты. Найди и съешь её', y:1 },
+  { id:'m1', t:'Мат в 1 ход', d:'Позиции из настоящих партий', y:1, a:1 },
+  { id:'m2', t:'Мат в 2 хода', d:'Первый ход готовит мат, второй ставит его', y:1, a:1 },
+  { id:'tac', t:'Тактика: выиграй материал', d:'Вилки, связки, двойные удары. Найди лучший ход', a:1 },
+  { id:'m3', t:'Мат в 3 хода', d:'Для сильных: три точных хода подряд', a:1 }
+];
+function chGoal(lv){ return lv === 'hang' ? 'Белые начинают и забирают фигуру' : lv === 'tac' ? 'Белые начинают и выигрывают материал' : lv === 'm1' || lv === 'm1e' ? 'Белые начинают и ставят мат в 1 ход' : lv === 'm2' ? 'Белые начинают и ставят мат в 2 хода' : 'Белые начинают и ставят мат в 3 хода'; }
+
+/* ===== Экран шахмат ===== */
+var CHS = { v:'menu' };   /* текущее состояние экрана шахмат (не сохраняется) */
+function chOpen(kid){ CHS = { v: kid ? 'menu' : 'table' }; }
+
+function chView(kid){
+  var h = '<main class="wrap chess ' + (kid || '') + '">';
+  if (CHS.v === 'table') return chTable(kid);
+  h += '<header class="bar"><button class="link" data-act="' + (CHS.v === 'menu' ? 'home' : 'chmenu') + '">← ' + (CHS.v === 'menu' ? 'Назад' : 'Шахматы') + '</button>' + (kid ? '<span class="coins">' + coinsHtml(S.kids[kid].coins) + '</span>' : '') + '</header>';
+  if (CHS.v === 'menu') h += chMenu(kid);
+  else if (CHS.v === 'pz') h += chPuzzle(kid);
+  else if (CHS.v === 'course') h += chCourseList(kid);
+  else if (CHS.v === 'cl') h += chLesson(kid);
+  return h + '</main>';
+}
+function chMenu(kid){
+  var C = chK(kid), h = '<section class="hello"><h1>♞ Шахматы</h1><p>Здесь можно заниматься всегда, даже в перерыв. ' + (chDayLeft(kid) ? 'За задачи, решённые с первой попытки без подсказки, — по 1 баллу в копилку (до ' + CHESS_DAY_MAX + ' в день, сегодня осталось ' + chDayLeft(kid) + ').' : 'Баллы за задачи на сегодня уже получены, но решать можно сколько хочешь.') + '</p></section>';
+  var mine = kid === 'yarik', i, L, n, tot, done;
+  var cdone = 0; for (i = 0; i < CH_COURSE.length; i++) if (C.course[CH_COURSE[i].id]) cdone++;
+  var courseTile = '<button class="tile chtile" data-act="chcourse"><span class="ico">♙</span><span class="tt"><span class="sn">Учимся играть' + (mine ? ' <em>начни здесь</em>' : '') + '</span><span class="ut">Как ходят фигуры, шах, мат, рокировка. Уроков пройдено: ' + cdone + ' из ' + CH_COURSE.length + '</span></span></button>';
+  var tableTile = '<button class="tile chtile" data-act="chtable"><span class="ico">♚</span><span class="tt"><span class="sn">Играть вдвоём</span><span class="ut">Положите планшет между собой: у каждого свои фигуры лицом к себе</span></span></button>';
+  h += '<section class="tiles">' + (mine ? courseTile : '') + tableTile + '</section><h2>Задачи</h2><section class="tiles">';
+  for (i = 0; i < CH_LEVELS.length; i++) { L = CH_LEVELS[i]; tot = (CHESS_PUZ[L.id] || []).length; if (!tot) continue; done = chSolvedIn(C, L.id);
+    var rec = (mine && L.y && !L.a) || (!mine && L.a && L.id !== 'm1');
+    h += '<button class="tile chtile' + (done >= tot ? ' done' : '') + '" data-act="chlevel" data-l="' + L.id + '"><span class="ico">' + (i + 1) + '</span><span class="tt"><span class="sn">' + L.t + (rec ? ' <em>для тебя</em>' : '') + '</span><span class="ut">' + L.d + '. Решено ' + done + ' из ' + tot + '</span></span></button>'; }
+  h += '</section>' + (mine ? '' : '<section class="tiles">' + courseTile + '</section>');
+  return h;
+}
+function chSolvedIn(C, lv){ var n = 0, k; for (k in C.solved) if (k.indexOf(lv + ':') === 0) n++; return n; }
+
+/* ---- задача ---- */
+function chPzStart(kid, lv, idx){
+  var C = chK(kid), list = CHESS_PUZ[lv], i;
+  if (idx == null) { idx = C.pos[lv] || 0; for (i = 0; i < list.length; i++) { var j = (idx + i) % list.length; if (!C.solved[lv + ':' + j]) { idx = j; break; } } }
+  idx = idx % list.length;
+  CHS = { v:'pz', lv:lv, i:idx, P:CH.parse(list[idx].f), ply:0, sel:null, msg:'', ok:null, first:true, hint:null, last:null, busy:false };
+}
+function chPuzzle(kid){
+  var lv = CHS.lv, z = CHESS_PUZ[lv][CHS.i], C = chK(kid), solved = !!C.solved[lv + ':' + CHS.i];
+  var h = '<div class="card chpz"><p class="eyebrow">' + CH_LEVELS.filter(function(x){ return x.id === lv; })[0].t + ' · задача ' + (CHS.i + 1) + ' из ' + CHESS_PUZ[lv].length + (solved && CHS.ok !== true ? ' · уже решена' : '') + '</p><h2>' + chGoal(lv) + '</h2>';
+  h += CHB.html({ P:CHS.P, sel:CHS.sel, last:CHS.last, hint:CHS.hint });
+  if (CHS.promo) h += CHB.promo('w', 'chpzpromo');
+  h += '<div class="chmsg ' + (CHS.ok === true ? 'ok' : CHS.ok === false ? 'try' : '') + '">' + (CHS.msg || (lv === 'm2' || lv === 'm3' ? 'Соперник будет защищаться. Ходи фигурой: нажми на неё, потом на клетку.' : 'Нажми на фигуру, потом на клетку, куда она пойдёт.')) + '</div>';
+  h += '<p class="chbtns">';
+  if (CHS.ok === true) h += '<button class="btn" data-act="chpznext">Следующая задача →</button>';
+  else { h += '<button class="btn ghost small" data-act="chpzhint">💡 Подсказка</button> <button class="btn ghost small" data-act="chpzreset">↺ Сначала</button> <button class="btn ghost small" data-act="chpzshow">Показать решение</button>'; }
+  h += ' <button class="btn ghost small" data-act="chpzskip">Другая задача</button></p></div>';
+  return h;
+}
+function chPzMove(kid, m){
+  var lv = CHS.lv, z = CHESS_PUZ[lv][CHS.i], sol = z.s, u = CH.uci(m), P1 = CH.make(CHS.P, m), mateLv = lv.charAt(0) === 'm';
+  var good, final;
+  if (mateLv) { good = P1.t && CH.status(P1) === 'mate' || u === sol[CHS.ply]; final = CH.status(P1) === 'mate'; }
+  else { good = u === sol[0]; final = good; }
+  if (!good) {
+    CHS.first = false; CHS.sel = null;
+    CHS.msg = CH.status(P1) === 'stalemate' ? 'Это пат: у соперника нет ходов, но и шаха нет. Это ничья! Найди мат.' : mateLv && CH.inCheck(P1) ? 'Шах, но не мат: король может уйти или закрыться. Попробуй другой ход.' : 'Не то. Подумай ещё: ' + (mateLv ? 'какой ход не оставит королю ни одной клетки?' : 'какая фигура соперника стоит без защиты или может попасть под двойной удар?');
+    CHS.ok = false; render(); return;
+  }
+  CHS.P = P1; CHS.last = [m.f, m.to]; CHS.sel = null; CHS.hint = null; CHS.ply++;
+  if (final) { chPzSolved(kid, lv, mateLv ? 'Мат! ' : '');
+    if (lv === 'tac' && sol.length >= 3) { chPzAuto(sol.slice(1, 3), 'Дальше: ', ['соперник — ', 'ты — ']); }
+    return; }
+  CHS.msg = 'Верно! Теперь ход соперника…'; CHS.ok = null; CHS.busy = true; render();
+  setTimeout(function(){ var r = CH.findMove(CHS.P, sol[CHS.ply]); if (!r) { CHS.busy = false; return; } CHS.msg = 'Соперник: ' + CH.moveText(CHS.P, r) + '. Твой ход!'; CHS.P = CH.make(CHS.P, r); CHS.last = [r.f, r.to]; CHS.ply++; CHS.busy = false; if (cur.view === 'always') render(); }, 700);
+}
+function chPzAuto(moves, pre, who){
+  CHS.busy = true; var i = 0, txt = [];
+  function step(){ if (i >= moves.length || cur.view !== 'always' || CHS.v !== 'pz') { CHS.busy = false; return; } var m = CH.findMove(CHS.P, moves[i]); if (!m) { CHS.busy = false; return; }
+    txt.push((who ? who[i % 2] : '') + CH.moveText(CHS.P, m)); CHS.P = CH.make(CHS.P, m); CHS.last = [m.f, m.to]; i++; CHS.msg = CHS.msg0 + '<br><small>' + pre + txt.join(', ') + '.</small>'; render(); setTimeout(step, 900); }
+  CHS.msg0 = CHS.msg; setTimeout(step, 900);
+}
+function chPzSolved(kid, lv, pre){
+  var C = chK(kid), key = lv + ':' + CHS.i, was = !!C.solved[key], pts = 0;
+  if (!was) { C.solved[key] = 1; C.n = (C.n || 0) + 1; if (CHS.first) pts = chPts(kid, 1); }
+  C.pos[lv] = CHS.i + 1;
+  CHS.ok = true; CHS.msg = pre + (CHS.first ? 'Отлично, с первой попытки!' : 'Решено!') + (pts ? ' +1 балл в копилку.' : was ? '' : CHS.first && !chDayLeft(kid) ? ' (баллы за шахматы на сегодня уже получены)' : '');
+  if (!was) ev(kid, 'шахматы', { subj:'Шахматы', unit: CH_LEVELS.filter(function(x){ return x.id === lv; })[0].t, text:'задача ' + (CHS.i + 1) + (CHS.first ? ' с первой попытки' : ' не с первой попытки'), coins: S.kids[kid].coins, price: pts || 0 });
+  save(); render();
+}
+function chPzHint(){
+  var z = CHESS_PUZ[CHS.lv][CHS.i], m = CH.findMove(CHS.P, z.s[CHS.ply]); if (!m) return;
+  CHS.first = false; CHS.hint = m.f; CHS.sel = null; CHS.msg = 'Подсказка: ходить нужно этой фигурой (' + CH.NAME[CH.typeOf(CHS.P.b[m.f])] + ').'; render();
+}
+function chPzShow(kid){
+  var z = CHESS_PUZ[CHS.lv][CHS.i]; CHS.first = false; CHS.P = CH.parse(z.f); CHS.ply = 0; CHS.sel = null; CHS.hint = null; CHS.msg = 'Решение:'; CHS.ok = null;
+  var seq = CHS.lv.charAt(0) === 'm' ? z.s : z.s.slice(0, 3); chPzAuto(seq, ''); render();
+}
+
+/* ---- игра вдвоём ---- */
+function chTabG(){ if (!S.chessT || !S.chessT.f) S.chessT = { f: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', hist:[], keys:[], moves:[], last:null, rot:true, end:'' }; return S.chessT; }
+function chTable(kid){
+  var G = chTabG(), P = CH.parse(G.f), st = G.end || CH.status(P, G.keys), turn = P.t;
+  var capW = '', capB = '', i, cnt = { w:{}, b:{} }, start = { p:8, n:2, b:2, r:2, q:1 }, t;
+  for (i = 0; i < 64; i++) if (P.b[i]) { t = CH.typeOf(P.b[i]); cnt[CH.colorOf(P.b[i])][t] = (cnt[CH.colorOf(P.b[i])][t] || 0) + 1; }
+  for (t in start) { for (i = 0; i < start[t] - (cnt.b[t] || 0); i++) capW += CH.GL[t] + '︎'; for (i = 0; i < start[t] - (cnt.w[t] || 0); i++) capB += CH.GL[t] + '︎'; }
+  function msg(col){
+    if (st === 'mate') return turn === col ? 'Мат. Ты проиграл(а) — сыграем ещё?' : '🏆 Мат! Ты победил(а)!';
+    if (st === 'stalemate') return 'Пат — ничья 🤝';
+    if (st === 'material') return 'Ничья: никто не сможет поставить мат 🤝';
+    if (st === 'fifty') return 'Ничья: 50 ходов без взятий 🤝';
+    if (st === 'repeat') return 'Ничья: позиция повторилась 3 раза 🤝';
+    if (st === 'resign-w') return col === 'w' ? 'Ты сдался(ась)' : '🏆 Соперник сдался!';
+    if (st === 'resign-b') return col === 'b' ? 'Ты сдался(ась)' : '🏆 Соперник сдался!';
+    if (st === 'draw') return 'Ничья по согласию 🤝';
+    if (turn === col) return st === 'check' ? '⚠ Тебе шах! Защити короля' : 'Твой ход';
+    return 'Ход соперника…';
+  }
+  function side(col){
+    var mine = turn === col && !G.end && st !== 'mate' && st !== 'stalemate';
+    return '<div class="chside ' + col + (mine ? ' turn' : '') + (G.rot && col === 'b' ? ' up' : '') + '"><div class="chst"><b>' + (col === 'w' ? 'Белые' : 'Чёрные') + '</b> · ' + msg(col) + '</div><div class="chcap">' + (col === 'w' ? capW : capB) + '</div>' +
+      (CHS.promo && turn === col ? CHB.promo(col, 'chtpromo') : '') +
+      '<div class="chbtns"><button class="btn ghost small" data-act="chtundo">↶ Отменить ход</button> ' + (isOver() ? '<button class="btn small" data-act="chtnew">Новая партия</button>' : '<button class="btn ghost small" data-act="chtresign" data-c="' + col + '">Сдаться</button> <button class="btn ghost small" data-act="chtdraw">Ничья</button>') + '</div></div>';
+  }
+  function isOver(){ return !!G.end || st === 'mate' || st === 'stalemate' || st === 'material' || st === 'fifty' || st === 'repeat'; }
+  var h = '<main class="wrap chess table ' + (kid || '') + '"><header class="bar"><button class="link" data-act="' + (kid ? 'chmenu' : 'chlogin') + '">← Назад</button><button class="link" data-act="chtrot">' + (G.rot ? '🔄 Фигуры: лицом к каждому' : '🔄 Фигуры: все в одну сторону') + '</button></header>';
+  h += '<div class="chtbl">' + side('b') + CHB.html({ P:P, sel:isOver() ? null : CHS.sel, last:G.last, rot:G.rot, act:'chtsq' }) + side('w') + '</div></main>';
+  return h;
+}
+function chTabMove(m){
+  var G = chTabG(), P = CH.parse(G.f), N = CH.make(P, m);
+  G.hist.push(G.f); G.keys.push(CH.posKey(P)); G.moves.push(CH.uci(m)); G.f = CH.fen(N); G.last = [m.f, m.to]; G.end = ''; CHS.sel = null; CHS.promo = null;
+  var st = CH.status(N, G.keys.concat([CH.posKey(N)]));
+  if (st === 'mate' || st === 'stalemate') { var kid = cur.kid; if (kid) ev(kid, 'шахматы', { subj:'Шахматы', unit:'игра вдвоём', text: st === 'mate' ? 'мат, победили ' + (N.t === 'w' ? 'чёрные' : 'белые') : 'пат' }); }
+  save(); render();
+}
+
+/* ---- курс ---- */
+function chCourseList(kid){
+  var C = chK(kid), h = '<section class="hello"><h1>♙ Учимся играть в шахматы</h1><p>Проходи уроки по порядку. В каждом — короткое объяснение и задания на доске.</p></section><section class="tiles">', i, L, done, open;
+  for (i = 0; i < CH_COURSE.length; i++) { L = CH_COURSE[i]; done = !!C.course[L.id]; open = i === 0 || C.course[CH_COURSE[i - 1].id] || done;
+    h += '<button class="tile chtile ' + (done ? 'done' : open ? '' : 'locked') + '" data-act="chlesson" data-i="' + i + '"' + (open ? '' : ' aria-disabled="true"') + '><span class="ico">' + L.ico + '</span><span class="tt"><span class="sn">' + (i + 1) + '. ' + L.t + '</span><span class="ut">' + L.d + '</span></span>' + (done ? '<span class="mark m5">✓</span>' : '') + '</button>'; }
+  return h + '</section>';
+}
+function chLessonStart(i){ CHS = { v:'cl', li:i, si:0 }; chStepInit(); }
+function chStepInit(){
+  var st = CH_COURSE[CHS.li].steps[CHS.si]; CHS.sel = null; CHS.ok = null; CHS.msg = ''; CHS.last = null; CHS.hint = null; CHS.qa = null; CHS.promo = null;
+  if (st.fen) CHS.P = CH.parse(st.fen.indexOf(' ') > 0 ? st.fen : st.fen + ' w - - 0 1');
+  if (st.stars) { CHS.stars = {}; for (var k = 0; k < st.stars.length; k++) CHS.stars[CH.sqIdx(st.stars[k])] = 1; CHS.nm = 0; }
+}
+function chLesson(kid){
+  var L = CH_COURSE[CHS.li], st = L.steps[CHS.si], h = '<div class="card chpz"><p class="eyebrow">Урок ' + (CHS.li + 1) + ': ' + L.t + ' · шаг ' + (CHS.si + 1) + ' из ' + L.steps.length + '</p>';
+  if (st.h) h += '<div class="chtext">' + st.h + ' <button class="link" data-act="chsay">🔊</button></div>';
+  if (st.fen) { var mk = {}, k; if (CHS.stars) for (k in CHS.stars) mk[k] = 'star'; if (st.mk) for (k = 0; k < st.mk.length; k++) mk[CH.sqIdx(st.mk[k])] = 'ring';
+    h += CHB.html({ P:CHS.P, sel:CHS.sel, last:CHS.last, marks:mk, hint:CHS.hint, noCheck: st.t === 'stars' }); }
+  if (CHS.promo) h += CHB.promo('w', 'chlpromo');
+  if (st.t === 'quiz') { h += '<div class="opts">'; for (var j = 0; j < st.o.length; j++) { var cls = CHS.qa == null ? '' : st.o[j] === st.a ? ' right' : ''; h += '<button class="opt' + cls + '" data-act="chquiz" data-v="' + U.esc(st.o[j]) + '">' + st.o[j] + '</button>'; } h += '</div>'; }
+  if (CHS.msg) h += '<div class="chmsg ' + (CHS.ok ? 'ok' : 'try') + '">' + CHS.msg + '</div>';
+  var canNext = st.t === 'text' || CHS.ok;
+  h += '<p class="chbtns">' + (canNext ? '<button class="btn" data-act="chlnext">' + (CHS.si + 1 < L.steps.length ? 'Дальше →' : 'Урок пройден ✓') + '</button>' : '') + (st.t !== 'text' && st.t !== 'quiz' && !CHS.ok ? ' <button class="btn ghost small" data-act="chlreset">↺ Сначала</button>' : '') + (CHS.si > 0 ? ' <button class="btn ghost small" data-act="chlprev">← Назад</button>' : '') + '</p></div>';
+  return h;
+}
+function chLessonMove(kid, m){
+  var st = CH_COURSE[CHS.li].steps[CHS.si], P1 = CH.make(CHS.P, m), u = CH.uci(m);
+  if (st.t === 'stars') {
+    P1.t = 'w'; P1.ep = -1; CHS.P = P1; CHS.last = [m.f, m.to]; CHS.sel = m.to; CHS.nm++;
+    if (CHS.stars[m.to]) delete CHS.stars[m.to];
+    var left = 0, k; for (k in CHS.stars) left++;
+    if (!left) { CHS.ok = true; CHS.sel = null; CHS.msg = 'Все звёзды собраны за ' + CHS.nm + ' ' + U.pl(CHS.nm, 'ход', 'хода', 'ходов') + '! ' + (st.best && CHS.nm <= st.best ? 'Это самый короткий путь 👍' : st.best ? 'А можно быстрее: за ' + st.best + '. Попробуй ещё раз или иди дальше.' : ''); }
+    else CHS.msg = 'Осталось звёзд: ' + left;
+    CHS.ok = !left ? true : null; render(); return;
+  }
+  var good = false, s1 = CH.status(P1);
+  if (st.goal === 'check') good = CH.inCheck(P1);
+  else if (st.goal === 'mate') good = s1 === 'mate';
+  else if (st.goal === 'escape') good = true;
+  else if (st.goal === 'best') good = !!m.cap && CH.VAL[CH.typeOf(m.cap)] >= st.v;
+  else if (st.goal === 'promo') good = !!m.pr;
+  else if (st.goal) good = st.goal.split(',').indexOf(u.slice(0, 4)) >= 0 || st.goal.split(',').indexOf(u) >= 0;
+  if (good) { CHS.P = P1; CHS.last = [m.f, m.to]; CHS.sel = null; CHS.ok = true; CHS.msg = st.ok || 'Правильно!'; }
+  else { CHS.sel = null; CHS.ok = false; CHS.msg = st.no || (st.goal === 'mate' && s1 === 'stalemate' ? 'Это пат, а не мат: ничья! Найди другой ход.' : st.goal === 'mate' && CH.inCheck(P1) ? 'Шах, но королю есть куда уйти. Ищи мат.' : 'Не так. Попробуй ещё раз.'); }
+  render();
+}
+
+/* ---- клики ---- */
+function chAct(act, b){
+  var kid = cur.kid, sq = b && b.getAttribute('data-sq') != null ? +b.getAttribute('data-sq') : null, P, ms, i, m;
+  switch (act) {
+    case 'chmenu': CHS = { v:'menu' }; render(); break;
+    case 'chlogin': cur.kid = null; go('login'); break;
+    case 'chtable': CHS = { v:'table' }; render(); break;
+    case 'chcourse': CHS = { v:'course' }; render(); break;
+    case 'chlevel': chPzStart(kid, b.getAttribute('data-l')); render(); break;
+    case 'chpznext': chPzStart(kid, CHS.lv, CHS.i + 1); render(); break;
+    case 'chpzskip': chPzStart(kid, CHS.lv, CHS.i + 1); render(); break;
+    case 'chpzreset': { var lv = CHS.lv, ix = CHS.i, f0 = CHS.first; chPzStart(kid, lv, ix); CHS.first = f0; render(); break; }
+    case 'chpzhint': if (!CHS.busy) chPzHint(); break;
+    case 'chpzshow': if (!CHS.busy) chPzShow(kid); break;
+    case 'chsq': {
+      if (CHS.busy || CHS.ok === true && CHS.v === 'pz') break;
+      P = CHS.P; if (!P) break;
+      if (CHS.v === 'cl') { var stp = CH_COURSE[CHS.li].steps[CHS.si];
+        if (stp.t === 'text' || stp.t === 'quiz') { CHS.sel = P.b[sq] && CHS.sel !== sq ? sq : null; render(); break; }
+        if (CHS.ok) break; }
+      if (CHS.sel != null) {
+        ms = CH.legal(P, CHS.sel); m = null; for (i = 0; i < ms.length; i++) if (ms[i].to === sq) { m = ms[i]; break; }
+        if (m) { if (m.pr) { CHS.promo = { f:m.f, to:m.to }; render(); break; } CHS.promo = null; if (CHS.v === 'pz') chPzMove(kid, m); else chLessonMove(kid, m); break; }
+      }
+      CHS.promo = null;
+      CHS.sel = P.b[sq] && CH.colorOf(P.b[sq]) === P.t && CHS.sel !== sq ? sq : null; if (CHS.v === 'pz' && CHS.ok === false) { CHS.ok = null; CHS.msg = ''; } render(); break; }
+    case 'chpzpromo': case 'chlpromo': { if (!CHS.promo) break; m = CH.findMove(CHS.P, CH.sqName(CHS.promo.f) + CH.sqName(CHS.promo.to) + b.getAttribute('data-p')); CHS.promo = null; if (m) { if (act === 'chpzpromo') chPzMove(kid, m); else chLessonMove(kid, m); } break; }
+    case 'chtsq': {
+      var G = chTabG(); P = CH.parse(G.f); if (G.end) break; var s0 = CH.status(P, G.keys); if (s0 === 'mate' || s0 === 'stalemate' || s0 === 'material' || s0 === 'fifty' || s0 === 'repeat') break;
+      if (CHS.sel != null) { ms = CH.legal(P, CHS.sel); m = null; for (i = 0; i < ms.length; i++) if (ms[i].to === sq) { m = ms[i]; break; }
+        if (m) { if (m.pr) { CHS.promo = { f:m.f, to:m.to }; render(); break; } chTabMove(m); break; } }
+      CHS.promo = null; CHS.sel = P.b[sq] && CH.colorOf(P.b[sq]) === P.t && CHS.sel !== sq ? sq : null; render(); break; }
+    case 'chtpromo': { if (!CHS.promo) break; var G2 = chTabG(); m = CH.findMove(CH.parse(G2.f), CH.sqName(CHS.promo.f) + CH.sqName(CHS.promo.to) + b.getAttribute('data-p')); if (m) chTabMove(m); break; }
+    case 'chtundo': { var G3 = chTabG(); if (!G3.hist.length) break; G3.f = G3.hist.pop(); G3.keys.pop(); G3.moves.pop(); G3.end = ''; G3.last = null; CHS.sel = null; CHS.promo = null; save(); render(); break; }
+    case 'chtnew': S.chessT = null; chTabG(); CHS.sel = null; save(); render(); break;
+    case 'chtresign': { if (!window.confirm('Сдаться? Партия закончится.')) break; chTabG().end = 'resign-' + b.getAttribute('data-c'); save(); render(); break; }
+    case 'chtdraw': { if (!window.confirm('Оба согласны на ничью?')) break; chTabG().end = 'draw'; save(); render(); break; }
+    case 'chtrot': { var G4 = chTabG(); G4.rot = !G4.rot; save(); render(); break; }
+    case 'chlesson': { var ii = +b.getAttribute('data-i'), C = chK(kid); if (ii > 0 && !C.course[CH_COURSE[ii - 1].id] && !C.course[CH_COURSE[ii].id]) { alertMsg('Сначала пройди предыдущий урок'); break; } chLessonStart(ii); render(); window.scrollTo(0, 0); break; }
+    case 'chlnext': { var L = CH_COURSE[CHS.li]; if (CHS.si + 1 < L.steps.length) { CHS.si++; chStepInit(); render(); window.scrollTo(0, 0); }
+      else { var C2 = chK(kid); if (!C2.course[L.id]) { C2.course[L.id] = 1; ev(kid, 'шахматы', { subj:'Шахматы', unit:'урок «' + L.t + '»', text:'пройден' }); save(); } CHS = { v:'course' }; render(); alertMsg('Урок «' + L.t + '» пройден ✓'); } break; }
+    case 'chlprev': CHS.si = Math.max(0, CHS.si - 1); chStepInit(); render(); break;
+    case 'chlreset': chStepInit(); render(); break;
+    case 'chsay': { var st = CH_COURSE[CHS.li].steps[CHS.si]; say(strip(st.h), 'ru-RU'); break; }
+    case 'chquiz': { if (CHS.qa != null) break; var st2 = CH_COURSE[CHS.li].steps[CHS.si], v = b.getAttribute('data-v'); if (v === st2.a) { CHS.qa = v; CHS.ok = true; CHS.msg = st2.e || 'Верно!'; } else { CHS.ok = false; CHS.msg = 'Нет. Подумай ещё раз.'; } render(); break; }
+  }
+}
+
+/* ===== Плитка «Шахматы» на главной (всегда доступна) и «Играть вдвоём» на экране входа ===== */
+var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
+ALWAYS.push({ id:'chess', order:20, login:true, full:true,
+  tile: function(kid){
+    if (!kid) return '<button class="tile always chtile" data-act="always" data-id="chess"><span class="ico">♞</span><span class="tt"><span class="sn">Шахматы вдвоём</span><span class="ut">Партия на одном экране: у каждого свои фигуры лицом к себе</span></span></button>';
+    var C = chK(kid); return '<button class="tile always chtile" data-act="always" data-id="chess"><span class="ico">♞</span><span class="tt"><span class="sn">Шахматы</span><span class="ut">' + (kid === 'yarik' ? 'Учимся играть, задачи и игра вдвоём' : 'Задачи на мат и тактику, игра вдвоём') + (C.n ? ' · решено задач: ' + C.n : '') + '</span></span></button>'; },
+  open: function(kid){ chOpen(kid); },
+  view: function(kid){ return chView(kid); },
+  act: function(a, el){ chAct(a, el); }
+});
+
+/* ===== Оформление (вставляется при загрузке, чтобы не трогать общие стили) ===== */
+(function(){
+  var css = '' +
+  '.chboard{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;margin:10px auto;border:3px solid #6b4a2b;border-radius:6px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.18);-webkit-user-select:none;user-select:none}' +
+  '.chboard .sq{position:relative;width:12.5%;height:0;padding:0 0 12.5%;margin:0;border:0;border-radius:0;cursor:pointer;-webkit-appearance:none;appearance:none;font:inherit;color:inherit}' +
+  '.chboard .sq.l{background:#f0d9b5}.chboard .sq.d{background:#b58863}' +
+  '.chboard .sq.last.l{background:#f3e98d}.chboard .sq.last.d{background:#d1bb54}' +
+  '.chboard .sq.sel{background:#8fd18b !important}' +
+  '.chboard .sq.chk{background:radial-gradient(circle,#ff4b3e 0,#e0322a 35%,rgba(224,50,42,0) 75%) !important}' +
+  '.chboard .sq.hnt{box-shadow:inset 0 0 0 4px #2f7cf6}' +
+  '.chboard .pc{position:absolute;left:0;top:0;width:100%;height:100%;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;-webkit-justify-content:center;justify-content:center;line-height:1;font-family:"Segoe UI Symbol","Apple Symbols","DejaVu Sans",serif;pointer-events:none}' +
+  '.pc.w{color:#fff;text-shadow:0 0 1px #000,0 0 1px #000,1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000}' +
+  '.pc.b{color:#1d1d1d;text-shadow:0 0 1px #fff}' +
+  '.chboard.rot .pc.b{-webkit-transform:rotate(180deg);transform:rotate(180deg)}' +
+  '.chboard .chd{position:absolute;left:37%;top:37%;right:37%;bottom:37%;border-radius:50%;background:rgba(20,80,20,.45);pointer-events:none}' +
+  '.chboard .chx{position:absolute;left:4%;top:4%;right:4%;bottom:4%;border-radius:50%;box-sizing:border-box;border:5px solid rgba(20,80,20,.45);pointer-events:none}' +
+  '.chboard .mk{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}' +
+  '.chboard .mk.star:after{content:"\\2605";position:absolute;left:0;right:0;top:50%;margin-top:-.5em;text-align:center;line-height:1;color:#f2b705;text-shadow:0 0 2px #7a5200}' +
+  '.chboard .mk.ring{box-sizing:border-box;border:4px solid #2f7cf6;border-radius:50%}' +
+  '.chboard .cf,.chboard .cr{position:absolute;font-style:normal;font-size:11px;line-height:1;opacity:.75;pointer-events:none;font-weight:700}' +
+  '.chboard .cf{right:3px;bottom:2px}.chboard .cr{left:3px;top:2px}' +
+  '.chboard .sq.l .cf,.chboard .sq.l .cr{color:#b58863}.chboard .sq.d .cf,.chboard .sq.d .cr{color:#f0d9b5}' +
+  '.chmsg{margin:10px 0;padding:10px 14px;border-radius:12px;background:var(--soft);min-height:1.5em}' +
+  '.chmsg.ok{background:#dff3e5;color:#17603a}.chmsg.try{background:#fdecea;color:#8a2520}' +
+  '.chbtns{text-align:center;margin:10px 0}.chbtns .btn{margin:4px}' +
+  '.chpromo{text-align:center;margin:8px 0}.chpromo .btn{font-size:34px;line-height:1;padding:6px 12px;margin:4px;min-width:60px}' +
+  '.chpromo .pc{position:static;display:inline}' +
+  '.chtext{font-size:19px;margin:6px 0 4px}' +
+  '.chess .tile .ico{font-size:30px}' +
+  '.chess.table{padding-top:6px}' +
+  '.chside{text-align:center;padding:6px 8px;border-radius:14px;background:var(--card);border:1px solid var(--line)}' +
+  '.chside.turn{border:2px solid var(--green);box-shadow:0 0 0 3px rgba(35,130,74,.15)}' +
+  '.chside.up{-webkit-transform:rotate(180deg);transform:rotate(180deg)}' +
+  '.chside .chst{font-size:18px}.chside .chcap{font-size:22px;min-height:26px;letter-spacing:1px;color:var(--ink2)}' +
+  '.chside .chbtns{margin:4px 0}' +
+  '@media (orientation:landscape) and (min-width:700px){.chess.table{max-width:none}.chtbl{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;-webkit-justify-content:center;justify-content:center}.chtbl .chside{width:220px;-webkit-flex:none;flex:none}.chtbl .chboard{margin:0 12px}}';
+  var el = document.createElement('style'); el.appendChild(document.createTextNode(css)); (document.head || document.documentElement).appendChild(el);
+  window.addEventListener('resize', function(){ if (typeof cur !== 'undefined' && cur.view === 'always' && cur.aid === 'chess') { clearTimeout(CHB.rt); CHB.rt = setTimeout(render, 150); } });
+})();
+
 /* ===== Игра «Тоби-программист»: основы программирования для Ярика =====
    Последовательность → удар по мячу → циклы → условия и «пока» → отладка.
    Поле: '.' трава, '#' препятствие, 'S' старт, 'G' финиш, '*' косточка (собирается сама),
@@ -2805,7 +3989,7 @@ function cgPayPending(kid){ const C = cgK(kid); if (!C.pend) return; const t = U
 /* --- плитка на главной --- */
 function codeTile(kid){ if (CODE_KIDS.indexOf(kid) < 0) return ''; const C = cgK(kid); let won = 0; CG_LV.forEach(l => { if (C.lv[l.id] && C.lv[l.id].s) won++; });
   const nx = CG_LV.find((l, i) => !(C.lv[l.id] && C.lv[l.id].s) && cgOpen(kid, i));
-  return `<button class="tile code" data-act="code"><span class="ico"><img src="img/code-tile.webp" alt="" onerror="this.parentNode.textContent='🐶'"></span><span class="tt"><span class="sn">Тоби-программист</span><span class="ut">${won ? `Пройдено ${won} из ${CG_LV.length}` : 'Игра: научи щенка Тоби слушаться программы'}${nx ? ` · дальше: уровень ${nx.id}` : ' · всё пройдено!'}</span></span><span class="state">до +${CODE_DAY_MAX}</span></button>`; }
+  return `<button class="tile code" data-act="always" data-id="code"><span class="ico"><img src="img/code-tile.webp" alt="" onerror="this.parentNode.textContent='🐶'"></span><span class="tt"><span class="sn">Тоби-программист</span><span class="ut">${won ? `Пройдено ${won} из ${CG_LV.length}` : 'Игра: научи щенка Тоби слушаться программы'}${nx ? ` · дальше: уровень ${nx.id}` : ' · всё пройдено!'}</span></span><span class="state">до +${CODE_DAY_MAX}</span></button>`; }
 
 /* --- карта уровней --- */
 function vCode(){ const kid = cur.kid, C = cgK(kid); cgPayPending(kid);
@@ -2815,15 +3999,15 @@ function vCode(){ const kid = cur.kid, C = cgK(kid); cgPayPending(kid);
     return `<section class="cgch card"><div class="cgchh"><div class="cgcov" style="background-image:url(img/${ch.img}.webp)"><span>${ch.ico}</span></div><div><h2>${ch.id}. ${U.esc(ch.t)}</h2><p class="hint">${U.esc(ch.what)} · ${got} из ${L.length}</p>${got === L.length ? `<p class="cgbadge">${U.esc(ch.badge)}</p>` : `<p class="hint">Награда за главу: ${U.esc(ch.badge)}</p>`}</div></div>
       <div class="cglvs">${L.map(z => { const r = C.lv[z.l.id], op = cgOpen(kid, z.i), s = r && r.s || 0;
         return `<button class="cglv ${s ? 'won' : op ? 'open' : 'lock'}${z.l.hard ? ' hard' : ''}" data-act="cglv" data-id="${z.l.id}" ${op ? '' : 'aria-disabled="true"'}><b>${z.l.id}</b><i>${s ? '★★★'.slice(0, s) + '<s>' + '★★★'.slice(s) + '</s>' : op ? '▶' : '🔒'}</i></button>`; }).join('')}</div></section>`; }).join('');
-  return `<main class="wrap ${kid} cg"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header>
+  return `<main class="wrap ${kid} cg"><header class="bar"><button class="link" data-act="home">← На главную</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header>
     <section class="hello cghero"><img class="cgtoby" src="img/code-toby.webp" alt="" onerror="this.remove()"><div><p class="eyebrow">Игра</p><h1>Тоби-программист</h1><p>Щенок Тоби понимает только программы. Собери из блоков программу, и Тоби выполнит её шаг за шагом.</p>
     <p class="hint">За новый уровень — столько баллов, сколько звёзд. Сегодня: <b>${day} из ${CODE_DAY_MAX}</b>.${C.pend ? ` Ждут в копилку: <b>${C.pend}</b> — придут, когда сделаешь уроки дня.` : ''}</p></div></section>${chs}</main>`; }
 
 /* --- экран уровня --- */
-let CG = null; /* { id, prog, sel:{k,i}, run, vi, step, res, hint } */
+let CG = null, CG_VIEW = 'map'; /* { id, prog, sel:{k,i}, run, vi, step, res, hint } */
 function cgStart(id){ const lv = CG_LV[cgIdx(id)]; const C = cgK(cur.kid); const r = C.lv[id] || {};
   CG = { id: id, prog: lv.bug ? cgParse(lv.bug) : (r.prog ? JSON.parse(JSON.stringify(r.prog)) : []), sel: { k: '', i: -1 }, run: false, vi: 0, res: null, hint: 0, used: false };
-  CG.sel.i = CG.prog.length; C.last = id; save(); go('codelv'); setTimeout(() => say(lv.say), 400); }
+  CG.sel.i = CG.prog.length; C.last = id; save(); CG_VIEW = 'lv'; go('always', { aid: 'code' }); setTimeout(() => say(lv.say), 400); }
 function cgSlot(prog, k){ if (!k) return prog; let a = prog; for (const part of k.split('/')) { const m = part.split('.'); const n = a[+m[0]]; a = m[1] === 'e' ? n.e : n.b; } return a; }
 function cgBlockHtml(x, path, k, i){ const sel = CG.sel.k === k && CG.sel.i === i + 1 && CG.selB, id = path;
   const del = sel ? `<span class="cgdel" data-act="cgdel" data-k="${k}" data-i="${i}">✕</span>` : '';
@@ -2890,7 +4074,7 @@ function cgRun(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids
     if (badge) ev(kid, 'программирование', { subj: 'Программирование', unit: `Глава ${lv.ch} пройдена`, text: badge });
     CG.res = { ok: true, stars: stars, pts: pts, pend: pend, vr: vr, badge: badge }; save(); render();
     say(badge ? 'Глава пройдена! Тоби получает награду: ' + badge.replace(/^\S+\s/, '') : stars === 3 ? 'Отлично! Три звезды!' : 'Получилось!'); };
-  const me = CG; const step = () => { if (CG !== me || cur.view !== 'codelv') { me.run = false; return; } const tr = R[vi].tr;
+  const me = CG; const step = () => { if (CG !== me || cur.view !== 'always' || cur.aid !== 'code' || CG_VIEW !== 'lv') { me.run = false; return; } const tr = R[vi].tr;
     if (i < tr.length) { cgApply(tr[i]); i++; setTimeout(step, tr[i - 1].ev === 'fly' ? 140 : CODE_STEP_MS); return; }
     if (R[vi].ok && vi + 1 < R.length) { vi++; i = 0; CG.vi = vi; CG.res = { vr: vr.map((v, k) => k < vi ? v : null) }; const w = document.getElementById('cgbwrap'); if (w) w.innerHTML = cgBoard(lv, grids[vi]); Array.prototype.forEach.call(document.querySelectorAll('.cgtabs .chip'), (el, k) => { el.classList.toggle('on', k === vi); }); setTimeout(step, 500); return; }
     if (!R[vi].ok) { R.forEach((x, k) => { if (k > vi) vr[k] = null; }); }
@@ -2899,10 +4083,10 @@ function cgRun(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids
 
 /* --- действия --- */
 function codeAct(act, b){ const kid = cur.kid;
-  if (act === 'code') { if (CG) CG.run = false; CG = null; go('code'); return true; }
+  if (act === 'code') { if (CG) CG.run = false; CG = null; CG_VIEW = 'map'; go('always', { aid: 'code' }); return true; }
   if (act === 'cglv') { const i = cgIdx(b.dataset.id); if (!cgOpen(kid, i)) { alertMsg('Сначала пройди предыдущий уровень'); return true; } cgStart(b.dataset.id); return true; }
   if (!CG) return false; const lv = CG_LV[cgIdx(CG.id)];
-  if (CG.run && cur.view === 'codelv') return true;
+  if (CG.run && CG_VIEW === 'lv') return true;
   const touch = () => { CG.res = null; };
   switch (act) {
     case 'cgsay': say(lv.say); return true;
@@ -2922,9 +4106,17 @@ function codeAct(act, b){ const kid = cur.kid;
     case 'cgrun': cgRun(); return true;
     case 'cghint': CG.hint = 1; render(); say('Номера на поле показывают, куда должен пройти Тоби. Посчитай шаги.'); ev(kid, 'не понимаю', { subj: 'Программирование', unit: `Уровень ${lv.id}`, text: 'подсказка' }); return true;
     case 'cgsol': if (!window.confirm('Показать решение? За этот уровень тогда будет одна звезда и без баллов. Разберись, как оно работает!')) return true; CG.prog = cgParse(lv.sol); CG.used = true; CG.sel = { k: '', i: CG.prog.length }; touch(); render(); return true;
-    case 'cgnext': { const i = cgIdx(CG.id) + 1; if (i < CG_LV.length && cgOpen(kid, i)) cgStart(CG_LV[i].id); else { CG = null; go('code'); } return true; }
+    case 'cgnext': { const i = cgIdx(CG.id) + 1; if (i < CG_LV.length && cgOpen(kid, i)) cgStart(CG_LV[i].id); else { CG = null; CG_VIEW = 'map'; go('always', { aid: 'code' }); } return true; }
   }
   return false; }
+
+/* подключение к разделу «Всегда доступно» (см. app.js: ALWAYS) */
+var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
+ALWAYS.push({ id: 'code', order: 5, full: true,
+  tile: function(kid){ return codeTile(kid); },
+  open: function(){ if (CG) CG.run = false; CG = null; CG_VIEW = 'map'; },
+  view: function(kid){ if (!kid) return vLogin(); return CG_VIEW === 'lv' && CG ? vCodeLv() : vCode(); },
+  act: function(act, b){ codeAct(act, b); } });
 
 /* ===== Настройка детей ===== */
 CUR_Y.lang = { name:'Языки', src:'Português: 2.º–3.º ano (gramática, ortografia) и English', units: PT_NAT, old: PT_Y, alt: EN_UNITS, altName:'English' };
@@ -2994,6 +4186,7 @@ function applyCfg(rows){
     else if (type.startsWith('сооб')) K.msgs.push({ id: row.id, text: String(row.value), seen: false });
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
     else if (type.startsWith('чтен')) { const n = Number(row.value); if (n > 0) K.readWords = n; }
+    else if (type.startsWith('книг')) bkApply(kid, row);
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     K.applied.push(row.id);
   }
@@ -3047,8 +4240,8 @@ function coinsHtml(n){ return `<span class="coin" aria-hidden="true"></span><b>$
 function render(){
   if (S.parentPin) for (const k of ['yarik', 'anya']) { burnCheck(k); piggyCheck(k); }
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
-  const v = !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'parent' ? vParent() : cur.view === 'code' ? vCode() : cur.view === 'codelv' && CG ? vCodeLv() : cur.view === 'codelv' ? vCode() : vLogin();
-  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'code', 'codelv'].includes(cur.view) ? cur.kid : '';
+  const v = !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : vLogin();
+  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always'].includes(cur.view) ? cur.kid : '';
   app().innerHTML = v; afterRender();
 }
 function afterRender(){ const f = app().querySelector('[autofocus]'); if (f) try { f.focus(); } catch (e) {} }
@@ -3065,6 +4258,7 @@ function vLogin(){
   const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${k}" data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[k].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
   return `<main class="wrap login"><header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header>
   <div class="kids">${card('yarik')}${card('anya')}</div>
+  ${alwaysTiles(null)}
   <p class="center"><button class="link" data-act="parent">Для родителей</button></p>${window.INSTALL_EV ? '<p class="center"><button class="btn ghost" data-act="install">📲 Установить на экран телефона</button></p>' : ''}</main>`;
 }
 /* Android/Chrome: своя кнопка установки приложения на главный экран */
@@ -3105,6 +4299,13 @@ function todaySubjects(kid){ const list = KIDS[kid].order.slice(); const D = day
 function dayDone(kid, ds){ const keep = cur.ds; cur.ds = ds; const D = S.kids[kid].days[ds]; const ok = !!D && todaySubjects(kid).every(s => D.les[s] && D.les[s].phase === 'done'); cur.ds = keep; return ok; }
 function lessonDay(kid){ const K = S.kids[kid], t = U.today(); if (K.openDay && K.openDay < t && !dayDone(kid, K.openDay)) return K.openDay; return t; }
 function nextOpen(kid){ const D = dayRec(kid, cur.ds); return todaySubjects(kid).find(s => !(D.les[s] && D.les[s].phase === 'done')); }
+/* ===== Всегда доступно: загадки, головоломки, задачи, шахматы (каждая фича — свой файл, ALWAYS.push) ===== */
+var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
+function alwaysGet(id){ return ALWAYS.filter(x => x.id === id)[0]; }
+function alwaysTiles(kid){ const L = ALWAYS.filter(x => kid || x.login).sort((a, b) => (a.order || 0) - (b.order || 0)); if (!L.length) return '';
+  return `<h2 class="alwh">${kid ? '🧩 Всегда доступно — даже когда уроки сделаны' : 'Играть вместе'}</h2><section class="tiles always">${L.map(x => { try { return x.tile(kid); } catch (e) { return ''; } }).join('')}</section>`; }
+function alwaysWrap(kid, html){ return `<main class="wrap ${kid || ''} alw"><header class="bar">${kid ? '<button class="link" data-act="home">← На главную</button>' : '<button class="link" data-act="tologin">← Назад</button>'}${kid ? `<span class="coins">${coinsHtml(S.kids[kid].coins)}</span>` : ''}</header>${html}</main>`; }
+function vAlways(){ const F = alwaysGet(cur.aid), kid = cur.kid || null; if (!F) return kid ? vHome() : vLogin(); let h; try { h = F.view(kid); } catch (e) { h = '<div class="card">Ошибка: ' + U.esc(e.message) + '</div>'; } return F.full ? h : alwaysWrap(kid, h); }
 function vHome(){
   const kid = cur.kid, K = S.kids[kid], D = dayRec(kid, cur.ds), subs = todaySubjects(kid);
   const done = subs.filter(s => D.les[s] && D.les[s].phase === 'done').length;
@@ -3117,8 +4318,10 @@ function vHome(){
   <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${restCard(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
-  <section class="tiles">${tiles}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}${codeTile(kid)}</section>
+  <section class="tiles">${tiles}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
+  ${alwaysTiles(kid)}
   ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
+  ${bkHomeCard(kid)}
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
   <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
 }
@@ -3669,12 +4872,13 @@ function vSettings(){
 /* ===== События ===== */
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act;
-  if (codeAct(act, b)) return;
   const kid = cur.kid; const D = kid && dayRec(kid, cur.ds); const L = D && cur.subj && D.les[cur.subj];
   switch (act) {
     case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;
     case 'parent': askPin('parent', () => go('parent', { kid: null })); break;
     case 'cancelpin': go(cur.kid ? 'home' : 'login'); break;
+    case 'always': { const F = alwaysGet(b.dataset.id); if (!F) break; if (F.open) F.open(cur.kid || null); go('always', { aid: F.id }); break; }
+    case 'tologin': cur.kid = null; go('login'); break;
     case 'key': pinKey(b.dataset.k); break;
     case 'logout': if (RD && (RD.active || RD.paused)) pauseRead(); RD = null; rememberScroll(); if (RT && RT.active) { RT.active = false; try { RT.rec.stop(); } catch (e) {} RT = null; } cur.kid = null; go('login'); break;
     case 'home': if (RD && (RD.active || RD.paused)) pauseRead(); RD = null; rememberScroll(); go('home'); break;
@@ -3748,6 +4952,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of ['yarik', 'anya']) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
+    default: { const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }
@@ -3755,6 +4960,7 @@ document.addEventListener('submit', e => {
   const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const k = f.dataset.form;
   const val = id => (document.getElementById(id) || {}).value || '';
   if (k === 'setup') { const p = val('pp'), y = val('py'), a = val('pa'); if (![p, y, a].every(x => /^\d{4}$/.test(x))) return alertMsg('Нужно по четыре цифры'); if (new Set([p, y, a]).size < 3) return alertMsg('Коды Юры, Ярика и Ани должны быть разными'); S.parentPin = hashPin(p); S.kids.yarik.pin = hashPin(y); S.kids.anya.pin = hashPin(a); save(); go('login'); }
+  { const F = ALWAYS.filter(x => k.indexOf(x.id) === 0)[0]; if (F && F.form) return F.form(k, f); }
   if (k === 'num') answer(val('numin'));
   if (k === 'rtry') retryAnswer(val('rtin'));
   if (k === 'prize') { const t = val('prname').trim().slice(0, 60); if (t) { const it = { id: 'o' + Date.now(), name: t, price: null, own: true }; cur.prOwn.push(it); cur.prSel.push(it.id); render(); } }

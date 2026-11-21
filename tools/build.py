@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.join(root, 'tools')); import meta2
 BX, _e = meta2.load()
 if _e: sys.exit('meta2: ' + '; '.join(_e))
 rd = lambda f: open(os.path.join(src, f), encoding='utf-8').read()
-js = '\n'.join([rd('core.js'), rd('cur_pt_nat.js'), rd('cur_fin.js'), rd('cur_fin_a.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('cur_more_y.js'), rd('cur_more_a.js'), rd('hard.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', 'const BOOK_X = ' + json.dumps(BX, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('code.js'), rd('app.js')])
+js = '\n'.join([rd('core.js'), rd('cur_pt_nat.js'), rd('cur_fin.js'), rd('cur_fin_a.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('cur_more_y.js'), rd('cur_more_a.js'), rd('hard.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', 'const BOOK_X = ' + json.dumps(BX, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('mybooks.js'), rd('fun_data.js'), rd('fun_pz.js'), rd('fun.js'), rd('chess_course.js'), rd('chess_puz.js'), rd('chess.js'), rd('code.js'), rd('app.js')])
 import subprocess; subprocess.run([sys.executable, os.path.join(root, 'tools', 'theme_css.py')], check=True)
 css = '\n'.join(open(os.path.join(src, f), encoding='utf-8').read() for f in ('style.css', 'theme.css', 'code.css'))
 ver = hashlib.md5((js + css).encode()).hexdigest()[:8]

@@ -126,7 +126,7 @@ function cgPayPending(kid){ const C = cgK(kid); if (!C.pend) return; const t = U
 /* --- плитка на главной --- */
 function codeTile(kid){ if (CODE_KIDS.indexOf(kid) < 0) return ''; const C = cgK(kid); let won = 0; CG_LV.forEach(l => { if (C.lv[l.id] && C.lv[l.id].s) won++; });
   const nx = CG_LV.find((l, i) => !(C.lv[l.id] && C.lv[l.id].s) && cgOpen(kid, i));
-  return `<button class="tile code" data-act="code"><span class="ico"><img src="img/code-tile.webp" alt="" onerror="this.parentNode.textContent='🐶'"></span><span class="tt"><span class="sn">Тоби-программист</span><span class="ut">${won ? `Пройдено ${won} из ${CG_LV.length}` : 'Игра: научи щенка Тоби слушаться программы'}${nx ? ` · дальше: уровень ${nx.id}` : ' · всё пройдено!'}</span></span><span class="state">до +${CODE_DAY_MAX}</span></button>`; }
+  return `<button class="tile code" data-act="always" data-id="code"><span class="ico"><img src="img/code-tile.webp" alt="" onerror="this.parentNode.textContent='🐶'"></span><span class="tt"><span class="sn">Тоби-программист</span><span class="ut">${won ? `Пройдено ${won} из ${CG_LV.length}` : 'Игра: научи щенка Тоби слушаться программы'}${nx ? ` · дальше: уровень ${nx.id}` : ' · всё пройдено!'}</span></span><span class="state">до +${CODE_DAY_MAX}</span></button>`; }
 
 /* --- карта уровней --- */
 function vCode(){ const kid = cur.kid, C = cgK(kid); cgPayPending(kid);
@@ -136,15 +136,15 @@ function vCode(){ const kid = cur.kid, C = cgK(kid); cgPayPending(kid);
     return `<section class="cgch card"><div class="cgchh"><div class="cgcov" style="background-image:url(img/${ch.img}.webp)"><span>${ch.ico}</span></div><div><h2>${ch.id}. ${U.esc(ch.t)}</h2><p class="hint">${U.esc(ch.what)} · ${got} из ${L.length}</p>${got === L.length ? `<p class="cgbadge">${U.esc(ch.badge)}</p>` : `<p class="hint">Награда за главу: ${U.esc(ch.badge)}</p>`}</div></div>
       <div class="cglvs">${L.map(z => { const r = C.lv[z.l.id], op = cgOpen(kid, z.i), s = r && r.s || 0;
         return `<button class="cglv ${s ? 'won' : op ? 'open' : 'lock'}${z.l.hard ? ' hard' : ''}" data-act="cglv" data-id="${z.l.id}" ${op ? '' : 'aria-disabled="true"'}><b>${z.l.id}</b><i>${s ? '★★★'.slice(0, s) + '<s>' + '★★★'.slice(s) + '</s>' : op ? '▶' : '🔒'}</i></button>`; }).join('')}</div></section>`; }).join('');
-  return `<main class="wrap ${kid} cg"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header>
+  return `<main class="wrap ${kid} cg"><header class="bar"><button class="link" data-act="home">← На главную</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header>
     <section class="hello cghero"><img class="cgtoby" src="img/code-toby.webp" alt="" onerror="this.remove()"><div><p class="eyebrow">Игра</p><h1>Тоби-программист</h1><p>Щенок Тоби понимает только программы. Собери из блоков программу, и Тоби выполнит её шаг за шагом.</p>
     <p class="hint">За новый уровень — столько баллов, сколько звёзд. Сегодня: <b>${day} из ${CODE_DAY_MAX}</b>.${C.pend ? ` Ждут в копилку: <b>${C.pend}</b> — придут, когда сделаешь уроки дня.` : ''}</p></div></section>${chs}</main>`; }
 
 /* --- экран уровня --- */
-let CG = null; /* { id, prog, sel:{k,i}, run, vi, step, res, hint } */
+let CG = null, CG_VIEW = 'map'; /* { id, prog, sel:{k,i}, run, vi, step, res, hint } */
 function cgStart(id){ const lv = CG_LV[cgIdx(id)]; const C = cgK(cur.kid); const r = C.lv[id] || {};
   CG = { id: id, prog: lv.bug ? cgParse(lv.bug) : (r.prog ? JSON.parse(JSON.stringify(r.prog)) : []), sel: { k: '', i: -1 }, run: false, vi: 0, res: null, hint: 0, used: false };
-  CG.sel.i = CG.prog.length; C.last = id; save(); go('codelv'); setTimeout(() => say(lv.say), 400); }
+  CG.sel.i = CG.prog.length; C.last = id; save(); CG_VIEW = 'lv'; go('always', { aid: 'code' }); setTimeout(() => say(lv.say), 400); }
 function cgSlot(prog, k){ if (!k) return prog; let a = prog; for (const part of k.split('/')) { const m = part.split('.'); const n = a[+m[0]]; a = m[1] === 'e' ? n.e : n.b; } return a; }
 function cgBlockHtml(x, path, k, i){ const sel = CG.sel.k === k && CG.sel.i === i + 1 && CG.selB, id = path;
   const del = sel ? `<span class="cgdel" data-act="cgdel" data-k="${k}" data-i="${i}">✕</span>` : '';
@@ -211,7 +211,7 @@ function cgRun(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids
     if (badge) ev(kid, 'программирование', { subj: 'Программирование', unit: `Глава ${lv.ch} пройдена`, text: badge });
     CG.res = { ok: true, stars: stars, pts: pts, pend: pend, vr: vr, badge: badge }; save(); render();
     say(badge ? 'Глава пройдена! Тоби получает награду: ' + badge.replace(/^\S+\s/, '') : stars === 3 ? 'Отлично! Три звезды!' : 'Получилось!'); };
-  const me = CG; const step = () => { if (CG !== me || cur.view !== 'codelv') { me.run = false; return; } const tr = R[vi].tr;
+  const me = CG; const step = () => { if (CG !== me || cur.view !== 'always' || cur.aid !== 'code' || CG_VIEW !== 'lv') { me.run = false; return; } const tr = R[vi].tr;
     if (i < tr.length) { cgApply(tr[i]); i++; setTimeout(step, tr[i - 1].ev === 'fly' ? 140 : CODE_STEP_MS); return; }
     if (R[vi].ok && vi + 1 < R.length) { vi++; i = 0; CG.vi = vi; CG.res = { vr: vr.map((v, k) => k < vi ? v : null) }; const w = document.getElementById('cgbwrap'); if (w) w.innerHTML = cgBoard(lv, grids[vi]); Array.prototype.forEach.call(document.querySelectorAll('.cgtabs .chip'), (el, k) => { el.classList.toggle('on', k === vi); }); setTimeout(step, 500); return; }
     if (!R[vi].ok) { R.forEach((x, k) => { if (k > vi) vr[k] = null; }); }
@@ -220,10 +220,10 @@ function cgRun(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids
 
 /* --- действия --- */
 function codeAct(act, b){ const kid = cur.kid;
-  if (act === 'code') { if (CG) CG.run = false; CG = null; go('code'); return true; }
+  if (act === 'code') { if (CG) CG.run = false; CG = null; CG_VIEW = 'map'; go('always', { aid: 'code' }); return true; }
   if (act === 'cglv') { const i = cgIdx(b.dataset.id); if (!cgOpen(kid, i)) { alertMsg('Сначала пройди предыдущий уровень'); return true; } cgStart(b.dataset.id); return true; }
   if (!CG) return false; const lv = CG_LV[cgIdx(CG.id)];
-  if (CG.run && cur.view === 'codelv') return true;
+  if (CG.run && CG_VIEW === 'lv') return true;
   const touch = () => { CG.res = null; };
   switch (act) {
     case 'cgsay': say(lv.say); return true;
@@ -243,6 +243,14 @@ function codeAct(act, b){ const kid = cur.kid;
     case 'cgrun': cgRun(); return true;
     case 'cghint': CG.hint = 1; render(); say('Номера на поле показывают, куда должен пройти Тоби. Посчитай шаги.'); ev(kid, 'не понимаю', { subj: 'Программирование', unit: `Уровень ${lv.id}`, text: 'подсказка' }); return true;
     case 'cgsol': if (!window.confirm('Показать решение? За этот уровень тогда будет одна звезда и без баллов. Разберись, как оно работает!')) return true; CG.prog = cgParse(lv.sol); CG.used = true; CG.sel = { k: '', i: CG.prog.length }; touch(); render(); return true;
-    case 'cgnext': { const i = cgIdx(CG.id) + 1; if (i < CG_LV.length && cgOpen(kid, i)) cgStart(CG_LV[i].id); else { CG = null; go('code'); } return true; }
+    case 'cgnext': { const i = cgIdx(CG.id) + 1; if (i < CG_LV.length && cgOpen(kid, i)) cgStart(CG_LV[i].id); else { CG = null; CG_VIEW = 'map'; go('always', { aid: 'code' }); } return true; }
   }
   return false; }
+
+/* подключение к разделу «Всегда доступно» (см. app.js: ALWAYS) */
+var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
+ALWAYS.push({ id: 'code', order: 5, full: true,
+  tile: function(kid){ return codeTile(kid); },
+  open: function(){ if (CG) CG.run = false; CG = null; CG_VIEW = 'map'; },
+  view: function(kid){ if (!kid) return vLogin(); return CG_VIEW === 'lv' && CG ? vCodeLv() : vCode(); },
+  act: function(act, b){ codeAct(act, b); } });
