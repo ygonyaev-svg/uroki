@@ -51,3 +51,8 @@ body.anya.h-h .prog i{ background:linear-gradient(90deg,#f2c230,#fde68a); }
 .hatcrest{ font-size:44px; line-height:1; }
 .hatres{ text-align:center; } .hatres .hatcrest{ font-size:72px; margin:4px 0 8px; }
 .hatopts .opt{ text-align:left; }
+.hppic{ display:flex; align-items:center; justify-content:center; min-height:150px; margin:6px 0 8px; padding:16px; border-radius:16px; background:linear-gradient(160deg,#1b1440,#3b2a6e 60%,#5b3b8c); box-shadow:inset 0 0 0 2px #c9a35a; }
+.hppic span{ font-size:54px; line-height:1.25; letter-spacing:6px; text-align:center; color:#fde68a; font-weight:800; }
+.hpcap{ margin:0 0 6px; font-style:italic; opacity:.85; }
+@media (max-width:520px){ .hppic span{ font-size:40px; letter-spacing:3px; } }
+.hprank .rlvb{ background:#f5d27a; color:#3b2a1a; }
