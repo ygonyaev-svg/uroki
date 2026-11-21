@@ -347,10 +347,13 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 /* стихи */
 .ptext p{ margin:2px 0; font-size:21px; line-height:1.5; font-family:Georgia, 'Times New Roman', serif; } .ptext.syl p{ letter-spacing:.5px; }
 .pline{ font-style:italic; font-size:19px; font-family:Georgia, serif; }
-.clapline{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:12px 0; font-size:22px; }
-.clapline .cs{ padding:4px 8px; border-radius:10px; background:var(--soft); } .clapline .cs.strong{ font-weight:800; text-decoration:underline; text-underline-offset:4px; }
-.clapline .cs.hit{ background:var(--gold); color:#1f2a44; } .clapline .cs.nx{ outline:3px solid var(--acc); } .clapline .cgap{ width:10px; display:inline-block; }
-.btn.clap{ font-size:44px; display:block; margin:8px auto; min-width:160px; }
+.sline{ display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin:14px 0; font-size:24px; line-height:1.2; }
+.sline .sw{ display:inline-flex; align-items:center; white-space:nowrap; } .sline .sw.plain{ color:var(--mut,#8a8f9c); padding:6px 2px; }
+.sline .sst{ font:inherit; color:inherit; border:2px solid var(--soft); background:var(--card,#fff); padding:6px 7px; margin:0 1px; border-radius:10px; min-width:34px; cursor:pointer; -webkit-appearance:none; }
+.sline .sst.right{ background:#2e9d5b; border-color:#2e9d5b; color:#fff; font-weight:800; } .sline .sst.wrong{ background:#d9534f; border-color:#d9534f; color:#fff; text-decoration:line-through; }
+.sline .sst:disabled{ opacity:1; cursor:default; }
+.rhythm{ margin-top:12px; padding:10px 12px; border-radius:12px; background:var(--soft); } .rline{ font-size:20px; } .rline i{ font-style:normal; opacity:.4; margin:0 3px; }
+.rline .rs{ font-weight:800; color:var(--acc); } .rpat{ margin:6px 0 0; letter-spacing:.5px; }
 .poem textarea{ width:100%; font-size:18px; border-radius:12px; border:1px solid var(--line); padding:10px; background:var(--card); color:var(--ink); box-sizing:border-box; }
 .poem .row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
 /* подсказки по касанию */
@@ -380,3 +383,9 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .pfprof .chip{ display:inline-block; margin:3px 2px; cursor:default; }
 .pfnote{ font-size:13px; margin:6px 4px 18px; }
 .tabs{ overflow-x:auto; -webkit-overflow-scrolling:touch; } .tabs .tab{ white-space:nowrap; flex-shrink:0; }
+/* тестовый режим */
+.testbar{ position:sticky; top:0; z-index:900; background:#7a3cff; color:#fff; padding:8px 12px; font-size:15px; text-align:center; } .testbar .link{ color:#fff; text-decoration:underline; margin-left:8px; }
+.notebtn{ position:fixed; right:14px; bottom:14px; z-index:950; background:#7a3cff; color:#fff; border:0; border-radius:24px; padding:12px 16px; font-size:16px; box-shadow:0 6px 20px rgba(0,0,0,.25); cursor:pointer; }
+.testc{ border:2px dashed #7a3cff; } .tipin textarea{ width:100%; box-sizing:border-box; font-size:17px; border-radius:12px; border:1px solid var(--line); padding:10px; margin-bottom:6px; background:var(--card); color:var(--ink); }
+.rbad{ text-decoration:underline wavy #d9534f; text-decoration-thickness:2px; text-underline-offset:4px; color:#b8322e; }
+.learnt .hidmsg{ display:none; } .learnt.hid .ptext{ display:none; } .learnt.hid .hidmsg{ display:block; padding:14px; border-radius:12px; background:var(--soft); text-align:center; }

@@ -30,7 +30,7 @@ function defShop(){ return [
   { id:'s4', name:'Выбрать ужин для всей семьи', price:80 },
   { id:'s6', name:'Подарок до 10 €', price:400 } ]; }
 function load(){ try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return s; } catch (e) {} return { v:1, parentPin:null, kids: FAM ? {} : { yarik:newKid(), anya:newKid() }, shop:defShop(), cfg:{ sync:'' }, queue:[], log:[] }; }
-function save(){ try { if (typeof snapMark === 'function') snapMark(); localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function save(){ try { if (TEST) { localStorage.setItem(KEY + '.test', JSON.stringify(S)); return; } if (typeof snapMark === 'function') snapMark(); localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const SYNC_URL = 'https://script.google.com/macros/s/AKfycbzlcMocKjYfldhFSe25-6w9_HVEN0sXMmlJrbj1VWuqMhHvQo5Fs-M0J7zZW2sDYEM3sw/exec';
 S = load();
 if (FAM) famInit();
@@ -46,7 +46,7 @@ const hashPin = p => String(U.h('uroki:' + p));
 
 /* ===== Синхронизация с Google Таблицей родителя ===== */
 function strip(h){ return String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); }
-function ev(kid, type, data){ const e = Object.assign({ t: new Date().toISOString(), kid: KIDS[kid].name, type }, data); S.queue.push(e); S.log.push(e); if (S.log.length > 1500) S.log = S.log.slice(-1500); try { dripOn(kid, type, data || {}); } catch (x) {} if (typeof pfOn === 'function') pfOn(kid, e); save(); flushSoon(); }
+function ev(kid, type, data){ const e = Object.assign({ t: new Date().toISOString(), kid: KIDS[kid].name, type }, data); if (!TEST) S.queue.push(e); S.log.push(e); if (S.log.length > 1500) S.log = S.log.slice(-1500); try { dripOn(kid, type, data || {}); } catch (x) {} if (typeof pfOn === 'function') pfOn(kid, e); save(); flushSoon(); }
 /* «Капающий процент»: каждый верный ответ с первой попытки — где угодно в приложении — немного увеличивает накопленный капитал (счёт + копилка).
    +0,4% капитала за ответ (не меньше 0,2 балла); серия 5 верных подряд — ×1,5, серия 10 — ×2; ошибка обнуляет серию и ничего не даёт.
    Потолок за день: 3% капитала, но не меньше 10 баллов. Капает в копилку (в воскресенье +10% сверху). */
@@ -67,11 +67,13 @@ function dripCard(kid){ const K = S.kids[kid], R = K.drip; if (!R || !(R.sess >=
 let flushT = null;
 function flushSoon(){ clearTimeout(flushT); flushT = setTimeout(flush, 4000); }
 async function flush(){
+  if (TEST) return;
   if (!S.cfg.sync || !S.queue.length || !navigator.onLine || (FAM && !(S.fam && S.fam.fid))) return;
   const batch = S.queue.slice(0, 200);
   try { await fetch(S.cfg.sync, { method:'POST', mode:'no-cors', headers:{ 'Content-Type':'text/plain' }, body: JSON.stringify(FAM ? { fam:'ev', fid:S.fam.fid, token:S.fam.token, events: batch } : { events: batch }) }); S.queue = S.queue.slice(batch.length); save(); if (S.queue.length) flushSoon(); } catch (e) {}
 }
 async function pull(){
+  if (TEST) return;
   if (FAM) return famStatus();
   if (!S.cfg.sync || !navigator.onLine) return;
   try { const r = await fetch(S.cfg.sync + (S.cfg.sync.includes('?') ? '&' : '?') + 'action=cfg'); const j = await r.json(); applyCfg(j.rows || []); } catch (e) {}
@@ -129,10 +131,20 @@ function sayRobot(text, lang){ try { const s = window.speechSynthesis; if (!s) r
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const normW = w => w.toLowerCase().replace(/ё/g, 'е').replace(/[^\p{L}\p{N}]/gu, '');
 function lev(a, b){ const m = a.length, n = b.length; if (!m) return n; if (!n) return m; let p = Array.from({ length: n + 1 }, (_, j) => j); for (let i = 1; i <= m; i++) { const c = [i]; for (let j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[n]; }
-function sim(a, b){ if (a === b) return true; if (Math.abs(a.length - b.length) > 2) return false; const d = lev(a, b); return d <= (b.length >= 7 ? 2 : b.length >= 4 ? 1 : 0) + (FAM && b.length >= 4 ? (KIDS[cur.kid] || {}).simPlus || 0 : 0); }
+/* Сравнение слов при чтении вслух: распознавание речи путает окончания и похожие звуки даже у взрослых — сравниваем «по звучанию». */
+function simPh(w){ return w.replace(/[ьъ]/g, '').replace(/[ёо]/g, 'а').replace(/[еэяиы]/g, 'и').replace(/ю/g, 'у').replace(/тс|дс|тьс/g, 'ц').replace(/(.)\1/g, '$1').replace(/[бвгдзж]$/, c => 'пфктсш'['бвгдзж'.indexOf(c)]); }
+function sim(a, b){ if (a === b) return true; if (Math.abs(a.length - b.length) > 3) return false; const plus = FAM && b.length >= 4 ? (KIDS[cur.kid] || {}).simPlus || 0 : 0;
+  if (lev(a, b) <= (b.length >= 7 ? 2 : b.length >= 4 ? 1 : 0) + plus) return true;
+  if (!/[а-я]/.test(b)) return false; const x = simPh(a), y = simPh(b); if (x === y) return true;
+  const sh = Math.min(x.length, y.length), lg = Math.max(x.length, y.length); if (sh >= 3 && lg - sh <= 2 && (x.startsWith(y) || y.startsWith(x))) return true;
+  return lg >= 4 && lev(x, y) <= (lg >= 7 ? 2 : 1); }
 function align(T, spoken){ const st = new Array(T.length).fill(0); let p = 0, extra = 0;
-  for (const s of spoken) { if (!s) continue; let f = -1; for (let j = p; j < Math.min(T.length, p + 5); j++) if (T[j] && sim(s, T[j])) { f = j; break; }
-    if (f < 0) { extra++; continue; } for (let k = p; k < f; k++) st[k] = T[k].length <= 2 ? 1 : 2; st[f] = 1; p = f + 1; }
+  const hit = (i, j) => { if (!T[j]) return 0; const s = spoken[i]; if (sim(s, T[j])) return 1; if (i + 1 < spoken.length && T[j].length > s.length) { const s2 = s + spoken[i + 1]; if (sim(s2, T[j])) return 2; if (i + 2 < spoken.length && sim(s2 + spoken[i + 2], T[j])) return 3; } return 0; };
+  for (let i = 0; i < spoken.length; i++) { if (!spoken[i]) continue; let f = -1, n = 0;
+    for (let j = p; j < Math.min(T.length, p + 5); j++) { n = hit(i, j); if (n) { f = j; break; } }
+    /* не застреваем: если слово не узнано, ищем дальше, но только когда и следующее сказанное слово совпадает со следующим в тексте */
+    if (f < 0) for (let j = p + 5; j < Math.min(T.length, p + 25); j++) { n = hit(i, j); if (n && i + n < spoken.length && j + 1 < T.length && hit(i + n, j + 1)) { f = j; break; } n = 0; }
+    if (f < 0) { extra++; continue; } for (let k = p; k < f; k++) st[k] = T[k].length <= 2 ? 1 : 2; st[f] = 1; p = f + 1; i += n - 1; }
   return { st, p, extra }; }
 
 /* ===== Состояние экрана ===== */
@@ -152,7 +164,7 @@ function render(){
   const v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : vLogin();
   document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always'].includes(cur.view) ? LK(cur.kid) + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
   if (FAM) famBody();
-  app().innerHTML = v; afterRender();
+  app().innerHTML = (TEST ? testBar() : '') + v; afterRender();
 }
 function afterRender(){ const f = app().querySelector('[autofocus]'); if (f) try { f.focus(); } catch (e) {} }
 
@@ -226,8 +238,8 @@ function vHome(){
   const streak = readStreak(kid);
   const msgs = K.msgs.filter(m => !m.seen);
   const tiles = subs.map(s => { const L = D.les[s]; const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new'; const g = L && L.grade;
-    const locked = (st === 'new' && restLeft(kid) > 0) || (st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s));
-    return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${s === 'lang' && track('lang', cur.ds) === '_alt' ? 'En' : ((s === 'world' && T(kid) === 'yarik') || (s === 'logic' && T(kid) === 'anya')) && track(s, cur.ds) === '_alt' ? '€' : SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && T(kid) === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
+    const locked = !TEST && ((st === 'new' && restLeft(kid) > 0) || (st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s)));
+    return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${icon(s === 'lang' && track('lang', cur.ds) === '_alt' ? 's_en' : ((s === 'world' && T(kid) === 'yarik') || (s === 'logic' && T(kid) === 'anya')) && track(s, cur.ds) === '_alt' ? 's_fin' : SUBJ_IC[s], 'big') || SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && T(kid) === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">Выйти</button><button class="link voice" data-act="voice" title="Кто читает задания">🔊 ${K.voice === 'm' ? 'Мужской голос' : 'Женский голос'}</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <div class="banner" aria-hidden="true">${THEME[TH(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[TH(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${rusNote(kid)}${dripCard(kid)}${restCard(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog tipc" data-tip="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
@@ -364,22 +376,24 @@ function vExample(kid, subj, L, u, cur0){ const n = L.helpN || 1; const shape = 
   return `<article class="card example"><h3>Разберём на похожем примере</h3><div class="q">${ex.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, subj, ex)}<p><b>Ответ: ${ans}</b></p>${ex.e ? `<p>${U.esc(strip(ex.e))}</p>` : ''}<div class="row"><button class="btn ghost small" data-act="sayex" data-t="${U.esc(strip(ex.q.replace(/_+/g, ' пропуск ')) + '. Ответ: ' + strip(String(ans)) + '. ' + (ex.e ? strip(ex.e) : ''))}">🔊 Послушать</button><button class="link" data-act="dunno">Ещё пример</button></div><p class="hint">Я отметил, что тема трудная: Юра увидит и поможет разобраться.</p></article>`; }
 /* Повторение внутри урока: список заданий и «попробовать ещё раз» — баллы не меняются */
 function vPracList(kid, subj, L){ const T = lessonTasks(L, kid, subj);
-  return `<div class="note">Это повторение — баллы не меняются. <button class="link" data-act="rview" data-s="">Вернуться к уроку →</button></div><article class="card"><h2>Все задания урока</h2><p class="hint">Нажми на задание, чтобы решить его ещё раз.</p><ol class="plist">${T.map((t, j) => { const a = L.ans[j]; const st = a && a.final ? (a.ok && a.tries === 1 ? 'ok' : a.ok ? 'mid' : 'bad') : ''; return `<li class="${st}"><button class="prow" data-act="rtask" data-i="${j}"${a && a.final ? '' : ' disabled'}><span class="pn">${j + 1}</span><span class="pq">${strip(t.q).replace(/_+/g, '?')}</span><span class="ps">${st === 'ok' ? '✓' : st === 'mid' ? '½' : st === 'bad' ? '✗' : '…'}</span></button></li>`; }).join('')}</ol></article><button class="btn big" data-act="rview" data-s="">Вернуться к уроку</button>`; }
+  return `<div class="note">Это повторение — баллы не меняются. <button class="link" data-act="rview" data-s="">Вернуться к уроку →</button></div><article class="card"><h2>Все задания урока</h2><p class="hint">Нажми на задание, чтобы решить его ещё раз.</p><ol class="plist">${T.map((t, j) => { const a = L.ans[j]; const st = a && a.final ? (a.ok && a.tries === 1 ? 'ok' : a.ok ? 'mid' : 'bad') : ''; return `<li class="${st}"><button class="prow" data-act="rtask" data-i="${j}"${a && a.final ? '' : ' disabled'}><span class="pn">${j + 1}</span><span class="pq">${strip(t.q).replace(/_+/g, '?')}</span><span class="ps">${a && a.fix ? '🛠' : st === 'ok' ? '✓' : st === 'mid' ? '½' : st === 'bad' ? '✗' : '…'}</span></button></li>`; }).join('')}</ol></article><button class="btn big" data-act="rview" data-s="">Вернуться к уроку</button>`; }
 function vRetry(kid, subj, L, i){ const T = lessonTasks(L, kid, subj), t = T[i]; if (!t) return ''; const r = cur.rtry && cur.rtry.i === i ? cur.rtry : { i, wrong: [], tries: 0 }; const fin = r.fin, a0 = L.ans[i] || {};
   let inp;
   if (t.k === 'c') inp = `<div class="opts">${t.opts.map(o => { const cls = fin && o === t.a ? 'right' : r.wrong.includes(o) ? 'wrong' : ''; return `<button class="opt ${cls}" data-act="rtryc" data-v="${U.esc(o)}" ${fin || r.wrong.includes(o) ? 'disabled' : ''}>${o}</button>`; }).join('')}</div>`;
   else inp = `<form class="numf" data-form="rtry"><input id="rtin" ${t.k === 't' ? 'autocapitalize="off" autocorrect="off" spellcheck="false"' : 'inputmode="decimal"'} autocomplete="off" ${fin ? 'disabled' : ''} value="${fin ? U.esc(r.v) : ''}" aria-label="Ответ"><button class="btn" ${fin ? 'disabled' : ''}>Проверить</button></form>`;
   const ra = t.k === 'n' ? U.dec(t.a) : U.esc(t.a);
   const fb = fin ? (r.ok ? `<div class="fb ok"><b>Верно!</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>` : `<div class="fb bad"><b>Правильный ответ: ${ra}</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>`) : r.tries ? '<div class="fb try">Не совсем. Подумай ещё раз.</div>' : '';
-  const was = a0.final ? `<p class="hint">В уроке: ${a0.ok && a0.tries === 1 ? 'верно с первого раза ✓' : a0.ok ? 'верно со второй попытки' : 'ошибка, ответ был ' + U.esc(String(a0.v))}</p>` : '';
-  const nxt = T.findIndex((x, j) => j > i && L.ans[j] && L.ans[j].final);
+  const was = a0.final ? `<p class="hint">${a0.fix ? '🛠 Исправлено в работе над ошибками. ' : ''}В уроке: ${a0.ok && a0.tries === 1 ? 'верно с первого раза ✓' : a0.ok ? 'верно со второй попытки' : 'ошибка, ответ был ' + U.esc(String(a0.v))}</p>` : '';
+  const W = fixList(kid, subj, L), nf = W.find(j => j !== i && !L.ans[j].fix), nxt = nf != null ? nf : T.findIndex((x, j) => j > i && L.ans[j] && L.ans[j].final);
   return `<div class="note">Повторение задания ${i + 1} — баллы не меняются.</div><article class="card task"><div class="q">${t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, t.sj || subj, t)}${was}${inp}${fb}</article>
-  <div class="row">${fin ? '<button class="btn ghost" data-act="rtryagain">↻ Ещё раз</button>' : ''}${nxt >= 0 ? `<button class="btn ghost" data-act="rtask" data-i="${nxt}">Следующее →</button>` : ''}</div><button class="btn big" data-act="rview" data-s="">Вернуться к уроку</button>`; }
+  <div class="row">${fin ? '<button class="btn ghost" data-act="rtryagain">↻ Ещё раз</button>' : ''}${nxt >= 0 ? `<button class="btn ghost" data-act="rtask" data-i="${nxt}">${nf != null ? 'Следующая ошибка →' : 'Следующее →'}</button>` : ''}</div><button class="btn big" data-act="rview" data-s="">Вернуться к уроку</button>`; }
 function retryAnswer(v){ const kid = cur.kid, L = dayRec(kid, cur.ds).les[cur.subj], i = cur.rtask, t = lessonTasks(L, kid, cur.subj)[i]; if (!t) return;
   const r = cur.rtry && cur.rtry.i === i ? cur.rtry : (cur.rtry = { i, wrong: [], tries: 0 }); if (r.fin) return; let ok;
   if (t.k === 'n') { const x = Number(String(v).replace(',', '.').replace(/\s/g, '')); if (String(v).trim() === '' || isNaN(x)) return; ok = Math.abs(x - t.a) < 1e-6; } else if (t.k === 't') { if (!String(v).trim()) return; ok = txtOk(t, v); } else ok = v === t.a;
   r.tries++; r.v = v; if (!ok && t.k === 'c') r.wrong.push(v);
   if (ok || r.tries >= 2 || (t.k === 'c' && t.opts.length - r.wrong.length <= 1)) { r.fin = true; r.ok = ok; }
+  const a0 = L.ans[i]; if (ok && a0 && a0.final && !(a0.ok && a0.tries === 1) && !a0.fix && !(t.k === 'c' && t.opts.length <= 2 && r.tries > 1)) { a0.fix = true; const W = fixList(kid, cur.subj, L), left = W.filter(j => !L.ans[j].fix).length;
+    ev(kid, 'исправлено', { subj: subjName(kid, cur.subj, cur.ds), unit: (unitById(kid, cur.subj, L.uid) || {}).t || '', q: strip(t.q), ans: String(v), right: String(t.a), ok: 'верно' }); save(); if (!left) alertMsg('Все ошибки исправлены — 100%! 💪'); }
   render(); }
 function vHwText(kid, L){ const K = S.kids[kid]; const items = K.hwText.filter(h => (L.txt || []).includes(h.id));
   return `<article class="card"><h2>Задание от Юры</h2>${items.length ? items.map(h => `<label class="check"><input type="checkbox" data-act="hwtxt" data-id="${h.id}" ${h.done ? 'checked' : ''}> ${U.esc(h.text)}</label>`).join('') : '<p>Сегодня отдельных заданий нет.</p>'}</article><button class="btn big" data-act="hwdone">Готово</button>`; }
@@ -395,8 +409,12 @@ function vSurvey(L){
 }
 function vResult(kid, subj, L){
   const msg = L.consolidate ? 'Хорошо! Завтра закрепим эту тему ещё раз — с новыми заданиями.' : L.passed === true ? 'Тема пройдена! Завтра — следующая.' : L.passed === false ? 'Завтра повторим эту тему с новыми заданиями.' : '';
-  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[TH(kid)].win)}</div>` : ''}<div class="bigmark m${L.grade}">${L.grade}</div><p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.ootCut ? '<p class="hint">Урок был не по порядку — баллов только треть.</p>' : ''}${L.rusCut ? `<p class="hint">📚 Баллы за этот урок — ${L.rusCut}%: русский пока не на пятёрку. Подтяни русский, и все баллы станут полными.</p>` : ''}${L.fastCut ? '<p class="hint">Слишком быстро — баллов меньше. Решай внимательно, проверяй себя.</p>' : ''}${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article><button class="btn big" data-act="home">К урокам</button>`;
+  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[TH(kid)].win)}</div>` : ''}<div class="bigmark m${L.grade}">${L.grade}</div><p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.ootCut ? '<p class="hint">Урок был не по порядку — баллов только треть.</p>' : ''}${L.rusCut ? `<p class="hint">📚 Баллы за этот урок — ${L.rusCut}%: русский пока не на пятёрку. Подтяни русский, и все баллы станут полными.</p>` : ''}${L.fastCut ? '<p class="hint">Слишком быстро — баллов меньше. Решай внимательно, проверяй себя.</p>' : ''}${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article>${fixCard(kid, subj, L)}<button class="btn big" data-act="home">К урокам</button>`;
 }
+/* Работа над ошибками: в любое время, без перерыва. Баллы не меняются, но результат можно довести до 100%. */
+function fixList(kid, subj, L){ const T = lessonTasks(L, kid, subj) || []; return T.map((t, j) => j).filter(j => { const a = L.ans[j]; return a && a.final && !(a.ok && a.tries === 1); }); }
+function fixCard(kid, subj, L){ if (!L.ans || ITEMS(subj) && subj === 'hw') return ''; const W = fixList(kid, subj, L); if (!W.length) return ''; const F = W.filter(j => L.ans[j].fix).length, tot = L.total || lessonTasks(L, kid, subj).length, pct = Math.round(((L.score || 0) + F) / Math.max(1, tot) * 100), nx = W.find(j => !L.ans[j].fix);
+  return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Исправлено <b>${F} из ${W.length}</b> · результат с исправлениями: <b>${pct}%</b></p><p class="hint">Можно в любое время, даже в перерыв. Баллы не меняются, но Юра увидит, что ты разобрал${T(kid) === 'anya' ? 'а' : ''} ошибки.</p>${nx != null ? `<button class="btn" data-act="rtask" data-i="${nx}">${F ? 'Дальше исправлять' : 'Исправить ошибки'}</button>` : '<p class="earn">✅ Все ошибки исправлены — 100%!</p>'}</article>`; }
 
 /* ----- Ответы ----- */
 function answer(v){
@@ -499,7 +517,7 @@ function extraTile(kid, D){ if (!D.bonus || cur.ds !== U.today()) return ''; con
   return `<button class="tile extra ${st}" data-act="openextra"><span class="ico">⭐</span><span class="tt"><span class="sn">Экстра</span><span class="ut">${st === 'done' ? `Сделано: +${L.coins || 0} баллов` : 'Хочешь ещё? Задания по сегодняшним ошибкам: +5 баллов'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : ''}</button>`; }
 /* Перерыв: позанимался ~20 минут (блок уроков) — следующее новое занятие откроется через 2 часа. Пройденные уроки открываются всегда. */
 const REST_MS = 2 * 3600 * 1000, BLOCK_SECS = 20 * 60;
-function restLeft(kid){ return Math.max(0, (S.kids[kid].restUntil || 0) - Date.now()); }
+function restLeft(kid){ if (TEST) return 0; return Math.max(0, (S.kids[kid].restUntil || 0) - Date.now()); }
 function hhmm(ts){ const d = new Date(ts), z = n => (n < 10 ? '0' : '') + n; return d.getHours() + ':' + z(d.getMinutes()); }
 function fmtLeft(ms){ const m = Math.ceil(ms / 60000), h = Math.floor(m / 60), r = m % 60; return h ? h + ' ч ' + r + ' мин' : r + ' мин'; }
 function restTick(kid, secs){ const K = S.kids[kid], now = Date.now(); if (!K.blkAt || now - K.blkAt > REST_MS) K.blk = 0; K.blk = (K.blk || 0) + (secs || 0); K.blkAt = now;
@@ -824,7 +842,7 @@ function vParent(){
     ${sh.length ? '<button class="btn small" data-act="saveshop">Сохранить цены</button>' : ''}</div>`; }
   else body = vSettings();
   return `<main class="wrap"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span>Родителям</span></header>
-  <nav class="tabs">${tabs.map(([k, t]) => `<button class="tab ${cur.parentTab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${t}</button>`).join('')}</nav>${body}</main>`;
+  <nav class="tabs">${tabs.map(([k, t]) => `<button class="tab ${cur.parentTab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${t}</button>`).join('')}</nav>${cur.parentTab === 'report' || cur.parentTab === 'set' ? testCard() : ''}${body}</main>`;
 }
 function vReport(kid){
   const K = S.kids[kid], d = KIDS[kid];
@@ -878,7 +896,7 @@ document.addEventListener('click', e => {
     case 'rtryc': retryAnswer(b.dataset.v); break;
     case 'rtryagain': cur.rtry = null; render(); break;
     case 'openextra': { if (restGate(kid, 'extra')) break; if (D.les.extra && D.les.extra.phase === 'done') { go('lesson', { subj: 'extra' }); break; } startLesson('extra'); break; }
-    case 'open': { const s0 = b.dataset.subj, L0 = D.les[s0]; if (restGate(kid, s0)) break; if (!(L0 && L0.phase === 'done') && s0 !== nextOpen(kid) && !(D.unlock || []).includes(s0)) {
+    case 'open': { const s0 = b.dataset.subj, L0 = D.les[s0]; if (restGate(kid, s0)) break; if (!TEST && !(L0 && L0.phase === 'done') && s0 !== nextOpen(kid) && !(D.unlock || []).includes(s0)) {
       const K0 = S.kids[kid]; if (K0.coins < SKIP_PRICE) { alertMsg(`Сначала закончи предыдущий урок 🔒 Открыть раньше можно за ${SKIP_PRICE} баллов`); break; }
       if (!window.confirm(`Открыть «${subjName(kid, s0, cur.ds)}» не по порядку за ${SKIP_PRICE} баллов?\nПока не сделаны все уроки дня, за такой урок дают только треть баллов.`)) break;
       K0.coins -= SKIP_PRICE; (D.unlock = D.unlock || []).push(s0); ev(kid, 'урок не по порядку', { subj: subjName(kid, s0, cur.ds), price: -SKIP_PRICE, coins: K0.coins }); save(); }
@@ -947,7 +965,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (testAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }

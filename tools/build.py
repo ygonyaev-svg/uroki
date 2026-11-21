@@ -11,13 +11,13 @@ sys.path.insert(0, os.path.join(root, 'tools')); import meta2
 BX, _e = meta2.load()
 if _e: sys.exit('meta2: ' + '; '.join(_e))
 rd = lambda f: open(os.path.join(src, f), encoding='utf-8').read()
-js = '\n'.join(['var FAM = %d;' % FAM, rd('core.js'), rd('cur_pt_nat.js'), rd('cur_fin.js'), rd('cur_fin_a.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('cur_more_y.js'), rd('cur_more_a.js'), ] + ([rd('cur_langs.js')] if FAM else []) + [rd('hard.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', 'const BOOK_X = ' + json.dumps(BX, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('mybooks.js'), rd('bookread.js'), rd('fun_data.js'), rd('fun_pz.js'), rd('fun.js'), ] + ([] if FAM else [rd('hp_data.js'), rd('hp.js')]) + [rd('chess_course.js'), rd('chess_puz.js'), rd('chess.js'), rd('code.js'), rd('gloss.js'), rd('poems.js'), rd('tips.js'), rd('snap.js'), rd('portrait.js')] + ([rd('fam.js')] if FAM else []) + [rd('app.js')])
+js = '\n'.join(['var FAM = %d;' % FAM, rd('core.js'), rd('icons.js'), rd('cur_pt_nat.js'), rd('cur_fin.js'), rd('cur_fin_a.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('cur_more_y.js'), rd('cur_more_a.js'), ] + ([rd('cur_langs.js')] if FAM else []) + [rd('hard.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', 'const BOOK_X = ' + json.dumps(BX, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('mybooks.js'), rd('bookread.js'), rd('fun_data.js'), rd('fun_pz.js'), rd('fun.js'), ] + ([] if FAM else [rd('hp_data.js'), rd('hp.js')]) + [rd('chess_course.js'), rd('chess_puz.js'), rd('chess.js'), rd('code.js'), rd('gloss.js'), rd('poems.js'), rd('tips.js'), rd('snap.js'), rd('portrait.js'), rd('testmode.js')] + ([rd('fam.js')] if FAM else []) + [rd('app.js')])
 if FAM:
     import re
     for a, b in [('Задание от Юры', 'Задание от родителей'), ('ждёт цену от Юры', 'ждёт цену от родителей'), ('цену назначит Юра', 'цену назначат родители'), ('баллы от Юры', 'баллы от родителей'), ('с Юрой', 'с папой')]: js = js.replace(a, b)
     js = re.sub(r'(?<![А-Яа-яЁё])Юр(а|ы|е|у|ой)(?![А-Яа-яЁё])', r'пап\1', js); js = re.sub(r'(?<![А-Яа-яЁё])Ярик', 'Глеб', js); js = re.sub(r'(?<![А-Яа-яЁё])Ан(я|и|е|ю|ей)(?![А-Яа-яЁё])', r'Кат\1', js)
 import subprocess; subprocess.run([sys.executable, os.path.join(root, 'tools', 'theme_css.py')], check=True)
-css = '\n'.join(open(os.path.join(src, f), encoding='utf-8').read() for f in ('style.css', 'theme.css', 'code.css') + (('fam.css',) if FAM else ('hp.css',)))
+css = '\n'.join(open(os.path.join(src, f), encoding='utf-8').read() for f in ('fonts.css', 'style.css', 'theme.css', 'code.css', 'design.css') + (('fam.css',) if FAM else ('hp.css',)))
 ver = hashlib.md5((js + css).encode()).hexdigest()[:8]
 TITLE = 'Словоход' if FAM else 'Уроки'; BASE = '<base href="../">' if FAM else ''; MAN = 'semya/manifest.webmanifest' if FAM else 'manifest.webmanifest'; HCL = ' class="fam"' if FAM else ''; TC = '#2D4A32' if FAM else '#38bdf8'; IP = 'semya/' if FAM else ''; FF = '&family=Alice&family=PT+Sans:wght@400;700' if FAM else ''
 html = f'''<!doctype html>
@@ -28,7 +28,7 @@ html = f'''<!doctype html>
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="{TITLE}">
 <link rel="manifest" href="{MAN}"><link rel="apple-touch-icon" href="{IP}icon-180.png"><link rel="icon" href="{IP}icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Nunito:wght@700;800;900&family=Cinzel+Decorative:wght@700{FF}&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700{FF}&display=swap" rel="stylesheet">
 <style>{css}</style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){{var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';}};</script>
