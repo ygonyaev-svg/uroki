@@ -295,7 +295,7 @@ function finishLesson(){
   if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
     if (subs.every(s => (D.les[s].q || 0) >= .9)) { const b = Math.max(0, DAY_MAX - D.pts); D.pts += b; K.coins += b; L.coins += b; L.perfect = true; }
     const mins = Math.round(D.secs / 60); K.extraN = K.extraN || 0; if (mins < 40) K.extraN = Math.min(3, K.extraN + 1); else if (mins > 65) K.extraN = Math.max(-2, K.extraN - 1);
-    ev(kid, 'день завершён', { coins: K.coins, score: D.pts + ' мин игры заработано', secs: D.secs, text: `занимался ${mins} мин; обычное время: игры ${baseTime(kid).game} мин, YouTube ${baseTime(kid).yt} мин` }); }
+    ev(kid, 'день завершён', { coins: K.coins, score: D.pts + ' мин игры заработано', secs: D.secs, text: `занимался ${mins} мин` }); }
   ev(kid, 'урок завершён', { subj: subjName(kid, subj, cur.ds), unit: lessonTitle(kid, subj, cur.ds), score: `${first}/${tot}`, grade: L.grade, passed: L.passed === undefined ? '' : L.passed ? 'тема пройдена' : 'повтор', mood: (L.fb || {}).mood, diff: (L.fb || {}).diff, like: (L.fb || {}).like, text: (L.fb || {}).text, coins: K.coins });
   save(); render();
 }
@@ -313,23 +313,22 @@ function lessonQuality(kid, subj, L, ratio){
   const w = parts.reduce((a, x) => a + x[1], 0); return parts.reduce((a, x) => a + x[0] * x[1], 0) / w;
 }
 /* Пропуск дня: баллы сгорают. Пропущен 1 день — половина, 2 и больше — все. */
-/* Базовое время каждый день: 60 мин игр + 30 мин YouTube. За каждый пропущенный день −15 мин игр и −10 мин YouTube,
-   полностью возвращается после 2 закрытых дней подряд. */
+/* Обычное время каждый день: 60 мин игр + 30 мин YouTube, не сгорает. Сгорают только заработанные баллы. */
 const BASE_GAME = 60, BASE_YT = 30;
-function baseTime(kid){ const c = S.kids[kid].baseCut || 0; return { game: Math.max(0, BASE_GAME - 15 * c), yt: Math.max(0, BASE_YT - 10 * c), cut: c }; }
+function baseTime(kid){ const c = 0; return { game: Math.max(0, BASE_GAME - 15 * c), yt: Math.max(0, BASE_YT - 10 * c), cut: c }; }
 function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) { K.lastDone = t; K.burnDate = t; return; } if (K.burnDate === t) return; K.burnDate = t;
   let missed = 0, d = K.lastDone; while (U.addDays(d, 1) < t) { d = U.addDays(d, 1); missed++; }
   const before = K.burnBase == null ? missed : missed - K.burnBase; K.burnBase = missed;
-  if (missed < 1 || before < 1) return;
-  K.baseCut = Math.min(4, (K.baseCut || 0) + before); K.okStreak = 0;
+  if (missed < 1 || before < 1 || K.coins <= 0) return;
+  K.okStreak = 0;
   const lost = K.coins > 0 ? (missed >= 2 ? K.coins : Math.ceil(K.coins / 2)) : 0; K.coins -= lost;
   const bt = baseTime(kid);
-  K.burnMsg = `Ты пропустил(а) занятия.${lost ? ` Сгорело ${lost} баллов.` : ''} Обычное время теперь меньше: игры ${bt.game} мин, YouTube ${bt.yt} мин. Позанимайся 2 дня подряд — всё вернётся.`;
-  ev(kid, 'баллы сгорели', { coins: K.coins, price: -lost, text: `пропущено дней: ${missed}; базовое время: игры ${bt.game} мин, YouTube ${bt.yt} мин` }); save(); }
-function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t) return '';
-  const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра ${K.coins > 0 ? `сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'}, и ` : ''}обычное время станет меньше: −15 мин игр и −10 мин YouTube.</div>`; }
+  K.burnMsg = `Ты пропустил(а) занятия — сгорело ${lost} баллов.`;
+  ev(kid, 'баллы сгорели', { coins: K.coins, price: -lost, text: `пропущено дней: ${missed}` }); save(); }
+function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0) return '';
+  const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'} (${K.coins}).</div>`; }
 function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
-  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span>🎮 Игры <b>${bt.game} мин</b></span><span>▶️ YouTube <b>${bt.yt} мин</b></span><span>⭐ Баллы <b>${K.coins}</b> (+1 минута за балл)</span></div>${bt.cut ? `<p class="hint">Обычное время урезано из‑за пропусков. Позанимайся 2 дня подряд — вернётся полностью (сейчас подряд: ${K.okStreak || 0}).</p>` : ''}</div>`; }
+  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span>🎮 Игры <b>${bt.game} мин</b></span><span>▶️ YouTube <b>${bt.yt} мин</b></span><span>⭐ Баллы <b>${K.coins}</b> (+1 минута за балл)</span></div></div>`; }
 
 /* ----- Чтение ----- */
 let RD = null; /* текущая сессия чтения вслух */
