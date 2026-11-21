@@ -262,7 +262,7 @@ function vTask(kid, subj, L){
   ${fin ? `<button class="btn big" data-act="next">${L.i + 1 < T.length ? 'Дальше' : 'Закончить'}</button>` : ''}`;
 }
 /* Разбор на похожем примере: задание того же типа с ответом и объяснением */
-function subjArt(kid, subj){ const k = kid === 'yarik' ? 'y' : 'a'; let n = subj; if (kid === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (kid === 'yarik' && subj === 'world' && track('world', cur.ds) === '_alt') return ''; if (kid === 'anya' && subj === 'logic' && track('logic', cur.ds) === '_alt') return ''; if (!['math','rus','world','logic','lang','read','hist','geo'].includes(n)) return '';
+function subjArt(kid, subj){ const k = kid === 'yarik' ? 'y' : 'a'; let n = subj; if (kid === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (kid === 'yarik' && subj === 'world' && track('world', cur.ds) === '_alt') n = 'fin'; if (kid === 'anya' && subj === 'logic' && track('logic', cur.ds) === '_alt') n = 'fin'; if (!['math','rus','world','logic','lang','read','hist','geo','fin'].includes(n)) return '';
   return `<img class="subjart" src="img/subj-${k}-${n}.webp" alt="" onerror="this.remove()">`; }
 function vExample(kid, subj, L, u, cur0){ const n = L.helpN || 1; const shape = x => strip(x.q).replace(/\d+([,.]\d+)?/g, '#').slice(0, 18);
   const cands = genTasks(u, (L.seed || 1) * 7 + n * 101, 14).filter(x => !cur0 || x.q !== cur0.q); const ex = (cur0 && cands.find(x => shape(x) === shape(cur0))) || (cur0 && cands.find(x => x.k === cur0.k && shape(x).slice(0, 8) === shape(cur0).slice(0, 8))) || cands[0]; if (!ex) return '';
