@@ -344,3 +344,12 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .gloss .gw{ display:flex; align-items:center; gap:12px; padding:8px 0; border-top:1px solid var(--line); } .gloss .gw:first-of-type{ border-top:0; }
 .gloss .gw>div{ flex:1; font-size:17px; } .gloss .ge{ font-size:34px; width:44px; text-align:center; flex:none; }
 .gloss .ib{ font-size:22px; background:var(--soft); border:0; border-radius:50%; width:44px; height:44px; flex:none; cursor:pointer; }
+/* стихи */
+.ptext p{ margin:2px 0; font-size:21px; line-height:1.5; font-family:Georgia, 'Times New Roman', serif; } .ptext.syl p{ letter-spacing:.5px; }
+.pline{ font-style:italic; font-size:19px; font-family:Georgia, serif; }
+.clapline{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:12px 0; font-size:22px; }
+.clapline .cs{ padding:4px 8px; border-radius:10px; background:var(--soft); } .clapline .cs.strong{ font-weight:800; text-decoration:underline; text-underline-offset:4px; }
+.clapline .cs.hit{ background:var(--gold); color:#1f2a44; } .clapline .cs.nx{ outline:3px solid var(--acc); } .clapline .cgap{ width:10px; display:inline-block; }
+.btn.clap{ font-size:44px; display:block; margin:8px auto; min-width:160px; }
+.poem textarea{ width:100%; font-size:18px; border-radius:12px; border:1px solid var(--line); padding:10px; background:var(--card); color:var(--ink); box-sizing:border-box; }
+.poem .row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
