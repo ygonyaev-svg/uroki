@@ -329,3 +329,18 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .dripfly{ position:fixed; right:18px; top:64px; z-index:20; background:#1f7a3d; color:#fff; font-weight:700; padding:8px 14px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.25); animation:dripup 1.6s ease-out forwards; pointer-events:none; }
 @keyframes dripup{ 0%{ opacity:0; transform:translateY(10px); } 15%{ opacity:1; transform:translateY(0); } 80%{ opacity:1; } 100%{ opacity:0; transform:translateY(-30px); } }
 .note.dripc{ border-left:4px solid #1f7a3d; }
+/* темп чтения и словарик */
+.pace .pbig{ font-size:20px; margin:4px 0 8px; } .pace .pbig b{ font-size:48px; color:var(--acc); margin-right:6px; }
+.pace .ppr{ font-size:18px; background:var(--accsoft); border-radius:12px; padding:10px 12px; }
+.spark{ width:100%; max-width:420px; height:auto; display:block; margin:8px auto 0; }
+.spark .sl{ fill:none; stroke:var(--acc); stroke-width:3; stroke-linejoin:round; }
+.spark .sc{ fill:var(--card); stroke:var(--acc); stroke-width:2.5; } .spark .sc.now{ fill:var(--acc); }
+.spark .sn{ stroke:var(--ink2); stroke-width:1.5; stroke-dasharray:5 5; } .spark .st{ fill:var(--ink2); font-size:12px; }
+.plv{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:10px 0; font-weight:600; }
+.pbar{ flex:1 1 120px; height:12px; background:var(--soft); border-radius:8px; overflow:hidden; } .pbar i{ display:block; height:100%; background:var(--gold); border-radius:8px; }
+.pgoal{ font-size:17px; }
+.badges{ display:flex; gap:6px; flex-wrap:wrap; margin:6px 0; } .badges span{ font-size:26px; background:var(--soft); border-radius:50%; width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center; }
+.rlv{ margin:6px 0; } .rlvb{ background:var(--accsoft); border-radius:10px; padding:3px 10px; font-weight:700; margin-right:6px; }
+.gloss .gw{ display:flex; align-items:center; gap:12px; padding:8px 0; border-top:1px solid var(--line); } .gloss .gw:first-of-type{ border-top:0; }
+.gloss .gw>div{ flex:1; font-size:17px; } .gloss .ge{ font-size:34px; width:44px; text-align:center; flex:none; }
+.gloss .ib{ font-size:22px; background:var(--soft); border:0; border-radius:50%; width:44px; height:44px; flex:none; cursor:pointer; }

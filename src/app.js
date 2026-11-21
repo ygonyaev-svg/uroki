@@ -230,7 +230,53 @@ function vHome(){
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
   <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
 }
-function lastReading(kid){ const R = S.kids[kid].reading.filter(x => x.lang === 'ru').slice(-5); if (!R.length) return ''; return '<div class="speeds">' + R.map(x => `<span title="${U.esc(x.title)}"><b>${x.wpm}</b> сл/мин</span>`).join('') + `</div><p class="hint">Цель к концу года: ${KIDS[kid].norm} слов в минуту.</p>`; }
+function lastReading(kid){ const K = S.kids[kid], R = K.reading.filter(x => x.lang === 'ru').slice(-5); if (!R.length) return ''; const best = readBestOf(kid), lv = readLv(kid, best);
+  return `<p class="rlv"><span class="rlvb">${lv.cur[2]} ${lv.cur[1]}</span> рекорд <b>${best}</b> сл/мин${lv.next ? ` · до уровня «${lv.next[1]}» ещё ${lv.next[0] - best}` : ''}</p>${badgesRow(kid)}` + '<div class="speeds">' + R.map(x => `<span title="${U.esc(x.title)}"><b>${x.wpm}</b> сл/мин</span>`).join('') + `</div><p class="hint">Цель к концу года: ${KIDS[kid].norm} слов в минуту.</p>${vocabRow(kid)}`; }
+/* ----- Темп чтения: уровни, рекорды, значки ----- */
+const READ_LV = { yarik: [[0,'Новичок','🌱'],[20,'Ученик','📖'],[30,'Читатель','📚'],[40,'Знаток слов','🔤'],[55,'Мастер чтения','🏅'],[70,'Чемпион','🏆'],[90,'Легенда','👑']],
+  anya: [[0,'Ученица','🌱'],[80,'Читательница','📖'],[100,'Книжный знаток','📚'],[120,'Мастер слова','✒️'],[140,'Магистр чтения','🌟'],[160,'Архимаг книг','🔮']] };
+function readLvList(kid){ return READ_LV[T(kid) === 'anya' ? 'anya' : 'yarik']; }
+function readLv(kid, wpm){ const A = readLvList(kid); let i = 0; A.forEach((x, k) => { if (wpm >= x[0]) i = k; }); return { i, cur: A[i], next: A[i + 1] }; }
+function readOkRec(kid, x){ return (x.acc == null || x.acc >= .85) && x.wpm <= KIDS[kid].norm * 3; }
+function readBestOf(kid){ const K = S.kids[kid]; if (K.readBest == null) K.readBest = Math.max(0, ...K.reading.filter(x => x.lang === 'ru' && readOkRec(kid, x)).map(x => x.wpm)); return K.readBest; }
+function badgesRow(kid){ const lv = readLv(kid, readBestOf(kid)).i; if (!lv) return ''; return `<div class="badges">${readLvList(kid).slice(1, lv + 1).map(x => `<span title="${x[1]}">${x[2]}</span>`).join('')}</div>`; }
+function vocabRow(kid){ const V = S.kids[kid].vocab || []; if (!V.length) return ''; return `<p class="hint">Новых слов в копилке слов: <b>${V.length}</b> — последние: ${V.slice(-4).map(v => U.esc(v.w)).join(', ')}.</p>`; }
+function sparkSvg(kid, vals, norm){ const W = 300, H = 90, P = 8, mx = Math.max(norm * 1.15, ...vals) || 1, lo = Math.floor(Math.min(norm, ...vals) * .7), n = vals.length;
+  const X = i => n < 2 ? W / 2 : P + i * (W - 2 * P) / (n - 1), Y = v => H - P - (v - lo) / Math.max(1, mx - lo) * (H - 2 * P);
+  const pts = vals.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="Скорость чтения по разам"><line x1="0" x2="${W}" y1="${Y(norm).toFixed(1)}" y2="${Y(norm).toFixed(1)}" class="sn"/><text x="${W - 4}" y="${(Y(norm) - 4).toFixed(1)}" text-anchor="end" class="st">норма ${norm}</text>${n > 1 ? `<polyline points="${pts}" class="sl"/>` : ''}${vals.map((v, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="${i === n - 1 ? 6 : 3.5}" class="${i === n - 1 ? 'sc now' : 'sc'}"/>`).join('')}</svg>`; }
+function paceCard(kid, r){ const K = S.kids[kid], norm = KIDS[kid].norm, best = readBestOf(kid), lv = readLv(kid, best), girl = T(kid) === 'anya';
+  const vals = K.reading.filter(x => x.lang === 'ru').slice(-10).map(x => x.wpm);
+  const d = r.prev != null ? r.wpm - r.prev : null;
+  const praise = r.lvup ? `🎉 Новый уровень: <b>${lv.cur[2]} ${lv.cur[1]}</b>! Ты ${girl ? 'заслужила' : 'заслужил'} новый значок и +10 баллов в копилку.`
+    : r.rec ? `🏆 Новый рекорд! Так быстро ты ещё не ${girl ? 'читала' : 'читал'}.`
+    : d == null ? 'Первый замер. Дальше будем сравнивать с ним.'
+    : d >= 3 ? `💪 Быстрее, чем в прошлый раз, на ${d} ${U.pl(d, 'слово', 'слова', 'слов')} в минуту! Молодец!`
+    : d > -3 ? 'Почти как в прошлый раз — ровно и спокойно. Так и держи!'
+    : `Сегодня чуть медленнее (в прошлый раз было ${r.prev}). Ничего страшного: текст был труднее. Главное — читать чисто.`;
+  const goal = lv.next ? Math.min(lv.next[0], Math.max(r.wpm, r.prev || 0) + 3) : Math.max(r.wpm, best) + 2;
+  const pr = lv.next ? Math.max(4, Math.min(100, Math.round((best - lv.cur[0]) / (lv.next[0] - lv.cur[0]) * 100))) : 100;
+  return `<article class="card pace"><p class="eyebrow">Твой темп</p><div class="pbig"><b>${r.wpm}</b> слов в минуту${r.acc != null ? ` · точность ${Math.round(r.acc * 100)}%` : ''}</div>
+   <p class="ppr">${praise}</p>
+   ${r.prev != null ? `<p>В прошлый раз: <b>${r.prev}</b>. Твой рекорд: <b>${best}</b>.</p>` : ''}
+   <p>Норма к концу года${KIDS[kid].grade ? ' (' + KIDS[kid].grade + ')' : ''} — <b>${norm}</b> слов в минуту.${r.wpm >= norm ? ' Ты уже читаешь как надо — даже быстрее!' : ` Осталось ${norm - r.wpm}.`}</p>
+   ${vals.length > 1 ? sparkSvg(kid, vals, norm) + '<p class="hint center">Твои последние чтения. Пунктир — норма.</p>' : ''}
+   <div class="plv"><span>${lv.cur[2]} ${lv.cur[1]}</span>${lv.next ? `<div class="pbar"><i style="width:${pr}%"></i></div><span>${lv.next[2]} ${lv.next[1]} · ${lv.next[0]}</span>` : '<span>Высший уровень!</span>'}</div>
+   ${badgesRow(kid)}
+   <p class="pgoal">🎯 Цель на следующий раз: <b>${goal}</b> слов в минуту${r.acc != null ? ' и без ошибок' : ''}.</p></article>
+   <button class="btn big" data-act="paceok">Дальше</button>`; }
+/* ----- Словарик: новые слова к главе и проверка в конце ----- */
+function glossCard(kid, L){ const gl = L.gl || []; if (!gl.length) return '';
+  return `<article class="card gloss"><h2>📖 Новые слова</h2><p class="hint">Сначала узнай, что они значат. Нажми 🔊 — я прочитаю. В конце спрошу!</p>${gl.map((g, i) => `<div class="gw"><span class="ge">${g.e}</span><div><b>${U.esc(g.w)}</b> — ${U.esc(g.d)}</div><button class="ib" data-act="sayg" data-i="${i}" aria-label="Послушать">🔊</button></div>`).join('')}</article>`; }
+function wordQs(kid, L){ const gl = (L.gl || []).slice(0, 4), lvl = T(kid) === 'anya' ? 'a' : 'y', r = U.rng(U.h('wq' + cur.ds + (L.gl || []).map(g => g.w).join()));
+  const pool = GLOSS.filter(g => lvl === 'a' || g[4] === 'y');
+  return gl.map(g => { const ds = [...new Set(r.shuffle(pool.filter(x => x[1] !== g.w && x[2] !== g.d)).map(x => x[2]))].slice(0, 2); return { w: g.w, e: g.e, a: g.d, opts: r.shuffle([g.d, ...ds]) }; }); }
+function vWords(kid, L, head){ const qs = wordQs(kid, L), i = L.wi || 0, A = L.wans || [];
+  if (i >= qs.length) { const okn = A.filter(a => a && a.ok).length;
+    return head + `<article class="card gloss"><h2>Какие новые слова ты ${T(kid) === 'anya' ? 'узнала' : 'узнал'}</h2><p>Угадано с первого раза: <b>${okn} из ${qs.length}</b>${okn === qs.length ? ' — отлично!' : ''}</p>${(L.gl || []).map((g, k) => `<div class="gw"><span class="ge">${g.e}</span><div><b>${U.esc(g.w)}</b> — ${U.esc(g.d)}</div>${A[k] ? (A[k].ok ? '✅' : '🔁') : ''}</div>`).join('')}<p class="hint">Попробуй сегодня сказать одно из этих слов в разговоре.</p></article><button class="btn big" data-act="wdone">Дальше</button></section>`; }
+  const q = qs[i], a = A[i] || {};
+  return head + `<div class="counter">Новое слово ${i + 1} из ${qs.length}</div><article class="card task"><div class="q">Что значит «${U.esc(q.w)}»? ${q.e}</div><div class="opts">${q.opts.map(o => `<button class="opt ${a.v != null && o === q.a ? 'right' : a.v === o && !a.ok ? 'wrong' : ''}" data-act="wq" data-v="${U.esc(o)}" ${a.v != null ? 'disabled' : ''}>${U.esc(o)}</button>`).join('')}</div>
+   ${a.v != null ? (a.ok ? '<div class="fb ok"><b>Верно!</b></div>' : `<div class="fb bad"><b>«${U.esc(q.w)}» — это ${U.esc(q.a)}</b></div>`) : ''}</article>${a.v != null ? `<button class="btn big" data-act="wnext">Дальше</button>` : ''}</section>`; }
 function readStreak(kid){ const K = S.kids[kid]; let n = 0, d = cur.ds; if (!(K.days[d] && K.days[d].les.read && K.days[d].les.read.phase === 'done')) d = U.addDays(d, -1); while (K.days[d] && K.days[d].les.read && K.days[d].les.read.phase === 'done') { n++; d = U.addDays(d, -1); } return n; }
 
 /* ----- Урок ----- */
@@ -518,16 +564,17 @@ function wordsLimit(kid){ const K = S.kids[kid]; return K.readWords || KIDS[kid]
 function tokensHtml(text, st, p){ let i = 0; return text.split('\n').map(line => '<p>' + line.split(/\s+/).filter(Boolean).map(w => { const k = i++; const c = st ? (st[k] === 1 ? 'r1' : st[k] === 2 ? 'r2' : k === p ? 'rc' : '') : ''; return `<span class="w ${c}" data-i="${k}">${U.esc(w)}</span>`; }).join(' ') + '</p>').join(''); }
 function vRead(kid, L){
   const t = readText(kid), K = S.kids[kid];
+  if (!L.gl && L.phase === 'warm') { L.gl = glossFor(kid, t.text, 4); save(); }
   const { aloud, rest } = aloudPart(t.text, readLim(kid, L));
   const head = `<section class="lesson"><p class="eyebrow">Чтение</p><h1>${U.esc(t.title)}</h1>${t.author ? `<p class="author">${U.esc(t.author)}</p>` : ''}
-   <ol class="steps">${(() => { const st = readSteps(t, rest), ix = st.indexOf(PH_STEP[L.phase]); return st.map((s, i) => { const on = cur.rview ? s === cur.rview : i === ix; const can = i < ix || (i === ix && cur.rview);
+   <ol class="steps">${(() => { const st = readSteps(t, rest, L), ix = st.indexOf(PH_STEP[L.phase]); return st.map((s, i) => { const on = cur.rview ? s === cur.rview : i === ix; const can = i < ix || (i === ix && cur.rview);
       return `<li class="${i < ix ? 'ok' : ''} ${on ? 'now' : ''} ${can ? 'tap' : ''}">${can ? `<button class="stp" data-act="rview" data-s="${i === ix ? '' : s}">${s}</button>` : s}</li>`; }).join(''); })()}</ol>`;
   if (cur.rview && cur.rview !== PH_STEP[L.phase]) return head + vReview(kid, L, t, aloud, rest) + '</section>';
   if (L.phase === 'warm') {
     const hard = Object.entries(K.hard).sort((a, b) => b[1].miss - a[1].miss).slice(0, 5).map(x => x[0]);
     const auto = t.text.split(/\s+/).map(w => w.replace(/[^\p{L}-]/gu, '')).filter(w => w.length >= 9);
     const list = [...new Set(hard.concat(auto))].slice(0, 6);
-    return head + cover(t) + `<article class="card"><h2>Разминка: прочитай слова по слогам</h2><p class="hint">Нажми на слово, чтобы его послушать.</p><div class="warm">${list.map(w => `<button class="ww" data-act="sayw" data-w="${U.esc(w)}">${U.esc(w)}</button>`).join('')}</div>
+    return head + cover(t) + glossCard(kid, L) + `<article class="card"><h2>Разминка: прочитай слова по слогам</h2><p class="hint">Нажми на слово, чтобы его послушать.</p><div class="warm">${list.map(w => `<button class="ww" data-act="sayw" data-w="${U.esc(w)}">${U.esc(w)}</button>`).join('')}</div>
     <p>Сегодня читаешь вслух: <b>${aloud.split(/\s+/).length} слов</b>. Читай спокойно и чётко, как будто рассказываешь кому-то.</p></article>
     <button class="btn big" data-act="toread">Начать чтение</button></section>`;
   }
@@ -536,6 +583,8 @@ function vRead(kid, L){
     return head + `<article class="card reading" lang="${L.lang || 'ru'}"><div class="text" id="rtext">${tokensHtml(aloud, RD && RD.st, RD && RD.p)}</div></article>${rest ? '<p class="hint">Это начало главы. Остальное потом дочитаешь сам(а), про себя.</p>' : ''}
     <div class="readbar">${readBar('startread', SR ? `<button class="btn big mic" data-act="startread">🎤 Читать вслух</button>` : `<button class="btn big" data-act="startread">Начать (засекаю время)</button><p class="hint">Здесь айпад не умеет слушать чтение (нужно обновить iPadOS). Ничего страшного: нажми «Начать», читай вслух, в конце нажми «Готово» — я засеку время и посчитаю скорость.</p>`)}</div></section>`;
   }
+  if (L.res && L.res.pace && !L.paceSeen && ['silent', 'retell', 'qs'].includes(L.phase)) return head + paceCard(kid, L.res) + '</section>';
+  if (L.phase === 'words') return vWords(kid, L, head);
   if (L.phase === 'silent') {
     if (!L.st0) { L.st0 = Date.now(); save(); }
     return head + cover(t) + `<article class="card"><p>Теперь дочитай главу <b>про себя</b>, внимательно. Потом перескажешь и ответишь на вопросы с подвохом.</p><p class="hint">Не торопись: раньше чем через ${Math.max(1, Math.round(silentMin(kid, rest) / 60))} мин кнопка не сработает.</p></article>
@@ -558,22 +607,24 @@ function vRead(kid, L){
   if (L.phase === 'survey') return head + vSurvey(L) + '</section>';
   return head + vResult(kid, 'read', L) + `<p class="center hint">${L.res && L.res.good ? 'Отличный темп! Следующий текст будет чуть длиннее.' : L.res && L.res.repeat ? 'Завтра перечитаем этот текст ещё раз — так читать станет легче.' : ''}</p></section>`;
 }
-const PH_STEP = { warm:'Разминка', read:'Читаю вслух', silent:'Читаю сам', retell:'Пересказ', qs:'Вопросы', survey:'Отзыв', done:'Отзыв' };
+const PH_STEP = { warm:'Разминка', read:'Читаю вслух', silent:'Читаю сам', retell:'Пересказ', qs:'Вопросы', words:'Слова', survey:'Отзыв', done:'Отзыв' };
 /* Повтор пройденного этапа: можно перечитать, послушать, пересказать ещё раз — баллы не меняются */
 function vReview(kid, L, t, aloud, rest){
   const s = cur.rview, K = S.kids[kid], r = L.res || {};
   const back = `<div class="note">Это повторение — баллы не меняются. <button class="link" data-act="rview" data-s="">Вернуться к уроку →</button></div>`;
   if (s === 'Разминка') { const hard = Object.keys(K.hard).slice(0, 5), auto = t.text.split(/\s+/).map(w => w.replace(/[^\p{L}-]/gu, '')).filter(w => w.length >= 9);
     const list = [...new Set(hard.concat(auto))].slice(0, 8);
-    return back + `<article class="card"><h2>Разминка</h2><div class="warm">${list.map(w => `<button class="ww" data-act="sayw" data-w="${U.esc(w)}">${U.esc(w)}</button>`).join('')}</div></article>`; }
+    return back + glossCard(kid, L) + `<article class="card"><h2>Разминка</h2><div class="warm">${list.map(w => `<button class="ww" data-act="sayw" data-w="${U.esc(w)}">${U.esc(w)}</button>`).join('')}</div></article>`; }
+  if (s === 'Читаю вслух' && r.pace) return back + paceCard(kid, r).replace(/<button class="btn big" data-act="paceok">Дальше<\/button>/, '') + `<article class="card reading"><div class="text">${tokensHtml(aloud)}</div></article>`;
   if (s === 'Читаю вслух') return back + `<article class="card"><div class="readres"><span><b>${r.wpm || '—'}</b> слов в минуту</span>${r.acc != null ? `<span><b>${Math.round(r.acc * 100)}%</b> точность</span>` : ''}${r.errs && r.errs.length ? `<span>Трудные слова: ${r.errs.slice(0, 8).map(w => `<button class="ww" data-act="sayw" data-w="${U.esc(w)}">${U.esc(w)}</button>`).join(' ')}</span>` : ''}</div><p class="hint">Прочитай ещё раз вслух — для тренировки.</p></article><article class="card reading"><div class="text">${tokensHtml(aloud)}</div></article>`;
+  if (s === 'Слова') return back + glossCard(kid, L);
   if (s === 'Читаю сам') return back + `<article class="card reading"><div class="text">${tokensHtml(rest)}</div></article>`;
   if (s === 'Пересказ') return back + (L.rt && L.rt.text ? `<article class="card"><h2>Твой пересказ</h2><p class="rtell">${U.esc(L.rt.text)}</p>${retellResHtml(L.rt)}</article>` : '') + retellBox(L, true);
   if (s === 'Вопросы') { const qs = readQs(kid, L);
     return back + `<article class="card"><h2>Вопросы</h2><ol class="plain">${qs.map((q, i) => { const a = L.ans[i] || {}; return `<li><b>${U.esc(q.q)}</b><br>Правильно: ${U.esc(q.a)}${a.wrong && a.wrong.length ? `<br><span class="hint">Сначала ответил(а): ${a.wrong.map(U.esc).join(', ')}</span>` : a.final ? ' ✓' : ''}</li>`; }).join('')}</ol></article><details class="peek"><summary>Посмотреть текст</summary><div class="text">${tokensHtml(t.text)}</div></details>`; }
   return back;
 }
-function readSteps(t, rest){ const s = ['Разминка', 'Читаю вслух']; if (rest) s.push('Читаю сам'); if (t.kw) s.push('Пересказ'); return s.concat(['Вопросы', 'Отзыв']); }
+function readSteps(t, rest, L){ const s = ['Разминка', 'Читаю вслух']; if (rest) s.push('Читаю сам'); if (t.kw) s.push('Пересказ'); s.push('Вопросы'); if (L && L.gl && L.gl.length) s.push('Слова'); return s.concat(['Отзыв']); }
 function readLim(kid, L){ return (L && L.lim) || wordsLimit(kid); }
 function silentMin(kid, rest){ const w = rest.split(/\s+/).filter(Boolean).length; return Math.min(900, Math.round(w / (KIDS[kid].norm * 2.5) * 60)); }
 let RT = null; /* пересказ голосом */
@@ -673,6 +724,9 @@ function stopRead(){
     errs.forEach(w => { const h = K.hard[w] || (K.hard[w] = { miss: 0, ok: 0 }); h.miss++; });
     if (useSR) RD.T.forEach((w, k) => { if (RD.st[k] === 1) { const orig = textWords[k].replace(/[^\p{L}-]/gu, ''); if (K.hard[orig]) { K.hard[orig].ok++; if (K.hard[orig].ok >= 2) delete K.hard[orig]; } } });
     const lim = wordsLimit(kid); K.readWords = Math.round(res.good ? lim * 1.15 : res.repeat ? Math.max(30, lim * .9) : lim);
+    { const pr = K.reading.filter(x => x.lang === 'ru').slice(-1)[0], b0 = readBestOf(kid), lv0 = readLv(kid, b0).i; res.prev = pr ? pr.wpm : null; res.pace = 1;
+      if (readOkRec(kid, res) && wpm > b0) { K.readBest = wpm; res.rec = b0 > 0; }
+      const lv1 = readLv(kid, K.readBest).i; if (lv1 > lv0 && b0 > 0) { res.lvup = lv1; (K.badges = K.badges || []).push({ t: 'read', lv: lv1, d: cur.ds, wpm }); piggyAdd(K, 10); ev(kid, 'новый уровень чтения', { subj: 'Чтение', unit: readLvList(kid)[lv1][1], wpm }); } }
     K.words += reached; K.reading.push({ d: cur.ds, title: readText(kid).title, wpm, acc, lang: 'ru', errs: errs.slice(0, 10) });
     ev(kid, 'чтение вслух', { subj: 'Чтение', unit: readText(kid).title, wpm, acc: acc == null ? '' : Math.round(acc * 100) + '%', words: reached, secs: res.secs, errs: errs.join(', ') });
   } else { const L = dayRec(kid, cur.ds).les[cur.subj]; L.fres = res; L.fphase = 'qs'; S.kids[kid].reading.push({ d: cur.ds, title: L.ftitle, wpm, acc, lang: L.tr === '_alt' ? 'en' : 'pt' }); ev(kid, 'чтение вслух', { subj: L.tr === '_alt' ? 'English' : 'Português', unit: L.ftitle, wpm, acc: acc == null ? '' : Math.round(acc * 100) + '%', errs: errs.join(', ') }); }
@@ -838,7 +892,13 @@ document.addEventListener('click', e => {
     case 'stopread': stopRead(); break;
     case 'pauseread': pauseRead(); render(); break;
     case 'rq': readAnswer(b.dataset.v); break;
-    case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = 'survey'; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) K.pos.read = (K.pos.read || 0) + 1; } save(); render(); break; }
+    case 'paceok': L.paceSeen = 1; L.st0 = Date.now(); save(); render(); window.scrollTo(0, 0); break;
+    case 'sayg': { const g = (L.gl || [])[+b.dataset.i]; if (g) say(`${g.w}. ${g.d}`, 'ru-RU'); break; }
+    case 'wq': { const qs = wordQs(kid, L), i = L.wi || 0, q = qs[i]; L.wans = L.wans || []; if (!q || L.wans[i]) break; const ok = b.dataset.v === q.a; L.wans[i] = { v: b.dataset.v, ok };
+      ev(kid, 'ответ', { subj: 'Чтение', unit: 'Новые слова', q: 'Что значит «' + q.w + '»?', ans: b.dataset.v, right: q.a, ok: ok ? 'верно' : 'ошибка' }); save(); render(); break; }
+    case 'wnext': L.wi = (L.wi || 0) + 1; save(); render(); break;
+    case 'wdone': { const K = S.kids[kid]; K.vocab = K.vocab || []; (L.gl || []).forEach((g, k) => { if (!K.vocab.some(v => v.w === g.w)) K.vocab.push({ w: g.w, d: g.d, e: g.e, ok: !!(L.wans && L.wans[k] && L.wans[k].ok), ds: cur.ds }); }); L.phase = 'survey'; save(); render(); window.scrollTo(0, 0); break; }
+    case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = L.gl && L.gl.length ? 'words' : 'survey'; L.wi = 0; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) K.pos.read = (K.pos.read || 0) + 1; } save(); render(); break; }
     case 'startfread': if (!(RD && RD.paused)) RD = null; startRead(L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break;
     case 'sayfull': say(curForeign(L).text, L.tr === '_alt' ? 'en-GB' : 'pt-PT'); break;
     case 'fq': foreignAnswer(b.dataset.v); break;
