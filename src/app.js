@@ -95,6 +95,7 @@ function applyCfg(rows){ let fresh = false;
     else if (type.startsWith('книг')) bkApply(kid, row);
     else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; }
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
+    else continue; /* незнакомую команду не отмечаем — её выполнит следующая версия приложения */
     K.applied.push(row.id); fresh = true;
   }
   if (fresh) { save(); if (cur.kid) softRender(); }
@@ -183,6 +184,10 @@ let pinBuf = '';
 function pinKey(k){
   if (k === '⌫') pinBuf = pinBuf.slice(0, -1); else if (pinBuf.length < 4) pinBuf += k;
   const dots = document.querySelectorAll('#dots i'); dots.forEach((d, i) => d.classList.toggle('on', i < pinBuf.length));
+  if (pinBuf.length === 4 && cur.pinSet) { const P = cur.pinSet, v = pinBuf; pinBuf = '';
+    if (!P.first) { const h = hashPin(v), used = [S.parentPin].concat(Object.keys(S.kids).filter(k => k !== P.kid).map(k => S.kids[k].pin)); if (used.includes(h)) { cur.msg = 'Этот код уже занят. Придумай другой'; setTimeout(render, 150); return; } P.first = v; cur.msg = 'Введи новый код ещё раз'; setTimeout(render, 150); return; }
+    if (P.first !== v) { cur.pinSet = { kid: P.kid }; cur.msg = 'Коды не совпали. Придумай новый код ещё раз'; setTimeout(render, 150); return; }
+    S.kids[P.kid].pin = hashPin(v); cur.pinSet = null; save(); ev(P.kid, 'пароль изменён', {}); alertMsg('Пароль изменён ✓'); go('home'); return; }
   if (pinBuf.length === 4) { const ok = cur.pinFor === 'parent' ? hashPin(pinBuf) === S.parentPin : hashPin(pinBuf) === S.kids[cur.pinFor].pin || hashPin(pinBuf) === S.parentPin; const cb = cur.onPin; pinBuf = '';
     if (ok) { cur.msg = ''; cb(); } else { cur.msg = 'Неверный код, попробуй ещё раз'; setTimeout(render, 150); } }
 }
@@ -228,6 +233,7 @@ function vHome(){
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}${poemTile(kid, D)}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
   ${alwaysTiles(kid)}
+  <p class="center"><button class="link" data-act="chpin">🔑 Поменять пароль</button></p>
   ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
   ${FAM ? '' : bkHomeCard(kid)}
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
@@ -855,7 +861,8 @@ document.addEventListener('click', e => {
   switch (act) {
     case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; snapCheck(cur.kid); ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;
     case 'parent': askPin('parent', () => go('parent', { kid: null })); break;
-    case 'cancelpin': go(cur.kid ? 'home' : 'login'); break;
+    case 'chpin': { const k0 = kid; askPin(k0, () => { cur.pinSet = { kid: k0 }; go('pin', { pinFor: k0, msg: 'Придумай новый код из 4 цифр' }); }, 'Введи свой старый код'); break; }
+    case 'cancelpin': cur.pinSet = null; go(cur.kid ? 'home' : 'login'); break;
     case 'always': { const F = alwaysGet(b.dataset.id); if (!F) break; if (F.open) F.open(cur.kid || null); go('always', { aid: F.id }); break; }
     case 'tologin': cur.kid = null; go('login'); break;
     case 'key': pinKey(b.dataset.k); break;
