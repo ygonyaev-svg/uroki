@@ -62,7 +62,7 @@ css = f"""/* ===== Яркое оформление (сгенерировано t
 :root:root{{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
   --blue:#2563eb; --red:#e11d48; --green:#16a34a; --gold:#f59e0b; --sh:0 6px 0 rgba(15,23,42,.10),0 10px 24px rgba(15,23,42,.12); --r:22px; }}
 body{{ background:#7dd3fc linear-gradient(160deg,#38bdf8 0%,#a78bfa 55%,#f472b6 100%) fixed; background-image:{uri(sky)},linear-gradient(160deg,#38bdf8 0%,#a78bfa 55%,#f472b6 100%); background-size:400px 400px,cover; color:var(--ink); }}
-body::before{{ content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; }}
+body::before{{ content:""; position:fixed; top:0; right:0; bottom:0; left:0; z-index:-1; pointer-events:none; }}
 body.yarik{{ background:#36983f; }} body.yarik::before{{ background:linear-gradient(rgba(2,6,23,.55),rgba(2,6,23,.25) 260px,rgba(2,6,23,.05) 420px),url(img/bg-yarik.webp) center 70%/cover no-repeat,{uri(stadium)} center top/cover no-repeat; }}
 body.yarik .lesson > h1{{ text-shadow:0 2px 14px rgba(0,0,0,.55); }}
 body.anya{{ background:#1e1250; }} body.anya::before{{ background:linear-gradient(rgba(7,11,36,.35),rgba(7,11,36,.15)),url(img/bg-anya.webp) center 40%/cover no-repeat,{uri(castle)} center bottom/cover no-repeat; }}
