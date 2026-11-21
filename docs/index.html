@@ -224,6 +224,7 @@ th{ color:var(--ink2); font-weight:600; }
 .coverwrap{ margin:0 0 14px; border-radius:16px; overflow:hidden; line-height:0; box-shadow:0 2px 10px rgba(0,0,0,.12); }
 .coverwrap .pic{ width:100%; height:auto; display:block; }
 .coverwrap.photo{ background:#1f2937 center/cover; } .coverwrap.photo img{ width:100%; aspect-ratio:3/2; max-height:340px; object-fit:cover; display:block; }
+.coverwrap.chimg img{ aspect-ratio:4/3; max-height:440px; }
 .pair{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; } .pair b{ font-size:28px; } .pic.place{ max-height:110px; } .pic.line{ max-height:110px; }
 .illus .pic{ max-width:100%; height:auto; }
 .stack{ display:flex; flex-direction:column; align-items:center; gap:6px; }
@@ -997,8 +998,9 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v12262f35 */
+<script>/* v6f5443db */
 var FAM = 0;
+const CH_IMG_LIST = ["bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac7", "bac8", "bac9", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bgt1", "bgt2", "bgt3", "bka3", "blg1", "blg2", "bmi1", "bmi2", "bmi3", "bnp7", "bsh3", "bsh4"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
 /* ===== Общие утилиты ===== */
 const U = {
@@ -4596,7 +4598,12 @@ const COVERS = {
   'Волшебник страны Оз': () => PX.svg(400, 170, `<rect width="400" height="170" fill="#bbf7d0"/><path d="M160,170 L200,70 L240,170Z" fill="#facc15"/><g stroke="#ca8a04" stroke-width="1"><line x1="170" y1="150" x2="230" y2="150"/><line x1="178" y1="130" x2="222" y2="130"/><line x1="186" y1="110" x2="214" y2="110"/></g><g fill="#16a34a"><rect x="180" y="30" width="12" height="40"/><rect x="198" y="18" width="12" height="52"/><rect x="216" y="36" width="12" height="34"/></g><text x="60" y="140" font-size="34">👧</text><text x="100" y="140" font-size="28">🐕</text><text x="280" y="140" font-size="32">🦁</text><text x="320" y="140" font-size="30">🤖</text><text x="30" y="40" font-size="30">🌪️</text>`, 'cover'),
   'Всадник без головы': () => PX.svg(400, 170, `<rect width="400" height="170" fill="#fdba74"/><circle cx="320" cy="60" r="30" fill="#fef08a"/><path d="M0,120 Q100,105 200,118 T400,112 V170 H0Z" fill="#a16207"/><g fill="#166534"><rect x="40" y="80" width="10" height="40"/><rect x="30" y="92" width="8" height="5"/><rect x="50" y="88" width="8" height="5"/><rect x="350" y="85" width="9" height="35"/></g><text x="150" y="125" font-size="52">🏇</text><text x="240" y="128" font-size="34">🐎</text><text x="90" y="150" font-size="22">🌵</text><text x="300" y="155" font-size="22">🤠</text>`, 'cover')
 };
-function cover(t){ const s = (t.book || '') + ' ' + (t.title || ''); let k = Object.keys(COVERS).concat(Object.keys(COVER_IMG)).find(k => s.includes(k));
+/* Иллюстрации к главам (Gemini, акварель+тушь): docs/img/book/<id>.webp. Список — что уже нарисовано. */
+const CH_IMG = new Set(typeof CH_IMG_LIST !== 'undefined' ? CH_IMG_LIST : []);
+const CH_ALIAS = { a5:'bkp1', a7:'bmu1', a9:'bbl1' }; /* отрывки = начало книги */
+function chImg(t){ const id = t && (CH_IMG.has(t.id) ? t.id : CH_ALIAS[t.id]); return id && CH_IMG.has(id) ? id : ''; }
+function cover(t){ const ci = chImg(t); if (ci) return `<div class="coverwrap photo chimg" style="background-image:url(img/book/${ci}.webp)"><img src="img/book/${ci}.webp" alt="" loading="lazy" onerror="this.parentNode.remove()"></div>`;
+  const s = (t.book || '') + ' ' + (t.title || ''); let k = Object.keys(COVERS).concat(Object.keys(COVER_IMG)).find(k => s.includes(k));
   if (!k && /Холмс/.test(s)) k = 'Пёстрая лента'; if (!k && /(^|\s)Оз(\s|\.|$)|Изумруд/.test(s)) k = 'Волшебник страны Оз';
   if (!k) return ''; const f = COVER_IMG[k];
   return f ? `<div class="coverwrap photo" style="background-image:url(img/${f})"><img src="img/${f}" alt="" loading="lazy" onerror="COVERS['${k}'] ? this.parentNode.innerHTML=COVERS['${k}']() : this.parentNode.remove()"></div>` : `<div class="coverwrap">${COVERS[k]()}</div>`; }

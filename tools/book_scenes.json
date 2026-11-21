@@ -1,0 +1,595 @@
+{
+ "_note": "Сцены для иллюстраций к главам книг (Gemini, стиль tools/illustration_style.md). Один чат Gemini на книгу — герои одинаковые. Файлы: docs/img/book/<id>.webp",
+ "books": [
+  {
+   "book": "Серая Шейка",
+   "cast": "a small grey duckling with a slightly drooping injured wing, a kind old mother duck, a sly red fox, a kind grey hare, an old hunter in a sheepskin coat",
+   "ch": [
+    [
+     "bsh1",
+     "early autumn by a forest river, flocks of ducks and geese gathering on the water preparing to fly south, a small grey duckling with a drooping wing sits sadly on the bank, yellow leaves, golden light"
+    ],
+    [
+     "bsh2",
+     "a tender farewell: an old mother duck hugging her little grey duckling with her wing at the river bank at dawn, the flock already taking off into the pale sky in a V shape"
+    ],
+    [
+     "bsh3",
+     "late autumn on a quiet forest river, edges frozen with thin ice, a small open patch of dark water in the middle where the little grey duck swims; on the ice edge a sly red fox sits looking at her but cannot reach; bare birches, first snow, soft grey-blue light with warm sunset glow"
+    ],
+    [
+     "bsh4",
+     "a kind old hunter in a sheepskin coat and fur hat gently holding the little grey duck in his hands on the snowy river bank, smiling, a grey hare peeking from the bushes, winter forest, warm low sun"
+    ]
+   ]
+  },
+  {
+   "book": "Лягушка-путешественница",
+   "cast": "a small green frog, a flock of grey wild ducks",
+   "ch": [
+    [
+     "blg1",
+     "a small green frog sitting on a lily pad in a marsh, talking to two wild ducks; one duck holds a twig in its beak and the frog shows how to hold the middle of the twig with her mouth; reeds, autumn colours"
+    ],
+    [
+     "blg2",
+     "two flying wild ducks carry a twig in their beaks, a little green frog hangs from the middle of the twig holding it in her mouth, below are fields, a village with people pointing up in surprise, autumn sky"
+    ]
+   ]
+  },
+  {
+   "book": "Аленький цветочек",
+   "cast": "a rich merchant with a grey beard in a red kaftan, his three daughters (the youngest - kind, with a long light-brown braid in a simple blue sarafan), an enchanted beast who is big, shaggy, kind-eyed and not scary, later a handsome young prince",
+   "ch": [
+    [
+     "bac1",
+     "an old Russian merchant's wooden house interior, the merchant sits at a table, three daughters stand before him asking for gifts: the eldest dreams of a golden crown, the middle of a crystal mirror, the youngest shyly asks for a little scarlet flower"
+    ],
+    [
+     "bac2",
+     "the merchant walks amazed through a magical palace with golden halls, set tables full of food, fountains, no people anywhere, warm candle light"
+    ],
+    [
+     "bac3",
+     "in a wonderful palace garden the merchant finds on a green hill a single glowing scarlet flower and reaches to pick it, exotic trees and birds around, magical evening light"
+    ],
+    [
+     "bac4",
+     "the merchant bows before a big shaggy enchanted beast standing in the garden; the beast is huge, hairy and strange but with kind sad eyes, not frightening; scarlet flower in the merchant's hand"
+    ],
+    [
+     "bac5",
+     "the merchant returned home with chests of gifts, the youngest daughter with a light-brown braid holds the scarlet flower in a golden jug and decides to go to the palace instead of her father"
+    ],
+    [
+     "bac6",
+     "the youngest daughter wakes up in a rich bedroom of the magical palace, morning light, her scarlet flower in a gilded jug beside the bed; on the white marble wall appear glowing fiery letters (unreadable decorative shapes, not real text)"
+    ],
+    [
+     "bac7",
+     "the youngest daughter sits in a garden gazebo in the evening and talks with an invisible voice from behind the gazebo, fountains, roses, lanterns, warm gentle mood"
+    ],
+    [
+     "bac8",
+     "the youngest daughter and the big shaggy kind-eyed beast walk together in the palace garden at dusk; she is no longer afraid, he walks a little behind her"
+    ],
+    [
+     "bac9",
+     "the youngest daughter puts a gold ring on her finger and finds herself back at her father's house, the family hugging her, sisters behind, evening, warm light; a clock showing it is late"
+    ],
+    [
+     "bac10",
+     "in the magical garden at dawn the youngest daughter embraces the shaggy beast lying by the scarlet flower, and he turns into a handsome young prince in sparkling light, palace in the background"
+    ]
+   ]
+  },
+  {
+   "book": "Городок в табакерке",
+   "cast": "a polite boy Misha about 8 with light hair in a 19th century suit, his father with sideburns, tiny boy-bells with golden caps, little uncle-hammers, a fat lazy overseer in a robe on a sofa, the princess-spring",
+   "ch": [
+    [
+     "bgt1",
+     "a cosy 19th century living room, a father puts a beautiful tortoiseshell music snuffbox on a table, its lid shows a tiny town with gates and towers; a light-haired boy leans in to look, fascinated"
+    ],
+    [
+     "bgt2",
+     "the light-haired boy, shrunk to tiny size, walks inside the snuffbox town among little boys with golden bell-shaped caps who ring 'ding-ding', arches of shiny steel, warm golden light"
+    ],
+    [
+     "bgt3",
+     "inside the music box mechanism: little men-hammers striking the bells, a fat lazy overseer lying on a sofa in a robe, and the boy touching a coiled steel spring - the princess spring - with gears around"
+    ]
+   ]
+  },
+  {
+   "book": "Мороз Иванович",
+   "cast": "a hardworking girl Needlewoman in a red sarafan with a braid, a lazy girl Sloth in a blue sarafan, a kind old nanny, Moroz Ivanovich - a white-haired old man with a long silver beard in a fur coat, living in an ice house",
+   "ch": [
+    [
+     "bmi1",
+     "a village well in winter, a girl in a red sarafan with a braid leans over the well where her bucket has fallen; an old nanny scolding from the doorway of a wooden izba"
+    ],
+    [
+     "bmi2",
+     "inside an icy house glittering with snow, the girl in red shakes a fluffy feather bed so that snow falls out like down; a kind old man with a long white beard, Moroz Ivanovich, sits by a cold stove, smiling"
+    ],
+    [
+     "bmi3",
+     "the lazy girl in a blue sarafan returns home from the ice house, instead of silver she carries a bucket with an icicle and a lump of melting mercury, she looks sulky; the hardworking sister and nanny watch, snowy yard"
+    ]
+   ]
+  },
+  {
+   "book": "Алёнушкины сказки",
+   "cast": "talking animals and insects of Russian fairy tales, drawn as charming animals (not humanoid)",
+   "ch": [
+    [
+     "bzy1",
+     "in a snowy winter forest a brave young hare stands up on a stump shouting boastfully, other hares listening; a wolf behind a bush jumps up in fright and runs away; funny, light mood"
+    ],
+    [
+     "bkz1",
+     "a tiny ladybird-like little bug on a big flower in a sunny spring meadow, looking around happily, bees and butterflies around, blue sky"
+    ],
+    [
+     "bkm1",
+     "a swamp at noon, a mosquito with a long nose standing heroically on a leaf, a big clumsy bear lying on the swamp grass, many mosquitoes buzzing around"
+    ],
+    [
+     "bkm2",
+     "a big clumsy bear sitting on a thick tree branch roaring, a swarm of mosquitoes led by a mosquito with a long nose flying at him, a swamp below, funny scene"
+    ],
+    [
+     "bvv1",
+     "a sparrow sitting on a branch over a small river talking to a spiny ruff fish peeking out of the water; summer, willows"
+    ],
+    [
+     "bvv2",
+     "a cheerful young chimney sweep with a sooty face and a brush washing himself by a river, a sparrow and a ruff fish quarrelling noisily near him"
+    ],
+    [
+     "bvv3",
+     "the chimney sweep sitting on the river bank making peace between a sparrow and a ruff fish, other birds and fish watching, sunset"
+    ],
+    [
+     "bmh1",
+     "a sunny summer veranda of a country house with open windows, a table with a jam jar and tea, a little fly flying happily among flowers, children's toys"
+    ],
+    [
+     "bmh2",
+     "a little fly sitting on the edge of a jam saucer on a dacha veranda table in late summer, a girl in an apron sweeping the veranda, a cat dozing in the sun"
+    ],
+    [
+     "bmh3",
+     "an autumn kitchen window with rain outside, a little fly sitting sadly on the warm window frame, yellow leaves blowing"
+    ],
+    [
+     "bmh4",
+     "a cosy winter room with a warm tiled stove, a little fly sitting on the warm stove listening, and a second fly just waking up and flying out of a crack, snow outside the window, joyful"
+    ],
+    [
+     "bvr1",
+     "a black crow on a birch branch cawing loudly, a grey cat dozing on a wooden fence nearly falling off in surprise, a village yard"
+    ],
+    [
+     "bvr2",
+     "a crow sitting on a windowsill talking to a little yellow canary in a cage, inside a village house"
+    ],
+    [
+     "bvr3",
+     "village boys spreading a net on the snowy ground and sprinkling flax seeds, a black crow on a fence warning a little yellow canary not to go near, winter village yard"
+    ],
+    [
+     "buv1",
+     "a pompous turkey strutting in a poultry yard before dawn, his wife the turkey hen half-asleep on a perch"
+    ],
+    [
+     "buv2",
+     "a poultry yard: a proud turkey lecturing hens, ducks and geese gathered around, a farm woman in a headscarf with a bowl of porridge"
+    ],
+    [
+     "buv3",
+     "a pompous turkey lecturing hens, ducks and geese in a poultry yard about a small hedgehog curled into a ball on the grass, all birds staring at it curiously, funny"
+    ],
+    [
+     "bmk1",
+     "an old kitchen with a stove: a clay pot of milk and a small pot of oat porridge bubbling and boiling over, a grey cat watching from a bench"
+    ],
+    [
+     "bmk2",
+     "a grey cat licking spilled milk from the floor near the stove, a cook in an apron entering the kitchen, funny scene"
+    ]
+   ]
+  },
+  {
+   "book": "Филипок",
+   "cast": "a little peasant boy Filipok in a huge fur hat and his father's big coat, a kind teacher",
+   "ch": [
+    [
+     "bfi1",
+     "a village school in winter: a small peasant boy in an oversized fur hat and too big coat stands shyly at the door of a classroom full of children at desks, a kind teacher smiles at him"
+    ]
+   ]
+  },
+  {
+   "book": "Слепая лошадь",
+   "cast": "a rich old Slavic merchant, a white horse, an old servant",
+   "ch": [
+    [
+     "bsp1",
+     "a rich old Slavic merchant in a fur-trimmed coat galloping home on a beautiful white horse along a forest road at dusk, the horse running like the wind, the town walls of a seaside trading city ahead; dramatic but not frightening"
+    ]
+   ]
+  },
+  {
+   "book": "Сказка о царе Салтане",
+   "cast": "Tsar Saltan with a dark beard and crown, the young tsaritsa in a kokoshnik, prince Gvidon (first a baby, then a young man in a red caftan), a white swan who becomes a beautiful princess with a crescent moon in her braid, a squirrel, thirty-three sea knights",
+   "ch": [
+    [
+     "bcs1",
+     "three maidens spinning by a window in the evening in an old Russian house, the tsar standing outside under the window listening, snow and moonlight"
+    ],
+    [
+     "bcs2",
+     "a big wooden barrel washed ashore on a sunny island, a young mother in a kokoshnik and a young prince stepping out of it; a white swan on the sea, an oak on a hill"
+    ],
+    [
+     "bcs3",
+     "in a palace garden a little squirrel sits in a crystal house, singing and cracking golden nuts with emerald kernels, guards and people admiring"
+    ],
+    [
+     "bcs4",
+     "thirty-three knights in shining armour coming out of the sea waves onto the shore, an old bearded leader in front, a young prince welcoming them; sunset"
+    ],
+    [
+     "bcs5",
+     "a beautiful princess with a crescent moon shining in her braid and a star on her forehead walks with the young prince in a red caftan; a white swan feather in the air; the old tsar arrives on a ship, happy reunion"
+    ]
+   ]
+  },
+  {
+   "book": "Сказка о рыбаке и рыбке",
+   "cast": "an old fisherman with a white beard, his grumpy old wife, a golden fish with a little crown",
+   "ch": [
+    [
+     "brr1",
+     "a poor old fisherman with a white beard standing at the edge of the blue sea holding a net, a small golden fish with a crown speaking to him from the waves; a broken wooden trough near a dugout hut in the background"
+    ]
+   ]
+  },
+  {
+   "book": "Сказка о мёртвой царевне",
+   "cast": "a young princess with a dark braid in a white sarafan, a proud queen with a magic mirror, seven bogatyr brothers, prince Elisei on a horse, a faithful dog Sokolko",
+   "ch": [
+    [
+     "bmc1",
+     "a proud beautiful queen in a rich dress looking into a magic mirror in a dark-wood palace room, candles"
+    ],
+    [
+     "bmc2",
+     "in a forest terem of seven brothers, a kind princess with a dark braid feeds a dog on the porch, an old woman with a basket of apples at the gate; birch forest, autumn"
+    ],
+    [
+     "bmc3",
+     "prince Elisei on a white horse riding across fields, asking the sun, the moon and the wind where his bride is; sky with sun and pale moon, wind bending grass"
+    ]
+   ]
+  },
+  {
+   "book": "Каштанка",
+   "cast": "a young red dog Kashtanka (a dachshund-mutt cross that looks like a fox), a carpenter Luka Alexandrych with a beard, his son Fedyushka, a kind stranger in a fur coat (a circus clown), a grey gander Ivan Ivanych, a white cat Fyodor Timofeyich, a pig Havronya Ivanovna",
+   "ch": [
+    [
+     "bka1",
+     "a snowy winter evening on a city street, a little red fox-like dog sits alone and lost by a closed door, snowflakes, street lamps; a kind man in a fur coat bends down to her"
+    ],
+    [
+     "bka2",
+     "a small warm room with dirty wallpaper, a red fox-like dog meets a grey gander, a white cat and a pig, all looking at her curiously; a kind man in a robe smiles"
+    ],
+    [
+     "bka3",
+     "a kind man in a clown costume rehearsing with animals in a room: the grey gander shooting a tiny toy pistol, the white cat, the pig standing in a pyramid, and the red dog jumping"
+    ],
+    [
+     "bka4",
+     "a circus arena with bright lights and a full audience; the red dog runs up the aisle toward a carpenter with a beard and a boy who called her name; a clown in the ring"
+    ]
+   ]
+  },
+  {
+   "book": "Ночь перед Рождеством",
+   "cast": "the young blacksmith Vakula, strong, in a Ukrainian embroidered shirt and sheepskin hat; Oksana, a beautiful proud girl with black braids and flower wreath; a small comic devil with a pig snout, little horns and a thin tail (funny, not scary); Solokha, a witch flying on a broom; fat Patsyuk; the empress in a luxurious gown",
+   "ch": [
+    [
+     "bnp1",
+     "a clear frosty Christmas night over a snow-covered Ukrainian village with white huts, a small comic devil with a pig snout stealing the bright moon and hiding it in his pocket, a witch on a broom flying in the starry sky; magical and funny"
+    ],
+    [
+     "bnp2",
+     "a cosy Ukrainian hut, a beautiful girl with black braids and a flower wreath admiring herself in a small mirror, a strong young blacksmith in the doorway watching her"
+    ],
+    [
+     "bnp3",
+     "Solokha's hut at night: guests hiding in coal sacks, a plump woman at the stove, a funny small devil peeking from a sack"
+    ],
+    [
+     "bnp4",
+     "a snowy village street at night with carolling young people holding a star on a pole; a strong blacksmith carrying big sacks on his back; the black-braided girl laughing and asking him to bring the tsaritsa's slippers"
+    ],
+    [
+     "bnp5",
+     "inside a hut a very fat man sits cross-legged eating dumplings that jump out of a bowl into his mouth by themselves; the blacksmith watching in surprise; funny"
+    ],
+    [
+     "bnp6",
+     "the blacksmith holding a small comic devil by the tail on a moonlit snowy field, the devil begging; funny not scary"
+    ],
+    [
+     "bnp7",
+     "the blacksmith flying high on the back of a small comic devil over the snowy night sky, below the lights of a big 18th century city with palaces and a river"
+    ],
+    [
+     "bnp8",
+     "a magnificent 18th century palace hall, the empress in a luxurious gown and the blacksmith in a Cossack outfit bowing to her and receiving beautiful golden embroidered slippers, courtiers watching"
+    ],
+    [
+     "bnp9",
+     "Christmas morning in a Ukrainian village, the blacksmith presents the golden slippers to the happy girl with black braids, snow sparkling, bells, church in the distance"
+    ]
+   ]
+  },
+  {
+   "book": "Слон",
+   "cast": "a little girl Nadya about 6 with light hair in a nightgown, her father in a 19th century suit, a kind gentle elephant Tommy, an old circus owner German",
+   "ch": [
+    [
+     "bsl1",
+     "a little pale girl lying in bed in a cosy 19th century bedroom, her worried father sitting next to her, a doctor in glasses; window with winter city"
+    ],
+    [
+     "bsl2",
+     "a gentle big elephant standing in a 19th century apartment dining room, a little girl in a nightgown offering him a bun, they have tea together, a smiling father in the doorway"
+    ]
+   ]
+  },
+  {
+   "book": "Всадник без головы",
+   "cast": "a young Irish mustanger Maurice in a Mexican hat and poncho, a young woman Louise on a spotted mare, an old hunter Zeb Stump with a beard, a big dog Tara, prairie",
+   "ch": [
+    [
+     "br1",
+     "a vast Texas prairie at sunset, a wagon caravan with settlers, a young horseman in a sombrero and poncho riding up to show the way; tall grass, warm orange light"
+    ],
+    [
+     "br2",
+     "a young woman galloping on a beautiful spotted mare across the prairie, a young mustanger on a dark horse riding beside her, wild horses running in the distance"
+    ],
+    [
+     "br3",
+     "a misty prairie at dawn, an old bearded hunter with a long rifle and a big dog looking at the silhouette of a cloaked rider far away on the horizon; mysterious but not scary, children's adventure book style"
+    ]
+   ]
+  },
+  {
+   "book": "Муму",
+   "cast": "Gerasim, a huge kind strong peasant janitor with a beard, in a red shirt; a small white spaniel puppy with dark spots (Mumu); an old capricious lady barina; a washerwoman Tatiana; butler Gavrila",
+   "ch": [
+    [
+     "bmu1",
+     "a grey Moscow house with white columns in the 19th century; a huge strong kind janitor with a beard working in the courtyard, carrying a whole barrel easily, servants watching"
+    ],
+    [
+     "bmu2",
+     "a quiet young washerwoman doing laundry in a courtyard, a huge kind bearded janitor shyly giving her a gingerbread rooster"
+    ],
+    [
+     "bmu3",
+     "a 19th century servants' room, a butler in livery whispering a plan to other servants, a cobbler with a bottle; comic old-fashioned scene"
+    ],
+    [
+     "bmu4",
+     "a huge bearded janitor tenderly holding a small white spaniel puppy with dark spots in his big hands, a small room under the stairs, warm light"
+    ],
+    [
+     "bmu5",
+     "the small white spaniel with dark spots running happily back into the courtyard to the huge janitor, he kneels to hug her, evening"
+    ],
+    [
+     "bmu6",
+     "a huge bearded man walking alone along a country road through fields at sunset with a bundle on a stick over his shoulder, going home to his village, wide Russian landscape, peaceful"
+    ]
+   ]
+  },
+  {
+   "book": "Кавказский пленник",
+   "cast": "Zhilin, a slim young Russian officer with a moustache in a 19th century uniform; Kostylin, a fat tired officer; Dina, a 13-year-old Caucasian girl in a long red shirt and trousers with coins in her hair; mountain village (aul)",
+   "ch": [
+    [
+     "bkp1",
+     "a mountain road in the Caucasus, a young Russian officer on horseback riding ahead of a slow convoy, high mountains, summer, dust; no violence"
+    ],
+    [
+     "bkp2",
+     "inside a stone barn in a mountain village, two officers sitting on straw writing a letter by a small window; local children peeking in curiously"
+    ],
+    [
+     "bkp3",
+     "a sunny mountain village with flat roofs; a young Russian officer sitting outside carving clay dolls, a 13-year-old Caucasian girl with coins in her hair admiring a doll he gave her"
+    ],
+    [
+     "bkp4",
+     "night in a stone barn, a young officer secretly digging a hole under the wall with a knife, a sleeping fat officer, moonlight through a window"
+    ],
+    [
+     "bkp5",
+     "two officers walking at night through a dark mountain forest, one carrying the other on his back, stars, mountains"
+    ],
+    [
+     "bkp6",
+     "night in a mountain village: a 13-year-old girl lowering a long pole into a pit to help a young officer climb out, moonlight, stars, tense but kind mood"
+    ]
+   ]
+  },
+  {
+   "book": "Чёрная курица, или Подземные жители",
+   "cast": "Alyosha, a 10-year-old boy in an old-fashioned 19th century school uniform; a black hen Chernushka; a tiny minister in black with a golden chain; little underground people the size of dolls; knights the size of dolls; an underground king",
+   "ch": [
+    [
+     "bck1",
+     "an old St Petersburg boarding school yard in the 19th century, a lonely boy in a school uniform feeding a black hen through a fence, autumn, old houses"
+    ],
+    [
+     "bck2",
+     "night in a school dormitory, a boy in his nightshirt sees by candlelight a tiny little man in black with a golden chain (the black hen transformed) at the door, other boys asleep"
+    ],
+    [
+     "bck3",
+     "an underground hall with tiny knights in armour lined up, a boy and a little minister walking through rooms with Dutch tiles and silver, candles, magic"
+    ],
+    [
+     "bck4",
+     "an underground throne room with a tiny king on a throne giving a boy a small hemp seed; tiny courtiers bowing; glowing light"
+    ],
+    [
+     "bck5",
+     "a 19th century classroom, a teacher in a frock coat, a boy standing at his desk worried, searching his pockets for something lost"
+    ],
+    [
+     "bck6",
+     "a boy in a nightshirt saying goodbye to tiny underground people leaving in a long line by candlelight; sad, tender mood"
+    ]
+   ]
+  },
+  {
+   "book": "Мальчики",
+   "cast": "two 19th century schoolboys - Volodya with light hair and his dark-haired friend Chechevitsyn, a family",
+   "ch": [
+    [
+     "bma1",
+     "a winter evening in a 19th century Russian house, a family rushes to greet a schoolboy with frosty red cheeks arriving by sleigh, a shy dark-haired friend behind him, troika of white horses outside"
+    ]
+   ]
+  },
+  {
+   "book": "Белолобый",
+   "cast": "a she-wolf, a silly white-faced puppy with a white blaze on his forehead, a sheep farm in winter",
+   "ch": [
+    [
+     "bbl1",
+     "a frosty March night, a thin grey she-wolf walking across the snow, carrying a silly black puppy with a white forehead in her mouth, the puppy happy, not hurt; a winter hut with a barn in the distance; gentle and funny"
+    ]
+   ]
+  },
+  {
+   "book": "Дети подземелья",
+   "cast": "Vasya, a 9-year-old boy in a 19th century jacket; Valek, a thin dark-haired 9-year-old boy in old clothes; Marusya, a little pale 4-year-old girl with light curls; Pan Tyburtsy, a tall man with a grey moustache in a worn coat; an old chapel and ruins of a castle",
+   "ch": [
+    [
+     "bdp1",
+     "a small old Ukrainian town with ruins of an old castle on a hill and a pond, a lonely boy walks towards the ruins, summer evening"
+    ],
+    [
+     "bdp2",
+     "a tall man with a grey moustache in a worn long coat speaking to a crowd in the town square, people listening, children around"
+    ],
+    [
+     "bdp3",
+     "a lonely boy wandering through the green fields and town streets, a stern father in a window behind"
+    ],
+    [
+     "bdp4",
+     "an old abandoned chapel on a hill, a boy climbing in through a high window, inside a thin dark-haired boy and a small pale girl with light curls look up at him"
+    ],
+    [
+     "bdp5",
+     "three children - a boy, a thin dark-haired boy and a little girl with light curls - playing in a meadow with flowers near an old chapel, the boy gives the girl apples"
+    ],
+    [
+     "bdp6",
+     "inside an old underground cave crypt lit by sunlight from above, a little girl sitting on a bench, a boy and a thin dark-haired boy, poor furniture; kind mood"
+    ],
+    [
+     "bdp7",
+     "the tall man with a grey moustache sitting with the children by a fire in the old chapel, sharing bread, warm light"
+    ],
+    [
+     "bdp8",
+     "autumn: yellow trees on the hill, a little pale girl with light curls sitting wrapped in a shawl, boys bringing her flowers"
+    ],
+    [
+     "bdp9",
+     "a boy giving a little pale girl with light curls a beautiful doll, she smiles happily, warm golden light"
+    ]
+   ]
+  },
+  {
+   "book": "Белый пудель",
+   "cast": "old grandfather Lodyzhkin with a barrel organ on his back, a 12-year-old acrobat boy Sergei in a striped leotard, a white poodle Arto with a lion haircut; a capricious rich boy Trilly; a Crimean seaside",
+   "ch": [
+    [
+     "bbp1",
+     "a wandering troupe walking along a narrow mountain path in Crimea: an old man with a barrel organ on his back, a boy acrobat and a white poodle with a lion haircut, the sea far below, morning"
+    ],
+    [
+     "bbp2",
+     "the old man, the boy and the white poodle walking past dachas among cypresses and olive trees along the Crimean coast, hot summer"
+    ],
+    [
+     "bbp3",
+     "a rich dacha garden, the boy acrobat doing a handstand, the white poodle jumping through a hoop, the old man turning the barrel organ, a capricious rich boy in a sailor suit shouting on the terrace"
+    ],
+    [
+     "bbp4",
+     "a lady in a fancy hat offering money for the white poodle, the old man shaking his head proudly, the boy holding the dog, garden terrace"
+    ],
+    [
+     "bbp5",
+     "a janitor with a broom running down the stairs after the old man, the boy and the poodle leaving the dacha, funny"
+    ],
+    [
+     "bbp6",
+     "the old man and the boy resting in the shade of oaks by a mountain spring, eating bread and cucumbers, the poodle drinking water"
+    ],
+    [
+     "bbp7",
+     "night, the boy climbing over a high fence of a dacha garden to free the white poodle, who joyfully runs to him, moonlight"
+    ]
+   ]
+  }
+ ],
+ "extracts": [
+  [
+   "y2",
+   "morning sun rays waking up a village: a lark flies up, a bunny jumps, a boy waking in bed, golden morning light"
+  ],
+  [
+   "y4",
+   "a boy Mitya sledding in winter, then picking flowers in spring, swimming in summer, carrying fruit in autumn - four small seasonal scenes in one picture"
+  ],
+  [
+   "y6",
+   "the wind and the sun competing: a traveller in a cloak on a road, the wind blowing hard, the sun smiling warmly"
+  ],
+  [
+   "y8",
+   "a big lion in a menagerie cage with a little black dog sleeping by his side, people watching"
+  ],
+  [
+   "y10",
+   "a sailing ship at sea, a boy climbing the mast after a monkey that took his hat, sailors watching from the deck"
+  ],
+  [
+   "y11",
+   "a little sparrow chick sitting on the edge of a nest under a roof, his mother sparrow worried, a cat below"
+  ],
+  [
+   "a1",
+   "a lamb drinking from a stream, a wolf on the bank (fable illustration, not scary)"
+  ],
+  [
+   "a3",
+   "a monkey, a donkey, a goat and a bear sitting on chairs trying to play music, a nightingale on a branch"
+  ]
+ ]
+}
