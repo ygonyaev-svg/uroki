@@ -170,6 +170,8 @@ function render(){
   if (typeof hpApply === 'function') hpApply();
   let v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : vLogin();
   if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vSleep(); }
+  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vRestScreen(cur.kid); }
+  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active)) v = vAsk(cur.kid);
   document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
   if (FAM) famBody();
   app().innerHTML = (TEST ? testBar() : '') + v; afterRender();
@@ -249,7 +251,7 @@ function vHome(){
     const locked = !TEST && ((st === 'new' && restLeft(kid) > 0) || (st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s)));
     return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${icon(s === 'lang' && track('lang', cur.ds) === '_alt' ? 's_en' : ((s === 'world' && T(kid) === 'yarik') || (s === 'logic' && T(kid) === 'anya')) && track(s, cur.ds) === '_alt' ? 's_fin' : SUBJ_IC[s], 'big') || SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && T(kid) === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">Выйти</button><button class="link voice" data-act="voice" title="Кто читает задания">🔊 ${K.voice === 'm' ? 'Мужской голос' : 'Женский голос'}</button><span class="coins">${coinsHtml(K.coins)}</span></header>
-  <div class="banner" aria-hidden="true">${THEME[TH(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[TH(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${rusNote(kid)}${dripCard(kid)}${restCard(kid)}${hwCard(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
+  <div class="banner" aria-hidden="true">${THEME[TH(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[TH(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${rusNote(kid)}${dripCard(kid)}${restCard(kid)}${hwCard(kid)}${capLeft(K) ? '' : '<div class="note">✅ Баллы на сегодня собраны (' + DAY_CAP + ' из ' + DAY_CAP + '). Можно заниматься дальше для ума — новые баллы завтра.</div>'}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog tipc" data-tip="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}${poemTile(kid, D)}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
@@ -480,15 +482,15 @@ function finishLesson(){
   if (subj === 'hw') K.hwText.forEach(h => { if ((L.txt || []).includes(h.id)) h.done = true; });
   L.secs = Math.min(1500, Math.round((Date.now() - (L.t0 || Date.now())) / 1000)); D.secs = (D.secs || 0) + L.secs; restTick(kid, L.secs);
   if (subj === 'extra') { /* Экстра после закрытого дня: +5 баллов при 80% верных с первого раза, +3 при 60% */
-    const rk = rusK(kid, subj), pts = Math.round((ratio >= .8 ? EXTRA_BONUS : ratio >= .6 ? 3 : 0) * rk); if (rk < 1) L.rusCut = Math.round(rk * 100); piggyAdd(K, pts); L.coins = pts; D.extraPts = pts; L.phase = 'done';
+    const rk = rusK(kid, subj), pts = Math.round((ratio >= .8 ? EXTRA_BONUS : ratio >= .6 ? 3 : 0) * rk); if (rk < 1) L.rusCut = Math.round(rk * 100); pts = piggyAdd(K, pts); L.coins = pts; D.extraPts = pts; L.phase = 'done';
     ev(kid, 'экстра', { subj: 'Экстра', score: `${first}/${tot}`, grade: L.grade, coins: K.coins, text: `+${pts} баллов` }); save(); render(); return; }
   if (subj === 'train') { /* Испытание после PRO: новые темы, одна попытка; до +15 баллов */
     let pts = ratio >= .85 ? TRAIN_BONUS : ratio >= .7 ? 10 : ratio >= .55 ? 5 : 0; { const rk = rusK(kid, subj); if (rk < 1) { pts = Math.round(pts * rk); L.rusCut = Math.round(rk * 100); } } const minS = T.length * (TPL(kid) === 'yarik' ? 25 : 30); if (L.secs < minS) { pts = Math.round(pts / 2); L.fastCut = true; }
-    piggyAdd(K, pts); L.coins = pts; D.trainPts = pts; L.phase = 'done';
+    pts = piggyAdd(K, pts); L.coins = pts; D.trainPts = pts; L.phase = 'done';
     ev(kid, 'испытание', { subj: '🔥 Испытание', score: `${first}/${tot}`, grade: L.grade, coins: K.coins, secs: L.secs, text: `+${pts} баллов` }); save(); render(); return; }
   if (subj === 'pro') { /* PRO: тот же день сложнее, одна попытка; до +30 баллов сверх дневного лимита */
     let pts = ratio >= .9 ? PRO_BONUS : ratio >= .75 ? 20 : ratio >= .6 ? 10 : 0; { const rk = rusK(kid, subj); if (rk < 1) { pts = Math.round(pts * rk); L.rusCut = Math.round(rk * 100); } } const minS = T.length * (TPL(kid) === 'yarik' ? 20 : 25); if (L.secs < minS) { pts = Math.round(pts / 2); L.fastCut = true; }
-    piggyAdd(K, pts); L.coins = pts; D.proPts = pts; L.phase = 'done';
+    pts = piggyAdd(K, pts); L.coins = pts; D.proPts = pts; L.phase = 'done';
     ev(kid, 'PRO', { subj: 'Уровень PRO', score: `${first}/${tot}`, grade: L.grade, coins: K.coins, secs: L.secs, text: `+${pts} баллов` }); save(); render(); return; }
   const subs = todaySubjects(kid), W = KIDS[kid].w || {}, wsum = subs.reduce((s0, x) => s0 + (W[x] || .1), 0), M = LESSON_POOL * (W[subj] || .1) / Math.max(1, wsum);
   let pts = q < .6 ? 0 : Math.round(M * q * q);
@@ -499,9 +501,9 @@ function finishLesson(){
   if (subj !== 'read' && !ITEMS(subj)) { const ow = hwOwed(kid, subj, cur.ds); if (ow && pts > 0) { pts = Math.round(pts * HW_K); L.hwCut = ow.n; } }
   { const rk = rusK(kid, subj); if (rk < 1 && pts > 0) { L.rusCut = Math.round(rk * 100); pts = Math.round(pts * rk); } }
   if (L.oot && !subs.every(s => s === subj || (D.les[s] && D.les[s].phase === 'done'))) { pts = Math.round(pts / 3); L.ootCut = true; } D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
-  piggyAdd(K, pts); L.coins = pts; L.phase = 'done';
+  pts = piggyAdd(K, pts); L.coins = pts; L.phase = 'done';
   if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
-    if (subs.every(s => (D.les[s].q || 0) >= .9 && !D.les[s].fastCut && !D.les[s].oot)) { const b = Math.max(0, DAY_MAX - D.pts); D.pts += b; piggyAdd(K, b); L.coins += b; L.perfect = true; D.perfect = b; }
+    if (subs.every(s => (D.les[s].q || 0) >= .9 && !D.les[s].fastCut && !D.les[s].oot)) { let b = Math.max(0, DAY_MAX - D.pts); b = piggyAdd(K, b); D.pts += b; L.coins += b; L.perfect = true; D.perfect = b; }
     const mins = Math.round(D.secs / 60); K.extraN = K.extraN || 0; if (mins < 40) K.extraN = Math.min(3, K.extraN + 1); else if (mins > 65) K.extraN = Math.max(-2, K.extraN - 1);
     ev(kid, 'день завершён', { coins: K.coins, score: D.pts + ' мин игры заработано', secs: D.secs, text: `занимался ${mins} мин` }); }
   ev(kid, 'урок завершён', { subj: subjName(kid, subj, cur.ds), unit: lessonTitle(kid, subj, cur.ds), score: `${first}/${tot}`, grade: L.grade, passed: L.passed === undefined ? '' : L.consolidate ? 'сдано 1 из 2 (закрепление завтра)' : L.passed ? 'тема пройдена' : 'повтор', mood: (L.fb || {}).mood, diff: (L.fb || {}).diff, like: (L.fb || {}).like, text: (L.fb || {}).text, coins: K.coins });
@@ -530,9 +532,24 @@ const REST_MS = 2 * 3600 * 1000, BLOCK_SECS = 20 * 60, SESS_SECS = 60 * 60;
 function restLeft(kid){ if (TEST) return 0; return Math.max(0, (S.kids[kid].restUntil || 0) - Date.now()); }
 function hhmm(ts){ const d = new Date(ts), z = n => (n < 10 ? '0' : '') + n; return d.getHours() + ':' + z(d.getMinutes()); }
 function fmtLeft(ms){ const m = Math.ceil(ms / 60000), h = Math.floor(m / 60), r = m % 60; return h ? h + ' ч ' + r + ' мин' : r + ' мин'; }
-function restTick(kid, secs){ if (TEST) return; const K = S.kids[kid], now = Date.now(); if (!K.blkAt || now - K.blkAt > REST_MS) { K.blk = 0; K.sess = 0; } K.blk = (K.blk || 0) + (secs || 0); K.sess = (K.sess || 0) + (secs || 0); K.blkAt = now;
+function restTick(kid, secs){ /* время теперь считает общий таймер экрана (screenTick) */ }
+function restTick0(kid, secs){ if (TEST) return; const K = S.kids[kid], now = Date.now(); if (!K.blkAt || now - K.blkAt > REST_MS) { K.blk = 0; K.sess = 0; } K.blk = (K.blk || 0) + (secs || 0); K.sess = (K.sess || 0) + (secs || 0); K.blkAt = now;
   if (K.sess >= SESS_SECS) { K.blk = 0; K.sess = 0; K.ask = false; K.restUntil = now + REST_MS; K.restForced = true; ev(kid, 'перерыв', { text: 'час занятий за сессию; обязательный перерыв до ' + hhmm(K.restUntil) }); }
   else if (K.blk >= BLOCK_SECS) { K.blk = 0; K.ask = true; } }
+/* Таймер экрана: считаем всё время в приложении (уроки, загадки, шахматы, программирование…), пока ребёнок реально нажимает. */
+let LAST_IN = Date.now(); ['pointerdown', 'touchstart', 'keydown'].forEach(e => document.addEventListener(e, () => { LAST_IN = Date.now(); }, true));
+function screenTick(){ const kid = cur.kid; if (!kid || TEST || !S.parentPin || document.visibilityState === 'hidden' || ['login', 'pin', 'parent'].includes(cur.view) || Date.now() - LAST_IN > 120000) return;
+  try { if (sleepNow() || restLeft(kid) || restAsk(kid)) return; } catch (e) { return; }
+  const K = S.kids[kid], a0 = K.ask, r0 = K.restUntil; restTick0(kid, 30); save(); if (K.ask !== a0 || K.restUntil !== r0) { if (!busyTyping() && !(typeof RD !== 'undefined' && RD && RD.active)) render(); } }
+setInterval(screenTick, 30000);
+function tomorrowHtml(kid){ const tm = U.addDays(U.today(), 1), it = []; try { const r = lessonTitle(kid, 'read', tm); if (r) it.push('📖 Новая глава: <b>' + U.esc(r) + '</b>'); } catch (e) {} try { const m = lessonTitle(kid, 'math', tm); if (m) it.push('🔢 Математика: <b>' + U.esc(m) + '</b>'); } catch (e) {}
+  it.push('🎵 Новое стихотворение или продолжение', '🎁 Сюрприз-загадка дня'); return '<ul class="tmr">' + it.map(x => '<li>' + x + '</li>').join('') + '</ul>'; }
+function vRestScreen(kid){ const K = S.kids[kid], ms = restLeft(kid), g = T(kid) === 'anya', forced = K.restForced, got = dayGot(K).n;
+  return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span class="coins">${coinsHtml(K.coins)}</span></header><section class="lesson"><article class="card result restscr">
+   ${forced ? `<div class="cheer">🌟</div><h1>На сегодня всё, ты ${g ? 'молодчина' : 'молодец'}!</h1><p>Ты отлично ${g ? 'позанималась' : 'позанимался'} целый час. Сегодня собрано <b>${got}</b> ${U.pl(got, 'балл', 'балла', 'баллов')}. Теперь — отдых для глаз и головы: погуляй, поиграй в мяч, почитай бумажную книжку.</p><p>${new Date(K.restUntil).getHours() >= CLOSE_H - 1 || new Date(K.restUntil).getDate() !== new Date().getDate() ? 'Следующее занятие — <b>завтра с 8 утра</b>.' : `Следующее занятие — в <b>${hhmm(K.restUntil)}</b> (через <span id="restleft">${fmtLeft(ms)}</span>).`}</p><h3>Завтра тебя ждёт:</h3>${tomorrowHtml(kid)}`
+   : `<div class="cheer">😴</div><h1>Отдыхаешь</h1><p>Вернёшься через <b><span id="restleft">${fmtLeft(ms)}</span></b> (в ${hhmm(K.restUntil)}). Отойди от экрана: подвигайся, попей воды, посмотри в окно.</p>`}
+   <p class="hint">Все баллы и прогресс сохранены.</p></article></section></main>`; }
+function vAsk(kid){ return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header><section class="lesson">${askCard(kid)}</section></main>`; }
 function restAsk(kid){ const K = S.kids[kid]; return !TEST && K.ask && !restLeft(kid); }
 function askCard(kid){ if (!restAsk(kid)) return ''; const K = S.kids[kid], m = Math.round((K.sess || 0) / 60), left = Math.max(5, Math.round((SESS_SECS - (K.sess || 0)) / 60)), g = T(kid) === 'anya';
   return `<div class="card askrest"><h2>${g ? 'Не устала?' : 'Не устал?'} 🙂</h2><p>Ты занимаешься уже <b>${m} мин</b>. Можно продолжить (сегодня ещё до ${left} мин подряд) или отдохнуть.</p>
@@ -602,7 +619,12 @@ function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
 /* ----- Копилка: заработанное за неделю копится и в воскресенье переходит на счёт с прибавкой +10%. Забрать раньше можно, но без прибавки. ----- */
 const PIGGY_RATE = .10;
 function weekStart(ds){ const n = U.dayNum(ds), wd = (n + 3) % 7; /* 0 = понедельник */ return U.addDays(ds, -wd); }
-function piggyAdd(K, pts){ if (!pts) return; K.piggy = (K.piggy || 0) + pts; if (!K.piggyWeek) K.piggyWeek = weekStart(U.today()); }
+/* Общий дневной потолок на ВСЁ приложение (правило Юры 21.11): уроки, Экстра, PRO, загадки, шахматы, программирование, стихи, книги, проценты.
+   Когда потолок набран — заниматься можно, но без баллов. */
+const DAY_CAP = 75;
+function dayGot(K){ const t = U.today(); if (!K.dg || K.dg.d !== t) K.dg = { d: t, n: 0 }; return K.dg; }
+function capLeft(K){ return Math.max(0, DAY_CAP - dayGot(K).n); }
+function piggyAdd(K, pts){ if (!pts) return 0; if (pts > 0) { const g = dayGot(K); pts = Math.min(pts, Math.max(0, DAY_CAP - g.n)); if (!pts) return 0; g.n += pts; } K.piggy = (K.piggy || 0) + pts; if (!K.piggyWeek) K.piggyWeek = weekStart(U.today()); return pts; }
 function piggyCheck(kid){ const K = S.kids[kid], t = U.today(), w = weekStart(t); if (!K.piggyWeek) { K.piggyWeek = w; return; }
   const sunday = (U.dayNum(t) + 3) % 7 === 6; if (K.piggy > 0 && (K.piggyWeek !== w || (sunday && K.piggyPaid !== K.piggyWeek))) { const bonus = K.piggyEarly === K.piggyWeek ? 0 : Math.round(K.piggy * PIGGY_RATE), tot = K.piggy + bonus; K.coins += tot; K.piggyMsg = `🐷 Копилка открыта: ${agree(K.piggy + ' баллов')}${bonus ? ` + ${bonus} за терпение (10%)` : ''} = ${tot} на счёт!`; ev(kid, 'копилка', { coins: K.coins, price: tot, text: `накоплено ${K.piggy}, процент ${bonus}` }); K.piggy = 0; K.piggyPaid = K.piggyWeek; save(); }
   if (K.piggyWeek !== w) { K.piggyWeek = w; save(); } }
