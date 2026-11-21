@@ -844,7 +844,7 @@ body.anya.h-h .prog i{ background:linear-gradient(90deg,#f2c230,#fde68a); }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v6d32a5d9 */
+<script>/* v98160f01 */
 var FAM = 0;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -6156,6 +6156,13 @@ function align(T, spoken){ const st = new Array(T.length).fill(0); let p = 0, ex
     if (f < 0) { extra++; continue; } for (let k = p; k < f; k++) st[k] = T[k].length <= 2 ? 1 : 2; st[f] = 1; p = f + 1; i += n - 1; }
   return { st, p, extra }; }
 
+/* Часы работы (правило Юры 21.11): детская часть — с 8:00 до 21:00 по Лиссабону. «Для родителей» и тестовый режим — всегда. */
+const OPEN_H = 8, CLOSE_H = 21;
+function lisbonHour(){ try { const p = new Date().toLocaleString('en-GB', { timeZone: 'Europe/Lisbon', hour: '2-digit', hour12: false }); const h = parseInt(p, 10); if (!isNaN(h)) return h % 24; } catch (e) {} return new Date().getHours(); }
+function sleepNow(){ const h = lisbonHour(); return h < OPEN_H || h >= CLOSE_H; }
+function vSleep(){ const h = lisbonHour(); return `<main class="wrap ${LK(cur.kid)}"><header class="bar"><button class="link" data-act="logout">← Выйти</button></header><section class="lesson"><article class="card result"><div class="cheer">🌙</div><h1 style="color:#2a2622">Сейчас приложение спит</h1><p>Уроки открыты с <b>8 утра до 9 вечера</b>. ${h >= CLOSE_H ? 'Пора отдыхать — почитай бумажную книжку перед сном 📖' : 'Ещё рано — приходи в 8 утра ☀️'}</p><p class="hint">Все баллы и прогресс сохранены.</p></article></section></main>`; }
+setInterval(() => { if (cur.kid && !TEST && cur.view !== 'parent' && ((sleepNow() ? 1 : 0) !== (cur.slept || 0))) { cur.slept = sleepNow() ? 1 : 0; render(); } }, 60000);
+
 /* ===== Состояние экрана ===== */
 const cur = { kid:null, view:'login', subj:null, ds:U.today(), K(){ return KIDS[this.kid]; }, pinFor:null, onPin:null, parentTab:'report', parentKid:'yarik', msg:'' };
 const app = () => document.getElementById('app');
@@ -6170,7 +6177,8 @@ function render(){
   if (S.parentPin) for (const k of kidIds()) { burnCheck(k); piggyCheck(k); }
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
   if (typeof hpApply === 'function') hpApply();
-  const v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : vLogin();
+  let v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : vLogin();
+  if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vSleep(); }
   document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
   if (FAM) famBody();
   app().innerHTML = (TEST ? testBar() : '') + v; afterRender();
