@@ -1,0 +1,163 @@
+/* ===== Дизайн-система (21.11.2026): шрифты, чистый текст без двойных теней, свои иконки =====
+   Шрифты: Ярик — Rubik (заголовки) + Nunito (текст); Аня — Playfair Display (заголовки) + Manrope (текст).
+   Карточки — плотные светлые поверхности, фон — атмосфера. Тени у текста только там, где он лежит прямо на картинке, и одна мягкая. */
+:root{ --fb:"Nunito",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; --fh:"Rubik","Nunito",-apple-system,sans-serif;
+  --il:#1B2A44; --ia:#4C9BE8; --ib:#F5A524; --iw:#ffffff; }
+body{ font-family:var(--fb); font-weight:500; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-rendering:optimizeLegibility; }
+h1,h2,h3,.kn,.btn,.tile .sn,.sn,.bigmark+p,.alwh{ font-family:var(--fh); }
+b,strong{ font-weight:800; }
+
+/* --- иконки --- */
+.ic{ width:1.2em; height:1.2em; vertical-align:-.22em; display:inline-block; overflow:visible; fill:none; stroke:var(--il); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+.ic .a{ fill:var(--ia); } .ic .b{ fill:var(--ib); } .ic .w{ fill:var(--iw); } .ic .l{ fill:var(--il); stroke:none; } .ic .l2{ fill:var(--il); }
+.ic text{ fill:var(--il); }
+.ic-fox{ --ia:#F08A3C; } .ic-lion{ --ia:#F6C453; --ib:#C9772B; } .ic-dog{ --ia:#E9C79A; --ib:#9A6A43; } .ic-cat{ --ia:#F3B36B; --ib:#F7A9A8; }
+.ic-frog,.ic-turtle,.ic-dino,.ic-tree,.ic-leaf,.ic-sprout{ --ia:#6CC070; } .ic-turtle{ --ib:#B5E3A1; } .ic-dolphin,.ic-fish,.ic-drop,.ic-wave{ --ia:#5AB0E8; }
+.ic-bear{ --ia:#B9875A; } .ic-wolf{ --ia:#A3AEBD; } .ic-bird{ --ia:#5AB0E8; --ib:#F5A524; } .ic-hedgehog{ --ib:#9A6A43; --ia:#E9C79A; } .ic-cap{ --ia:#2F3B55; } .ic-question{ --ia:#4C9BE8; }
+.ic-rabbit{ --ib:#F7A9A8; } .ic-panda{ --ib:#3A3A48; } .ic-apple{ --ib:#EF5B4C; --ia:#6CC070; } .ic-bball{ --ib:#F08A3C; } .ic-tennis{ --ia:#D8E84A; }
+.ic-piggy{ --ia:#F7A9B8; --ib:#F7A9B8; } .ic-coin,.ic-trophy,.ic-medal,.ic-crown,.ic-star,.ic-sun{ --ib:#F7C142; } .ic-fire{ --ib:#F7883A; --iw:#FFD35A; }
+.ic-check{ --ia:#2EAD6B; } .ic-cross{ --ib:#F08080; } .ic-candle,.ic-moon{ --ib:#F5C451; } .ic-boot{ --ia:#2F3B55; --ib:#F5A524; } .ic-goal{ --ib:#ffffff; }
+.btn .ic,.link .ic{ width:1.15em; height:1.15em; }
+.btn .ic{ --il:currentColor; --iw:transparent; }
+.ico .ic.big{ width:36px; height:36px; }
+
+/* --- общий слой: чистый текст --- */
+.card,.note,.tile,.opt,.chip,.kidcard,.piggy,.modal,.toast{ text-shadow:none !important; }
+.card *,.note *,.tile *,.opt *,.chip *,.piggy *{ text-shadow:none !important; }
+.tipc{ text-decoration:none; }
+.card{ background:rgba(255,255,255,.96); border:1px solid rgba(20,33,61,.08); border-radius:22px; box-shadow:0 2px 4px rgba(15,23,42,.06),0 10px 28px rgba(15,23,42,.14); }
+.note{ background:#FFF8E1; color:#3D3000; border:1px solid #F3DE94; border-radius:16px; padding:14px 18px; line-height:1.45; box-shadow:0 8px 24px rgba(15,23,42,.12); }
+.note .ic{ margin-right:4px; }
+.hint{ line-height:1.45; }
+
+/* шапка */
+.bar .link{ text-shadow:0 1px 8px rgba(0,0,0,.45); }
+.bar .link .ic{ --il:#fff; --ia:rgba(255,255,255,.35); --iw:#fff; filter:drop-shadow(0 1px 3px rgba(0,0,0,.4)); }
+.coins{ font-family:var(--fh); font-weight:700; }
+.coin{ width:22px; height:22px; border-radius:0; box-shadow:none; vertical-align:-5px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='%23F7C142' stroke='%231B2A44' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='8.5' fill='none' stroke='%231B2A44' stroke-width='2'/%3E%3Cpath d='M16 11l1.5 3 3.3.4-2.4 2.3.6 3.3-3-1.6-3 1.6.6-3.3-2.4-2.3 3.3-.4z' fill='%23fff' stroke='%231B2A44' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+
+/* приветствие прямо на фоне: белый текст, одна мягкая тень */
+body .wrap > .hello > h1,body .wrap > .hello > p,.hero h1,.hero .eyebrow,.lesson > h1,.lesson > .eyebrow{ text-shadow:0 2px 14px rgba(0,0,0,.55); }
+body .wrap > .hello{ text-shadow:none; }
+.hello > h1{ font-size:40px; font-weight:800; letter-spacing:-.01em; line-height:1.1; }
+.hello > p:not(.eyebrow){ font-size:19px; font-weight:600; }
+.hello .eyebrow{ font-family:var(--fh); font-weight:700; letter-spacing:.12em; font-size:13px; }
+.hello > .hint,.wrap > .hint{ background:rgba(15,23,42,.62); color:#F1F5F9 !important; border-radius:16px; padding:12px 16px; font-size:15px; text-shadow:none !important; }
+.hello > .hint .ic{ --il:#F1F5F9; }
+
+/* декоративный ряд в шапке — значки-наклейки */
+.banner{ display:flex; justify-content:space-between; flex-wrap:wrap; max-width:640px; margin:10px 0 14px; font-size:34px; }
+.banner span{ display:inline-block; line-height:0; }
+.banner .ic{ width:58px; height:58px; padding:7px; box-sizing:border-box; border-radius:50%; background:rgba(255,255,255,.94); box-shadow:0 4px 14px rgba(0,0,0,.25); vertical-align:middle; }
+.banner span:nth-child(odd) .ic{ transform:rotate(-6deg); } .banner span:nth-child(even) .ic{ transform:rotate(5deg); }
+
+/* время на сегодня — три аккуратных «чипа» */
+.timecard h2{ font-size:20px; margin:0 0 12px; }
+.timecard .tt2{ display:flex; flex-wrap:wrap; margin:-5px; font-size:16px; }
+.timecard .tt2 > span{ display:inline-flex; align-items:center; margin:5px; padding:8px 14px 8px 10px; border-radius:999px; background:#F1F5FB; color:var(--ink); font-weight:600; }
+.timecard .tt2 > span .ic{ width:26px; height:26px; margin-right:8px; }
+.timecard .tt2 b{ margin-left:4px; }
+.piggy{ background:#FFF1F5; border:1px solid #F7C6D4; border-radius:16px; color:#5A1A35; font-size:15px; padding:10px 14px; }
+.piggy .pig .ic{ width:34px; height:34px; }
+
+/* плитки уроков: светлая карточка, иконка на тонированном кружке в цвет предмета */
+.tile{ background:rgba(255,255,255,.97); border:1px solid rgba(20,33,61,.08); border-left:0; border-radius:20px; box-shadow:0 2px 4px rgba(15,23,42,.06),0 8px 22px rgba(15,23,42,.14); padding:14px 16px; }
+.tile .sn{ font-size:18px; font-weight:700; color:var(--ink); letter-spacing:0; }
+.tile .ut{ font-size:15px; color:#56627A; font-weight:500; }
+.tile .ico{ width:58px; height:58px; border-radius:18px; background:var(--sct,#EEF2F7); box-shadow:none; color:var(--scd,#334155);
+  --il:var(--scd,#1B2A44); --ia:var(--sc,#94a3b8); --ib:var(--sc,#94a3b8); --iw:#fff; }
+.tile .ico .ic.big{ width:38px; height:38px; }
+.tile[data-subj=read]{ --sc:#F97316; --sct:#FFEDD5; --scd:#7C2D12; } .tile[data-subj=math]{ --sc:#3B82F6; --sct:#DBEAFE; --scd:#1E3A8A; }
+.tile[data-subj=rus]{ --sc:#EF4444; --sct:#FEE2E2; --scd:#7F1D1D; } .tile[data-subj=world]{ --sc:#22C55E; --sct:#DCFCE7; --scd:#14532D; }
+.tile[data-subj=hist]{ --sc:#A855F7; --sct:#F3E8FF; --scd:#581C87; } .tile[data-subj=logic]{ --sc:#EAB308; --sct:#FEF9C3; --scd:#713F12; }
+.tile[data-subj=lang]{ --sc:#06B6D4; --sct:#CFFAFE; --scd:#164E63; } .tile[data-subj=hw]{ --sc:#64748B; --sct:#F1F5F9; --scd:#1E293B; }
+.tile.main{ box-shadow:0 0 0 3px var(--sc),0 8px 22px rgba(15,23,42,.14); }
+.tile.locked{ opacity:1; filter:none; background:rgba(241,245,249,.92); }
+.tile.locked .tt{ opacity:.7; }
+.tile.locked .ico{ filter:grayscale(1); opacity:.55; position:relative; }
+.tile.locked .ico::after{ content:""; position:absolute; right:-6px; top:-6px; width:22px; height:22px; transform:none; border-radius:50%; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='7' y='14' width='18' height='13' rx='3.5' fill='%2394A3B8' stroke='%231B2A44' stroke-width='2.4'/%3E%3Cpath d='M11 14v-3a5 5 0 0 1 10 0v3' fill='none' stroke='%231B2A44' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E") center/16px no-repeat; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+.tile.done::after{ content:""; right:12px; top:12px; width:22px; height:22px; border-radius:50%; background:#22C55E url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat; }
+.sn em{ font-family:var(--fb); font-weight:800; font-size:11px; text-transform:uppercase; letter-spacing:.04em; border-radius:999px; padding:2px 8px; }
+.tile.fun{ border-style:solid; }
+.tiles.always .tile .ico{ --sct:#EEF4FF; --sc:#4C9BE8; --scd:#1B2A44; }
+.tile.extra .ico,.tile.pro .ico{ --il:#3B2A00; }
+.tiles .tile.pro .ico{ --ib:#FFF1C2; --iw:#FFD35A; --ia:#F7C142; }
+
+/* «Всегда доступно» — заголовок на фоне в капсуле */
+.alwh{ display:inline-block; margin:26px 0 0; padding:8px 16px 8px 12px; border-radius:999px; background:rgba(15,23,42,.62); color:#fff !important; font-size:18px; font-weight:700; text-shadow:none !important; }
+.alwh .ic{ --il:#fff; --ia:rgba(255,255,255,.3); --ib:rgba(255,255,255,.3); margin-right:6px; }
+
+/* кнопки: мягче, без грубых «ступенек» */
+.btn{ font-weight:700; letter-spacing:0; box-shadow:0 3px 0 rgba(0,0,0,.18),0 6px 16px rgba(15,23,42,.16); }
+.btn:active{ transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,.18); }
+
+/* вход */
+.kb{ font-size:0; letter-spacing:0; }
+.kb .ic{ width:38px; height:38px; margin:0 3px; padding:6px; box-sizing:border-box; border-radius:50%; background:rgba(255,255,255,.95); }
+.kidcard .avatar{ font-family:var(--fh); }
+
+/* ===== Ярик: стадион ===== */
+body.yarik{ --il:#1B2A44; --ia:#4C9BE8; --ib:#F5A524; }
+body.yarik .wrap > .hello,body.yarik .lesson > h1{ text-shadow:none; }
+body.yarik .lesson > h1{ text-shadow:0 2px 14px rgba(0,0,0,.55); }
+body.yarik .coins{ background:rgba(15,23,42,.88); color:#FDE68A; font-family:var(--fh); border-radius:999px; letter-spacing:0; padding:6px 14px; box-shadow:0 4px 14px rgba(0,0,0,.25); }
+body.yarik .coins::before{ content:none; }
+.coins .ic{ width:24px; height:24px; vertical-align:-6px; }
+body.yarik .btn{ background:linear-gradient(#FB8A3C,#EA6A12); }
+
+/* ===== Аня: школа волшебства ===== */
+body.anya{ --fb:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; --fh:"Playfair Display",Georgia,"Times New Roman",serif;
+  --il:#2E1F47; --ia:#8B6CC9; --ib:#E2B04A; --iw:#FFF8E8; }
+body.anya h1,body.anya h2,body.anya .lesson > h1,body.anya .hello h1,body.anya .cheer{ font-family:var(--fh); }
+body.anya .tile .sn,body.anya .btn,body.anya .sn em,body.anya .alwh,body.anya .coins,body.anya .hello .eyebrow{ font-family:var(--fb); }
+body.anya .hello > h1{ color:#F7DA8F; font-weight:700; letter-spacing:0; }
+body.anya .card,body.anya .tile,body.anya .opt,body.anya .chip,body.anya .note{ background:#FBF6EC; color:#2E2440; --ink:#2E2440; --ink2:#6A5C7C; --soft:#F1E9DA;
+  border:1px solid #DCC58E; box-shadow:0 2px 4px rgba(10,6,30,.2),0 10px 28px rgba(10,6,30,.35); }
+body.anya .note{ background:#FFF6DC; }
+body.anya .card h2,body.anya .card h3{ color:#4A2F78; }
+body.anya .tile .ut{ color:#6A5C7C; }
+body.anya .tile.locked{ background:rgba(232,223,205,.95); }
+body.anya .timecard .tt2 > span{ background:#F1E9DA; }
+body.anya .piggy{ background:#FBEFF3; }
+body.anya .btn{ background:linear-gradient(#7452B8,#53348F); color:#FFF3D1; box-shadow:0 3px 0 #2E1A55,0 6px 16px rgba(10,6,30,.35); }
+body.anya .btn.ghost{ background:#F1E9DA; color:#4A2F78; }
+body.anya .coins{ background:rgba(30,20,60,.88); color:#F7DA8F; box-shadow:inset 0 0 0 1px #C9A35A,0 4px 14px rgba(0,0,0,.35); }
+body.anya .wrap > .hello::after{ height:2px; margin:12px 0 2px; border-radius:0; background:linear-gradient(90deg,rgba(226,176,74,0),#E2B04A 15%,#E2B04A 85%,rgba(226,176,74,0)); box-shadow:none; }
+body.anya .banner .ic{ background:rgba(28,20,58,.82); box-shadow:inset 0 0 0 1.5px #C9A35A,0 4px 14px rgba(0,0,0,.35); --il:#F7E7BF; --ia:#8B6CC9; --ib:#E2B04A; --iw:#2E1F47; }
+body.anya .banner .ic-candle{ --iw:#FFF8E8; } body.anya .banner .ic-potion{ --iw:rgba(255,248,232,.15); }
+body.anya .tiles.always .tile .ico{ --sct:#EFE7FA; --sc:#8B6CC9; --scd:#2E1F47; }
+body.anya .alwh{ background:rgba(28,20,58,.75); }
+body.anya .hello > .hint{ background:rgba(28,20,58,.75); }
+body.anya .kb .ic{ background:rgba(28,20,58,.82); --il:#F7E7BF; --iw:#2E1F47; }
+
+/* узкие экраны */
+@media (max-width:520px){
+  .hello > h1{ font-size:32px; }
+  .banner .ic{ width:40px; height:40px; padding:5px; }
+  .banner{ margin:6px 0 10px; }
+  .timecard .tt2{ font-size:15px; }
+}
+
+/* вкладки урока: одинаковая высота, текст по центру, без подчёркиваний */
+.steps{ display:flex; flex-wrap:wrap; list-style:none; padding:0; margin:-4px -4px 10px; gap:0; }
+.steps li{ display:-webkit-inline-box; display:inline-flex; -webkit-box-align:center; align-items:center; justify-content:center; height:40px; margin:4px; padding:0 16px; border-radius:999px; box-sizing:border-box;
+  font-family:var(--fh); font-size:15px; font-weight:700; line-height:1; color:#56627A; background:rgba(255,255,255,.88); box-shadow:0 2px 8px rgba(15,23,42,.12); text-decoration:none; }
+.steps li.tap{ padding:0; }
+.steps li .stp{ display:-webkit-inline-box; display:inline-flex; -webkit-box-align:center; align-items:center; height:40px; min-height:0; padding:0 16px; line-height:1; font-weight:700; text-decoration:none; color:inherit; }
+.steps li.ok{ background:#fff; color:var(--acc); }
+.steps li.ok::before{ content:""; flex:none; width:18px; height:18px; margin:0 -8px 0 12px; border-radius:50%; background:var(--acc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat; }
+.steps li.ok:not(.tap)::before{ margin:0 8px 0 -4px; }
+.steps li.now{ background:var(--acc); color:#fff; box-shadow:0 4px 12px rgba(15,23,42,.2); }
+.steps li.now.ok::before{ background-color:#fff; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='%23EA6A12' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+body.anya .steps li{ background:rgba(251,246,236,.92); color:#6A5C7C; }
+body.anya .steps li.ok{ background:#FBF6EC; color:#5B3E96; } body.anya .steps li.ok::before{ background-color:#6E4BB0; }
+body.anya .steps li.now{ background:#6E4BB0; color:#FFF3D1; }
+/* пунктир под цифрами и подсказками — убрать */
+.tipc,.card .tipc,.speeds .tipc{ text-decoration:none !important; border-bottom:0; }
+/* чтение: у Ярика — крупный округлый шрифт, как в букваре; у Ани — книжная антиква */
+body.yarik .reading .text,body.yarik .peek .text{ font-family:var(--fb); font-weight:600; letter-spacing:.01em; }
+body.anya .reading .text,body.anya .peek .text,body.anya .ptext p{ font-family:"Playfair Display",Georgia,serif; font-weight:500; }
+/* круглые «медальки» и мелкие значки в тексте */
+.card .ic{ --iw:#fff; }
+.toast .ic{ --il:#fff; }
