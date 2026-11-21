@@ -47,7 +47,22 @@ function pfOn(kid, e){ try { S.pf = S.pf || {}; const L = S.pf[kid] = S.pf[kid] 
 function pfInit(){ if (S.pfInit) return; S.pf = S.pf || {}; const byName = {}; for (const k of kidIds()) byName[KIDS[k].name] = k;
   for (const e of S.log || []) { const k = byName[e.kid]; if (k) pfOn(k, e); } S.pfInit = 1; }
 
-function pfCalc(kid){ pfInit(); const L = (S.pf && S.pf[kid]) || [], sc = {}, vol = {}, days = new Set(), now = Date.now() / 1000;
+/* Основа — таблица «События» (все занятия со всех устройств), журнал этого устройства — дополнение к тому, чего в таблице ещё нет. */
+let PF_BUSY = false;
+function pfRows2recs(rows){ const out = []; for (const x of rows || []) { const e = { t: new Date(+x[0]).toISOString(), type: x[2], subj: x[3], q: x[4], ok: x[5], score: x[6], wpm: x[7], acc: x[8], text: x[9] };
+  const r = pfRec(e); if (!r) continue; out.push(r); if (r[3] && !/^vol:/.test(r[1]) && PF_VOL[e.type]) out.push([r[0], 'vol:' + e.type, -1, 1]); } return out; }
+function pfFetch(force){ if (PF_BUSY || !navigator.onLine || !S.cfg || !S.cfg.sync) return; S.pfSheet = S.pfSheet || {};
+  if (!force && S.pfSheet._at && Date.now() - S.pfSheet._at < 5 * 60e3) return; PF_BUSY = true;
+  const done = rows => { const by = {}; for (const k of kidIds()) by[KIDS[k].name] = k; const g = {}; for (const x of rows || []) { const k = by[x[1]]; if (k) (g[k] = g[k] || []).push(x); }
+    S.pfSheet = { _at: Date.now() }; for (const k of kidIds()) S.pfSheet[k] = pfRows2recs(g[k] || []); save(); if (cur.view === 'parent' && cur.parentTab === 'portrait') render(); };
+  const p = FAM ? (S.fam && S.fam.fid ? famApi({ fam: 'pf', fid: S.fam.fid, token: S.fam.token }) : Promise.reject())
+    : Promise.all(kidIds().map(k => fetch(S.cfg.sync + (S.cfg.sync.includes('?') ? '&' : '?') + 'action=pf&kid=' + encodeURIComponent(KIDS[k].name)).then(r => r.json()))).then(a => ({ ok: a.every(j => j && j.ok), rows: [].concat.apply([], a.map(j => (j && j.rows) || [])) }));
+  p.then(j => { if (j && j.ok) done(j.rows); }).catch(() => {}).then(() => { PF_BUSY = false; }); }
+function pfData(kid){ pfInit(); const sh = (S.pfSheet && S.pfSheet[kid]) || [], loc = (S.pf && S.pf[kid]) || [];
+  const key = r => Math.floor(r[0] / 60) + '|' + r[1] + '|' + r[2], cnt = {}; for (const r of sh) cnt[key(r)] = (cnt[key(r)] || 0) + 1;
+  const out = sh.slice(); for (const r of loc) { const k = key(r); if (cnt[k]) cnt[k]--; else out.push(r); }
+  return out.sort((a, b) => a[0] - b[0]); }
+function pfCalc(kid){ const L = pfData(kid), sc = {}, vol = {}, days = new Set(), now = Date.now() / 1000;
   for (const k in PF_SC) sc[k] = { n: 0, w: 0, ok: 0, fix: 0, err: 0, rec: [] };
   let t0 = null, prevAns = null; const gaps = [], rd = [], rt = [];
   for (const r of L) { const [ts, c, o] = r; if (!t0 || ts < t0) t0 = ts;
@@ -74,11 +89,12 @@ function pfWord(n, a, b, c){ n = Math.abs(n) % 100; const n1 = n % 10; return n 
 function pfBar(v){ return `<span class="pfbar"><i style="width:${Math.round(Math.max(.04, Math.min(1, v)) * 100)}%"></i></span>`; }
 
 function vPortrait(kid){
+  pfFetch();
   const P = pfCalc(kid), MIN_ANS = 40, MIN_DAYS = 5, SC_MIN = 20, DIR_DAYS = 20, DIR_SPAN = 42;
   const note = `<p class="hint pfnote">Это наблюдения по результатам ребёнка в приложении, а не психологическая диагностика и не прогноз. Интересы и способности в этом возрасте быстро меняются — портрет обновляется сам по мере занятий.</p>`;
   if (P.tot < MIN_ANS || P.days < MIN_DAYS) {
     const p = Math.min(P.tot / MIN_ANS, P.days / MIN_DAYS);
-    return `<div class="card"><h2>Портрет: копим наблюдения</h2><p>Чтобы выводы были честными, нужно хотя бы ${MIN_ANS} ответов за ${MIN_DAYS} разных дней. Сейчас: ${P.tot} ${pfWord(P.tot, 'ответ', 'ответа', 'ответов')} за ${P.days} ${pfWord(P.days, 'день', 'дня', 'дней')}.</p>${pfBar(p)}<p class="hint">Готово примерно на ${Math.round(p * 100)}%.</p></div>${note}`; }
+    return `<div class="card"><h2>Портрет: копим наблюдения</h2><p>Чтобы выводы были честными, нужно хотя бы ${MIN_ANS} ответов за ${MIN_DAYS} разных дней. Сейчас: ${P.tot} ${pfWord(P.tot, 'ответ', 'ответа', 'ответов')} за ${P.days} ${pfWord(P.days, 'день', 'дня', 'дней')}.</p>${pfBar(p)}<p class="hint">Готово примерно на ${Math.round(p * 100)}%. ${S.pfSheet && S.pfSheet._at ? 'Учтены все занятия из таблицы.' : 'Загружаю занятия из таблицы…'}</p></div>${note}`; }
   const ready = Object.keys(PF_SC).filter(k => P.sc[k].n >= SC_MIN);
   const rows = Object.keys(PF_SC).map(k => { const x = P.sc[k], s = PF_SC[k];
     if (x.n < SC_MIN) return `<div class="pfrow dim"><b>${s.i} ${s.n}</b><span class="hint">пока мало данных (${x.n} из ${SC_MIN})</span></div>`;
@@ -108,7 +124,7 @@ function vPortrait(kid){
   out += '</div>';
   /* как работает */
   const how = [];
-  if (P.errs >= 10) { const f = P.fixed / P.errs; how.push(f >= .5 ? `После ошибки чаще всего пробует снова и сам находит верный ответ (${P.fixed} из ${P.errs} случаев) — это настойчивость, она важнее скорости.` : f >= .25 ? `После ошибки примерно в ${Math.round(f * 100)}% случаев сам доходит до верного ответа. Хорошо хвалить именно за вторую попытку.` : `После ошибки пока чаще сдаётся или ждёт подсказки. Помогает спокойное «попробуй ещё раз» и похвала за саму попытку.`); }
+  if (P.errs >= 10) { const f = P.fixed / P.errs; how.push(f >= .5 ? `После ошибки чаще всего пробует снова и сам находит верный ответ (${P.fixed} из ${P.errs} случаев) — это настойчивость, она важнее скорости.` : f >= .25 ? `После ошибки примерно в ${Math.round(f * 100)}% случаев сам доходит до верного ответа. Хорошо хвалить именно за вторую попытку.` : `После ошибки пока редко доходит до верного ответа сам. Помогает спокойное «попробуй ещё раз» и похвала за саму попытку.`); }
   if (P.style) { const st = P.style; how.push(st.fa < st.sa - .15 ? `Быстрые ответы заметно чаще ошибочны, чем обдуманные (${Math.round(st.fa * 100)}% против ${Math.round(st.sa * 100)}%) — иногда торопится. Тут помогает правило «прочитай вопрос ещё раз».` : st.acc >= .8 ? (st.med <= 15 ? 'Работает быстро и при этом точно: навык уже автоматизирован.' : 'Работает вдумчиво: не спешит, зато отвечает точно.') : st.med <= 15 ? 'Отвечает быстро; точность пока средняя — стоит чуть сбавить темп.' : 'Думает над ответами подолгу; точность растёт вместе с опытом.'); }
   if (how.length) out += `<div class="card"><h2>Как работает</h2><ul>${how.map(h => `<li>${h}</li>`).join('')}</ul></div>`;
   /* сам выбирает */
@@ -123,5 +139,5 @@ function vPortrait(kid){
   } else { const left = Math.max(DIR_DAYS - P.days, 0), leftSpan = Math.max(DIR_SPAN - P.span, 0);
     out += `<div class="card dim"><h2>Где такие навыки пригодятся</h2><p class="hint">Откроется после 6 недель наблюдений${left || leftSpan ? ` — ещё примерно ${Math.max(left, leftSpan)} ${pfWord(Math.max(left, leftSpan), 'день', 'дня', 'дней')}` : ''}. Раньше выводы о направлениях были бы гаданием.</p></div>`; }
   if (grow) out += `<div class="card"><h2>Что можно развивать</h2><p><b>${PF_SC[grow].n}.</b> ${G_TXT[grow]}</p></div>`;
-  return `<div class="card"><h2>Направления</h2><p class="hint">Доля верных ответов с первой попытки по каждому направлению. Сравниваем ребёнка только с самим собой.</p>${rows}<p class="hint">Основание: ${P.tot} ${pfWord(P.tot, 'ответ', 'ответа', 'ответов')} за ${P.days} ${pfWord(P.days, 'день', 'дня', 'дней')} занятий.</p></div>` + out + note;
+  return `<div class="card"><h2>Направления</h2><p class="hint">Доля верных ответов с первой попытки по каждому направлению. Сравниваем ребёнка только с самим собой.</p>${rows}<p class="hint">${S.pfSheet && S.pfSheet._at ? 'Данные из таблицы занятий на ' + new Date(S.pfSheet._at).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) + ' + это устройство. ' : 'Пока только данные этого устройства, таблица загружается. '}Основание: ${P.tot} ${pfWord(P.tot, 'ответ', 'ответа', 'ответов')} за ${P.days} ${pfWord(P.days, 'день', 'дня', 'дней')} занятий.</p></div>` + out + note;
 }
