@@ -111,7 +111,7 @@ function unitAt(kid, subj, tr){ const list = unitsOf(kid, subj, tr); const K = S
   return { u: list[i], i, total: list.length }; }
 function acc(K, uid){ const s = K.stats[uid]; return s && s.n ? s.ok / s.n : 1; }
 function genTasks(unit, seed, n){ const r = U.rng(seed); const out = []; const seen = new Set(); let guard = 0;
-  while (out.length < n && guard++ < n * 12) { const t = unit.g(r); t.q = agree(t.q); t.e = agree(t.e); if (t.k === 'c' && /^\d+([.,]\d+)?$/.test(t.a) && t.w.every(x => /^\d+([.,]\d+)?$/.test(String(x)))) { t.k = 'n'; t.a = Number(String(t.a).replace(',', '.')); delete t.w; } /* числа — только вводом, без угадывания */
+  while (out.length < n && guard++ < n * 12) { const t = unit.g(r); t.q = agree(t.q); t.e = agree(t.e); if (t.k === 'c' && /^\d+([.,]\d+)?$/.test(t.a) && t.w.every(x => /^\d+([.,]\d+)?$/.test(String(x)))) { t.k = 'n'; t.wn = t.w; t.a = Number(String(t.a).replace(',', '.')); delete t.w; } /* числа — только вводом, без угадывания */
     else if (t.k === 'c' && /^[a-zà-üа-яё'’-]+$/i.test(String(t.a)) && t.w.every(x => /^[a-zà-üа-яё'’-]+$/i.test(String(x))) && !TXT_KEEP[strip(t.q)] && !(FAM && (KIDS[cur.kid] || {}).noType) && (/_/.test(t.q) || new RegExp('(^|[^a-zà-üа-яё])' + String(t.a).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-zà-üа-яё]|$)', 'i').test(strip(t.q)))) { t.k = 't'; t.alt = TXT_ALT[strip(t.q)] || []; t.a = String(t.a); t.wx = t.w; delete t.w; } /* слово из вопроса или пропуск — пишем сами */ if (seen.has(t.q)) continue; seen.add(t.q); if (t.k === 'c') t.opts = r.shuffle([t.a, ...t.w]); out.push(t); }
   return out; }
 function grade(x){ return x >= .9 ? 5 : x >= .75 ? 4 : x >= .5 ? 3 : 2; }
