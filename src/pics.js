@@ -191,6 +191,7 @@ function mathPic(kid, q){
 function illus(kid, subj, t){
   const q = (t.q || '').replace(/<[^>]+>/g, ' ');
   if (/[\u{1F300}-\u{1FAFF}]{3,}/u.test(q)) return ''; /* в задании уже есть картинки */
+  if (/<svg/.test(t.q || '')) return ''; /* в задании свой рисунок (фигуры, карточки, весы) */
   if (subj === 'math') { const m = mathPic(kid, t.q || ''); if (m) return `<div class="illus">${m}</div>`; }
   const q2 = String(t.a).length <= 3 && /_/.test(q) ? q.replace(/_+/, t.a) : q;
   /* Картинка не должна подсказывать ответ: убираем рисунки, которые совпадают с рисунком ответа или вариантов */
