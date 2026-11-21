@@ -231,11 +231,26 @@ function chPuzzle(kid){
   h += ' <button class="btn ghost small" data-act="chpzskip">Другая задача</button></p></div>';
   return h;
 }
+/* Проверка «другого верного решения»: в задачах на мат засчитываем любой ход, после которого мат неизбежен за оставшиеся ходы
+   (иначе ребёнка ругали бы за верный, но не «авторский» ход); в «Забери фигуру» — взятие той же фигуры другим способом, если оно не хуже. */
+function chForce(P, n){ var ms = CH.legal(P), i, j, Q, st, rs, ok;
+  for (i = 0; i < ms.length; i++) { Q = CH.make(P, ms[i]); st = CH.status(Q); if (st === 'mate') return true;
+    if (n > 1 && st !== 'stalemate' && st !== 'material') { rs = CH.legal(Q); ok = rs.length > 0; for (j = 0; j < rs.length && ok; j++) if (!chForce(CH.make(Q, rs[j]), n - 1)) ok = false; if (ok) return true; } }
+  return false; }
+function chAllMate(Q, n){ var st = CH.status(Q); if (st === 'mate') return true; if (n < 1 || st === 'stalemate' || st === 'material') return false; var rs = CH.legal(Q), j; if (!rs.length) return false; for (j = 0; j < rs.length; j++) if (!chForce(CH.make(Q, rs[j]), n)) return false; return true; }
+function chMatEv(P){ var s = 0, i, p; for (i = 0; i < 64; i++) { p = P.b[i]; if (p) s += (CH.colorOf(p) === P.t ? 1 : -1) * CH.VAL[CH.typeOf(p)]; } return s; }
+function chQS(P, a, b, d){ var ms = CH.legal(P); if (!ms.length) return CH.inCheck(P) ? -100 : 0; var sp = chMatEv(P), i, v; if (d <= 0) { if (sp >= b) return sp; if (sp > a) a = sp; }
+  var best = d <= 0 ? sp : -1e9; for (i = 0; i < ms.length; i++) { if (d <= 0 && !ms[i].cap && !ms[i].pr) continue; v = -chQS(CH.make(P, ms[i]), -b, -a, d - 1); if (v > best) best = v; if (v > a) a = v; if (a >= b) break; } return best; }
+function chFreeReply(P, n){ var rs = CH.legal(P), i; for (i = 0; i < rs.length; i++) if (n <= 1 || !chForce(CH.make(P, rs[i]), 1)) return rs[i]; return rs[0]; }
 function chPzMove(kid, m){
   var lv = CHS.lv, z = CHESS_PUZ[lv][CHS.i], sol = z.s, u = CH.uci(m), P1 = CH.make(CHS.P, m), mateLv = lv.charAt(0) === 'm';
   var good, final;
-  if (mateLv) { good = P1.t && CH.status(P1) === 'mate' || u === sol[CHS.ply]; final = CH.status(P1) === 'mate'; }
-  else { good = u === sol[0]; final = good; }
+  var left = Math.ceil((sol.length - CHS.ply) / 2);
+  if (mateLv) { final = CH.status(P1) === 'mate'; good = final || (!CHS.free && u === sol[CHS.ply]);
+    if (!good && left > 1 && chAllMate(P1, left - 1)) { good = true; CHS.free = true; } }
+  else { good = u === sol[0];
+    if (!good && lv === 'hang') { var m0 = CH.findMove(CHS.P, sol[0]); if (m0 && m.cap && m.to === m0.to && -chQS(P1, -1e9, 1e9, 1) >= -chQS(CH.make(CHS.P, m0), -1e9, 1e9, 1)) good = true; }
+    final = good; }
   if (!good) {
     CHS.first = false; CHS.sel = null;
     CHS.msg = CH.status(P1) === 'stalemate' ? 'Это пат: у соперника нет ходов, но и шаха нет. Это ничья! Найди мат.' : mateLv && CH.inCheck(P1) ? 'Шах, но не мат: король может уйти или закрыться. Попробуй другой ход.' : 'Не то. Подумай ещё: ' + (mateLv ? 'какой ход не оставит королю ни одной клетки?' : 'какая фигура соперника стоит без защиты или может попасть под двойной удар?');
@@ -246,7 +261,7 @@ function chPzMove(kid, m){
     if (lv === 'tac' && sol.length >= 3) { chPzAuto(sol.slice(1, 3), 'Дальше: ', ['соперник — ', 'ты — ']); }
     return; }
   CHS.msg = 'Верно! Теперь ход соперника…'; CHS.ok = null; CHS.busy = true; render();
-  setTimeout(function(){ var r = CH.findMove(CHS.P, sol[CHS.ply]); if (!r) { CHS.busy = false; return; } CHS.msg = 'Соперник: ' + CH.moveText(CHS.P, r) + '. Твой ход!'; CHS.P = CH.make(CHS.P, r); CHS.last = [r.f, r.to]; CHS.ply++; CHS.busy = false; if (cur.view === 'always') render(); }, 700);
+  setTimeout(function(){ var r = CHS.free ? chFreeReply(CHS.P, Math.ceil((sol.length - CHS.ply) / 2)) : CH.findMove(CHS.P, sol[CHS.ply]); if (!r) { CHS.busy = false; return; } CHS.msg = 'Соперник: ' + CH.moveText(CHS.P, r) + '. Твой ход!'; CHS.P = CH.make(CHS.P, r); CHS.last = [r.f, r.to]; CHS.ply++; CHS.busy = false; if (cur.view === 'always') render(); }, 700);
 }
 function chPzAuto(moves, pre, who){
   CHS.busy = true; var i = 0, txt = [];
@@ -263,11 +278,13 @@ function chPzSolved(kid, lv, pre){
   save(); render();
 }
 function chPzHint(){
-  var z = CHESS_PUZ[CHS.lv][CHS.i], m = CH.findMove(CHS.P, z.s[CHS.ply]); if (!m) return;
+  var z = CHESS_PUZ[CHS.lv][CHS.i], m = CHS.free ? null : CH.findMove(CHS.P, z.s[CHS.ply]), left = Math.ceil((z.s.length - CHS.ply) / 2), ms, i;
+  if (CHS.free) { ms = CH.legal(CHS.P); for (i = 0; i < ms.length && !m; i++) if (chAllMate(CH.make(CHS.P, ms[i]), left - 1)) m = ms[i]; }
+  if (!m) return;
   CHS.first = false; CHS.hint = m.f; CHS.sel = null; CHS.msg = 'Подсказка: ходить нужно этой фигурой (' + CH.NAME[CH.typeOf(CHS.P.b[m.f])] + ').'; render();
 }
 function chPzShow(kid){
-  var z = CHESS_PUZ[CHS.lv][CHS.i]; CHS.first = false; CHS.P = CH.parse(z.f); CHS.ply = 0; CHS.sel = null; CHS.hint = null; CHS.msg = 'Решение:'; CHS.ok = null;
+  var z = CHESS_PUZ[CHS.lv][CHS.i]; CHS.first = false; CHS.P = CH.parse(z.f); CHS.ply = 0; CHS.free = false; CHS.sel = null; CHS.hint = null; CHS.msg = 'Решение:'; CHS.ok = null;
   var seq = CHS.lv.charAt(0) === 'm' ? z.s : z.s.slice(0, 3); chPzAuto(seq, ''); render();
 }
 
