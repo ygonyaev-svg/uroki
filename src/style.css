@@ -272,3 +272,15 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .steps li.tap{ padding:0; text-decoration:none; }
 .stp{ appearance:none; -webkit-appearance:none; border:0; background:none; color:inherit; font:inherit; padding:10px 14px; min-height:40px; cursor:pointer; text-decoration:underline; text-underline-offset:3px; touch-action:manipulation; }
 .note.rest{ border-left:4px solid var(--acc); font-size:18px; }
+
+/* Мои книги */
+.bkhome h2{ margin-top:0; }
+.bkthumb{ overflow:hidden; padding:0; }
+.bkthumb img{ width:100%; height:100%; object-fit:cover; }
+.bkcover{ display:block; max-width:180px; max-height:240px; border-radius:10px; margin:10px 0; box-shadow:var(--sh); }
+.bkcover.sm{ max-width:90px; max-height:120px; margin:0 16px 0 0; }
+.bkhead{ display:flex; align-items:center; }
+.bksnap{ position:relative; overflow:hidden; text-align:center; background:var(--green); }
+.bkread{ font-size:21px; line-height:1.45; }
+.bkinp{ display:block; width:100%; margin-top:6px; padding:12px; font-size:18px; border:1.5px solid var(--line); border-radius:12px; background:var(--card); color:inherit; }
+#bkup:empty{ display:none; }
