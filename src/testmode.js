@@ -5,7 +5,7 @@ function testCard(){ return `<div class="card testc"><h2>🧪 Тестовый �
 function testEnter(k){ const real = S; S = JSON.parse(JSON.stringify(real)); S.queue = []; S.test = true; TEST = true;
   Object.keys(S.kids).forEach(x => { S.kids[x].restUntil = 0; S.kids[x].blk = 0; S.kids[x].prizesSet = true; });
   cur.kid = k; go('home'); }
-function testExit(){ TEST = false; S = load(); cur.kid = null; go('login'); }
+function testExit(){ TEST = false; TEST_SHIFT = 0; S = load(); cur.kid = null; go('login'); }
 function testBar(){ return `<div class="testbar">🧪 Тест · ${U.esc(cur.kid ? KIDS[cur.kid].name : '')} <button class="link" data-act="testkid">сменить ребёнка</button> <button class="link" data-act="testday">новый день</button> <button class="link" data-act="testexit">выйти из теста</button></div><button class="notebtn" data-act="noteopen">📝 Замечание</button>`; }
 function noteCtx(){ const h = document.querySelector('#app h1'), q = document.querySelector('#app .q'); return [cur.kid ? KIDS[cur.kid].name : '', cur.view, cur.subj && cur.view === 'lesson' ? cur.subj : '', h ? h.textContent.trim().slice(0, 80) : ''].filter(Boolean).join(' / ') + (q ? ' — ' + q.textContent.trim().slice(0, 200) : ''); }
 function noteOpen(){ const ctx = noteCtx(); const d = document.createElement('div'); d.className = 'tipbox'; d.id = 'notebox';
@@ -22,7 +22,7 @@ function testAct(act, b){ switch (act) {
   case 'testgo': testEnter(b.dataset.k); return true;
   case 'testexit': testExit(); return true;
   case 'testkid': { const ks = kidIds(), i = ks.indexOf(cur.kid); cur.kid = ks[(i + 1) % ks.length]; go('home'); return true; }
-  case 'testday': { if (!cur.kid) return true; const K = S.kids[cur.kid]; delete K.days[U.today()]; K.restUntil = 0; K.blk = 0; go('home'); alertMsg('Тестовый день начат заново'); return true; }
+  case 'testday': { if (!cur.kid) return true; TEST_SHIFT++; Object.keys(S.kids).forEach(x => { const K = S.kids[x]; K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; K.restForced = false; }); go('home'); alertMsg('Тестовый день: ' + U.today().split('-').reverse().join('.') + ' (календарь сдвинут на ' + TEST_SHIFT + ' ' + U.pl(TEST_SHIFT, 'день', 'дня', 'дней') + ' вперёд)'); return true; }
   case 'noteopen': noteOpen(); return true;
   case 'noteclose': { try { micStop(); } catch (x) {} const o = document.getElementById('notebox'); if (o) o.remove(); return true; }
   case 'notesend': noteSend(); return true;
