@@ -32,7 +32,7 @@ function famRoute_(d){
     if (String(d.key || '') !== String(famSh('Настройки').getRange('A1').getValue())) return { ok: false, msg: 'Неверный ключ' };
     R = famRows();
     if (d.op === 'set') { i = famFind(R.v, 0, d.fid); if (i < 0) return { ok: false, msg: 'Нет такой семьи' }; R.sh.getRange(i + 1, 9).setValue(d.on ? 'активна' : 'отключена'); R = famRows(); }
-    var fams = R.v.slice(1).filter(function(r){ return r[0]; }).map(function(r){ return { fid: String(r[0]), created: r[1], email: r[2], name: r[3], kids: famKids(r[6]).map(function(k){ return { name: k.name, age: k.age, ints: k.ints || [], hero: k.hero || '' }; }), off: r[8] === 'отключена', last: r[10], events: r[11] || 0 }; });
+    var fams = R.v.slice(1).filter(function(r){ return r[0]; }).map(function(r){ return { fid: String(r[0]), created: r[1], email: r[2], name: r[3], kids: famKids(r[6]).map(function(k){ return { name: k.name, age: k.age, ints: k.ints || [], hero: k.hero || '', books: k.books || '', done: k.done || '', rd: k.rd }; }), off: r[8] === 'отключена', last: r[10], events: r[11] || 0 }; });
     var fb = famSh('Отзывы').getDataRange().getValues().slice(1).slice(-50).reverse().map(function(r){ return { t: r[0], email: r[2], text: r[3] }; });
     return { ok: true, fams: fams, fb: fb };
   }
@@ -41,7 +41,7 @@ function famRoute_(d){
   if (d.fam === 'st') { a.R.sh.getRange(a.i + 1, 11).setValue(now); return { ok: true, off: off }; }
   if (off) return { ok: false, off: true };
   if (d.fam === 'kids') {
-    var kids = (d.kids || []).slice(0, 5).map(function(k){ return { id: String(k.id).slice(0, 30), name: String(k.name).slice(0, 20), age: +k.age, look: String(k.look || '').slice(0, 10), ints: (k.ints || []).slice(0, 15).map(String), hero: String(k.hero || '').slice(0, 80), color: String(k.color || '').slice(0, 10), pin: k.pin ? String(k.pin) : null }; });
+    var kids = (d.kids || []).slice(0, 5).map(function(k){ return { id: String(k.id).slice(0, 30), name: String(k.name).slice(0, 20), age: +k.age, look: String(k.look || '').slice(0, 10), ints: (k.ints || []).slice(0, 15).map(String), hero: String(k.hero || '').slice(0, 80), books: String(k.books || '').slice(0, 200), done: String(k.done || '').slice(0, 300), rd: k.rd == null ? null : +k.rd, color: String(k.color || '').slice(0, 10), pin: k.pin ? String(k.pin) : null }; });
     a.R.sh.getRange(a.i + 1, 7, 1, 2).setValues([[JSON.stringify(kids), d.ppin ? "'" + String(d.ppin) : '']]); return { ok: true };
   }
   if (d.fam === 'ev') {
