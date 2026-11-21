@@ -8,6 +8,7 @@ const KIDS_TPL = {
 };
 const KIDS = FAM ? {} : KIDS_TPL;
 /* Шаблон программы (yarik — младшие, anya — старшие) и оформление ребёнка; в семейной версии дети заводятся родителями */
+const TPL = k => T(k);
 function T(k){ return FAM ? ((KIDS[k] && KIDS[k].tpl) || 'yarik') : k; }
 function LK(k){ return FAM ? ((KIDS[k] && KIDS[k].look) || T(k)) : k; }
 function kidIds(){ return FAM ? Object.keys(KIDS) : ['yarik', 'anya']; }
@@ -383,17 +384,17 @@ function finishLesson(){
     const pts = ratio >= .8 ? EXTRA_BONUS : ratio >= .6 ? 3 : 0; piggyAdd(K, pts); L.coins = pts; D.extraPts = pts; L.phase = 'done';
     ev(kid, 'экстра', { subj: 'Экстра', score: `${first}/${tot}`, grade: L.grade, coins: K.coins, text: `+${pts} баллов` }); save(); render(); return; }
   if (subj === 'train') { /* Испытание после PRO: новые темы, одна попытка; до +15 баллов */
-    let pts = ratio >= .85 ? TRAIN_BONUS : ratio >= .7 ? 10 : ratio >= .55 ? 5 : 0; const minS = T.length * (T(kid) === 'yarik' ? 25 : 30); if (L.secs < minS) { pts = Math.round(pts / 2); L.fastCut = true; }
+    let pts = ratio >= .85 ? TRAIN_BONUS : ratio >= .7 ? 10 : ratio >= .55 ? 5 : 0; const minS = T.length * (TPL(kid) === 'yarik' ? 25 : 30); if (L.secs < minS) { pts = Math.round(pts / 2); L.fastCut = true; }
     piggyAdd(K, pts); L.coins = pts; D.trainPts = pts; L.phase = 'done';
     ev(kid, 'испытание', { subj: '🔥 Испытание', score: `${first}/${tot}`, grade: L.grade, coins: K.coins, secs: L.secs, text: `+${pts} баллов` }); save(); render(); return; }
   if (subj === 'pro') { /* PRO: тот же день сложнее, одна попытка; до +30 баллов сверх дневного лимита */
-    let pts = ratio >= .9 ? PRO_BONUS : ratio >= .75 ? 20 : ratio >= .6 ? 10 : 0; const minS = T.length * (T(kid) === 'yarik' ? 20 : 25); if (L.secs < minS) { pts = Math.round(pts / 2); L.fastCut = true; }
+    let pts = ratio >= .9 ? PRO_BONUS : ratio >= .75 ? 20 : ratio >= .6 ? 10 : 0; const minS = T.length * (TPL(kid) === 'yarik' ? 20 : 25); if (L.secs < minS) { pts = Math.round(pts / 2); L.fastCut = true; }
     piggyAdd(K, pts); L.coins = pts; D.proPts = pts; L.phase = 'done';
     ev(kid, 'PRO', { subj: 'Уровень PRO', score: `${first}/${tot}`, grade: L.grade, coins: K.coins, secs: L.secs, text: `+${pts} баллов` }); save(); render(); return; }
   const subs = todaySubjects(kid), W = KIDS[kid].w || {}, wsum = subs.reduce((s0, x) => s0 + (W[x] || .1), 0), M = LESSON_POOL * (W[subj] || .1) / Math.max(1, wsum);
   let pts = q < .6 ? 0 : Math.round(M * q * q);
   /* Баллы за усилие: урок, пролетевший быстрее нормы времени, даёт меньше (норма ≈ 25–30 с на задание) */
-  if (subj !== 'read' && !ITEMS(subj)) { const T0 = lessonTasks(L, kid, subj), minS = (T0.length || 5) * (T(kid) === 'yarik' ? 35 : 40), fk = Math.min(1, L.secs / minS); if (fk < 1) { pts = Math.round(pts * Math.max(.3, fk)); L.fastCut = fk < .9; }
+  if (subj !== 'read' && !ITEMS(subj)) { const T0 = lessonTasks(L, kid, subj), minS = (T0.length || 5) * (TPL(kid) === 'yarik' ? 35 : 40), fk = Math.min(1, L.secs / minS); if (fk < 1) { pts = Math.round(pts * Math.max(.3, fk)); L.fastCut = fk < .9; }
     /* Выбор из вариантов стоит меньше, чем ответ, написанный самому */ const inS = T0.filter(x => x.k !== 'c').length / Math.max(1, T0.length); pts = Math.round(pts * (.6 + .4 * inS)); }
   /* Урок, открытый не по порядку за баллы: пока день не закрыт целиком, только треть */
   if (L.oot && !subs.every(s => s === subj || (D.les[s] && D.les[s].phase === 'done'))) { pts = Math.round(pts / 3); L.ootCut = true; } D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
@@ -516,7 +517,7 @@ function vRead(kid, L){
   if (L.phase === 'read') {
     rdRestore(L, aloud);
     return head + `<article class="card reading" lang="${L.lang || 'ru'}"><div class="text" id="rtext">${tokensHtml(aloud, RD && RD.st, RD && RD.p)}</div></article>${rest ? '<p class="hint">Это начало главы. Остальное потом дочитаешь сам(а), про себя.</p>' : ''}
-    <div class="readbar">${readBar('startread', SR ? `<button class="btn big mic" data-act="startread">🎤 Читать вслух</button>` : `<button class="btn big" data-act="startread">Начать (засекаю время)</button><p class="hint">На этом устройстве нет распознавания речи. Читай вслух взрослому, я засеку время.</p>`)}</div></section>`;
+    <div class="readbar">${readBar('startread', SR ? `<button class="btn big mic" data-act="startread">🎤 Читать вслух</button>` : `<button class="btn big" data-act="startread">Начать (засекаю время)</button><p class="hint">Здесь айпад не умеет слушать чтение (нужно обновить iPadOS). Ничего страшного: нажми «Начать», читай вслух, в конце нажми «Готово» — я засеку время и посчитаю скорость.</p>`)}</div></section>`;
   }
   if (L.phase === 'silent') {
     if (!L.st0) { L.st0 = Date.now(); save(); }
@@ -748,9 +749,11 @@ function vReport(kid){
   <div class="card"><h2>Быстрые действия</h2><form class="form" data-form="hw"><label>Задание ребёнку (появится в «Домашнем задании»)<input id="hwtext" autocomplete="off"></label><button class="btn small">Добавить</button></form>
   <form class="form" data-form="coins"><label>Баллы (+ или −)<input id="coinadd" inputmode="numeric" autocomplete="off"></label><button class="btn small">Начислить</button></form></div>`;
 }
+function devInfo(){ const ua = navigator.userAgent; const m = ua.match(/OS (\d+)[_.](\d+)/) || ua.match(/Version\/(\d+)\.(\d+)/); const ios = m ? m[1] + '.' + m[2] : '?'; const pwa = (window.navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches)) ? 'с главного экрана' : 'в браузере';
+  return `Версия системы: ${ios}, открыто ${pwa}. Распознавание чтения вслух: ${SR ? '✅ есть' : '❌ нет — нужен iPadOS 14.5 или новее (Настройки → Основные → Обновление ПО); пока скорость чтения считается по таймеру'}. Микрофон: ${navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? 'доступен' : 'недоступен'}.`; }
 function vSettings(){
   const unitSel = kid => Object.entries(KIDS[kid].cur).filter(([, c]) => c.units).map(([k, c]) => [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []).map(([tr, list, nm]) => `<label>${KIDS[kid].name} · ${nm}<select id="sel_${kid}_${k}${tr}">${list.map((u, i) => `<option value="${i}" ${(S.kids[kid].pos[k + tr] || 0) === i ? 'selected' : ''}>${i + 1}. ${U.esc(u.t)}</option>`).join('')}</select></label>`).join('')).join('');
-  return `<div class="card"><h2>Перерыв 2 часа</h2><p class="hint">После ~20 минут занятий новые уроки открываются через 2 часа.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
+  return `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерыв 2 часа</h2><p class="hint">После ~20 минут занятий новые уроки открываются через 2 часа.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
   ${FAM ? '' : `<div class="card form" ><h2>Связь с таблицей родителя</h2><label>Адрес скрипта Google<input id="syncurl" value="${U.esc(S.cfg.sync || '')}" autocomplete="off"></label><p class="hint">В очереди на отправку: ${S.queue.length}.</p><div class="row"><button class="btn small" data-act="savesync">Сохранить и отправить</button></div></div>`}
   <div class="card"><h2>Начать заново</h2><p class="hint">Стирает на этом айпаде весь прогресс, монеты, покупки и коды. После теста нажмите — и приложение будет как новое.</p><button class="btn small stop" data-act="resetall">Сбросить всё на этом устройстве</button></div>
   ${FAM ? famSettings() : `<form class="card form" data-form="pins"><h2>Коды</h2><label>Новый код родителя<input id="np" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ярика<input id="ny" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ани<input id="na" inputmode="numeric" maxlength="4" autocomplete="off"></label><button class="btn small">Сменить коды</button></form>`}`;
