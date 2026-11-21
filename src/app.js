@@ -137,8 +137,11 @@ function vLogin(){
   const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${k}" data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[k].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
   return `<main class="wrap login"><header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header>
   <div class="kids">${card('yarik')}${card('anya')}</div>
-  <p class="center"><button class="link" data-act="parent">Для родителей</button></p></main>`;
+  <p class="center"><button class="link" data-act="parent">Для родителей</button></p>${window.INSTALL_EV ? '<p class="center"><button class="btn ghost" data-act="install">📲 Установить на экран телефона</button></p>' : ''}</main>`;
 }
+/* Android/Chrome: своя кнопка установки приложения на главный экран */
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.INSTALL_EV = e; if (cur.view === 'login') render(); });
+window.addEventListener('appinstalled', () => { window.INSTALL_EV = null; if (cur.view === 'login') render(); });
 function vPin(){
   const who = cur.pinFor === 'parent' ? 'Код родителя' : 'Код: ' + KIDS[cur.pinFor].name;
   return `<main class="wrap narrow"><header class="hero"><h1>${who}</h1><p>${U.esc(cur.msg || 'Введи четыре цифры')}</p></header>
@@ -741,6 +744,7 @@ document.addEventListener('click', e => {
       if (!window.confirm(`Открыть «${subjName(kid, s0, cur.ds)}» не по порядку за ${SKIP_PRICE} баллов?\nПока не сделаны все уроки дня, за такой урок дают только треть баллов.`)) break;
       K0.coins -= SKIP_PRICE; (D.unlock = D.unlock || []).push(s0); ev(kid, 'урок не по порядку', { subj: subjName(kid, s0, cur.ds), price: -SKIP_PRICE, coins: K0.coins }); save(); }
     startLesson(s0); if (D.les[s0] && (D.unlock || []).includes(s0)) { D.les[s0].oot = true; save(); } break; }
+    case 'install': { const ie = window.INSTALL_EV; if (ie) { ie.prompt(); ie.userChoice.then(() => { window.INSTALL_EV = null; render(); }); } break; }
     case 'norest': { const K0 = S.kids[b.dataset.k]; K0.restUntil = 0; K0.blk = 0; save(); render(); break; }
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
     case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); break; }

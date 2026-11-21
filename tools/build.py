@@ -31,7 +31,8 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.se
 </script></body></html>'''
 open(os.path.join(out, 'index.html'), 'w', encoding='utf-8').write(html)
 json.dump({'name': 'Уроки для Ярика и Ани', 'short_name': 'Уроки', 'start_url': './', 'display': 'standalone', 'background_color': '#fbfaf5', 'theme_color': '#2350a8', 'lang': 'ru',
-           'icons': [{'src': 'icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': 'icon-512.png', 'sizes': '512x512', 'type': 'image/png'}]},
+           'id': './', 'scope': './', 'orientation': 'any', 'description': 'Ежедневные уроки по-русски: чтение, математика, языки',
+           'icons': [{'src': 'icon-192.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'}, {'src': 'icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'}, {'src': 'icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}]},
           open(os.path.join(out, 'manifest.webmanifest'), 'w', encoding='utf-8'), ensure_ascii=False)
 open(os.path.join(out, 'sw.js'), 'w').write(f'''const C='uroki-{ver}';
 self.addEventListener('install',e=>{{e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icon-180.png','img/bg-yarik.webp','img/bg-anya.webp'])));self.skipWaiting();}});
