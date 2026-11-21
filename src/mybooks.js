@@ -192,7 +192,7 @@ function bkFinish(kid, b, t){
   var accs = (P.sp || []).filter(function(r){ return r.acc != null; }); if (accs.length) q = .8 * q + .2 * accs.reduce(function(a, r){ return a + r.acc; }, 0) / accs.length;
   var pts = q < .6 ? 0 : Math.round(BOOK_PTS * q * q);
   var D = dayRec(kid, U.today()); D.bookPts = D.bookPts || 0; pts = Math.max(0, Math.min(pts, BOOK_PTS - D.bookPts)); D.bookPts += pts;
-  var K = S.kids[kid]; piggyAdd(K, pts); P.pts = pts; P.ph = 'done'; P.end = Date.now(); K.texts = (K.texts || 0) + 1;
+  var K = S.kids[kid]; pts = piggyAdd(K, pts); P.pts = pts; P.ph = 'done'; P.end = Date.now(); K.texts = (K.texts || 0) + 1;
   ev(kid, 'книга: задание', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || ''), score: ok + '/' + n, secs: P.secs || '', coins: K.coins, text: '+' + pts + ' баллов' + (P.rt ? '; пересказ ' + P.rt.hit.length + '/' + P.rt.n : '') });
   save(); render(); alertMsg(pts ? 'Задание по книге сделано: +' + pts + ' 🐷' : (D.bookPts >= BOOK_PTS ? 'Сделано! Баллы за книги сегодня уже получены' : 'Сделано! В следующий раз читай внимательнее'));
 }

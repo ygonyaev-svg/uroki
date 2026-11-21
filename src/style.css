@@ -103,6 +103,7 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 .author{ color:var(--ink2); margin-top:-8px; }
 .counter{ font-size:15px; color:var(--ink2); margin-top:8px; }
 .task .q{ font-size:24px; line-height:1.4; margin:4px 0 14px; }
+.bw{ font-size:1.35em; font-weight:800; letter-spacing:.04em; } /* крупные буквы и слова для «Учимся читать» */
 .gap{ display:inline-block; min-width:44px; border-bottom:2px solid var(--acc); color:var(--acc); text-align:center; }
 .opts{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
 .opt{ appearance:none; border:2px solid var(--line); background:var(--card); border-radius:14px; padding:14px; min-height:60px; font-size:21px; cursor:pointer; }
@@ -404,3 +405,4 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .askrest, .askrest p, .askrest h2{ color:#2a2622 !important; } .askrest .hint{ color:#5a524a !important; } .askrest{ border:2px solid var(--acc); }
 .hwc .hwrow{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px solid var(--soft); }
 .hwc, .hwc p, .hwc b{ color:#2a2622; } .hwc .hint{ color:#5a524a !important; } .hwc{ border:2px solid var(--acc); }
+.restscr h1, .restscr p, .restscr h3, .restscr li{ color:#2a2622; } .restscr .hint{ color:#5a524a !important; } .tmr{ text-align:left; margin:8px 0 12px; padding-left:20px; } .tmr li{ margin:6px 0; }
