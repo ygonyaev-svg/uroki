@@ -294,7 +294,7 @@ function answer(v){
   else ok = v === t.a;
   a.tries++; a.v = v;
   if (!ok && t.k === 'c') a.wrong.push(v);
-  const lastTry = subj === 'pro' || (t.k === 'c' && t.opts.length - a.wrong.length <= 1);
+  const lastTry = (subj === 'pro' && !t.pro) || (t.k === 'c' && t.opts.length - a.wrong.length <= 1);
   if (ok || a.tries >= 2 || lastTry) { a.final = true; a.ok = ok;
     const K = S.kids[kid];
     const uid = ITEMS(subj) ? (t.uid || subj) : L.uid;
@@ -366,13 +366,13 @@ function ITEMS(subj){ return subj === 'hw' || subj === 'extra' || subj === 'pro'
 function proReady(kid, D){ if (!D.bonus || cur.ds !== U.today()) return false; const E = D.les.extra; return (E && E.phase === 'done') || (!E && !extraTasks(kid, D).length); }
 function proTasks(kid, D){ const out = [];
   for (const s of Object.keys(D.les)) { const L = D.les[s]; if (!L.uid || L.phase !== 'done') continue; const u = unitById(kid, s, L.uid); if (!u) continue;
-    for (const x of genTasks(u, U.h(kid + cur.ds + 'pro' + s), 3)) { x.sj = s; x.uid = u.id; out.push(x); }
+    for (const x of genTasks(HARD[u.id] ? { g: HARD[u.id] } : u, U.h(kid + cur.ds + 'pro' + s), HARD[u.id] ? 4 : 3)) { x.sj = s; x.uid = u.id; out.push(x); }
     const list = unitsOf(kid, s, L.tr), j = list.indexOf(u), nx = j >= 0 && list[j + 1];
     if (nx) for (const x of genTasks(nx, U.h(kid + cur.ds + 'pro2' + s), 2)) { x.sj = s; x.uid = nx.id; x.pro = 1; out.push(x); } }
   return U.rng(U.h(kid + cur.ds + 'proMix')).shuffle(out).slice(0, 16); }
 function proTile(kid, D){ if (!proReady(kid, D)) return ''; const L = D.les.pro; if (!L && !proTasks(kid, D).length) return '';
   const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new';
-  return `<button class="tile pro ${st}" data-act="openpro"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${st === 'done' ? `Пройден: +${L.coins || 0} баллов` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Пройди этот день ещё раз — сложнее, с темой завтрашнего урока и одной попыткой на ответ'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : '<span class="state">до +30</span>'}</button>`; }
+  return `<button class="tile pro ${st}" data-act="openpro"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${st === 'done' ? `Пройден: +${L.coins || 0} баллов` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Пройди этот день ещё раз — задачи на смекалку и тема завтрашнего урока. Одна попытка (на новой теме — две)'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : '<span class="state">до +30</span>'}</button>`; }
 /* Экстра: по 3 новых задания на темы, где сегодня были ошибки, и по 1 на закрепление остальных; не больше 10 */
 function extraTasks(kid, D){ const out = [];
   const subs = Object.keys(D.les).filter(s => D.les[s].uid && D.les[s].phase === 'done').map(s => { const L = D.les[s]; const bad = (L.ans || []).filter(a => a && !(a.ok && a.tries === 1)).length; return { s, L, bad }; }).sort((a, b) => b.bad - a.bad);
