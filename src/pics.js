@@ -120,9 +120,33 @@ function wordPics(text, max){
 function picWords(text, cls){ const ps = wordPics(text, 3); return ps.length ? `<div class="wpics ${cls || ''}">${ps.map(e => `<span>${e}</span>`).join('')}</div>` : ''; }
 
 /* Рисунок к заданию по математике: разбираем условие */
+/* Ярик (2 класс): треугольник с подписанными сторонами; прямоугольник с неизвестной шириной */
+function picTri(a, b, c, unit){ let g = `<polygon points="30,140 210,140 110,30" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/>`;
+  g += PX.t(120, 162, `${a} ${unit}`, 14) + PX.t(52, 82, `${b} ${unit}`, 14, null, 'middle') + PX.t(190, 82, `${c} ${unit}`, 14, null, 'middle');
+  return PX.svg(240, 172, g, 'tri'); }
+function picRectQ(a, unit, note){ const w = 150, h = 80, L = 40; let g = `<rect x="${L}" y="24" width="${w}" height="${h}" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>`;
+  g += PX.t(L + w / 2, 17, `${a} ${unit}`, 14) + PX.t(L - 6, 24 + h / 2 + 5, '?', 16, null, 'end') + PX.t(L + w / 2, 24 + h / 2 + 6, note, 13, '#16a34a');
+  return PX.svg(L + w + 20, h + 44, g, 'rect'); }
+/* Особые случаи для Ярика: null — разбирать дальше обычным порядком, '' — без картинки (картинка была бы неверной или подсказала бы ответ) */
+function mathPicY(s){ let m;
+  const tm = [...s.matchAll(/(\d{1,2}):(\d\d)/g)]; if (tm.length) return tm.length > 1 ? `<div class="pair">${tm.slice(0, 2).map(x => picClock(+x[1], +x[2])).join('<b>→</b>')}</div>` : picClock(+tm[0][1], +tm[0][2]);
+  if ((m = s.match(/[Сс]тороны треугольника (\d+)\s*(см|дм|м),\s*(\d+)\s*(?:см|дм|м)\s*и\s*(\d+)/))) return picTri(+m[1], +m[3], +m[4], m[2]);
+  if ((m = s.match(/(Периметр|Площадь) (?:прямоугольника )?(\d+)\s*см²?,\s*длина (\d+)\s*(см)/))) return picRectQ(+m[3], m[4], m[1] === 'Периметр' ? `P = ${m[2]} ${m[4]}` : `S = ${m[2]} см²`);
+  if (/см²|[Пп]лощадь/.test(s) && !/[Дд]лина[^\d]*\d+[^\d]*ширина[^\d]*\d+|[Сс]торона квадрата/.test(s)) return '';
+  if (/идёт \d+ час/.test(s)) return '';
+  if (/\d+\s*сот\./.test(s) || /\(ост\./.test(s)) return '';
+  if (/^\s*\d+\s*(дм|м)(\s*\d+\s*см)?\s*=\s*\?\s*см/.test(s)) return '';
+  if ((m = s.match(/(□|\d+)\s*([+−·-])\s*(□|\d+)\s*=\s*(\d+)/)) && /□/.test(m[1] + m[3])) return picScale(`${m[1]} ${m[2]} ${m[3]}`, m[4]);
+  if ((m = s.match(/([\d\s()+−·:-]+)=\s*\?/))) { const ex = m[1], ops = (ex.match(/[+−·:-]/g) || []).length;
+    if (ops >= 2) return '';
+    if ((m = ex.match(/(\d+)\s*([·:])\s*(\d+)/))) { const a = +m[1], b = +m[3];
+      if (m[2] === '·' && (a < 1 || b < 1 || a > 10 || b > 10)) return '';
+      if (m[2] === ':' && (a < 1 || b < 1 || a % b || a / b > 10 || b > 10)) return ''; } }
+  return null; }
 function mathPic(kid, q){
   const s = q.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/ /g, ' ');
   let m;
+  if (T(kid) === 'yarik') { const y = mathPicY(s); if (y !== null) return y; }
   if ((m = s.match(/(\d+)\s*ч\s*(\d+)\s*мин/))) return picClock(+m[1], +m[2]);
   if (/(^|[^а-яё])час(ов|а|ы)?([^а-яё]|$)|минут/.test(s) && !/\d+\s*[·:]/.test(s)) return picClock(3, 0);
   if ((m = s.match(/(\d+)\s*%/)) && T(kid) === 'anya') return picPct(+m[1]);
@@ -158,7 +182,7 @@ function mathPic(kid, q){
     if ((m = s.match(/(\d+)\s*дес\.\s*(\d+)\s*ед/))) return picTens([+m[1] * 10 + +m[2]], '', true);
     if ((m = s.match(/(\d+)\s+[а-яё]+\s+разложили[^\d]+по\s+(\d+)/))) { const e = wordPics(s, 1)[0] || '🔵'; return picArray(+m[1] / +m[2], +m[2], e); }
     const ns = (s.match(/\d+/g) || []).map(Number); const e = wordPics(s, 1)[0];
-    if (e && ns.length >= 2 && ns[0] <= 20 && ns[1] <= 20) return `<div class="groups">${ns.slice(0, 2).map(n => `<span class="grp">${e.repeat(n)}</span>`).join('<b>?</b>')}</div>`;
+    if (e && ns.length === 2 && ns[0] <= 20 && ns[1] <= 20 && !/раз|больше|меньше|ног|лап|по \d|поровну|подели|раздели|между|одн(ой|ого|а|у) |кажд|€|цент|кг|десят|\d\s*(г|л|м|см|дм|мин|ч)(?![а-яё])/.test(s)) return `<div class="groups">${ns.slice(0, 2).map(n => `<span class="grp">${e.repeat(n)}</span>`).join('<b>?</b>')}</div>`;
   }
   return '';
 }

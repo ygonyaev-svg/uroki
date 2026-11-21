@@ -260,7 +260,7 @@ const Y_LOGIC = [
      const a=r.int(1,5), b=r.int(1,6); return NW(`Во дворе гуляют кошки и куры. Кошек — ${a}, кур — ${b}. Сколько у них всего ног?`, 4*a+2*b, [2*a+2*b, 4*a+4*b, 4*a+2*b+2, a+b], `4 · ${a} + 2 · ${b} = ${4*a+2*b}`); } },
  { id:'l2_7', t:'Волшебный квадрат',
    th:'В волшебном квадрате сумма чисел в каждой строке, каждом столбце и по диагоналям одинаковая. В квадрате из чисел 1–9 эта сумма равна 15.<br>Найди строку или столбец, где спрятано только одно число, и дополни до 15.',
-   g: r => { let M=[[2,7,6],[9,5,1],[4,3,8]]; for(let k=r.int(0,3);k>0;k--) M=M[0].map((_,j)=>M.map(row=>row[j]).reverse()); if (r()<.5) M=M.map(row=>row.slice().reverse()); const i=r.int(0,2), j=r.int(0,2); const ans=M[i][j]; const rest=M[i].filter((_,cj)=>cj!==j); const rows=M.map((row,ri)=>row.map((v,cj)=>ri===i&&cj===j?'□':v).join('  ')).join('<br>'); return NW(`Сумма в каждой строке и каждом столбце — 15. Какое число спрятано в □?<div class="sq">${rows}</div>`, ans, [ans+1, ans-1, 15-rest[0], 15-rest[1]].filter(x=>x>=1), `В строке ${rest[0]} + ${rest[1]} + □ = 15, значит □ = ${ans}`); } }
+   g: r => { let M=[[2,7,6],[9,5,1],[4,3,8]]; for(let k=r.int(0,3);k>0;k--) M=M[0].map((_,j)=>M.map(row=>row[j]).reverse()); if (r()<.5) M=M.map(row=>row.slice().reverse()); const i=r.int(0,2), j=r.int(0,2); const ans=M[i][j]; const rest=M[i].filter((_,cj)=>cj!==j); const rows=M.map((row,ri)=>row.map((v,cj)=>ri===i&&cj===j?'□':v).join('  ')).join('<br>'); return NW(`Сумма в каждой строке и каждом столбце — 15. Какое число спрятано в □?<div class="sq">${rows}</div>`, ans, [ans+1, ans-1, ans+2, ans-2].filter(x=>x>=1&&x<=9), `В строке ${rest[0]} + ${rest[1]} + □ = 15, значит □ = ${ans}`); } }
 ];
 
 /* ===== Português — Ярик (уровень A1) ===== */
