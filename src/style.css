@@ -268,3 +268,7 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .piggy b{ color:#b0124e; }
 .revtag{ margin:0 0 6px; font-size:13px; color:var(--ink2); }
 .txtf input{ text-align:left; letter-spacing:.02em; }
+
+.steps li.tap{ padding:0; text-decoration:none; }
+.stp{ appearance:none; -webkit-appearance:none; border:0; background:none; color:inherit; font:inherit; padding:10px 14px; min-height:40px; cursor:pointer; text-decoration:underline; text-underline-offset:3px; touch-action:manipulation; }
+.note.rest{ border-left:4px solid var(--acc); font-size:18px; }

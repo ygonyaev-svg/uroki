@@ -278,6 +278,10 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .revtag{ margin:0 0 6px; font-size:13px; color:var(--ink2); }
 .txtf input{ text-align:left; letter-spacing:.02em; }
 
+.steps li.tap{ padding:0; text-decoration:none; }
+.stp{ appearance:none; -webkit-appearance:none; border:0; background:none; color:inherit; font:inherit; padding:10px 14px; min-height:40px; cursor:pointer; text-decoration:underline; text-underline-offset:3px; touch-action:manipulation; }
+.note.rest{ border-left:4px solid var(--acc); font-size:18px; }
+
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
   --blue:#2563eb; --red:#e11d48; --green:#16a34a; --gold:#f59e0b; --sh:0 6px 0 rgba(15,23,42,.10),0 10px 24px rgba(15,23,42,.12); --r:22px; }
@@ -353,7 +357,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v85fdfb11 */
+<script>/* v8fb3b8a9 */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -2743,10 +2747,10 @@ function vHome(){
   const streak = readStreak(kid);
   const msgs = K.msgs.filter(m => !m.seen);
   const tiles = subs.map(s => { const L = D.les[s]; const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new'; const g = L && L.grade;
-    const locked = st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s);
+    const locked = (st === 'new' && restLeft(kid) > 0) || (st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s));
     return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${s === 'lang' && track('lang', cur.ds) === '_alt' ? 'En' : ((s === 'world' && kid === 'yarik') || (s === 'logic' && kid === 'anya')) && track(s, cur.ds) === '_alt' ? '€' : SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && kid === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${kid}"><header class="bar"><button class="link" data-act="logout">Выйти</button><button class="link voice" data-act="voice" title="Кто читает задания">🔊 ${K.voice === 'm' ? 'Мужской голос' : 'Женский голос'}</button><span class="coins">${coinsHtml(K.coins)}</span></header>
-  <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
+  <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${restCard(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}${extraTile(kid, D)}${proTile(kid, D)}</section>
@@ -2788,7 +2792,7 @@ function vLesson(){
   const stepIdx = ITEMS(subj) ? 0 : { theory:0, practice:1, fread:2, survey: steps.length - 1, done: steps.length - 1 }[L.phase] || 0;
   const doneAll = L.phase === 'done' || L.phase === 'survey';
   const stepper = `<ol class="steps">${steps.map((s, i) => { const past = i < stepIdx || (ITEMS(subj) && doneAll); const on = cur.rview ? s === cur.rview : i === stepIdx; const can = past || (i === stepIdx && (cur.rview || cur.rtask != null));
-    return `<li class="${past ? 'ok' : ''} ${on ? 'now' : ''} ${can ? 'tap' : ''}" ${can ? `data-act="rview" data-s="${past && s !== cur.rview ? s : ''}" role="button"` : ''}>${s}</li>`; }).join('')}</ol>`;
+    return `<li class="${past ? 'ok' : ''} ${on ? 'now' : ''} ${can ? 'tap' : ''}">${can ? `<button class="stp" data-act="rview" data-s="${past && s !== cur.rview ? s : ''}">${s}</button>` : s}</li>`; }).join('')}</ol>`;
   const title = `<p class="eyebrow">${subjName(kid, subj, cur.ds)}</p><h1>${U.esc(subj === 'hw' ? 'Повторение ошибок' : subj === 'extra' ? 'Дополнительные задания по сегодняшним урокам' : subj === 'pro' ? 'Уровень PRO: тот же день, но сложнее' : u.t)}</h1>`;
   if (cur.rtask != null) body = vRetry(kid, subj, L, cur.rtask);
   else if (cur.rview === 'Теория' && u) body = `<div class="note">Это повторение — баллы не меняются. <button class="link" data-act="rview" data-s="">Вернуться к уроку →</button></div><article class="card theory">${subjArt(kid, subj)}<div class="th">${u.th}</div><div class="row"><button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button></div></article><button class="btn big" data-act="rview" data-s="">Вернуться к уроку</button>`;
@@ -2818,8 +2822,8 @@ function vTask(kid, subj, L){
   const spk = t.sp ? `<button class="btn ghost small" data-act="sayq">🔊 Послушать</button>` : '';
   const u0 = (subj === 'extra' || subj === 'pro') && t.uid ? unitById(kid, t.sj, t.uid) : subj !== 'hw' && unitById(kid, subj, L.uid);
   const help = u0 && !fin ? (L.showTh === L.i ? `<details class="peek" open><summary>Правило</summary><div class="th">${u0.th}</div></details>${vExample(kid, subj, L, u0, t)}` : `<button class="link" data-act="dunnotask">🤔 Не понимаю</button>`) : '';
-  const dots = `<div class="dots">${T.map((x, j) => { const aj = L.ans[j]; const st = aj && aj.final ? (aj.ok && aj.tries === 1 ? 'ok' : aj.ok ? 'mid' : 'bad') : j === L.i ? 'now' : ''; return aj && aj.final && j !== L.i ? `<button class="dot ${st}" data-act="rtask" data-i="${j}" aria-label="Задание ${j + 1}">${j + 1}</button>` : `<span class="dot ${st}">${j + 1}</span>`; }).join('')}</div>`;
-  return `<div class="counter">Задание ${L.i + 1} из ${T.length}</div>${dots}${L.ans.some(x => x && x.final) ? '<p class="hint small">Нажми на номер решённого задания, чтобы посмотреть его и попробовать ещё раз.</p>' : ''}<article class="card task">${(() => { const il = illus(kid, t.sj || subj, t); return il ? '' : `<div class="scenebar">${scene(kid, (L.seed || 7) + L.i)}</div>`; })()}<span class="sticker" aria-hidden="true">${U.rng((L.seed || 7) + L.i * 31).pick(THEME[kid].pics)}</span>${t.rev ? `<p class="revtag">🔁 Повторение: ${U.esc(t.rev)}</p>` : ''}<div class="q">${t.k === 't' ? t.q : t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, t.sj || subj, t)}${t.sp && !t.spAfter ? spk : ''}${inp}${fb}${t.sp && t.spAfter && fin ? spk : ''}${help}</article>
+  const dots = `<div class="dots">${T.map((x, j) => { const aj = L.ans[j]; const st = aj && aj.final ? (aj.ok && aj.tries === 1 ? 'ok' : aj.ok ? 'mid' : 'bad') : j === L.i ? 'now' : ''; return `<span class="dot ${st}">${j + 1}</span>`; }).join('')}</div>`;
+  return `<div class="counter">Задание ${L.i + 1} из ${T.length}</div>${dots}${L.i === 0 ? '<p class="hint small">Отвечай внимательно: засчитывается только первый ответ.</p>' : ''}<article class="card task">${(() => { const il = illus(kid, t.sj || subj, t); return il ? '' : `<div class="scenebar">${scene(kid, (L.seed || 7) + L.i)}</div>`; })()}<span class="sticker" aria-hidden="true">${U.rng((L.seed || 7) + L.i * 31).pick(THEME[kid].pics)}</span>${t.rev ? `<p class="revtag">🔁 Повторение: ${U.esc(t.rev)}</p>` : ''}<div class="q">${t.k === 't' ? t.q : t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, t.sj || subj, t)}${t.sp && !t.spAfter ? spk : ''}${inp}${fb}${t.sp && t.spAfter && fin ? spk : ''}${help}</article>
   ${fin ? `<button class="btn big" data-act="next">${L.i + 1 < T.length ? 'Дальше' : 'Закончить'}</button>` : ''}`;
 }
 /* Разбор на похожем примере: задание того же типа с ответом и объяснением */
@@ -2876,7 +2880,7 @@ function answer(v){
   a.tries++; a.v = v;
   if (!ok && t.k === 'c') a.wrong.push(v);
   const lastTry = (subj === 'pro' && !t.pro) || (t.k === 'c' && t.opts.length - a.wrong.length <= 1);
-  if (ok || a.tries >= 2 || lastTry) { a.final = true; a.ok = ok;
+  if (ok || a.tries >= 1 || lastTry) { /* засчитывается только первый ответ */ a.final = true; a.ok = ok;
     const K = S.kids[kid];
     const uid = ITEMS(subj) ? (t.uid || subj) : L.uid;
     t.uid = uid;
@@ -2919,7 +2923,7 @@ function finishLesson(){
     if (f.diff === 'легко' && ratio === 1) K.lvl[subj] = Math.min(lv + 1, 5); else if (f.diff === 'трудно' && ratio < .75) K.lvl[subj] = Math.max(lv - 1, -1);
   }
   if (subj === 'hw') K.hwText.forEach(h => { if ((L.txt || []).includes(h.id)) h.done = true; });
-  L.secs = Math.min(1500, Math.round((Date.now() - (L.t0 || Date.now())) / 1000)); D.secs = (D.secs || 0) + L.secs;
+  L.secs = Math.min(1500, Math.round((Date.now() - (L.t0 || Date.now())) / 1000)); D.secs = (D.secs || 0) + L.secs; restTick(kid, L.secs);
   if (subj === 'extra') { /* Экстра после закрытого дня: +5 баллов при 80% верных с первого раза, +3 при 60% */
     const pts = ratio >= .8 ? EXTRA_BONUS : ratio >= .6 ? 3 : 0; piggyAdd(K, pts); L.coins = pts; D.extraPts = pts; L.phase = 'done';
     ev(kid, 'экстра', { subj: 'Экстра', score: `${first}/${tot}`, grade: L.grade, coins: K.coins, text: `+${pts} баллов` }); save(); render(); return; }
@@ -2949,6 +2953,16 @@ function extraTile(kid, D){ if (!D.bonus || cur.ds !== U.today()) return ''; con
   if (!L && !extraTasks(kid, D).length) return '';
   const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new';
   return `<button class="tile extra ${st}" data-act="openextra"><span class="ico">⭐</span><span class="tt"><span class="sn">Экстра</span><span class="ut">${st === 'done' ? `Сделано: +${L.coins || 0} баллов` : 'Хочешь ещё? Задания по сегодняшним ошибкам: +5 баллов'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : ''}</button>`; }
+/* Перерыв: позанимался ~20 минут (блок уроков) — следующее новое занятие откроется через 2 часа. Пройденные уроки открываются всегда. */
+const REST_MS = 2 * 3600 * 1000, BLOCK_SECS = 20 * 60;
+function restLeft(kid){ return Math.max(0, (S.kids[kid].restUntil || 0) - Date.now()); }
+function hhmm(ts){ const d = new Date(ts), z = n => (n < 10 ? '0' : '') + n; return d.getHours() + ':' + z(d.getMinutes()); }
+function fmtLeft(ms){ const m = Math.ceil(ms / 60000), h = Math.floor(m / 60), r = m % 60; return h ? h + ' ч ' + r + ' мин' : r + ' мин'; }
+function restTick(kid, secs){ const K = S.kids[kid], now = Date.now(); if (!K.blkAt || now - K.blkAt > REST_MS) K.blk = 0; K.blk = (K.blk || 0) + (secs || 0); K.blkAt = now;
+  if (K.blk >= BLOCK_SECS) { K.blk = 0; K.restUntil = now + REST_MS; ev(kid, 'перерыв', { text: 'занимался ' + Math.round(secs / 60) + '+ мин; следующее занятие после ' + hhmm(K.restUntil) }); } }
+function restGate(kid, s){ const D = dayRec(kid, cur.ds); if (D.les[s]) return false; const ms = restLeft(kid); if (!ms) return false; alertMsg(`Перерыв ☕ Следующее занятие откроется в ${hhmm(S.kids[kid].restUntil)} (через ${fmtLeft(ms)})`); return true; }
+function restCard(kid){ const ms = restLeft(kid); if (!ms) return ''; return `<div class="note rest">☕ <b>Перерыв.</b> Ты хорошо позанимался(ась)! Следующее занятие откроется в <b>${hhmm(S.kids[kid].restUntil)}</b> (через <span id="restleft">${fmtLeft(ms)}</span>). Пройденные уроки можно открыть и повторить.</div>`; }
+setInterval(() => { const el = document.getElementById('restleft'); if (!el || !cur.kid) return; const ms = restLeft(cur.kid); if (!ms) render(); else el.textContent = fmtLeft(ms); }, 30000);
 function ITEMS(subj){ return subj === 'hw' || subj === 'extra' || subj === 'pro'; }
 /* Уровень PRO: после всех уроков и Экстры — тот же день заново, но сложнее. По 3 задания на сегодняшнюю тему и 2 на следующую (на завтра). Одна попытка. */
 function proReady(kid, D){ if (!D.bonus || cur.ds !== U.today()) return false; const E = D.les.extra; return (E && E.phase === 'done') || (!E && !extraTasks(kid, D).length); }
@@ -2960,7 +2974,7 @@ function proTasks(kid, D){ const out = [];
   return U.rng(U.h(kid + cur.ds + 'proMix')).shuffle(out).slice(0, 16); }
 function proTile(kid, D){ if (!proReady(kid, D)) return ''; const L = D.les.pro; if (!L && !proTasks(kid, D).length) return '';
   const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new';
-  return `<button class="tile pro ${st}" data-act="openpro"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${st === 'done' ? `Пройден: +${L.coins || 0} баллов` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Пройди этот день ещё раз — задачи на смекалку и тема завтрашнего урока. Одна попытка (на новой теме — две)'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : '<span class="state">до +30</span>'}</button>`; }
+  return `<button class="tile pro ${st}" data-act="openpro"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${st === 'done' ? `Пройден: +${L.coins || 0} баллов` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Пройди этот день ещё раз — задачи на смекалку и тема завтрашнего урока. Одна попытка'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : '<span class="state">до +30</span>'}</button>`; }
 /* Экстра: по 3 новых задания на темы, где сегодня были ошибки, и по 1 на закрепление остальных; не больше 10 */
 function extraTasks(kid, D){ const out = [];
   const subs = Object.keys(D.les).filter(s => D.les[s].uid && D.les[s].phase === 'done').map(s => { const L = D.les[s]; const bad = (L.ans || []).filter(a => a && !(a.ok && a.tries === 1)).length; return { s, L, bad }; }).sort((a, b) => b.bad - a.bad);
@@ -3018,7 +3032,7 @@ function vRead(kid, L){
   const { aloud, rest } = aloudPart(t.text, readLim(kid, L));
   const head = `<section class="lesson"><p class="eyebrow">Чтение</p><h1>${U.esc(t.title)}</h1>${t.author ? `<p class="author">${U.esc(t.author)}</p>` : ''}
    <ol class="steps">${(() => { const st = readSteps(t, rest), ix = st.indexOf(PH_STEP[L.phase]); return st.map((s, i) => { const on = cur.rview ? s === cur.rview : i === ix; const can = i < ix || (i === ix && cur.rview);
-      return `<li class="${i < ix ? 'ok' : ''} ${on ? 'now' : ''} ${can ? 'tap' : ''}" ${can ? `data-act="rview" data-s="${i === ix ? '' : s}" role="button"` : ''}>${s}</li>`; }).join(''); })()}</ol>`;
+      return `<li class="${i < ix ? 'ok' : ''} ${on ? 'now' : ''} ${can ? 'tap' : ''}">${can ? `<button class="stp" data-act="rview" data-s="${i === ix ? '' : s}">${s}</button>` : s}</li>`; }).join(''); })()}</ol>`;
   if (cur.rview && cur.rview !== PH_STEP[L.phase]) return head + vReview(kid, L, t, aloud, rest) + '</section>';
   if (L.phase === 'warm') {
     const hard = Object.entries(K.hard).sort((a, b) => b[1].miss - a[1].miss).slice(0, 5).map(x => x[0]);
@@ -3180,7 +3194,7 @@ function readAnswer(v){
   const kid = cur.kid, L = dayRec(kid, cur.ds).les.read, qs = readQs(kid, L), i = L.i || 0, q = qs[i];
   const a = L.ans[i] || (L.ans[i] = { tries: 0, wrong: [] }); if (a.final) return; a.tries++;
   const ok = v === q.a; if (!ok) a.wrong.push(v);
-  if (ok || a.tries >= 2) { a.final = true; a.ok = ok; ev(kid, 'ответ', { subj: 'Чтение', unit: readText(kid).title, q: q.q, ans: v, right: q.a, ok: ok && a.tries === 1 ? 'верно' : ok ? 'со 2-й попытки' : 'ошибка' }); }
+  if (ok || a.tries >= 1) { a.final = true; a.ok = ok; ev(kid, 'ответ', { subj: 'Чтение', unit: readText(kid).title, q: q.q, ans: v, right: q.a, ok: ok && a.tries === 1 ? 'верно' : ok ? 'со 2-й попытки' : 'ошибка' }); }
   save(); render();
 }
 
@@ -3199,7 +3213,7 @@ function vForeign(kid, L){
 }
 function foreignAnswer(v){ const kid = cur.kid, L = dayRec(kid, cur.ds).les[cur.subj], t = curForeign(L); const r = U.rng(U.h(L.fid + cur.ds)); const qs = t.qs.map(([q, a, ...w]) => ({ q, a, opts: r.shuffle([a, ...w]) })); const q = qs[L.fi];
   const a = L.fans[L.fi] || (L.fans[L.fi] = { tries: 0, wrong: [] }); if (a.final) return; a.tries++; const ok = v === q.a; if (!ok) a.wrong.push(v);
-  if (ok || a.tries >= 2) { a.final = true; a.ok = ok; ev(kid, 'ответ', { subj: L.tr === '_alt' ? 'English' : 'Português', unit: t.title, q: q.q, ans: v, right: q.a, ok: ok && a.tries === 1 ? 'верно' : ok ? 'со 2-й попытки' : 'ошибка' }); }
+  if (ok || a.tries >= 1) { a.final = true; a.ok = ok; ev(kid, 'ответ', { subj: L.tr === '_alt' ? 'English' : 'Português', unit: t.title, q: q.q, ans: v, right: q.a, ok: ok && a.tries === 1 ? 'верно' : ok ? 'со 2-й попытки' : 'ошибка' }); }
   save(); render(); }
 
 /* ----- Магазин ----- */
@@ -3265,7 +3279,7 @@ function vReport(kid){
 }
 function vSettings(){
   const unitSel = kid => Object.entries(KIDS[kid].cur).filter(([, c]) => c.units).map(([k, c]) => [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []).map(([tr, list, nm]) => `<label>${KIDS[kid].name} · ${nm}<select id="sel_${kid}_${k}${tr}">${list.map((u, i) => `<option value="${i}" ${(S.kids[kid].pos[k + tr] || 0) === i ? 'selected' : ''}>${i + 1}. ${U.esc(u.t)}</option>`).join('')}</select></label>`).join('')).join('');
-  return `<div class="card form"><h2>Темы: с чего продолжать</h2>${unitSel('yarik')}${unitSel('anya')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
+  return `<div class="card"><h2>Перерыв 2 часа</h2><p class="hint">После ~20 минут занятий новые уроки открываются через 2 часа.</p>${['yarik', 'anya'].map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${unitSel('yarik')}${unitSel('anya')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
   <div class="card form" ><h2>Связь с таблицей родителя</h2><label>Адрес скрипта Google<input id="syncurl" value="${U.esc(S.cfg.sync || '')}" autocomplete="off"></label><p class="hint">В очереди на отправку: ${S.queue.length}.</p><div class="row"><button class="btn small" data-act="savesync">Сохранить и отправить</button></div></div>
   <div class="card"><h2>Начать заново</h2><p class="hint">Стирает на этом айпаде весь прогресс, монеты, покупки и коды. После теста нажмите — и приложение будет как новое.</p><button class="btn small stop" data-act="resetall">Сбросить всё на этом устройстве</button></div>
   <form class="card form" data-form="pins"><h2>Коды</h2><label>Новый код родителя<input id="np" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ярика<input id="ny" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ани<input id="na" inputmode="numeric" maxlength="4" autocomplete="off"></label><button class="btn small">Сменить коды</button></form>`;
@@ -3285,16 +3299,17 @@ document.addEventListener('click', e => {
     case 'piggyearly': { const K0 = S.kids[kid]; if (!(K0.piggy > 0)) break; if (!window.confirm(`Забрать ${K0.piggy} сейчас? Тогда прибавки +10% (${Math.round(K0.piggy * PIGGY_RATE)}) не будет.`)) break; K0.coins += K0.piggy; ev(kid, 'копилка досрочно', { coins: K0.coins, price: K0.piggy, text: 'без процента' }); K0.piggy = 0; save(); render(); break; }
     case 'voice': { const K0 = S.kids[kid]; K0.voice = K0.voice === 'm' ? 'f' : 'm'; save(); render(); say(K0.voice === 'm' ? 'Привет! Теперь задания читаю я.' : 'Привет! Теперь задания читаю я.', 'ru-RU'); break; }
     case 'piggyseen': S.kids[kid].piggyMsg = ''; save(); render(); break;
-    case 'openpro': { if (D.les.pro) { go('lesson', { subj: 'pro' }); break; } if (!proReady(kid, D)) break; startLesson('pro'); break; }
+    case 'openpro': { if (restGate(kid, 'pro')) break; if (D.les.pro) { go('lesson', { subj: 'pro' }); break; } if (!proReady(kid, D)) break; startLesson('pro'); break; }
     case 'rtask': { cur.rtask = +b.dataset.i; cur.rtry = null; rememberScroll(); render(); window.scrollTo(0, 0); break; }
     case 'rtryc': retryAnswer(b.dataset.v); break;
     case 'rtryagain': cur.rtry = null; render(); break;
-    case 'openextra': { if (D.les.extra && D.les.extra.phase === 'done') { go('lesson', { subj: 'extra' }); break; } startLesson('extra'); break; }
-    case 'open': { const s0 = b.dataset.subj, L0 = D.les[s0]; if (!(L0 && L0.phase === 'done') && s0 !== nextOpen(kid) && !(D.unlock || []).includes(s0)) {
+    case 'openextra': { if (restGate(kid, 'extra')) break; if (D.les.extra && D.les.extra.phase === 'done') { go('lesson', { subj: 'extra' }); break; } startLesson('extra'); break; }
+    case 'open': { const s0 = b.dataset.subj, L0 = D.les[s0]; if (restGate(kid, s0)) break; if (!(L0 && L0.phase === 'done') && s0 !== nextOpen(kid) && !(D.unlock || []).includes(s0)) {
       const K0 = S.kids[kid]; if (K0.coins < SKIP_PRICE) { alertMsg(`Сначала закончи предыдущий урок 🔒 Открыть раньше можно за ${SKIP_PRICE} баллов`); break; }
       if (!window.confirm(`Открыть «${subjName(kid, s0, cur.ds)}» не по порядку за ${SKIP_PRICE} баллов?\nПока не сделаны все уроки дня, за такой урок дают только треть баллов.`)) break;
       K0.coins -= SKIP_PRICE; (D.unlock = D.unlock || []).push(s0); ev(kid, 'урок не по порядку', { subj: subjName(kid, s0, cur.ds), price: -SKIP_PRICE, coins: K0.coins }); save(); }
     startLesson(s0); if (D.les[s0] && (D.unlock || []).includes(s0)) { D.les[s0].oot = true; save(); } break; }
+    case 'norest': { const K0 = S.kids[b.dataset.k]; K0.restUntil = 0; K0.blk = 0; save(); render(); break; }
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
     case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); break; }
     case 'dunnotask': { L.showTh = L.i; L.helpN = (L.helpN || 0) + 1; const t = lessonTasks(L, kid, cur.subj)[L.i], u = (t.uid && t.sj ? unitById(kid, t.sj, t.uid) : unitById(kid, cur.subj, L.uid)) || { t: '' }; ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, q: strip(t.q) }); save(); render(); break; }
