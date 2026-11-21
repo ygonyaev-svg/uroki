@@ -1,0 +1,43 @@
+/* ===== Словоход: фирменный стиль «Древо слова» (только семейная сборка) =====
+   Зелень #2D4A32, охра #C28A2C, лён #F5EFE0, кора #6B4A2E, чернила #2A2A1E, линия #E6DCC3.
+   Экраны детей сохраняют выбранное оформление (футбол/волшебство); здесь — вход, регистрация, родительские экраны. */
+html.fam{ --fg:#2D4A32; --fo:#C28A2C; --fl:#F5EFE0; --fk:#6B4A2E; --fi:#2A2A1E; --fln:#E6DCC3; }
+html.fam body:not(.yarik):not(.anya){ background:#F5EFE0 !important; background-image:none !important; color:#2A2A1E;
+  font-family:"PT Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --ink:#2A2A1E; --ink2:#6B4A2E; --line:#E6DCC3; --card:#FFFDF7; --soft:#EFE6D2; --acc:#2D4A32; --accsoft:#E4EBDD; --paper:#F5EFE0; --sh:0 1px 2px rgba(42,42,30,.06),0 6px 18px rgba(42,42,30,.08); }
+html.fam body:not(.yarik):not(.anya) h1,
+html.fam body:not(.yarik):not(.anya) h2,
+html.fam body:not(.yarik):not(.anya) .btn{ font-family:"Alice",Georgia,serif; font-weight:400; }
+html.fam body:not(.yarik):not(.anya) h1{ font-size:32px; color:#2D4A32; text-shadow:none; }
+html.fam body:not(.yarik):not(.anya) h2{ color:#2D4A32; }
+html.fam body:not(.yarik):not(.anya) .hero p,
+html.fam body:not(.yarik):not(.anya) .hero{ color:#2A2A1E; text-shadow:none; }
+html.fam body:not(.yarik):not(.anya) .eyebrow{ color:#C28A2C; text-shadow:none; }
+html.fam body:not(.yarik):not(.anya) .card{ background:#FFFDF7; border:1px solid #E6DCC3; border-radius:18px; }
+html.fam body:not(.yarik):not(.anya) .btn{ background:#2D4A32; color:#F5EFE0; border:0; border-radius:14px; box-shadow:0 4px 0 #1d3121; letter-spacing:.01em; }
+html.fam body:not(.yarik):not(.anya) .btn.big{ background:#C28A2C; color:#fff; box-shadow:0 4px 0 #8f6420; font-size:22px; }
+html.fam body:not(.yarik):not(.anya) .btn.ghost{ background:transparent; color:#2D4A32; border:2px solid #2D4A32; box-shadow:none; }
+html.fam body:not(.yarik):not(.anya) .btn.stop{ background:#8E3B2E; box-shadow:0 4px 0 #5e261d; }
+html.fam body:not(.yarik):not(.anya) .link,
+html.fam body:not(.yarik):not(.anya) .wrap.login .center .link,
+html.fam body:not(.yarik):not(.anya) .bar .link{ color:#2D4A32; text-shadow:none; font-weight:700; }
+html.fam body:not(.yarik):not(.anya) .wrap > .center,
+html.fam body:not(.yarik):not(.anya) .wrap > .hint{ background:none; color:#6B4A2E; }
+html.fam body:not(.yarik):not(.anya) input,
+html.fam body:not(.yarik):not(.anya) select,
+html.fam body:not(.yarik):not(.anya) textarea{ background:#fff; border:1px solid #E6DCC3; color:#2A2A1E; }
+html.fam body:not(.yarik):not(.anya) .tab.on{ color:#2D4A32; border-color:#C28A2C; }
+html.fam body:not(.yarik):not(.anya) .chip.on{ background:#2D4A32; color:#F5EFE0; }
+html.fam body:not(.yarik):not(.anya) .alwh{ color:#2D4A32; text-shadow:none; }
+html.fam body:not(.yarik):not(.anya) .bar span{ color:#2D4A32; text-shadow:none; }
+.fambrand{ display:flex; align-items:center; gap:14px; padding:14px 0 4px; }
+.fambrand img{ border-radius:18%; box-shadow:0 6px 18px rgba(45,74,50,.25); flex:none; }
+.fambrand.big{ flex-direction:column; text-align:center; gap:10px; padding-top:22px; }
+.famlogo{ font-family:"Alice",Georgia,serif; font-size:30px; line-height:1; color:#2A2A1E; }
+.fambrand.big .famlogo{ font-size:44px; }
+.famlogo span{ color:#C28A2C; }
+.fammotto{ font-family:"Alice",Georgia,serif; color:#2D4A32; font-size:18px; margin:8px auto 0; max-width:420px; }
+.wrap.login .fammotto{ margin:18px auto 8px; text-align:center; }
+.famintro{ font-size:18px; }
+.famscr .hero{ text-align:center; }
+.famscr .fkid h2 .link{ font-size:15px; }
