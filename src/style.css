@@ -262,3 +262,9 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .tile.pro .ut{ -webkit-line-clamp:unset; display:block; overflow:visible; }
 .tile.pro .state{ white-space:nowrap; font-size:15px; padding:4px 10px; }
 .tiles .tile.pro .ico{ background:linear-gradient(135deg,#ffd76a,#d99a1a) !important; }
+/* Копилка */
+.piggy{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px; padding:10px 12px; border-radius:14px; background:#fff3f6; border:1.5px dashed #f19ab4; color:#6b2140; font-size:15px; }
+.piggy .pig{ font-size:26px; }
+.piggy b{ color:#b0124e; }
+.revtag{ margin:0 0 6px; font-size:13px; color:var(--ink2); }
+.txtf input{ text-align:left; letter-spacing:.02em; }

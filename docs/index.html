@@ -271,6 +271,12 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .tile.pro .ut{ -webkit-line-clamp:unset; display:block; overflow:visible; }
 .tile.pro .state{ white-space:nowrap; font-size:15px; padding:4px 10px; }
 .tiles .tile.pro .ico{ background:linear-gradient(135deg,#ffd76a,#d99a1a) !important; }
+/* Копилка */
+.piggy{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px; padding:10px 12px; border-radius:14px; background:#fff3f6; border:1.5px dashed #f19ab4; color:#6b2140; font-size:15px; }
+.piggy .pig{ font-size:26px; }
+.piggy b{ color:#b0124e; }
+.revtag{ margin:0 0 6px; font-size:13px; color:var(--ink2); }
+.txtf input{ text-align:left; letter-spacing:.02em; }
 
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
@@ -347,7 +353,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* vd34b4db4 */
+<script>/* ve8125fdb */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -394,6 +400,166 @@ const AGREE_PREP = /(?:^|[\s(«])(из|от|до|без|у|для|около|к�
 function agree(s){ if (typeof s !== 'string') return s; return s.replace(/(^|[^\d,.])(\d+)(\s+)([а-яё]+)(?![а-яё])/gi, (all, pre, n, sp, w, off, str) => { off += pre.length; const f = AGREE[w.toLowerCase()]; if (!f) return all;
   if (AGREE_PREP.test(str.slice(Math.max(0, off - 12), off))) return all; const k = +n, m10 = k % 10, m100 = k % 100;
   const v = m10 === 1 && m100 !== 11 ? f[0] : m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? f[1] : f[2]; return pre + n + sp + (w[0] === w[0].toUpperCase() ? v[0].toUpperCase() + v.slice(1) : v); }); }
+
+/* ===== Português para quem já fala: 2.º–3.º ano da escola portuguesa (gramática, ortografia, leitura) =====
+   k:'t' — ответ вводится словом; сравнение без учёта регистра и лишних пробелов, но С учётом акцентов. */
+function TX(q, a, e, alt){ return { k: 't', q, a: String(a), alt: alt || [], e: e || '' }; }
+function TB(lines, mk){ const it = lines.map(l => l.split('|')); return r => mk(r.pick(it), r); }
+/* Неверные варианты деления на слоги: сдвигаем одну границу на букву */
+function sylWrong(ok, r){ const P = ok.split('-'), out = [];
+  for (let i = 0; i < P.length - 1; i++) { if (P[i].length > 1) { const q = P.slice(); q[i + 1] = q[i].slice(-1) + q[i + 1]; q[i] = q[i].slice(0, -1); out.push(q.join('-')); } if (P[i + 1].length > 1) { const q = P.slice(); q[i] = q[i] + q[i + 1][0]; q[i + 1] = q[i + 1].slice(1); out.push(q.join('-')); } }
+  if (P.length > 1) out.push(P.slice(0, -2).concat([P[P.length - 2] + P[P.length - 1]]).join('-'));
+  return r.shuffle(out.filter(x => x !== ok)).slice(0, 3); }
+const PT_NAT = [
+ { id:'pn_1', t:'Ordem alfabética',
+   th:'O alfabeto tem 26 letras: a b c d e f g h i j k l m n o p q r s t u v w x y z.<br>Para ordenar palavras, olhamos para a <b>1.ª letra</b>; se for igual, para a <b>2.ª</b>, depois a 3.ª…<br>Ex.: <b>bola</b> vem antes de <b>bolo</b> (a &lt; o na 4.ª letra).',
+   g: r => { const W = ['abelha','árvore','bola','bolo','barco','cão','casa','castelo','dado','dente','escola','estrela','faca','festa','gato','gelado','janela','jogo','lápis','leão','livro','mesa','mochila','navio','ovo','pato','peixe','pão','queijo','rato','rua','sapato','sol','tigre','uva','vaca','zebra'];
+     const t = r.int(0, 2); const ws = r.shuffle(W).slice(0, 4); const s = ws.slice().sort((a, b) => a.localeCompare(b, 'pt'));
+     if (t === 0) return C(`Qual destas palavras vem <b>primeiro</b> na ordem alfabética?`, s[0], s.slice(1), `Ordem: ${s.join(', ')}.`);
+     if (t === 1) return C(`Qual destas palavras vem <b>em último</b> na ordem alfabética?`, s[3], s.slice(0, 3), `Ordem: ${s.join(', ')}.`);
+     const L = 'abcdefghijklmnopqrstuvwxyz', i = r.int(1, 24); return TX(`Que letra vem <b>entre</b> ${L[i - 1]} e ${L[i + 1]} no alfabeto?`, L[i], `${L[i - 1]}, ${L[i]}, ${L[i + 1]}.`); } },
+ { id:'pn_2', t:'Sílabas: divisão silábica',
+   th:'Dividimos as palavras em sílabas como as dizemos devagar: <b>bor-bo-le-ta</b> (4 sílabas).<br>Palavras com 1 sílaba — monossílabas (<i>sol</i>), 2 — dissílabas (<i>ca-sa</i>), 3 — trissílabas (<i>ja-ne-la</i>), 4 ou mais — polissílabas (<i>bi-ci-cle-ta</i>).<br>Os dígrafos <b>rr</b> e <b>ss</b> separam-se: <i>car-ro</i>, <i>pás-sa-ro</i>. <b>ch, lh, nh</b> ficam juntos: <i>co-e-lho</i>.',
+   g: TB(['sol|1|sol','mar|1|mar','pão|1|pão','casa|2|ca-sa','carro|2|car-ro','livro|2|li-vro','janela|3|ja-ne-la','pássaro|3|pás-sa-ro','coelho|3|co-e-lho','sapato|3|sa-pa-to','borboleta|4|bor-bo-le-ta','bicicleta|4|bi-ci-cle-ta','telefone|4|te-le-fo-ne','chocolate|4|cho-co-la-te','hipopótamo|5|hi-po-pó-ta-mo','computador|4|com-pu-ta-dor','escola|3|es-co-la','futebol|3|fu-te-bol','guarda-chuva|4|guar-da-chu-va','abelha|3|a-be-lha','girafa|3|gi-ra-fa','frigorífico|5|fri-go-rí-fi-co','elefante|4|e-le-fan-te','professora|4|pro-fes-so-ra'],
+     (x, r) => r() < .6 ? N(`Quantas sílabas tem a palavra <b>${x[0]}</b>?`, x[1], `${x[2]} — ${x[1]}.`) : C(`Como se divide em sílabas a palavra <b>${x[0]}</b>?`, x[2], sylWrong(x[2], r), `${x[2]}.`)) },
+ { id:'pn_3', t:'Sílaba tónica: aguda, grave, esdrúxula',
+   th:'A sílaba que se diz com mais força é a <b>sílaba tónica</b>.<br><b>Aguda</b> — a última (<i>ca-fé, pa-pel</i>). <b>Grave</b> — a penúltima (<i>ca-sa, ja-ne-la</i>) — a maioria das palavras! <b>Esdrúxula</b> — a antepenúltima (<i>pás-sa-ro, mé-di-co</i>) — leva sempre acento.',
+   g: TB(['café|aguda|fé','papel|aguda|pel','sofá|aguda|fá','avó|aguda|vó','jardim|aguda|dim','animal|aguda|mal','casa|grave|ca','janela|grave|ne','livro|grave|li','escola|grave|co','sapato|grave|pa','árvore|esdrúxula|ár','pássaro|esdrúxula|pás','médico|esdrúxula|mé','lâmpada|esdrúxula|lâm','música|esdrúxula|mú','fácil|grave|fá','lápis|grave|lá','pé|aguda|pé','número|esdrúxula|nú','camião|aguda|ão'],
+     (x, r) => r() < .5 ? C(`A palavra <b>${x[0]}</b> é…`, x[1], ['aguda', 'grave', 'esdrúxula'], `A sílaba tónica é «${x[2]}».`) : TX(`Escreve a <b>sílaba tónica</b> da palavra <b>${x[0]}</b>.`, x[2], `${x[0]}: a sílaba tónica é «${x[2]}» — palavra ${x[1]}.`)) },
+ { id:'pn_4', t:'Acentos: escrever bem',
+   th:'Acento <b>agudo</b> (´) — som aberto: <i>café, avó, pé</i>. <b>Circunflexo</b> (^) — som fechado: <i>avô, você, lâmpada</i>. <b>Til</b> (~) — som nasal: <i>mãe, pão, limão</i>. <b>Grave</b> (`) — só em <i>à, às, àquele</i>.<br>Todas as esdrúxulas têm acento: <i>árvore, máquina</i>.',
+   g: TB(['arvore|árvore','passaro|pássaro','medico|médico','cafe|café','mae|mãe','pao|pão','limao|limão','avo (a mãe da mãe)|avó','avo (o pai da mãe)|avô','voce|você','lampada|lâmpada','musica|música','facil|fácil','lapis|lápis','numero|número','maca (fruta)|maçã','agua|água','tambem|também','ma (não é boa)|má','irmao|irmão','coracao|coração','licao|lição'],
+     x => TX(`Escreve <b>com os acentos certos</b>: ${x[0]}`, x[1], `Escreve-se «${x[1]}».`)) },
+ { id:'pn_5', t:'C, Ç, S ou SS?',
+   th:'<b>ç</b> só antes de a, o, u: <i>caça, poço, açúcar</i> (nunca no início da palavra e nunca antes de e, i).<br><b>c</b> antes de e, i soa [s]: <i>cebola, cinema</i>.<br>Entre vogais: <b>s</b> soa [z] (<i>casa, rosa</i>), <b>ss</b> soa [s] (<i>passo, massa</i>).',
+   g: TB(['ca_a (vai à caça)|ç|c;s;ss|caça','po_o|ç|c;s;ss|poço','a_úcar|ç|c;s;ss|açúcar','_ebola|c|ç;s;ss|cebola','_inema|c|ç;ss;s|cinema','ca_a (onde moro)|s|ss;ç;c|casa','ro_a|s|ss;ç;c|rosa','pa_aro|ss|s;ç;c|pássaro','ma_a|ss|s;ç;c|massa','pe_ego|s|ss;ç;c|pêssego','cabe_a|ç|c;s;ss|cabeça','pa_o (dar um passo)|ss|s;ç;c|passo','me_a|s|ss;ç;c|mesa','pre_unto|s|ss;ç;c|presunto','almo_o|ç|c;s;ss|almoço','vi_inho|z|s;ss;ç|vizinho','ra_ão|z|s;ss;ç|razão','do_e|c|ç;s;ss|doce','cora_ão|ç|c;s;ss|coração','ma_ã|ç|c;s;ss|maçã'],
+     (x, r) => r() < .5 ? C(`Que letra falta? <b>${x[0]}</b>`, x[1], x[2].split(';'), `Escreve-se «${x[3]}».`) : TX(`Escreve a palavra completa: <b>${x[0]}</b>`, x[3], `Escreve-se «${x[3]}».`)) },
+ { id:'pn_6', t:'R ou RR? S ou Z?',
+   th:'Som forte [R] entre vogais escreve-se <b>rr</b>: <i>carro, terra, ferro</i>. No início da palavra basta um <b>r</b>: <i>rato, rua</i>. Depois de consoante também: <i>honra, tenro</i>.<br>Som [z] entre vogais: às vezes <b>s</b> (<i>casa</i>), às vezes <b>z</b> (<i>vizinho, prazer</i>) — decora as palavras!',
+   g: TB(['ca_o (automóvel)|rr|r|carro','ca_o (custa muito)|r|rr|caro','te_a|rr|r|terra','_ato|r|rr|rato','ga_afa|rr|r|garrafa','pe_a (fruta)|r|rr|pera','co_er|rr|r|correr','ba_ata (custa pouco)|r|rr|barata','fe_o|rr|r|ferro','ca_eta|r|rr|careta','to_e|rr|r|torre','pa_ede|r|rr|parede','ca_amelo|r|rr|caramelo','ce_eja|r|rr|cereja','go_ro|rr|r|gorro','ze_o|r|rr|zero'],
+     (x, r) => r() < .5 ? C(`<b>r</b> ou <b>rr</b>? ${x[0]}`, x[1], [x[2]], `Escreve-se «${x[3]}».`) : TX(`Escreve a palavra completa: <b>${x[0]}</b>`, x[3], `Escreve-se «${x[3]}».`)) },
+ { id:'pn_7', t:'Nomes: masculino e feminino',
+   th:'Muitos nomes mudam <b>-o → -a</b>: <i>gato → gata</i>. Outros têm formas próprias: <i>leão → leoa, galo → galinha, cavalo → égua, rei → rainha, homem → mulher, pai → mãe, ator → atriz, príncipe → princesa, cão → cadela, boi → vaca</i>.',
+   g: TB(['gato|gata','leão|leoa','galo|galinha','cavalo|égua','rei|rainha','homem|mulher','ator|atriz','príncipe|princesa','cão|cadela','boi|vaca','professor|professora','avô|avó','padrinho|madrinha','genro|nora','carneiro|ovelha','irmão|irmã','alemão|alemã','campeão|campeã','imperador|imperatriz','bode|cabra'],
+     (x, r) => r() < .75 ? TX(`Escreve o <b>feminino</b> de <b>${x[0]}</b>.`, x[1], `${x[0]} → ${x[1]}.`) : TX(`Escreve o <b>masculino</b> de <b>${x[1]}</b>.`, x[0], `${x[1]} → ${x[0]}.`)) },
+ { id:'pn_8', t:'Singular e plural',
+   th:'Regra geral: <b>+s</b> (<i>casa → casas</i>). Depois de r, z: <b>+es</b> (<i>flor → flores, luz → luzes</i>). <b>-m → -ns</b> (<i>homem → homens</i>). <b>-al, -ol → -ais, -óis</b> (<i>animal → animais, anzol → anzóis</i>). <b>-il → -is</b> (<i>funil → funis</i>).<br><b>-ão</b> tem três plurais: <i>mão → mãos, pão → pães, leão → leões</i>.',
+   g: TB(['flor|flores','luz|luzes','homem|homens','animal|animais','jornal|jornais','anzol|anzóis','caracol|caracóis','funil|funis','mão|mãos','pão|pães','leão|leões','cão|cães','avião|aviões','irmão|irmãos','limão|limões','balão|balões','papel|papéis','lápis|lápis','mar|mares','nuvem|nuvens','botão|botões','alemão|alemães','cidadão|cidadãos','rapaz|rapazes'],
+     x => TX(`Escreve o <b>plural</b> de <b>${x[0]}</b>.`, x[1], `um ${x[0]} → dois ${x[1]}.`)) },
+ { id:'pn_9', t:'Classes de palavras: nome, adjetivo, verbo',
+   th:'<b>Nome</b> — pessoa, animal, coisa, lugar: <i>Rita, cão, bola, Lisboa</i>.<br><b>Adjetivo</b> — diz como é: <i>grande, azul, simpático</i>.<br><b>Verbo</b> — o que se faz ou acontece: <i>correr, chove, brinca</i>.',
+   g: TB(['O cão preto corre no jardim.|adjetivo|preto|cão;corre;jardim','O cão preto corre no jardim.|verbo|corre|cão;preto;jardim','A Rita come uma maçã vermelha.|nome próprio|Rita|come;maçã;vermelha','O mar está calmo hoje.|adjetivo|calmo|mar;está;hoje','Os meninos jogam à bola.|verbo|jogam|meninos;bola;os','A professora simpática lê uma história.|adjetivo|simpática|professora;lê;história','O avô planta árvores.|verbo|planta|avô;árvores;o','O gato dorme no sofá velho.|adjetivo|velho|gato;dorme;sofá','A cegonha faz o ninho na torre.|nome comum|cegonha|faz;o;na','O Tiago marcou um golo fantástico.|verbo|marcou|Tiago;golo;fantástico'],
+     x => C(`Na frase «${x[0]}», qual é o <b>${x[1]}</b>?`, x[2], x[3].split(';'), `«${x[2]}» é ${x[1]}.`)) },
+ { id:'pn_10', t:'Sinónimos e antónimos',
+   th:'<b>Sinónimos</b> — significam o mesmo: <i>bonito = lindo, contente = feliz</i>.<br><b>Antónimos</b> — significam o contrário: <i>alto ≠ baixo, abrir ≠ fechar</i>.',
+   g: TB(['alto|baixo|antónimo','quente|frio|antónimo','abrir|fechar|antónimo','cheio|vazio|antónimo','rápido|lento|antónimo','longe|perto|antónimo','novo|velho|antónimo','começar|acabar|antónimo','dia|noite|antónimo','entrar|sair|antónimo','contente|feliz|sinónimo','bonito|lindo|sinónimo','casa|lar|sinónimo','começar|iniciar|sinónimo','rapaz|menino|sinónimo','falar|dizer|sinónimo','grande|enorme|sinónimo'],
+     (x, r) => TX(`Escreve um <b>${x[2]}</b> de <b>${x[0]}</b>.`, x[1], `${x[0]} — ${x[1]}.`, x[2] === 'antónimo' ? ({ novo: ['jovem'], velho: ['novo'], acabar: ['terminar'], começar: ['acabar', 'terminar'], baixo: ['pequeno'] }[x[0]] || []) : ({ contente: ['alegre'], bonito: ['belo'], grande: ['gigante'], falar: ['conversar'], rapaz: ['moço', 'garoto'] }[x[0]] || []))) },
+ { id:'pn_11', t:'Verbos no presente',
+   th:'Verbos em <b>-ar</b> (cantar): eu cant<b>o</b>, tu cant<b>as</b>, ele cant<b>a</b>, nós cant<b>amos</b>, vocês/eles cant<b>am</b>.<br><b>-er</b> (comer): com<b>o</b>, com<b>es</b>, com<b>e</b>, com<b>emos</b>, com<b>em</b>.<br><b>-ir</b> (partir): part<b>o</b>, part<b>es</b>, part<b>e</b>, part<b>imos</b>, part<b>em</b>.',
+   g: r => { const V = r.pick([['cantar','ar'],['saltar','ar'],['jogar','ar'],['nadar','ar'],['desenhar','ar'],['comer','er'],['beber','er'],['correr','er'],['escrever','er'],['aprender','er'],['partir','ir'],['abrir','ir'],['dividir','ir'],['decidir','ir']]); const st = V[0].slice(0, -2), P = [['Eu','o'],['Tu',{ar:'as',er:'es',ir:'es'}],['O Ivo',{ar:'a',er:'e',ir:'e'}],['Nós',{ar:'amos',er:'emos',ir:'imos'}],['Eles',{ar:'am',er:'em',ir:'em'}]]; const p = r.pick(P); const end = typeof p[1] === 'string' ? p[1] : p[1][V[1]]; const f = (V[0] === 'jogar' && false) ? '' : st + end;
+     return TX(`Completa com o verbo <b>${V[0]}</b> no presente:<br>${p[0]} ___ todos os dias.`, f, `${p[0]} ${f}.`); } },
+ { id:'pn_12', t:'Pretérito perfeito: o que aconteceu',
+   th:'Para falar do que já aconteceu (ontem, no sábado):<br><b>-ar</b>: eu cant<b>ei</b>, tu cant<b>aste</b>, ele cant<b>ou</b>, nós cant<b>ámos</b>, eles cant<b>aram</b>.<br><b>-er</b>: com<b>i</b>, com<b>este</b>, com<b>eu</b>, com<b>emos</b>, com<b>eram</b>.<br><b>-ir</b>: part<b>i</b>, part<b>iste</b>, part<b>iu</b>, part<b>imos</b>, part<b>iram</b>.<br>Irregulares: <i>ser/ir → fui, foi; ter → tive, teve; fazer → fiz, fez; estar → estive, esteve</i>.',
+   g: r => { if (r() < .25) { const x = r.pick([['ir','Eu','fui'],['ir','Ele','foi'],['ter','Eu','tive'],['ter','Ela','teve'],['fazer','Eu','fiz'],['fazer','Ele','fez'],['estar','Eu','estive'],['estar','Ela','esteve'],['dizer','Eu','disse'],['ver','Eu','vi']]); return TX(`Ontem… <b>${x[1]}</b> ___ (${x[0]})`, x[2], `${x[1]} ${x[2]} — verbo irregular.`); }
+     const V = r.pick([['cantar','ar'],['jogar','ar'],['nadar','ar'],['brincar','ar'],['comer','er'],['beber','er'],['correr','er'],['escrever','er'],['abrir','ir'],['partir','ir'],['dormir','ir']]); const st = V[0].slice(0, -2); const P = [['Eu',{ar:'ei',er:'i',ir:'i'}],['Tu',{ar:'aste',er:'este',ir:'iste'}],['A Rita',{ar:'ou',er:'eu',ir:'iu'}],['Nós',{ar:'ámos',er:'emos',ir:'imos'}],['Eles',{ar:'aram',er:'eram',ir:'iram'}]]; const p = r.pick(P); let f = st + p[1][V[1]];
+     if (p[0] === 'Eu') f = f.replace(/gei$/, 'guei').replace(/cei$/, 'quei'); return TX(`Ontem… <b>${p[0]}</b> ___ (${V[0]})`, f, `${p[0]} ${f}.`); } },
+ { id:'pn_13', t:'Tipos de frase e pontuação',
+   th:'<b>Declarativa</b> — informa, termina em ponto (.): <i>Está sol.</i><br><b>Interrogativa</b> — pergunta (?): <i>Vens comigo?</i><br><b>Exclamativa</b> — emoção (!): <i>Que golo!</i><br><b>Imperativa</b> — ordem ou pedido: <i>Fecha a porta.</i>',
+   g: TB(['Hoje está muito frio|declarativa|.','Vais ao treino amanhã|interrogativa|?','Que golo fantástico|exclamativa|!','Arruma o teu quarto|imperativa|.','Onde está a minha mochila|interrogativa|?','O comboio chega às dez|declarativa|.','Que bonito é o mar|exclamativa|!','Quantos golos marcaste|interrogativa|?','Lava as mãos antes de comer|imperativa|.','Os golfinhos vivem no mar|declarativa|.'],
+     (x, r) => r() < .5 ? C(`Que tipo de frase é: «${x[0]}${x[2]}»`, x[1], ['declarativa','interrogativa','exclamativa','imperativa'], `É uma frase ${x[1]}.`) : C(`Que sinal falta no fim? «${x[0]}_»`, x[2], ['.','?','!'], `Frase ${x[1]}: «${x[0]}${x[2]}»`)) },
+ { id:'pn_14', t:'Diminutivos e aumentativos',
+   th:'<b>Diminutivo</b> — mais pequeno ou carinhoso: <i>casa → casinha, gato → gatinho, pão → pãozinho, flor → florzinha</i>.<br><b>Aumentativo</b> — maior: <i>casa → casarão, cão → canzarrão, rapaz → rapagão, boca → bocarra</i>.',
+   g: TB(['casa|casinha|diminutivo','gato|gatinho|diminutivo','livro|livrinho|diminutivo','pão|pãozinho|diminutivo','flor|florzinha|diminutivo','mesa|mesinha|diminutivo','bola|bolinha|diminutivo','pé|pezinho|diminutivo','avó|avozinha|diminutivo','casa|casarão|aumentativo','rapaz|rapagão|aumentativo','boca|bocarra|aumentativo','homem|homenzarrão|aumentativo','copo|copázio|aumentativo','sala|salão|aumentativo'],
+     x => TX(`Escreve o <b>${x[2]}</b> de <b>${x[0]}</b>.`, x[1], `${x[0]} → ${x[1]}.`, x[1] === 'avozinha' ? ['avòzinha'] : [])) },
+ { id:'pn_15', t:'Família de palavras',
+   th:'Palavras da mesma <b>família</b> têm a mesma parte principal (o radical): <i>mar → marinheiro, marítimo, maré</i>; <i>pão → padeiro, padaria</i>; <i>flor → florista, floresta, florido</i>.',
+   g: TB(['pão|padaria|pastelaria;sapataria;livraria','mar|marinheiro|martelo;marmelada;margarida','flor|florista|floco;fogo;forte','livro|livraria|limão;livre;lixo','sapato|sapateiro|sapo;sopa;saco','terra|terramoto|terça;termo;teia','pedra|pedreiro|pedido;pedal;perna','leite|leiteiro|leitor;leito;lei','casa|casota|cascata;casaco;castelo','jardim|jardineiro|janela;jarra;jantar','dente|dentista|dentro;dez;dança','chuva|chuvoso|chupa;chave;chá'],
+     x => C(`Qual destas palavras é da <b>família</b> de <b>${x[0]}</b>?`, x[1], x[2].split(';'), `${x[0]} → ${x[1]}.`)) },
+ { id:'pn_16', t:'Escrever bem: palavras difíceis',
+   th:'Palavras que se escrevem de forma diferente de como se dizem — é preciso <b>decorar</b>: <i>hoje, hora, homem</i> (h mudo), <i>exame, táxi</i> (x), <i>gelo, girafa / jogo, jardim</i> (g ou j), <i>chave, xícara</i> (ch ou x).',
+   g: TB(['_oje (h ou nada)|hoje','_ora (h ou nada)|hora','_elado (g ou j)|gelado','_ardim (g ou j)|jardim','_irafa (g ou j)|girafa','_anela (g ou j)|janela','_ave (ch ou x)|chave','pei_e (ch ou x)|peixe','cai_a (ch ou x)|caixa','_uva (ch ou x)|chuva','e_ame (x ou z)|exame','_ospital (h ou nada)|hospital','_elefante|elefante','be_iga (x ou z)|bexiga','a_ul (s ou z)|azul','me_ma (s ou z)|mesma'],
+     x => TX(`Escreve a palavra completa: <b>${x[0]}</b>`, x[1], `Escreve-se «${x[1]}».`)) }
+];
+
+/* ===== Деньги: финансовая грамотность для 2–3 класса =====
+   По мотивам национальных стандартов США (Jump$tart, K-2 и 3-5): заработок, траты, нужды и желания, сбережения и цели, проценты, сравнение цен, обмен и доверие. */
+const Y_FIN = [
+ { id:'f_1', t:'Откуда берутся деньги',
+   th:'Деньги <b>зарабатывают</b> трудом: взрослые работают и получают <b>зарплату</b>. Врач лечит, водитель возит, повар готовит — и за это им платят.<br>Деньги не растут на деревьях и не берутся из банкомата сами: в банкомате лежат деньги, которые человек раньше заработал и положил в банк.<br>Дети тоже могут «зарабатывать» — баллы за уроки и помощь дома.',
+   g: MIX(B(['Откуда берутся деньги в банкомате?|Их туда положил человек, который их заработал|Банкомат их печатает;Они там появляются сами;Их приносит почтальон|Банкомат только выдаёт твои же деньги.',
+     'Как взрослые чаще всего получают деньги?|Работают и получают зарплату|Находят на улице;Берут в магазине;Просят у соседей|Зарплата — плата за работу.',
+     'Что такое зарплата?|Деньги за работу|Подарок на день рождения;Сдача в магазине;Деньги из копилки|Зарплату платят за выполненную работу.',
+     'Что из этого — работа, за которую платят?|Лечить людей в больнице|Смотреть мультики;Спать;Играть в приставку|Врач получает зарплату за то, что лечит.',
+     'Как ты сам можешь заработать баллы?|Сделать все уроки внимательно|Попросить у Юры;Нажимать быстрее;Пропустить урок|Баллы — твоя «зарплата» за уроки.']),
+     r => { const h = r.int(2, 5), p = r.pick([5, 10, 8]); return N(`Мальчик помогал соседу в саду ${h} часа, за каждый час ему платили ${p} €. Сколько евро он заработал?`, h * p, `${h} × ${p} = ${h * p} €.`); }) },
+ { id:'f_2', t:'Нужды и желания',
+   th:'<b>Нужды</b> — то, без чего нельзя жить: еда, вода, жильё, одежда по погоде, лекарства.<br><b>Желания</b> — то, что приятно иметь, но можно и без этого: игрушки, сладости, новая игра.<br>Сначала тратим на нужды, потом — на желания.',
+   g: B(['Что из этого — нужда?|Хлеб и вода|Новая приставка;Конфеты;Наклейки с футболистами|Без еды нельзя жить.',
+     'Что из этого — желание?|Новая игра для приставки|Зимняя куртка;Лекарство от простуды;Обед|Без игры можно прожить.',
+     'Что из этого — нужда?|Тёплые ботинки зимой|Третий футбольный мяч;Шоколадка;Игрушечная машинка|Ноги должны быть в тепле.',
+     'На что разумнее потратить деньги в первую очередь?|На еду для семьи|На вторую игрушку;На наклейки;На мороженое каждый день|Сначала — нужды.',
+     'Что из этого — желание?|Футболка с любимым игроком|Зубная щётка;Школьный рюкзак;Вода|Без такой футболки можно обойтись.',
+     'Что из этого — нужда?|Плата за квартиру|Билет в кино;Новые наушники;Мороженое|Жильё — нужда.']) },
+ { id:'f_3', t:'Монеты и купюры евро',
+   th:'В Португалии деньги — <b>евро</b> (€). 1 евро = <b>100 центов</b>.<br>Монеты: 1, 2, 5, 10, 20, 50 центов, 1 € и 2 €. Купюры: 5, 10, 20, 50, 100, 200 €.<br>2 евро 50 центов пишут так: <b>2,50 €</b>.',
+   g: r => { const t = r.int(0, 3);
+     if (t === 0) { const a = r.pick([[2,'2 €'],[1,'1 €'],[5,'5 €']]), b = r.pick([[1,'1 €'],[2,'2 €']]), n1 = r.int(1, 4), n2 = r.int(1, 4); return N(`У тебя ${n1} монеты по ${a[1]} и ${n2} монеты по ${b[1]}. Сколько всего евро?`, n1 * a[0] + n2 * b[0], `${n1} × ${a[0]} + ${n2} × ${b[0]} = ${n1 * a[0] + n2 * b[0]} €.`); }
+     if (t === 1) { const e = r.int(1, 5); return N(`Сколько центов в ${e} евро?`, e * 100, `1 € = 100 центов, ${e} € = ${e * 100} центов.`); }
+     if (t === 2) { const c = r.pick([20, 50, 10]), k = 100 / c; return N(`Сколько монет по ${c} центов нужно, чтобы получился 1 евро?`, k, `${c} × ${k} = 100 центов = 1 €.`); }
+     const c50 = r.int(1, 5), c20 = r.int(1, 4); return N(`В кошельке ${c50} монеты по 50 центов и ${c20} монеты по 20 центов. Сколько это центов?`, c50 * 50 + c20 * 20, `${c50 * 50} + ${c20 * 20} = ${c50 * 50 + c20 * 20} центов.`); } },
+ { id:'f_4', t:'Покупка и сдача',
+   th:'Чтобы найти <b>сдачу</b>, из того, что дал продавцу, вычитаем цену: дал 10 €, книга стоит 7 € → сдача 10 − 7 = <b>3 €</b>.<br>Перед покупкой сложи цены всех вещей и проверь, хватит ли денег.',
+   g: r => { const t = r.int(0, 2);
+     if (t === 0) { const p = r.int(3, 18), g = p < 10 ? 10 : 20; return N(`Мяч стоит ${p} €. Ты дал продавцу ${g} €. Сколько сдачи?`, g - p, `${g} − ${p} = ${g - p} €.`); }
+     if (t === 1) { const a = r.int(2, 6), b = r.int(2, 6), c = r.int(1, 4); return N(`Тетрадь стоит ${a} €, ручка ${b} €, ластик ${c} €. Сколько стоит всё вместе?`, a + b + c, `${a} + ${b} + ${c} = ${a + b + c} €.`); }
+     const have = r.int(10, 20), a = r.int(4, 9), b = r.int(4, 9); return N(`У тебя ${have} €. Ты купил книгу за ${a} € и мяч за ${b} €. Сколько евро осталось? (Если не хватает — напиши 0)`, Math.max(0, have - a - b), `${have} − ${a} − ${b} = ${have - a - b}${have - a - b < 0 ? ' — денег не хватило' : ' €'}.`); } },
+ { id:'f_5', t:'Копилка и цель',
+   th:'<b>Сбережения</b> — деньги, которые не тратишь сразу, а откладываешь на большую цель.<br>Если хочешь вещь за 30 €, а откладываешь по 5 € в неделю, то копить нужно 30 : 5 = <b>6 недель</b>.<br>Чтобы копить быстрее: откладывать больше или тратить меньше на мелочи.',
+   g: r => { const t = r.int(0, 2);
+     if (t === 0) { const w = r.pick([2, 3, 4, 5]), n = r.int(4, 9); return N(`Ты хочешь купить бутсы за ${w * n} €. Каждую неделю откладываешь по ${w} €. Сколько недель нужно копить?`, n, `${w * n} : ${w} = ${n} недель.`); }
+     if (t === 1) { const w = r.int(2, 6), n = r.int(3, 8); return N(`Ты откладываешь по ${w} € в неделю. Сколько будет в копилке через ${n} ${U.pl(n, 'неделю', 'недели', 'недель')}?`, w * n, `${w} × ${n} = ${w * n} €.`); }
+     const goal = r.pick([40, 50, 60]), have = r.int(1, 3) * 10; const w = r.pick([5, 10]); return N(`Цель — ${goal} €. В копилке уже ${have} €. Откладываешь по ${w} € в неделю. Через сколько недель соберёшь?`, (goal - have) / w, `Осталось ${goal - have} €, ${goal - have} : ${w} = ${(goal - have) / w}.`); } },
+ { id:'f_6', t:'Проценты: копилка растёт',
+   th:'Банк платит тебе за то, что твои деньги лежат у него, — это <b>процент</b>.<br><b>10%</b> — это одна десятая часть: 10% от 50 = 50 : 10 = <b>5</b>.<br>В твоей копилке баллов: если не трогаешь её всю неделю, в воскресенье добавляется <b>+10%</b>.',
+   g: r => { const t = r.int(0, 2);
+     if (t === 0) { const a = r.int(2, 9) * 10; return N(`Сколько будет 10% от ${a}?`, a / 10, `${a} : 10 = ${a / 10}.`); }
+     if (t === 1) { const a = r.int(2, 9) * 10; return N(`В копилке ${a} баллов. В воскресенье добавили 10%. Сколько стало баллов?`, a + a / 10, `${a} + ${a / 10} = ${a + a / 10}.`); }
+     const a = r.int(2, 6) * 10; return N(`Ты не трогал копилку и получил +10%. Было ${a}. На сколько баллов больше, чем если бы забрал раньше?`, a / 10, `10% от ${a} = ${a / 10}.`); } },
+ { id:'f_7', t:'Сравниваем цены',
+   th:'Одна и та же вещь в разных магазинах может стоить по-разному. Перед покупкой <b>сравни</b>.<br>Если упаковки разные, считай цену <b>одной штуки</b>: 3 йогурта за 6 € — это 2 € за штуку; 4 йогурта за 6 € — дешевле.',
+   g: r => { const t = r.int(0, 1);
+     if (t === 0) { const a = r.int(2, 5), b = a + r.int(1, 3); return N(`В одном магазине мяч стоит ${b * 3} €, в другом — ${a * 3} €. Сколько евро ты сэкономишь, если купишь дешевле?`, (b - a) * 3, `${b * 3} − ${a * 3} = ${(b - a) * 3} €.`); }
+     const p = r.int(2, 4), n1 = r.int(2, 4), n2 = n1 + r.int(1, 2); return C(`Где один йогурт дешевле: ${n1} шт. за ${p * n1} € или ${n2} шт. за ${p * n1} €?`, `${n2} шт. за ${p * n1} €`, [`${n1} шт. за ${p * n1} €`, 'одинаково'], `Цена та же, а йогуртов больше — значит, каждый дешевле.`); } },
+ { id:'f_8', t:'Бюджет: план трат',
+   th:'<b>Бюджет</b> — план: сколько денег пришло и на что их потратим.<br>Удобное правило для детей: из каждых 10 € — <b>5 € на траты, 4 € в копилку, 1 € на подарок или помощь другим</b>.',
+   g: r => { const t = r.int(0, 2), m = r.int(2, 6) * 10;
+     if (t === 0) return N(`Тебе подарили ${m} €. По правилу половину тратишь, остальное откладываешь. Сколько отложишь?`, m / 2, `${m} : 2 = ${m / 2} €.`);
+     if (t === 1) return N(`Из ${m} € ты откладываешь 4 € из каждых 10 €. Сколько отложишь?`, m / 10 * 4, `${m / 10} десятков × 4 = ${m / 10 * 4} €.`);
+     const a = r.int(5, 15), b = r.int(5, 15); return N(`Бюджет на неделю ${a + b + 10} €. Еда — ${a} €, транспорт — ${b} €. Сколько осталось на остальное?`, 10, `${a + b + 10} − ${a} − ${b} = 10 €.`); } },
+ { id:'f_9', t:'Реклама и хитрые покупки',
+   th:'Реклама хочет, чтобы ты <b>захотел</b> купить. Перед покупкой спроси себя: «Мне это нужно? Я буду этим пользоваться через неделю?»<br>«Скидка 50%» — это значит половина цены. «Купи 2 — получи 3-й в подарок» выгодно, только если тебе нужны три.',
+   g: MIX(B(['Реклама говорит: «Эта игрушка сделает тебя счастливым!» Что правильно?|Реклама хочет, чтобы я купил; надо подумать самому|Это обязательно правда;Надо купить сразу;Реклама всегда честная|Реклама — это продажа.',
+     'В игре предлагают купить монеты за настоящие деньги. Что сделать?|Спросить взрослого и подумать, нужно ли это|Сразу купить;Ввести мамину карту;Купить побольше, пока скидка|Внутриигровые покупки — частая ловушка.',
+     'Что значит «скидка 50%»?|Цена в два раза меньше|Цена в два раза больше;Бесплатно;Цена на 50 € меньше|50% — половина.']),
+     r => { const p = r.int(3, 10) * 4; return N(`Кроссовки стоили ${p} €, скидка 50%. Сколько они стоят теперь?`, p / 2, `${p} : 2 = ${p / 2} €.`); },
+     r => { const p = r.int(2, 9) * 10; return N(`Игра стоила ${p} €, скидка 10%. На сколько евро она подешевела?`, p / 10, `10% от ${p} = ${p / 10} €.`); }) },
+ { id:'f_10', t:'Банк, карта и долг',
+   th:'<b>Банк</b> хранит деньги. <b>Карта</b> — это не волшебные деньги: платишь картой — тратятся деньги со своего счёта.<br><b>Долг</b> — когда взял чужие деньги и должен вернуть. Часто вернуть нужно <b>больше</b>, чем взял.',
+   g: MIX(B(['Если платить картой, откуда берутся деньги?|Со счёта в банке, где лежат заработанные деньги|Карта их придумывает;Из магазина;Ниоткуда, это бесплатно|Карта — ключ к твоему счёту.',
+     'Друг одолжил тебе 5 €. Что честно сделать?|Вернуть 5 € в срок|Забыть;Вернуть 2 €;Попросить ещё|Долг надо возвращать.',
+     'Где безопаснее хранить большие деньги?|В банке|Под подушкой;В кармане куртки;У незнакомца|Банк охраняет деньги.']),
+     r => { const a = r.int(2, 6) * 10; return N(`Ты взял в долг ${a} €, а вернуть надо на 10% больше. Сколько нужно вернуть?`, a + a / 10, `${a} + ${a / 10} = ${a + a / 10} €.`); }) },
+ { id:'f_11', t:'Как заработать: свой маленький бизнес',
+   th:'<b>Доход</b> — сколько получил от продажи. <b>Расход</b> — сколько потратил, чтобы сделать товар. <b>Прибыль</b> = доход − расход.<br>Продал лимонад на 20 €, а лимоны и сахар стоили 8 € — прибыль 12 €.',
+   g: r => { const t = r.int(0, 1);
+     if (t === 0) { const n = r.int(5, 12), p = r.pick([1, 2]), cost = r.int(3, n * p - 2); return N(`Ты продал ${n} стаканов лимонада по ${p} €. Лимоны и сахар стоили ${cost} €. Какая прибыль?`, n * p - cost, `Доход ${n * p} €, прибыль ${n * p} − ${cost} = ${n * p - cost} €.`); }
+     const n = r.int(3, 8), p = r.int(2, 5), c = r.int(1, p - 1); return N(`Ты сделал ${n} ${U.pl(n, 'браслет', 'браслета', 'браслетов')}. Материал на один стоит ${c} €, продаёшь по ${p} €. Сколько прибыли, если продашь все?`, n * (p - c), `С одного ${p} − ${c} = ${p - c} €, всего ${n} × ${p - c} = ${n * (p - c)} €.`); } },
+ { id:'f_12', t:'Делиться и помогать',
+   th:'Часть денег люди отдают на <b>помощь другим</b>: в приют для животных, тем, кто заболел, на подарки близким.<br>Подарок не обязательно покупать — можно сделать своими руками или помочь делом.',
+   g: MIX(B(['Как можно помочь приюту для собак, если денег мало?|Принести старые одеяла или погулять с собаками со взрослым|Ничем;Только деньгами;Забрать всех собак домой|Помогать можно делом.',
+     'Ты накопил 20 €. Что разумно?|Часть отложить, часть потратить, немного отдать на подарок|Потратить всё в первый день;Никогда ничего не тратить;Отдать всё незнакомцу|Баланс — главное правило.']),
+     r => { const a = r.int(2, 5) * 10; return N(`Ты отдаёшь 1 € из каждых 10 € на помощь животным. Сколько отдашь из ${a} €?`, a / 10, `${a} : 10 = ${a / 10} €.`); }) }
+];
 
 /* ===== Ярик, 2 класс. Математика — по учебнику М. И. Моро и др. (1986) ===== */
 const Y_MATH = [
@@ -2322,11 +2488,12 @@ const COVER_IMG = { 'Пёстрая лента':'cover-holmes.webp', 'Серая
   'Сказка о мёртвой царевне':'cover-carevna.webp', 'Филипок':'cover-filipok.webp' };
 
 /* ===== Настройка детей ===== */
-CUR_Y.lang = { name:'Языки', src:'Português A1 и English', units: PT_Y, alt: EN_UNITS, altName:'English' };
+CUR_Y.lang = { name:'Языки', src:'Português: 2.º–3.º ano (gramática, ortografia) и English', units: PT_NAT, old: PT_Y, alt: EN_UNITS, altName:'English' };
+CUR_Y.world.alt = Y_FIN; CUR_Y.world.altName = '💶 Деньги'; CUR_Y.world.altSrc = 'Финансовая грамотность (по стандартам Jump$tart, K-5)';
 delete CUR_Y.pt;
 const KIDS = {
-  yarik: { name:'Ярик', grade:'2 класс', cur: CUR_Y, read: READ_Y, n: 10, norm: 55, startWords: 60, order:['read','math','rus','world','logic','lang'] },
-  anya:  { name:'Аня',  grade:'5 класс', cur: CUR_A, read: READ_A, n: 12, norm: 110, startWords: 150, order:['read','math','rus','hist','logic','lang'] }
+  yarik: { name:'Ярик', grade:'2 класс', cur: CUR_Y, read: READ_Y, n: 10, w: { read: .24, rus: .13, lang: .13, math: .30, world: .10, logic: .10, hw: .05 }, norm: 55, startWords: 60, order:['read','math','rus','world','logic','lang'] },
+  anya:  { name:'Аня',  grade:'5 класс', cur: CUR_A, read: READ_A, n: 14, w: { read: .22, rus: .16, lang: .12, math: .26, hist: .12, logic: .12, hw: .05 }, norm: 110, startWords: 150, order:['read','math','rus','hist','logic','lang'] }
 };
 const SUBJ_ICON = { read:'Аа', math:'7+5', rus:'Ёё', world:'☼', hist:'XV', logic:'?!', lang:'Pt', hw:'ДЗ' };
 const STEPS = [1, 3, 7];
@@ -2354,6 +2521,8 @@ S.shop = (S.shop || []).filter(x => !/пап/i.test(x.name));
 /* Крупные призы — примерно месяц стабильных занятий (≈50 баллов в день) */
 { const NP = { match: [600, 1500], trip: [600, 1500], ball: [500, 800], zoo: [350, 700], cafe: [400, 600] };
   for (const k of ['yarik', 'anya']) for (const it of (S.kids[k] && S.kids[k].shop) || []) { const r = NP[it.id]; if (r && it.price === r[0]) it.price = r[1]; } }
+/* 21.11: Ярику — математика с умножения, португальский для носителя с начала; Ане — уровень выше */
+if (!S.mig2 && S.kids && S.kids.yarik) { const Y = S.kids.yarik, A = S.kids.anya; Y.pos = Y.pos || {}; Y.pos.math = Math.max(Y.pos.math || 0, 9); Y.pos.lang = 0; A.lvl = A.lvl || {}; for (const sj of ['math', 'rus', 'logic', 'lang', 'hist']) A.lvl[sj] = Math.max(A.lvl[sj] || 0, 1); S.mig2 = 1; }
 const hashPin = p => String(U.h('uroki:' + p));
 
 /* ===== Синхронизация с Google Таблицей родителя ===== */
@@ -2400,7 +2569,7 @@ function unitAt(kid, subj, tr){ const list = unitsOf(kid, subj, tr); const K = S
   return { u: list[i], i, total: list.length }; }
 function acc(K, uid){ const s = K.stats[uid]; return s && s.n ? s.ok / s.n : 1; }
 function genTasks(unit, seed, n){ const r = U.rng(seed); const out = []; const seen = new Set(); let guard = 0;
-  while (out.length < n && guard++ < n * 12) { const t = unit.g(r); t.q = agree(t.q); t.e = agree(t.e); if (seen.has(t.q)) continue; seen.add(t.q); if (t.k === 'c') t.opts = r.shuffle([t.a, ...t.w]); out.push(t); }
+  while (out.length < n && guard++ < n * 12) { const t = unit.g(r); t.q = agree(t.q); t.e = agree(t.e); if (t.k === 'c' && /^\d+([.,]\d+)?$/.test(t.a) && t.w.every(x => /^\d+([.,]\d+)?$/.test(String(x)))) { t.k = 'n'; t.a = Number(String(t.a).replace(',', '.')); delete t.w; } /* числа — только вводом, без угадывания */ if (seen.has(t.q)) continue; seen.add(t.q); if (t.k === 'c') t.opts = r.shuffle([t.a, ...t.w]); out.push(t); }
   return out; }
 function grade(x){ return x >= .9 ? 5 : x >= .75 ? 4 : x >= .5 ? 3 : 2; }
 function dayRec(kid, ds){ const K = S.kids[kid]; if (!K.days[ds]) K.days[ds] = { les:{}, bonus:false }; return K.days[ds]; }
@@ -2428,7 +2597,7 @@ function coinsHtml(n){ return `<span class="coin" aria-hidden="true"></span><b>$
 
 /* ===== Экраны ===== */
 function render(){
-  if (S.parentPin) for (const k of ['yarik', 'anya']) burnCheck(k);
+  if (S.parentPin) for (const k of ['yarik', 'anya']) { burnCheck(k); piggyCheck(k); }
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
   const v = !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'parent' ? vParent() : vLogin();
   document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes'].includes(cur.view) ? cur.kid : '';
@@ -2491,9 +2660,9 @@ function vHome(){
   const msgs = K.msgs.filter(m => !m.seen);
   const tiles = subs.map(s => { const L = D.les[s]; const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new'; const g = L && L.grade;
     const locked = st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s);
-    return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${s === 'lang' && track('lang', cur.ds) === '_alt' ? 'En' : SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && kid === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
+    return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${s === 'lang' && track('lang', cur.ds) === '_alt' ? 'En' : s === 'world' && kid === 'yarik' && track('world', cur.ds) === '_alt' ? '€' : SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && kid === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${kid}"><header class="bar"><button class="link" data-act="logout">Выйти</button><span class="coins">${coinsHtml(K.coins)}</span></header>
-  <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры, за день можно заработать до 60.</p>
+  <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}${extraTile(kid, D)}${proTile(kid, D)}</section>
@@ -2519,8 +2688,11 @@ function startLesson(subj){
   }
   go('lesson', { subj });
 }
-function unitById(kid, subj, uid){ const c = KIDS[kid].cur[subj]; return (c.units || []).concat(c.alt || []).find(u => u.id === uid); }
-function lessonTasks(L, kid, subj){ if (ITEMS(subj)) return L.items; if (!L._t) { const u = unitById(kid, subj, L.uid); Object.defineProperty(L, '_t', { value: genTasks(u, L.seed, L.n), enumerable: false }); } return L._t; }
+function unitById(kid, subj, uid){ const c = KIDS[kid].cur[subj]; return (c.units || []).concat(c.alt || [], c.old || []).find(u => u.id === uid); }
+function lessonTasks(L, kid, subj){ if (ITEMS(subj)) return L.items; if (!L._t) { const u = unitById(kid, subj, L.uid); let T = genTasks(u, L.seed, L.n);
+    /* Математика: в конце урока 3 задания на повторение пройденных тем (вперемешку, со вводом ответа) */
+    if (subj === 'math' && L.mix !== 0) { const list = unitsOf(kid, subj, L.tr || ''), j = list.indexOf(u); if (j > 0) { const r = U.rng(L.seed + 5); for (let k = 0; k < 3; k++) { const pu = list[r.int(Math.max(0, j - 12), j - 1)], x = genTasks(HARD[pu.id] ? { g: HARD[pu.id] } : pu, L.seed + 17 * k, 1)[0]; if (x) { x.rev = pu.t; T.push(x); } } } }
+    Object.defineProperty(L, '_t', { value: T, enumerable: false }); } return L._t; }
 
 function vLesson(){
   const kid = cur.kid, subj = cur.subj, D = dayRec(kid, cur.ds), L = D.les[subj];
@@ -2554,6 +2726,7 @@ function vTask(kid, subj, L){
   const lang = subj === 'lang' ? (L.tr === '_alt' ? 'en-GB' : 'pt-PT') : 'ru-RU';
   let inp;
   if (t.k === 'c') inp = `<div class="opts">${t.opts.map(o => { const cls = fin && o === t.a ? 'right' : (a.wrong || []).includes(o) ? 'wrong' : ''; return `<button class="opt ${cls}" data-act="choose" data-v="${U.esc(o)}" ${fin || (a.wrong || []).includes(o) ? 'disabled' : ''}>${o}</button>`; }).join('')}</div>`;
+  else if (t.k === 't') inp = `<form class="numf txtf" data-form="num"><input id="numin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" ${fin ? 'disabled' : 'autofocus'} value="${fin ? U.esc(a.v) : ''}" aria-label="Ответ" placeholder="Напиши ответ"><button class="btn" ${fin ? 'disabled' : ''}>Проверить</button></form>`;
   else inp = `<form class="numf" data-form="num"><input id="numin" inputmode="decimal" autocomplete="off" ${fin ? 'disabled' : 'autofocus'} value="${fin ? U.esc(a.v) : ''}" aria-label="Ответ"><button class="btn" ${fin ? 'disabled' : ''}>Проверить</button></form>`;
   let fb = '';
   if (fin) fb = a.ok ? `<div class="fb ok"><b>${a.tries === 1 ? U.rng(L.seed + L.i).pick(THEME[kid].win) : 'Верно!'}</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>` : `<div class="fb bad"><b>Правильный ответ: ${t.k === 'n' ? U.dec(t.a) : t.a}</b> ${t.e ? U.esc(strip(t.e)) : ''}<br><span class="hint">Это задание вернётся в домашнем задании.</span></div>`;
@@ -2562,11 +2735,11 @@ function vTask(kid, subj, L){
   const u0 = (subj === 'extra' || subj === 'pro') && t.uid ? unitById(kid, t.sj, t.uid) : subj !== 'hw' && unitById(kid, subj, L.uid);
   const help = u0 && !fin ? (L.showTh === L.i ? `<details class="peek" open><summary>Правило</summary><div class="th">${u0.th}</div></details>${vExample(kid, subj, L, u0, t)}` : `<button class="link" data-act="dunnotask">🤔 Не понимаю</button>`) : '';
   const dots = `<div class="dots">${T.map((x, j) => { const aj = L.ans[j]; const st = aj && aj.final ? (aj.ok && aj.tries === 1 ? 'ok' : aj.ok ? 'mid' : 'bad') : j === L.i ? 'now' : ''; return aj && aj.final && j !== L.i ? `<button class="dot ${st}" data-act="rtask" data-i="${j}" aria-label="Задание ${j + 1}">${j + 1}</button>` : `<span class="dot ${st}">${j + 1}</span>`; }).join('')}</div>`;
-  return `<div class="counter">Задание ${L.i + 1} из ${T.length}</div>${dots}${L.ans.some(x => x && x.final) ? '<p class="hint small">Нажми на номер решённого задания, чтобы посмотреть его и попробовать ещё раз.</p>' : ''}<article class="card task">${(() => { const il = illus(kid, t.sj || subj, t); return il ? '' : `<div class="scenebar">${scene(kid, (L.seed || 7) + L.i)}</div>`; })()}<span class="sticker" aria-hidden="true">${U.rng((L.seed || 7) + L.i * 31).pick(THEME[kid].pics)}</span><div class="q">${t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, t.sj || subj, t)}${t.sp && !t.spAfter ? spk : ''}${inp}${fb}${t.sp && t.spAfter && fin ? spk : ''}${help}</article>
+  return `<div class="counter">Задание ${L.i + 1} из ${T.length}</div>${dots}${L.ans.some(x => x && x.final) ? '<p class="hint small">Нажми на номер решённого задания, чтобы посмотреть его и попробовать ещё раз.</p>' : ''}<article class="card task">${(() => { const il = illus(kid, t.sj || subj, t); return il ? '' : `<div class="scenebar">${scene(kid, (L.seed || 7) + L.i)}</div>`; })()}<span class="sticker" aria-hidden="true">${U.rng((L.seed || 7) + L.i * 31).pick(THEME[kid].pics)}</span>${t.rev ? `<p class="revtag">🔁 Повторение: ${U.esc(t.rev)}</p>` : ''}<div class="q">${t.k === 't' ? t.q : t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, t.sj || subj, t)}${t.sp && !t.spAfter ? spk : ''}${inp}${fb}${t.sp && t.spAfter && fin ? spk : ''}${help}</article>
   ${fin ? `<button class="btn big" data-act="next">${L.i + 1 < T.length ? 'Дальше' : 'Закончить'}</button>` : ''}`;
 }
 /* Разбор на похожем примере: задание того же типа с ответом и объяснением */
-function subjArt(kid, subj){ const k = kid === 'yarik' ? 'y' : 'a'; let n = subj; if (kid === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (!['math','rus','world','logic','lang','read','hist','geo'].includes(n)) return '';
+function subjArt(kid, subj){ const k = kid === 'yarik' ? 'y' : 'a'; let n = subj; if (kid === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (kid === 'yarik' && subj === 'world' && track('world', cur.ds) === '_alt') return ''; if (!['math','rus','world','logic','lang','read','hist','geo'].includes(n)) return '';
   return `<img class="subjart" src="img/subj-${k}-${n}.webp" alt="" onerror="this.remove()">`; }
 function vExample(kid, subj, L, u, cur0){ const n = L.helpN || 1; const shape = x => strip(x.q).replace(/\d+([,.]\d+)?/g, '#').slice(0, 18);
   const cands = genTasks(u, (L.seed || 1) * 7 + n * 101, 14).filter(x => !cur0 || x.q !== cur0.q); const ex = (cur0 && cands.find(x => shape(x) === shape(cur0))) || (cur0 && cands.find(x => x.k === cur0.k && shape(x).slice(0, 8) === shape(cur0).slice(0, 8))) || cands[0]; if (!ex) return '';
@@ -2578,8 +2751,8 @@ function vPracList(kid, subj, L){ const T = lessonTasks(L, kid, subj);
 function vRetry(kid, subj, L, i){ const T = lessonTasks(L, kid, subj), t = T[i]; if (!t) return ''; const r = cur.rtry && cur.rtry.i === i ? cur.rtry : { i, wrong: [], tries: 0 }; const fin = r.fin, a0 = L.ans[i] || {};
   let inp;
   if (t.k === 'c') inp = `<div class="opts">${t.opts.map(o => { const cls = fin && o === t.a ? 'right' : r.wrong.includes(o) ? 'wrong' : ''; return `<button class="opt ${cls}" data-act="rtryc" data-v="${U.esc(o)}" ${fin || r.wrong.includes(o) ? 'disabled' : ''}>${o}</button>`; }).join('')}</div>`;
-  else inp = `<form class="numf" data-form="rtry"><input id="rtin" inputmode="decimal" autocomplete="off" ${fin ? 'disabled' : ''} value="${fin ? U.esc(r.v) : ''}" aria-label="Ответ"><button class="btn" ${fin ? 'disabled' : ''}>Проверить</button></form>`;
-  const ra = t.k === 'n' ? U.dec(t.a) : t.a;
+  else inp = `<form class="numf" data-form="rtry"><input id="rtin" ${t.k === 't' ? 'autocapitalize="off" autocorrect="off" spellcheck="false"' : 'inputmode="decimal"'} autocomplete="off" ${fin ? 'disabled' : ''} value="${fin ? U.esc(r.v) : ''}" aria-label="Ответ"><button class="btn" ${fin ? 'disabled' : ''}>Проверить</button></form>`;
+  const ra = t.k === 'n' ? U.dec(t.a) : U.esc(t.a);
   const fb = fin ? (r.ok ? `<div class="fb ok"><b>Верно!</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>` : `<div class="fb bad"><b>Правильный ответ: ${ra}</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>`) : r.tries ? '<div class="fb try">Не совсем. Подумай ещё раз.</div>' : '';
   const was = a0.final ? `<p class="hint">В уроке: ${a0.ok && a0.tries === 1 ? 'верно с первого раза ✓' : a0.ok ? 'верно со второй попытки' : 'ошибка, ответ был ' + U.esc(String(a0.v))}</p>` : '';
   const nxt = T.findIndex((x, j) => j > i && L.ans[j] && L.ans[j].final);
@@ -2587,7 +2760,7 @@ function vRetry(kid, subj, L, i){ const T = lessonTasks(L, kid, subj), t = T[i];
   <div class="row">${fin ? '<button class="btn ghost" data-act="rtryagain">↻ Ещё раз</button>' : ''}${nxt >= 0 ? `<button class="btn ghost" data-act="rtask" data-i="${nxt}">Следующее →</button>` : ''}</div><button class="btn big" data-act="rview" data-s="">Вернуться к уроку</button>`; }
 function retryAnswer(v){ const kid = cur.kid, L = dayRec(kid, cur.ds).les[cur.subj], i = cur.rtask, t = lessonTasks(L, kid, cur.subj)[i]; if (!t) return;
   const r = cur.rtry && cur.rtry.i === i ? cur.rtry : (cur.rtry = { i, wrong: [], tries: 0 }); if (r.fin) return; let ok;
-  if (t.k === 'n') { const x = Number(String(v).replace(',', '.').replace(/\s/g, '')); if (String(v).trim() === '' || isNaN(x)) return; ok = Math.abs(x - t.a) < 1e-6; } else ok = v === t.a;
+  if (t.k === 'n') { const x = Number(String(v).replace(',', '.').replace(/\s/g, '')); if (String(v).trim() === '' || isNaN(x)) return; ok = Math.abs(x - t.a) < 1e-6; } else if (t.k === 't') { if (!String(v).trim()) return; ok = txtOk(t, v); } else ok = v === t.a;
   r.tries++; r.v = v; if (!ok && t.k === 'c') r.wrong.push(v);
   if (ok || r.tries >= 2 || (t.k === 'c' && t.opts.length - r.wrong.length <= 1)) { r.fin = true; r.ok = ok; }
   render(); }
@@ -2614,6 +2787,7 @@ function answer(v){
   const a = L.ans[L.i] || (L.ans[L.i] = { tries: 0, wrong: [] }); if (a.final) return;
   let ok;
   if (t.k === 'n') { const x = Number(String(v).replace(',', '.').replace(/\s/g, '')); if (String(v).trim() === '' || isNaN(x)) return; ok = Math.abs(x - t.a) < 1e-6; }
+  else if (t.k === 't') { if (!String(v).trim()) return; ok = txtOk(t, v); }
   else ok = v === t.a;
   a.tries++; a.v = v;
   if (!ok && t.k === 'c') a.wrong.push(v);
@@ -2629,6 +2803,8 @@ function answer(v){
   }
   save(); render();
 }
+function txtN(x){ return String(x).toLowerCase().replace(/[«».!?]/g, '').replace(/\s+/g, ' ').trim(); }
+function txtOk(t, v){ const z = txtN(v); return z === txtN(t.a) || (t.alt || []).some(x => txtN(x) === z); }
 function addSrs(kid, subj, t){ const K = S.kids[kid]; const key = U.h(t.q + t.a) + ''; if (K.srs.some(x => x.key === key)) return; const copy = JSON.parse(JSON.stringify(t)); K.srs.push({ key, task: copy, step: 0, due: U.addDays(cur.ds, 1) }); }
 function updSrs(kid, key, ok){ const K = S.kids[kid]; const x = K.srs.find(z => z.key === key); if (!x) return; if (ok) { x.step++; if (x.step >= STEPS.length) K.srs = K.srs.filter(z => z !== x); else x.due = U.addDays(cur.ds, STEPS[x.step]); } else { x.step = 0; x.due = U.addDays(cur.ds, 1); } }
 function nextTask(){
@@ -2657,21 +2833,22 @@ function finishLesson(){
   if (subj === 'hw') K.hwText.forEach(h => { if ((L.txt || []).includes(h.id)) h.done = true; });
   L.secs = Math.min(1500, Math.round((Date.now() - (L.t0 || Date.now())) / 1000)); D.secs = (D.secs || 0) + L.secs;
   if (subj === 'extra') { /* Экстра после закрытого дня: +5 баллов при 80% верных с первого раза, +3 при 60% */
-    const pts = ratio >= .8 ? EXTRA_BONUS : ratio >= .6 ? 3 : 0; K.coins += pts; L.coins = pts; D.extraPts = pts; L.phase = 'done';
+    const pts = ratio >= .8 ? EXTRA_BONUS : ratio >= .6 ? 3 : 0; piggyAdd(K, pts); L.coins = pts; D.extraPts = pts; L.phase = 'done';
     ev(kid, 'экстра', { subj: 'Экстра', score: `${first}/${tot}`, grade: L.grade, coins: K.coins, text: `+${pts} баллов` }); save(); render(); return; }
   if (subj === 'pro') { /* PRO: тот же день сложнее, одна попытка; до +30 баллов сверх дневного лимита */
     let pts = ratio >= .9 ? PRO_BONUS : ratio >= .75 ? 20 : ratio >= .6 ? 10 : 0; const minS = T.length * (kid === 'yarik' ? 20 : 25); if (L.secs < minS) { pts = Math.round(pts / 2); L.fastCut = true; }
-    K.coins += pts; L.coins = pts; D.proPts = pts; L.phase = 'done';
+    piggyAdd(K, pts); L.coins = pts; D.proPts = pts; L.phase = 'done';
     ev(kid, 'PRO', { subj: 'Уровень PRO', score: `${first}/${tot}`, grade: L.grade, coins: K.coins, secs: L.secs, text: `+${pts} баллов` }); save(); render(); return; }
-  const subs = todaySubjects(kid), M = LESSON_POOL / Math.max(5, subs.length);
+  const subs = todaySubjects(kid), W = KIDS[kid].w || {}, wsum = subs.reduce((s0, x) => s0 + (W[x] || .1), 0), M = LESSON_POOL * (W[subj] || .1) / Math.max(1, wsum);
   let pts = q < .6 ? 0 : Math.round(M * q * q);
   /* Баллы за усилие: урок, пролетевший быстрее нормы времени, даёт меньше (норма ≈ 25–30 с на задание) */
-  if (subj !== 'read' && !ITEMS(subj)) { const T0 = lessonTasks(L, kid, subj), minS = (T0.length || 5) * (kid === 'yarik' ? 25 : 30), fk = Math.min(1, L.secs / minS); if (fk < 1) { pts = Math.round(pts * Math.max(.3, fk)); L.fastCut = fk < .9; } }
+  if (subj !== 'read' && !ITEMS(subj)) { const T0 = lessonTasks(L, kid, subj), minS = (T0.length || 5) * (kid === 'yarik' ? 35 : 40), fk = Math.min(1, L.secs / minS); if (fk < 1) { pts = Math.round(pts * Math.max(.3, fk)); L.fastCut = fk < .9; }
+    /* Выбор из вариантов стоит меньше, чем ответ, написанный самому */ const inS = T0.filter(x => x.k !== 'c').length / Math.max(1, T0.length); pts = Math.round(pts * (.6 + .4 * inS)); }
   /* Урок, открытый не по порядку за баллы: пока день не закрыт целиком, только треть */
   if (L.oot && !subs.every(s => s === subj || (D.les[s] && D.les[s].phase === 'done'))) { pts = Math.round(pts / 3); L.ootCut = true; } D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
-  K.coins += pts; L.coins = pts; L.phase = 'done';
+  piggyAdd(K, pts); L.coins = pts; L.phase = 'done';
   if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
-    if (subs.every(s => (D.les[s].q || 0) >= .9 && !D.les[s].fastCut && !D.les[s].oot)) { const b = Math.max(0, DAY_MAX - D.pts); D.pts += b; K.coins += b; L.coins += b; L.perfect = true; D.perfect = b; }
+    if (subs.every(s => (D.les[s].q || 0) >= .9 && !D.les[s].fastCut && !D.les[s].oot)) { const b = Math.max(0, DAY_MAX - D.pts); D.pts += b; piggyAdd(K, b); L.coins += b; L.perfect = true; D.perfect = b; }
     const mins = Math.round(D.secs / 60); K.extraN = K.extraN || 0; if (mins < 40) K.extraN = Math.min(3, K.extraN + 1); else if (mins > 65) K.extraN = Math.max(-2, K.extraN - 1);
     ev(kid, 'день завершён', { coins: K.coins, score: D.pts + ' мин игры заработано', secs: D.secs, text: `занимался ${mins} мин` }); }
   ev(kid, 'урок завершён', { subj: subjName(kid, subj, cur.ds), unit: lessonTitle(kid, subj, cur.ds), score: `${first}/${tot}`, grade: L.grade, passed: L.passed === undefined ? '' : L.consolidate ? 'сдано 1 из 2 (закрепление завтра)' : L.passed ? 'тема пройдена' : 'повтор', mood: (L.fb || {}).mood, diff: (L.fb || {}).diff, like: (L.fb || {}).like, text: (L.fb || {}).text, coins: K.coins });
@@ -2720,16 +2897,25 @@ function baseTime(kid){ const c = 0; return { game: Math.max(0, BASE_GAME - 15 *
 function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) { K.lastDone = t; K.burnDate = t; return; } if (K.burnDate === t) return; K.burnDate = t;
   let missed = 0, d = K.lastDone; while (U.addDays(d, 1) < t) { d = U.addDays(d, 1); missed++; }
   const before = K.burnBase == null ? missed : missed - K.burnBase; K.burnBase = missed;
-  if (missed < 1 || before < 1 || K.coins <= 0) return;
+  if (missed < 1 || before < 1 || (K.coins <= 0 && !(K.piggy > 0))) return;
   K.okStreak = 0;
-  const lost = K.coins > 0 ? (missed >= 2 ? K.coins : Math.ceil(K.coins / 2)) : 0; K.coins -= lost;
+  let lost = K.coins > 0 ? (missed >= 2 ? K.coins : Math.ceil(K.coins / 2)) : 0; K.coins -= lost; if (K.piggy > 0) { const lp = missed >= 2 ? K.piggy : Math.ceil(K.piggy / 2); K.piggy -= lp; lost += lp; }
   const bt = baseTime(kid);
   K.burnMsg = `Ты пропустил(а) занятия — сгорело ${agree(lost + ' баллов')}.`;
   ev(kid, 'баллы сгорели', { coins: K.coins, price: -lost, text: `пропущено дней: ${missed}` }); save(); }
 function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0) return '';
   const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'} (${K.coins}).</div>`; }
 function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
-  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span>🎮 Игры <b>${bt.game} мин</b></span><span>▶️ YouTube <b>${bt.yt} мин</b></span><span>⭐ Баллы <b>${K.coins}</b> (+1 минута за балл)</span></div></div>`; }
+  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span>🎮 Игры <b>${bt.game} мин</b></span><span>▶️ YouTube <b>${bt.yt} мин</b></span><span>⭐ Баллы <b>${K.coins}</b> (+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
+/* ----- Копилка: заработанное за неделю копится и в воскресенье переходит на счёт с прибавкой +10%. Забрать раньше можно, но без прибавки. ----- */
+const PIGGY_RATE = .10;
+function weekStart(ds){ const n = U.dayNum(ds), wd = (n + 3) % 7; /* 0 = понедельник */ return U.addDays(ds, -wd); }
+function piggyAdd(K, pts){ if (!pts) return; K.piggy = (K.piggy || 0) + pts; if (!K.piggyWeek) K.piggyWeek = weekStart(U.today()); }
+function piggyCheck(kid){ const K = S.kids[kid], t = U.today(), w = weekStart(t); if (!K.piggyWeek) { K.piggyWeek = w; return; }
+  const sunday = (U.dayNum(t) + 3) % 7 === 6; if (K.piggy > 0 && (K.piggyWeek !== w || (sunday && K.piggyPaid !== K.piggyWeek))) { const bonus = K.piggyEarly === K.piggyWeek ? 0 : Math.round(K.piggy * PIGGY_RATE), tot = K.piggy + bonus; K.coins += tot; K.piggyMsg = `🐷 Копилка открыта: ${agree(K.piggy + ' баллов')}${bonus ? ` + ${bonus} за терпение (10%)` : ''} = ${tot} на счёт!`; ev(kid, 'копилка', { coins: K.coins, price: tot, text: `накоплено ${K.piggy}, процент ${bonus}` }); K.piggy = 0; K.piggyPaid = K.piggyWeek; save(); }
+  if (K.piggyWeek !== w) { K.piggyWeek = w; save(); } }
+function piggyCard(kid){ const K = S.kids[kid], p = K.piggy || 0, b = Math.round(p * PIGGY_RATE);
+  return `<div class="piggy"><span class="pig" aria-hidden="true">🐷</span><span>Копилка: <b>${p}</b>${p ? ` · в воскресенье станет <b>${p + b}</b> (+10%)` : ' · заработанное за уроки копится тут до воскресенья'}</span>${p ? '<button class="link" data-act="piggyearly">Забрать сейчас без процента</button>' : ''}</div>${K.piggyMsg ? `<div class="note">${U.esc(K.piggyMsg)} <button class="link" data-act="piggyseen">Ура!</button></div>` : ''}`; }
 
 /* ----- Чтение ----- */
 let RD = null; /* текущая сессия чтения вслух */
@@ -3008,6 +3194,8 @@ document.addEventListener('click', e => {
     case 'key': pinKey(b.dataset.k); break;
     case 'logout': if (RD && (RD.active || RD.paused)) pauseRead(); RD = null; rememberScroll(); if (RT && RT.active) { RT.active = false; try { RT.rec.stop(); } catch (e) {} RT = null; } cur.kid = null; go('login'); break;
     case 'home': if (RD && (RD.active || RD.paused)) pauseRead(); RD = null; rememberScroll(); go('home'); break;
+    case 'piggyearly': { const K0 = S.kids[kid]; if (!(K0.piggy > 0)) break; if (!window.confirm(`Забрать ${K0.piggy} сейчас? Тогда прибавки +10% (${Math.round(K0.piggy * PIGGY_RATE)}) не будет.`)) break; K0.coins += K0.piggy; ev(kid, 'копилка досрочно', { coins: K0.coins, price: K0.piggy, text: 'без процента' }); K0.piggy = 0; save(); render(); break; }
+    case 'piggyseen': S.kids[kid].piggyMsg = ''; save(); render(); break;
     case 'openpro': { if (D.les.pro) { go('lesson', { subj: 'pro' }); break; } if (!proReady(kid, D)) break; startLesson('pro'); break; }
     case 'rtask': { cur.rtask = +b.dataset.i; cur.rtry = null; rememberScroll(); render(); window.scrollTo(0, 0); break; }
     case 'rtryc': retryAnswer(b.dataset.v); break;
