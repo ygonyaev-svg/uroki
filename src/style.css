@@ -210,3 +210,5 @@ th{ color:var(--ink2); font-weight:600; }
 .pair .pic{ max-width:46%; }
 .prizes{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
 .prizes .chip{ font-size:16px; }
+.timecard h2{ margin:0 0 8px; font-size:18px; }
+.timecard .tt2{ display:flex; flex-wrap:wrap; gap:10px 18px; font-size:17px; }

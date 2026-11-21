@@ -158,7 +158,7 @@ function vHome(){
     const locked = st !== 'done' && s !== nextOpen(kid);
     return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${s === 'lang' && track('lang', cur.ds) === '_alt' ? 'En' : SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && kid === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${kid}"><header class="bar"><button class="link" data-act="logout">Выйти</button><span class="coins">${coinsHtml(K.coins)}</span></header>
-  <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. 1 балл = 1 минута игры, за день можно заработать до 60.</p>
+  <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. 1 балл = 1 минута игры, за день можно заработать до 60.</p>
    <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(m.text)} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}</section>
@@ -292,10 +292,10 @@ function finishLesson(){
   const subs = todaySubjects(kid), M = Math.floor(LESSON_POOL / Math.max(5, subs.length));
   let pts = q < .6 ? 0 : Math.round(M * q * q); D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
   K.coins += pts; L.coins = pts; L.phase = 'done';
-  if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; K.lastDone = U.today(); K.burnBase = 0;
+  if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
     if (subs.every(s => (D.les[s].q || 0) >= .9)) { const b = Math.max(0, DAY_MAX - D.pts); D.pts += b; K.coins += b; L.coins += b; L.perfect = true; }
     const mins = Math.round(D.secs / 60); K.extraN = K.extraN || 0; if (mins < 40) K.extraN = Math.min(3, K.extraN + 1); else if (mins > 65) K.extraN = Math.max(-2, K.extraN - 1);
-    ev(kid, 'день завершён', { coins: K.coins, score: D.pts + ' мин игры заработано', secs: D.secs, text: `занимался ${mins} мин` }); }
+    ev(kid, 'день завершён', { coins: K.coins, score: D.pts + ' мин игры заработано', secs: D.secs, text: `занимался ${mins} мин; обычное время: игры ${baseTime(kid).game} мин, YouTube ${baseTime(kid).yt} мин` }); }
   ev(kid, 'урок завершён', { subj: subjName(kid, subj, cur.ds), unit: lessonTitle(kid, subj, cur.ds), score: `${first}/${tot}`, grade: L.grade, passed: L.passed === undefined ? '' : L.passed ? 'тема пройдена' : 'повтор', mood: (L.fb || {}).mood, diff: (L.fb || {}).diff, like: (L.fb || {}).like, text: (L.fb || {}).text, coins: K.coins });
   save(); render();
 }
@@ -313,14 +313,23 @@ function lessonQuality(kid, subj, L, ratio){
   const w = parts.reduce((a, x) => a + x[1], 0); return parts.reduce((a, x) => a + x[0] * x[1], 0) / w;
 }
 /* Пропуск дня: баллы сгорают. Пропущен 1 день — половина, 2 и больше — все. */
+/* Базовое время каждый день: 60 мин игр + 30 мин YouTube. За каждый пропущенный день −15 мин игр и −10 мин YouTube,
+   полностью возвращается после 2 закрытых дней подряд. */
+const BASE_GAME = 60, BASE_YT = 30;
+function baseTime(kid){ const c = S.kids[kid].baseCut || 0; return { game: Math.max(0, BASE_GAME - 15 * c), yt: Math.max(0, BASE_YT - 10 * c), cut: c }; }
 function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) { K.lastDone = t; K.burnDate = t; return; } if (K.burnDate === t) return; K.burnDate = t;
   let missed = 0, d = K.lastDone; while (U.addDays(d, 1) < t) { d = U.addDays(d, 1); missed++; }
   const before = K.burnBase == null ? missed : missed - K.burnBase; K.burnBase = missed;
-  if (missed < 1 || before < 1 || K.coins <= 0) return;
-  const lost = missed >= 2 ? K.coins : Math.ceil(K.coins / 2); K.coins -= lost; K.burnMsg = `Ты пропустил(а) занятия — сгорело ${lost} мин игры.`;
-  ev(kid, 'баллы сгорели', { coins: K.coins, price: -lost, text: `пропущено дней: ${missed}` }); save(); }
-function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0) return '';
-  const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'} (${K.coins}).</div>`; }
+  if (missed < 1 || before < 1) return;
+  K.baseCut = Math.min(4, (K.baseCut || 0) + before); K.okStreak = 0;
+  const lost = K.coins > 0 ? (missed >= 2 ? K.coins : Math.ceil(K.coins / 2)) : 0; K.coins -= lost;
+  const bt = baseTime(kid);
+  K.burnMsg = `Ты пропустил(а) занятия.${lost ? ` Сгорело ${lost} баллов.` : ''} Обычное время теперь меньше: игры ${bt.game} мин, YouTube ${bt.yt} мин. Позанимайся 2 дня подряд — всё вернётся.`;
+  ev(kid, 'баллы сгорели', { coins: K.coins, price: -lost, text: `пропущено дней: ${missed}; базовое время: игры ${bt.game} мин, YouTube ${bt.yt} мин` }); save(); }
+function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t) return '';
+  const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра ${K.coins > 0 ? `сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'}, и ` : ''}обычное время станет меньше: −15 мин игр и −10 мин YouTube.</div>`; }
+function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
+  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span>🎮 Игры <b>${bt.game} мин</b></span><span>▶️ YouTube <b>${bt.yt} мин</b></span><span>⭐ Баллы <b>${K.coins}</b> (+1 минута за балл)</span></div>${bt.cut ? `<p class="hint">Обычное время урезано из‑за пропусков. Позанимайся 2 дня подряд — вернётся полностью (сейчас подряд: ${K.okStreak || 0}).</p>` : ''}</div>`; }
 
 /* ----- Чтение ----- */
 let RD = null; /* текущая сессия чтения вслух */
@@ -523,7 +532,7 @@ function vReport(kid){
   const rd = K.reading.slice(-10).reverse().map(r => `<tr><td>${r.d}</td><td>${U.esc(r.title)}</td><td>${r.lang}</td><td>${r.wpm}</td><td>${r.acc == null ? '—' : Math.round(r.acc * 100) + '%'}</td><td>${U.esc((r.errs || []).join(', '))}</td></tr>`).join('');
   const fbs = S.log.filter(e => e.kid === d.name && e.type === 'урок завершён').slice(-10).reverse().map(e => `<li>${e.t.slice(0, 10)} · ${U.esc(e.subj)}: ${e.grade} (${e.score}) · ${['', '🙁', '😐', '🙂', '😀'][e.mood || 0] || ''} ${U.esc(e.diff || '')}${e.text ? ' · «' + U.esc(e.text) + '»' : ''}</li>`).join('');
   const errs = S.log.filter(e => e.kid === d.name && e.type === 'ответ' && e.ok === 'ошибка').slice(-12).reverse().map(e => `<li><b>${U.esc(e.subj)}</b>: ${U.esc(e.q)} — ответил(а) «${U.esc(e.ans)}», надо «${U.esc(e.right)}»</li>`).join('');
-  return kidSw + `<div class="card"><h2>${d.name}: монеты ${K.coins}, прочитано слов ${K.words}, в повторении ${K.srs.length} заданий</h2>
+  return kidSw + timeCard(kid) + `<div class="card"><h2>${d.name}: баллы ${K.coins}, прочитано слов ${K.words}, в повторении ${K.srs.length} заданий</h2>
   <div class="tscroll"><table><thead><tr><th>Предмет</th><th>Темы</th><th>Сейчас</th><th>Точность</th></tr></thead><tbody>${subs}</tbody></table></div></div>
   <div class="card"><h2>Слабые места</h2>${weak ? `<ul>${weak}</ul>` : '<p>Пока мало данных.</p>'}</div>
   <div class="card"><h2>Чтение вслух</h2>${rd ? `<div class="tscroll"><table><thead><tr><th>Дата</th><th>Текст</th><th>Язык</th><th>сл/мин</th><th>Точность</th><th>Ошибки</th></tr></thead><tbody>${rd}</tbody></table></div>` : '<p>Ещё не читал(а).</p>'}<p class="hint">Норма к концу года: ${d.norm} слов в минуту. Сейчас читает вслух по ${wordsLimit(kid)} слов за урок.</p></div>
