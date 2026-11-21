@@ -28,21 +28,23 @@ function famStatus(){
 }
 function famGate(){
   if (!KIDS[cur.parentKid]) cur.parentKid = kidIds()[0] || null;
-  if (S.fam && S.fam.off) return famWrap('<header class="hero"><p class="eyebrow">Словоход</p><h1>Доступ приостановлен</h1><p>Тестовый доступ для вашей семьи сейчас отключён. Свяжитесь с организатором теста.</p></header><p class="center"><button class="btn ghost" data-act="fkrecheck">Проверить ещё раз</button></p>');
+  if (S.fam && S.fam.off) return famWrap(famBrand(true) + '<header class="hero"><h1>Доступ приостановлен</h1><p>Тестовый доступ для вашей семьи сейчас отключён. Свяжитесь с организатором теста.</p></header><p class="center"><button class="btn ghost" data-act="fkrecheck">Проверить ещё раз</button></p>');
   if (!S.fam) return cur.fview === 'login' ? vFamLogin() : vFamReg();
   if (!S.parentPin || !kidIds().length || cur.view === 'fkids') return vFamKids();
   return null;
 }
-function famWrap(h){ return '<main class="wrap narrow">' + h + '</main>'; }
+function famWrap(h){ return '<main class="wrap narrow famscr">' + h + '</main>'; }
+var FAM_MOTTO = 'Слово за словом, шаг за шагом — к родным корням.';
+function famBrand(big){ return '<div class="fambrand' + (big ? ' big' : '') + '"><img src="semya/logo.webp" alt="" width="' + (big ? 160 : 64) + '" height="' + (big ? 160 : 64) + '"><div><div class="famlogo">Слово<span>ход</span></div>' + (big ? '<p class="fammotto">' + FAM_MOTTO + '</p>' : '') + '</div></div>'; }
 function famIn(id, label, type, extra){ return '<label>' + label + '<input id="' + id + '" type="' + (type || 'text') + '" autocomplete="off" ' + (extra || '') + '></label>'; }
 function vFamReg(){
-  return famWrap('<header class="hero"><p class="eyebrow">Бесплатная тестовая версия</p><h1>Словоход</h1><p>Русский язык, чтение вслух, математика и логика для детей 6–13 лет. 20–40 минут в день, уроки ведёт приложение, отчёт — родителю.</p></header>' +
+  return famWrap(famBrand(true) + '<header class="hero"><p class="eyebrow">Бесплатная тестовая версия</p><p class="famintro">Всё начинается со слова. Родная речь — корни, из которых растёт человек, где бы он ни жил. Русский язык, чтение вслух, математика и логика для детей 6–13 лет. 20–40 минут в день, уроки ведёт приложение, отчёт — родителю.</p></header>' +
     '<form class="card form" data-form="freg"><h2>Регистрация семьи</h2>' + famIn('fname', 'Ваше имя') + famIn('femail', 'Email', 'email', 'inputmode="email" autocapitalize="off"') + famIn('fpass', 'Пароль (не короче 6 знаков)', 'password') +
     '<button class="btn big"' + (FAM_BUSY ? ' disabled' : '') + '>' + (FAM_BUSY ? 'Подождите…' : 'Зарегистрироваться') + '</button></form>' +
     '<p class="center"><button class="link" data-act="fklogin">Уже регистрировались? Войти</button></p>');
 }
 function vFamLogin(){
-  return famWrap('<header class="hero"><p class="eyebrow">Словоход</p><h1>Вход для родителей</h1><p>Войдите тем же email и паролем, что при регистрации.</p></header>' +
+  return famWrap(famBrand(true) + '<header class="hero"><h1>Вход для родителей</h1><p>Войдите тем же email и паролем, что при регистрации.</p></header>' +
     '<form class="card form" data-form="flogin">' + famIn('femail', 'Email', 'email', 'inputmode="email" autocapitalize="off"') + famIn('fpass', 'Пароль', 'password') +
     '<button class="btn big"' + (FAM_BUSY ? ' disabled' : '') + '>' + (FAM_BUSY ? 'Подождите…' : 'Войти') + '</button></form>' +
     '<p class="center"><button class="link" data-act="fkreg">Новая семья? Регистрация</button></p>');
@@ -60,12 +62,12 @@ function vFamKids(){
     '<label>Возраст<select id="fka' + i + '">' + ages(c.age) + '</select></label>' +
     '<label>Оформление<select id="fkl' + i + '">' + looks(c.look, c.age) + '</select></label>' +
     '<label>Код ребёнка, 4 цифры' + (c.has ? ' (оставьте пустым, чтобы не менять)' : '') + '<input id="fkp' + i + '" inputmode="numeric" maxlength="4" autocomplete="off" value="' + U.esc(c.pinNew || '') + '"></label></fieldset>'; }).join('');
-  return famWrap('<header class="hero"><p class="eyebrow">Словоход · ' + U.esc((S.fam && S.fam.email) || '') + '</p><h1>' + (first ? 'Добавьте детей' : 'Дети') + '</h1><p>Программа подстраивается под возраст: 6–9 лет — младшая, 10–13 лет — старшая. Дальше сложность меняется по ответам ребёнка.</p></header>' +
+  return famWrap(famBrand(false) + '<header class="hero"><p class="eyebrow">' + U.esc((S.fam && S.fam.email) || '') + '</p><h1>' + (first ? 'Добавьте детей' : 'Дети') + '</h1><p>Программа подстраивается под возраст: 6–9 лет — младшая, 10–13 лет — старшая. Дальше сложность меняется по ответам ребёнка.</p></header>' +
     '<form data-form="fkids">' + rows + (L.length < 5 ? '<p class="center"><button type="button" class="btn ghost" data-act="fkadd">+ Ещё ребёнок</button></p>' : '') +
     '<div class="card form"><label>Код родителя, 4 цифры' + (first ? '' : ' (оставьте пустым, чтобы не менять)') + '<input id="fkpp" inputmode="numeric" maxlength="4" autocomplete="off"></label><p class="hint">Код родителя открывает отчёты и подтверждает призы. Коды детей — чтобы брат или сестра не заходили друг за друга.</p>' +
     '<button class="btn big">Сохранить</button>' + (first ? '' : ' <button type="button" class="link" data-act="fkback">Отмена</button>') + '</div></form>');
 }
-function famLoginExtra(){ return '<p class="center hint">Словоход · бесплатная тестовая версия</p>'; }
+function famLoginExtra(){ return '<p class="fammotto center">' + FAM_MOTTO + '</p>'; }
 function famSettings(){
   return '<div class="card"><h2>Семья</h2><p class="hint">' + U.esc(S.fam.email || '') + '</p><div class="row"><button class="btn small" data-act="fkedit">Дети и коды</button> <button class="btn small stop" data-act="fkout">Выйти из аккаунта</button></div></div>' +
     '<form class="card form" data-form="ffb"><h2>Отзыв о тестовой версии</h2><label>Что понравилось, что мешает, чего не хватает<textarea id="ffbt" rows="4" maxlength="2000" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;font:inherit;padding:10px;border-radius:12px;border:1px solid #cbd5e1"></textarea></label><button class="btn small">Отправить</button></form>';
