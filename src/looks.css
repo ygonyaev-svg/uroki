@@ -1,0 +1,118 @@
+/* ===== Темы оформления на выбор (looks.js) ===== */
+/* --- общий интерактив --- */
+.lkrow{ display:flex; gap:18px; align-items:flex-start; }
+.lkprev{ flex:none; width:150px; display:flex; justify-content:center; padding:10px 0; border-radius:18px; background:var(--accsoft,#f1f5f9); }
+.lkmain{ flex:1; min-width:0; }
+.lkopts{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.lkopts.grid{ grid-template-columns:repeat(4,1fr); }
+.lkopt{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; text-align:center; padding:12px 8px; min-height:64px; }
+.lkopt small{ font-weight:500; font-size:13px; opacity:.75; line-height:1.25; }
+.lkopt.on{ border-color:var(--acc); background:var(--accsoft,#fff); }
+.lkopt .ic.big{ width:36px; height:36px; }
+.lksw{ display:inline-block; width:38px; height:38px; border-radius:50%; border:2px solid #1B2A44; }
+.lksw.sq{ border-radius:4px; }
+.lknum{ font-size:24px; }
+.lkform{ margin-top:12px; }
+.lkres{ text-align:center; }
+.lkbig{ display:flex; justify-content:center; margin:6px 0 10px; }
+.lksay{ font-size:20px; line-height:1.4; }
+.lktile .ico{ background:var(--accsoft,#fff) !important; overflow:hidden; }
+.lktile .ico .lkpic{ max-height:54px; }
+@media (max-width:620px){ .lkrow{ flex-direction:column; align-items:stretch; } .lkprev{ width:auto; } .lkopts.grid{ grid-template-columns:repeat(3,1fr); } }
+
+/* --- выбор темы родителем --- */
+.lkset h3{ margin:16px 0 8px; }
+.lkgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.lkcard{ display:flex; flex-direction:column; align-items:flex-start; gap:4px; text-align:left; padding:10px; border-radius:16px; border:3px solid transparent; background:#f8fafc; font:inherit; color:inherit; cursor:pointer; }
+.lkcard.on{ border-color:#2563eb; background:#eff6ff; }
+.lkcard b{ font-size:16px; } .lkcard small{ font-size:12.5px; opacity:.75; line-height:1.25; }
+.lkcard-sw{ display:flex; gap:4px; padding:8px; border-radius:12px; width:100%; box-sizing:border-box; justify-content:space-around; }
+.lkcard-sw .ic{ width:28px; height:28px; --iw:#fff; }
+@media (max-width:620px){ .lkgrid{ grid-template-columns:1fr 1fr; } }
+
+/* --- вход: карточки детей --- */
+.kidcard.th-hero{ background:linear-gradient(#2B4FA8,#1E2E6E); box-shadow:0 8px 0 #121B45,0 14px 30px rgba(0,0,0,.25); }
+.kidcard.th-cube{ background:linear-gradient(#5DA130 0 22%,#8B5A2B 22%); border-radius:8px; box-shadow:0 8px 0 #5A3A1A,0 14px 30px rgba(0,0,0,.25); }
+.kidcard.th-prin{ background:linear-gradient(#E58AB8,#A8457F); box-shadow:0 8px 0 #6E2A54,0 14px 30px rgba(0,0,0,.25); }
+.kidcard.th-doll{ background:linear-gradient(#F48FC0,#E4479A); box-shadow:0 8px 0 #A3236A,0 14px 30px rgba(0,0,0,.25); }
+
+/* ======================= СУПЕРГЕРОИ: ночной город, комикс ======================= */
+body.th-hero{ background:#1D2350; --il:#141A33; --ia:#E23B3B; --ib:#FFD23F; --iw:#ffffff; }
+body.th-hero::before{ background:linear-gradient(rgba(10,12,40,.45),rgba(10,12,40,.15) 300px,rgba(10,12,40,.05)),url(img/bg-hero.webp) center 60%/cover no-repeat,linear-gradient(#141838,#3C2E6E 55%,#F08A4B) !important; }
+body.th-hero .wrap{ --acc:var(--b1,#E23B3B); --accsoft:#FFF3C4; }
+body.th-hero h1,body.th-hero h2,body.th-hero .sn{ font-style:italic; letter-spacing:.01em; }
+body.th-hero .hello > h1,body.th-hero .lesson > h1{ text-transform:uppercase; font-weight:900; color:#FFD23F; text-shadow:3px 3px 0 #141A33; }
+body.th-hero .card,body.th-hero .tile,body.th-hero .opt,body.th-hero .note{ border:3px solid #141A33 !important; box-shadow:5px 5px 0 #141A33 !important; border-radius:14px; }
+body.th-hero .btn{ background:var(--b1,#E23B3B); color:#fff; border:3px solid #141A33; box-shadow:4px 4px 0 #141A33; text-transform:uppercase; font-style:italic; }
+body.th-hero .btn:active{ transform:translate(3px,3px); box-shadow:1px 1px 0 #141A33; }
+body.th-hero .btn.ghost{ background:#FFD23F; color:#141A33; }
+body.th-hero .coins{ background:#FFD23F; color:#141A33; border:3px solid #141A33; box-shadow:3px 3px 0 #141A33; }
+body.th-hero .banner .ic{ background:#FFD23F; border:3px solid #141A33; border-radius:50%; box-shadow:3px 3px 0 #141A33; }
+body.th-hero .tile .ico{ border:3px solid #141A33; border-radius:12px; }
+body.th-hero .prog i{ background:repeating-linear-gradient(45deg,#E23B3B 0 10px,#FFD23F 10px 20px); }
+body.th-hero .wrap > .hello::after{ content:""; display:block; height:8px; margin-top:10px; background:repeating-linear-gradient(90deg,#E23B3B 0 30px,#FFD23F 30px 60px,#2B4FA8 60px 90px); border:2px solid #141A33; border-radius:4px; }
+
+/* ======================= КУБИЧЕСКИЙ МИР: блоки, пиксели ======================= */
+body.th-cube{ background:#6FB7E8; --il:#2B2B33; --ia:#5DA130; --ib:#8B5A2B; --iw:#6B4320; }
+body.th-cube::before{ background:linear-gradient(rgba(20,30,40,.35),rgba(20,30,40,.05) 300px),url(img/bg-cube.webp) center 65%/cover no-repeat,linear-gradient(#7CC4F0 0 55%,#5DA130 55% 60%,#8B5A2B 60%) !important; }
+body.th-cube .wrap{ --acc:var(--b2,#3F7A1F); --accsoft:#E9F5DF; }
+body.th-cube .ic{ stroke-linejoin:miter; stroke-linecap:square; }
+body.th-cube .hello > h1,body.th-cube .lesson > h1{ text-transform:uppercase; letter-spacing:.04em; color:#fff; text-shadow:3px 3px 0 #2B2B33; }
+body.th-cube .card,body.th-cube .tile,body.th-cube .opt,body.th-cube .note,body.th-cube .chip{ border-radius:4px !important; border:3px solid #2B2B33 !important; box-shadow:inset -5px -5px 0 rgba(0,0,0,.12),inset 5px 5px 0 rgba(255,255,255,.6),0 6px 0 rgba(0,0,0,.35) !important; }
+body.th-cube .card{ background:#F6F1E7; }
+body.th-cube .btn{ border-radius:4px; background:linear-gradient(var(--b1,#5DA130) 0 30%,#8B5A2B 30%); color:#fff; border:3px solid #2B2B33; text-shadow:2px 2px 0 rgba(0,0,0,.45); box-shadow:inset -4px -4px 0 rgba(0,0,0,.2),0 5px 0 #2B2B33; text-transform:uppercase; letter-spacing:.04em; }
+body.th-cube .btn.ghost{ background:#C9C9C9; color:#2B2B33; text-shadow:none; }
+body.th-cube .coins{ border-radius:4px; background:#2B2B33; color:#7EE0F5; border:3px solid #555; }
+body.th-cube .banner .ic{ background:#F6F1E7; border:3px solid #2B2B33; border-radius:4px; }
+body.th-cube .tile .ico{ border-radius:4px; }
+body.th-cube .prog,body.th-cube .prog i{ border-radius:2px; }
+body.th-cube .prog i{ background:repeating-linear-gradient(90deg,#5DA130 0 14px,#4C8A26 14px 16px); }
+body.th-cube .dot{ border-radius:3px; }
+body.th-cube .wrap > .hello::after{ content:""; display:block; height:14px; margin-top:10px; background:linear-gradient(#5DA130 0 40%,#8B5A2B 40%); border:3px solid #2B2B33; }
+
+/* ======================= ПРИНЦЕССЫ: сказочный замок, розовое золото ======================= */
+body.th-prin{ background:#F7C9DD; --il:#5A2C52; --ia:#F4A6C8; --ib:#F2C14E; --iw:#FFF8FB; }
+body.th-prin::before{ background:linear-gradient(rgba(90,30,70,.35),rgba(90,30,70,.05) 320px),url(img/bg-prin.webp) center 50%/cover no-repeat,linear-gradient(#F9D5E5,#FCE9D6 60%,#BFE3C4) !important; }
+body.th-prin .wrap{ --acc:var(--b2,#A8457F); --accsoft:#FCE4F0; --gold:#F2C14E; }
+body.th-prin .card,body.th-prin .tile,body.th-prin .opt,body.th-prin .chip,body.th-prin .note{ background:#FFF8FB !important; color:#4A2340; --ink:#4A2340; --ink2:#7D5A72; --soft:#FCE4F0; box-shadow:0 0 0 2px #E3B65B inset,0 6px 0 rgba(120,40,90,.25),0 10px 30px rgba(120,40,90,.25) !important; border-radius:22px; }
+body.th-prin .card h2,body.th-prin .card h3{ color:var(--b2,#A8457F); }
+body.th-prin .hello > h1,body.th-prin .lesson > h1{ color:#FFF3D1; text-shadow:0 2px 10px rgba(90,30,70,.6); }
+body.th-prin .btn{ background:linear-gradient(var(--b1,#E58AB8),var(--b2,#A8457F)); color:#fff; box-shadow:0 0 0 2px #F2C14E inset,0 4px 0 rgba(90,30,70,.5),0 8px 16px rgba(90,30,70,.3); }
+body.th-prin .btn.ghost{ background:#FCE4F0; color:#7A2E5E; }
+body.th-prin .coins{ background:rgba(90,30,70,.85); color:#FFE29A; box-shadow:inset 0 0 0 1.5px #E3B65B,0 4px 14px rgba(0,0,0,.25); }
+body.th-prin .banner .ic{ background:rgba(255,248,251,.92); box-shadow:inset 0 0 0 1.5px #E3B65B,0 4px 14px rgba(90,30,70,.3); --iw:#FFF8FB; }
+body.th-prin .kb .ic{ background:rgba(255,248,251,.9); }
+body.th-prin .alwh,body.th-prin .hello > .hint{ background:rgba(90,30,70,.72); }
+body.th-prin .tiles.always .tile .ico{ --sct:#FCE4F0; --sc:#E58AB8; --scd:#5A2C52; }
+body.th-prin .tile.locked{ background:rgba(240,225,232,.95) !important; }
+body.th-prin .steps li{ background:rgba(255,248,251,.92); color:#7D5A72; } body.th-prin .steps li.now{ background:var(--b2,#A8457F); color:#fff; }
+body.th-prin .prog i{ background:linear-gradient(90deg,#F2C14E,#F4A6C8); }
+body.th-prin .wrap > .hello::after{ height:2px; margin:12px 0 2px; background:linear-gradient(90deg,rgba(242,193,78,0),#F2C14E 15%,#F2C14E 85%,rgba(242,193,78,0)); }
+
+/* ======================= КУКОЛЬНЫЙ МИР: всё розовое ======================= */
+body.th-doll{ background:#FFD6EA; --fh:"Playfair Display",Georgia,serif; --il:#7A1F4F; --ia:#F48FC0; --ib:#FFFFFF; --iw:#FFE3F1; }
+body.th-doll::before{ background:linear-gradient(rgba(160,30,100,.25),rgba(160,30,100,0) 320px),url(img/bg-doll.webp) center 50%/cover no-repeat,radial-gradient(circle at 20% 15%,#fff 0 6%,transparent 7%),linear-gradient(#FFC2DF,#FFE3F1 60%,#FFD1E8) !important; }
+body.th-doll .wrap{ --acc:var(--b1,#E4479A); --accsoft:#FFE3F1; }
+body.th-doll h1,body.th-doll h2,body.th-doll .hello > h1{ font-family:var(--fh); font-style:italic; }
+body.th-doll .hello > h1,body.th-doll .lesson > h1{ color:#fff; text-shadow:0 2px 12px rgba(160,30,100,.55); }
+body.th-doll .card,body.th-doll .tile,body.th-doll .opt,body.th-doll .chip,body.th-doll .note{ background:#fff !important; color:#5A1A3E; --ink:#5A1A3E; --ink2:#9A5A7E; --soft:#FFE3F1; border:2px solid #F9B4D6 !important; border-radius:26px !important; box-shadow:0 8px 24px rgba(228,71,154,.22) !important; }
+body.th-doll .card h2,body.th-doll .card h3{ color:var(--b1,#E4479A); }
+body.th-doll .btn{ border-radius:999px; background:linear-gradient(#F77DB8,var(--b1,#E4479A)); color:#fff; box-shadow:0 4px 0 #B8287A,0 8px 18px rgba(228,71,154,.35); }
+body.th-doll .btn.ghost{ background:#FFE3F1; color:#B8287A; }
+body.th-doll .coins{ background:#fff; color:#E4479A; border-radius:999px; box-shadow:0 4px 14px rgba(228,71,154,.3); }
+body.th-doll .banner .ic{ background:#fff; border-radius:50%; box-shadow:0 4px 14px rgba(228,71,154,.3); --ib:#FFD1E8; }
+body.th-doll .tile .ico{ border-radius:50%; }
+body.th-doll .alwh,body.th-doll .hello > .hint{ background:rgba(184,40,122,.72); }
+body.th-doll .prog i{ background:linear-gradient(90deg,#F9B4D6,#E4479A); }
+body.th-doll .wrap > .hello::after{ content:""; display:block; height:10px; margin-top:10px; border-radius:5px; background:radial-gradient(circle,#fff 0 3px,transparent 3.5px) 0 0/16px 10px,#F48FC0; }
+
+/* иконки на ярких кнопках-предметах остаются белыми; рисунки интерактива не перекрашиваются */
+.lkpic .ics{ stroke-width:2; }
+
+/* светлые темы: текст прямо на фоне — тёмный со светлым ореолом, ссылки шапки — в капсулах */
+body.th-prin .hello > h1,body.th-prin .lesson > h1,body.th-prin .alw .hello h1{ color:#6E2A54; text-shadow:0 0 2px #fff,0 0 14px rgba(255,255,255,.95),0 0 24px rgba(255,255,255,.8); }
+body.th-doll .hello > h1,body.th-doll .lesson > h1,body.th-doll .alw .hello h1{ color:#B8287A; text-shadow:0 0 2px #fff,0 0 14px rgba(255,255,255,.95),0 0 24px rgba(255,255,255,.8); }
+body.th-prin .hello .eyebrow,body.th-doll .hello .eyebrow,body.th-prin .hello > p,body.th-doll .hello > p{ display:inline-block; width:auto; color:#fff; text-shadow:none; background:rgba(110,42,84,.78); border-radius:10px; padding:3px 10px; }
+body.th-doll .hello .eyebrow,body.th-doll .hello > p{ background:rgba(184,40,122,.8); }
+body.th-prin .bar .link,body.th-doll .bar .link{ background:rgba(110,42,84,.72); border-radius:999px; padding:6px 12px; text-shadow:none; }
+body.th-doll .bar .link{ background:rgba(184,40,122,.75); }
