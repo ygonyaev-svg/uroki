@@ -41,3 +41,11 @@ html.fam body:not(.yarik):not(.anya) .bar span{ color:#2D4A32; text-shadow:none;
 .famintro{ font-size:18px; }
 .famscr .hero{ text-align:center; }
 .famscr .fkid h2 .link{ font-size:15px; }
+
+.fkql{ margin:12px 0 6px; font-weight:700; color:#6B4A2E; font-size:16px; }
+.fkints{ display:flex; flex-wrap:wrap; gap:8px; }
+html.fam body:not(.yarik):not(.anya) .fkints .chip{ background:#fff; border:1px solid #E6DCC3; color:#2A2A1E; border-radius:99px; padding:6px 12px; font-size:16px; }
+html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color:#F5EFE0; border-color:#2D4A32; }
+.fkcols{ display:flex; flex-wrap:wrap; gap:10px; }
+.fkcol{ width:38px; height:38px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1px #E6DCC3; cursor:pointer; padding:0; }
+.fkcol.on{ box-shadow:0 0 0 3px #2D4A32; }
