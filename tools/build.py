@@ -7,17 +7,18 @@ os.makedirs(out, exist_ok=True)
 parts = json.load(open(os.path.join(root, 'books', 'parts.json'), encoding='utf-8'))
 rd = lambda f: open(os.path.join(src, f), encoding='utf-8').read()
 js = '\n'.join([rd('core.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('app.js')])
-css = open(os.path.join(src, 'style.css'), encoding='utf-8').read()
+import subprocess; subprocess.run([sys.executable, os.path.join(root, 'tools', 'theme_css.py')], check=True)
+css = open(os.path.join(src, 'style.css'), encoding='utf-8').read() + '\n' + open(os.path.join(src, 'theme.css'), encoding='utf-8').read()
 ver = hashlib.md5((js + css).encode()).hexdigest()[:8]
 html = f'''<!doctype html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Уроки</title>
-<meta name="theme-color" content="#2350a8">
+<meta name="theme-color" content="#38bdf8"><meta name="color-scheme" content="light">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Уроки">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Nunito:wght@700;800;900&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
 <style>{css}</style></head>
 <body><div id="app"></div>
 <script>/* v{ver} */
