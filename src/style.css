@@ -380,3 +380,7 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .pfprof .chip{ display:inline-block; margin:3px 2px; cursor:default; }
 .pfnote{ font-size:13px; margin:6px 4px 18px; }
 .tabs{ overflow-x:auto; -webkit-overflow-scrolling:touch; } .tabs .tab{ white-space:nowrap; flex-shrink:0; }
+/* тестовый режим */
+.testbar{ position:sticky; top:0; z-index:900; background:#7a3cff; color:#fff; padding:8px 12px; font-size:15px; text-align:center; } .testbar .link{ color:#fff; text-decoration:underline; margin-left:8px; }
+.notebtn{ position:fixed; right:14px; bottom:14px; z-index:950; background:#7a3cff; color:#fff; border:0; border-radius:24px; padding:12px 16px; font-size:16px; box-shadow:0 6px 20px rgba(0,0,0,.25); cursor:pointer; }
+.testc{ border:2px dashed #7a3cff; } .tipin textarea{ width:100%; box-sizing:border-box; font-size:17px; border-radius:12px; border:1px solid var(--line); padding:10px; margin-bottom:6px; background:var(--card); color:var(--ink); }
