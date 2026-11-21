@@ -180,3 +180,6 @@ function icoSvgText(root){ if (!root || !root.getElementsByTagName) return; var 
   function start(){ var a = document.getElementById('app'); if (!a || !window.MutationObserver) return;
     new MutationObserver(function(){ if (busy) return; if (!sched) { sched = true; run(); } }).observe(document.body, { childList: true, subtree: true, characterData: true }); run(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start(); })();
+/* Весы ⚖ (были настоящим эмодзи в загадках и в уроке шахмат «Сколько стоят фигуры») */
+if (!ICONS.scales) ICONS.scales = '<path d="M16 6v20M10 27h12M6 10h20M6 10l-3.5 8M6 10l3.5 8M26 10l-3.5 8M26 10l3.5 8"/><path class="a" d="M2.5 18h7a3.5 3.5 0 0 1-7 0zM22.5 18h7a3.5 3.5 0 0 1-7 0z"/><circle class="l" cx="16" cy="6" r="1.8"/>';
+if (!EMO_ICON['⚖']) { EMO_ICON['⚖'] = 'scales'; EMO_RE = icoBuildRe(); }
