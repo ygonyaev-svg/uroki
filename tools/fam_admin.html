@@ -27,13 +27,15 @@ function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c
 function dt(s){ if (!s) return '—'; var d = new Date(s); if (isNaN(d)) return '—'; return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }); }
 function api(o){ o.fam = 'admin'; o.key = KEY; return fetch(URL_, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(o) }).then(function(r){ return r.json(); }); }
 var A = document.getElementById('app');
+var QL = { rt: ['пересказ', 'легко', 'коротко', 'по вопросам', 'не умеет'], vw: ['слова', 'почти все', 'бытовые', 'просит перевод'], wr: ['пишет', 'сам', 'по буквам', 'нет'], mt: ['математика', 'до 20', 'до 100', 'умножение', 'задачи'], at: ['внимание', '10–15 мин', '20–25 мин', '30–40 мин'], er: ['ошибки', 'бросает', 'злится', 'спокойно'], dk: ['дикция', 'чисто', 'акцент', 'по слогам'], mo: ['мотивация', 'копилка', 'похвала', 'рекорды', 'сюжет'] };
+function qs(k){ return Object.keys(QL).filter(function(x){ return k[x] != null && QL[x][k[x] + 1]; }).map(function(x){ return '; ' + QL[x][0] + ': ' + QL[x][k[x] + 1]; }).join(''); }
 function keyForm(msg){ A.innerHTML = '<h1>Словоход — семьи</h1><div class="card"><p>' + (msg || 'Введите ключ администратора.') + '</p><input id="k" autocomplete="off"><button onclick="KEY=document.getElementById(\'k\').value.trim();try{localStorage.setItem(\'slovohod.admin\',KEY)}catch(e){};load()">Открыть</button></div>'; }
 function draw(j){
   var F = j.fams || [], act = F.filter(function(f){ return !f.off; }).length;
   var h = '<h1>Словоход — семьи</h1><p class="mut">Всего ' + F.length + ', активных ' + act + '. <button class="gh" onclick="load()">Обновить</button></p>';
   if (!F.length) h += '<div class="card">Пока никто не зарегистрировался.</div>';
   F.slice().reverse().forEach(function(f){
-    var kids = (f.kids || []).map(function(k){ return esc(k.name) + ', ' + esc(k.age) + ((k.ints && k.ints.length) || k.hero ? ' <span class="mut">(' + esc((k.ints || []).join(', ') + (k.hero ? '; герои: ' + k.hero : '') + (k.books ? '; любит: ' + k.books : '') + (k.done ? '; прочитал(а): ' + k.done : '') + (k.rd != null ? '; чтение ' + k.rd + ' из 3' : '')) + ')</span>' : ''); }).join('; ') || 'детей ещё нет';
+    var kids = (f.kids || []).map(function(k){ return esc(k.name) + ', ' + esc(k.age) + ((k.ints && k.ints.length) || k.hero || k.rd != null || qs(k) ? ' <span class="mut">(' + esc((k.ints || []).join(', ') + (k.hero ? '; герои: ' + k.hero : '') + (k.books ? '; любит: ' + k.books : '') + (k.done ? '; прочитал(а): ' + k.done : '') + (k.rd != null ? '; чтение ' + k.rd + ' из 3' : '') + qs(k)) + ')</span>' : ''); }).join('; ') || 'детей ещё нет';
     h += '<div class="card"><div class="top"><div><b>' + esc(f.name || 'без имени') + '</b><br><span class="mut">' + esc(f.email) + '</span></div><span class="st ' + (f.off ? 'off">отключена' : 'on">активна') + '</span></div>' +
       '<p>Дети: ' + kids + '</p><p class="mut">Регистрация: ' + dt(f.created) + ' · был(а): ' + dt(f.last) + ' · событий: ' + esc(f.events) + '</p>' +
       '<button class="' + (f.off ? '' : 'red') + '" onclick="setSt(\'' + esc(f.fid) + '\',' + (f.off ? 'true' : 'false') + ')">' + (f.off ? 'Включить' : 'Отключить') + '</button></div>';

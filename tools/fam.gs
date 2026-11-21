@@ -7,6 +7,7 @@ function famSh(n){ return SpreadsheetApp.openById(FAM_SID).getSheetByName(n); }
 function famHash(salt, p){ return Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + '|' + p, Utilities.Charset.UTF_8)); }
 function famRows(){ var sh = famSh('Семьи'), v = sh.getDataRange().getValues(); return { sh: sh, v: v }; }
 function famFind(v, col, val){ for (var i = 1; i < v.length; i++) if (String(v[i][col]) === String(val)) return i; return -1; }
+function famN(v){ return v == null || v === '' || isNaN(+v) ? null : Math.max(0, Math.min(9, Math.round(+v))); }
 function famKids(s){ try { return JSON.parse(s || '[]'); } catch (e) { return []; } }
 function famAuth(d){ var R = famRows(), i = famFind(R.v, 0, d.fid); if (i < 0 || String(R.v[i][9]) !== String(d.token)) return null; return { R: R, i: i, row: R.v[i] }; }
 function famResp(row){ return { ok: true, fid: String(row[0]), token: String(row[9]), email: String(row[2]), name: String(row[3]), kids: famKids(row[6]), ppin: row[7] === '' ? null : String(row[7]), off: row[8] === 'отключена' }; }
@@ -32,7 +33,7 @@ function famRoute_(d){
     if (String(d.key || '') !== String(famSh('Настройки').getRange('A1').getValue())) return { ok: false, msg: 'Неверный ключ' };
     R = famRows();
     if (d.op === 'set') { i = famFind(R.v, 0, d.fid); if (i < 0) return { ok: false, msg: 'Нет такой семьи' }; R.sh.getRange(i + 1, 9).setValue(d.on ? 'активна' : 'отключена'); R = famRows(); }
-    var fams = R.v.slice(1).filter(function(r){ return r[0]; }).map(function(r){ return { fid: String(r[0]), created: r[1], email: r[2], name: r[3], kids: famKids(r[6]).map(function(k){ return { name: k.name, age: k.age, ints: k.ints || [], hero: k.hero || '', books: k.books || '', done: k.done || '', rd: k.rd }; }), off: r[8] === 'отключена', last: r[10], events: r[11] || 0 }; });
+    var fams = R.v.slice(1).filter(function(r){ return r[0]; }).map(function(r){ return { fid: String(r[0]), created: r[1], email: r[2], name: r[3], kids: famKids(r[6]).map(function(k){ return { name: k.name, age: k.age, ints: k.ints || [], hero: k.hero || '', books: k.books || '', done: k.done || '', rd: k.rd, rt: k.rt, vw: k.vw, wr: k.wr, mt: k.mt, at: k.at, er: k.er, dk: k.dk, mo: k.mo }; }), off: r[8] === 'отключена', last: r[10], events: r[11] || 0 }; });
     var fb = famSh('Отзывы').getDataRange().getValues().slice(1).slice(-50).reverse().map(function(r){ return { t: r[0], email: r[2], text: r[3] }; });
     return { ok: true, fams: fams, fb: fb };
   }
@@ -41,7 +42,7 @@ function famRoute_(d){
   if (d.fam === 'st') { a.R.sh.getRange(a.i + 1, 11).setValue(now); return { ok: true, off: off }; }
   if (off) return { ok: false, off: true };
   if (d.fam === 'kids') {
-    var kids = (d.kids || []).slice(0, 5).map(function(k){ return { id: String(k.id).slice(0, 30), name: String(k.name).slice(0, 20), age: +k.age, look: String(k.look || '').slice(0, 10), ints: (k.ints || []).slice(0, 15).map(String), hero: String(k.hero || '').slice(0, 80), books: String(k.books || '').slice(0, 200), done: String(k.done || '').slice(0, 300), rd: k.rd == null ? null : +k.rd, color: String(k.color || '').slice(0, 10), pin: k.pin ? String(k.pin) : null }; });
+    var kids = (d.kids || []).slice(0, 5).map(function(k){ return { id: String(k.id).slice(0, 30), name: String(k.name).slice(0, 20), age: +k.age, look: String(k.look || '').slice(0, 10), ints: (k.ints || []).slice(0, 15).map(String), hero: String(k.hero || '').slice(0, 80), books: String(k.books || '').slice(0, 200), done: String(k.done || '').slice(0, 300), rd: k.rd == null ? null : +k.rd, color: String(k.color || '').slice(0, 10), pin: k.pin ? String(k.pin) : null, rt: famN(k.rt), vw: famN(k.vw), wr: famN(k.wr), mt: famN(k.mt), at: famN(k.at), er: famN(k.er), dk: famN(k.dk), mo: famN(k.mo) }; });
     a.R.sh.getRange(a.i + 1, 7, 1, 2).setValues([[JSON.stringify(kids), d.ppin ? "'" + String(d.ppin) : '']]); return { ok: true };
   }
   if (d.fam === 'ev') {
