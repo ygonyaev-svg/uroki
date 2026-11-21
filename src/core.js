@@ -51,7 +51,11 @@ function numOpts(a, r){ a = Number(a); const isInt = Math.abs(a - Math.round(a))
   const out = []; for (const v0 of r.shuffle(c)) { const v = Math.round(v0 * 1000) / 1000; if (v !== a && (a < 0 || v >= 0) && !out.includes(v)) out.push(v); if (out.length === 3) break; }
   while (out.length < 3) { const v = a + out.length + 3; if (!out.includes(v)) out.push(v); } return out; }
 function asChoice(t, seed, pool){ if (!t || t.k === 'c' || !(t.k === 'n' || t.k === 't')) return t; const r = U.rng(seed);
-  if (t.k === 'n') { const a = U.dec(t.a); return Object.assign({}, t, { k: 'c', a, opts: r.shuffle([a].concat(numOpts(t.a, r).map(U.dec))), was: 'n' }); }
+  if (t.k === 'n') { const a = U.dec(t.a);
+    /* У автора были свои неверные варианты — берём их: соседние числа могут оказаться тоже верными («делится на 10»: 4820 и 48200) */
+    const own = (t.wn || []).map(x => U.dec(Number(String(x).replace(',', '.')))).filter((x, i, A) => x !== a && A.indexOf(x) === i);
+    const ws = own.length >= 2 ? own.slice(0, 3) : numOpts(t.a, r).map(U.dec);
+    return Object.assign({}, t, { k: 'c', a, opts: r.shuffle([a].concat(ws)), was: 'n' }); }
   const low = x => String(x).toLowerCase().replace(/ё/g, 'е').trim(), A = String(t.a), bad = [A].concat(t.alt || []).map(low);
   const qw = (String(t.q).replace(/<[^>]+>/g, ' ').match(/«([^»]+)»/) || [])[1] || '';
   const fromQ = qw.split(/[\s,.;:!?—–-]+/).filter(w => w.length >= 2 && /[А-Яа-яЁёA-Za-zÀ-ÿ]/.test(w));

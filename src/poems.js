@@ -49,7 +49,7 @@ const POEMS = [
  { id:'osen_tut', a:'Ф. И. Тютчев', t:'Есть в осени первоначальной…', k:'a', m:'ямб', e:'🍁', r:'abab', st:['первоначАльной','корОткая','хрустАльный','лучезАрны'],
    text:'Есть в осени первоначальной\nКороткая, но дивная пора —\nВесь день стоит как бы хрустальный,\nИ лучезарны вечера…' },
  { id:'privet', a:'А. А. Фет', t:'Я пришёл к тебе с приветом…', k:'a', m:'хорей', e:'🌄', r:'ababcdcd', st:['привЕтом','горЯчим','затрепетАло','встрепенУлся'],
-   text:'Я пришёл к тебе с приветом,\nРассказать, что солнце встало,\nЧто оно горячим светом\nПо листам затрепетало;\nРассказать, что лес проснулся,\nВесь проснулся, веткой каждой,\nКаждой птицей встрепенулся\nИ весенней полон жаждой;' },
+   text:'Я пришёл к тебе с приветом,\nРассказать, что солнце встало,\nЧто оно горячим светом\nПо листам затрепетало;\nРассказать, что лес проснулся,\nВесь проснулся, веткой каждой,\nКаждой птицей встрепенулся\nИ весенней полон жаждой…' },
  { id:'borod', a:'М. Ю. Лермонтов', t:'Бородино', k:'a', m:'ямб', e:'🎖️', r:'aabcccb', learn:7, st:['спалЁнная','францУзу','боевЫе','РоссИя'],
    text:'— Скажи-ка, дядя, ведь не даром\nМосква, спалённая пожаром,\nФранцузу отдана?\nВедь были ж схватки боевые,\nДа, говорят, ещё какие!\nНедаром помнит вся Россия\nПро день Бородина!' },
  { id:'ptichka', a:'А. С. Пушкин', t:'Птичка', k:'a', m:'ямб', e:'🕊️', r:'ababcdcd', st:['чужбИне','обЫчай','утешЕнью','даровАть'],
@@ -164,10 +164,13 @@ function recSame(w, g){ if (!w || !g) return false; if (pvN(w).replace(/ё/g, '�
 function recLcs(T, G){ const n = T.length, m = G.length, d = []; for (let i = 0; i <= n; i++) { d[i] = []; for (let j = 0; j <= m; j++) d[i][j] = i && j ? (recSame(T[i - 1], G[j - 1]) ? d[i - 1][j - 1] + 1 : Math.max(d[i - 1][j], d[i][j - 1])) : 0; }
   const hit = new Array(n).fill(false); let i = n, j = m; while (i && j) { if (recSame(T[i - 1], G[j - 1]) && d[i][j] === d[i - 1][j - 1] + 1) { hit[i - 1] = true; i--; j--; } else if (d[i - 1][j] >= d[i][j - 1]) i--; else j--; } return hit; }
 function poemRecScore(p, n, said){ const got = String(said).split(/\s+/).map(pvN).filter(Boolean); let hit = 0, tot = 0; const miss = [], bad = {};
+  /* слова через дефис и слитные («солнышко-вёдрышко», «глянь-ка», «недаром») распознавание часто пишет двумя словами — склеиваем */
+  poemLines(p).slice(0, n).join(' ').split(/\s+/).map(pvN).filter(w => w.includes('-') || w.length >= 6).forEach(h => { for (let i = 0; i + 1 < got.length; i++) if (!recSame(got[i], h) && recSame(got[i] + got[i + 1], h)) got.splice(i, 2, got[i] + got[i + 1]); });
   poemLines(p).slice(0, n).forEach((line, li) => { const raw = line.split(/\s+/), T0 = raw.map(pvN), idx = T0.map((w, i) => w ? i : -1).filter(i => i >= 0), T = idx.map(i => T0[i]); if (!T.length) return;
     const W = Math.ceil(T.length * 1.6) + 3; let best = null, bn = -1;
     for (let st = 0; st < Math.max(1, got.length - Math.min(W, got.length) + 1); st++) { const h = recLcs(T, got.slice(st, st + W)), c = h.filter(Boolean).length; if (c > bn) { bn = c; best = h; } if (c === T.length) break; }
-    tot += T.length; hit += bn; best.forEach((ok, k) => { if (!ok) { miss.push(T[k]); (bad[li] = bad[li] || []).push(idx[k]); } }); });
+    /* однобуквенные «и», «в», «с» распознавание часто теряет — их пропуск не считаем ошибкой */
+    tot += T.length; hit += bn; best.forEach((ok, k) => { if (!ok) { if (T[k].replace(/-/g, '').length <= 1) { tot--; return; } miss.push(T[k]); (bad[li] = bad[li] || []).push(idx[k]); } }); });
   return { s: hit / Math.max(1, tot), miss, bad }; }
 function poemFinish(kid){ const D = dayRec(kid, cur.ds), P = D.poem, K = S.kids[kid], p = POEMS.find(x => x.id === P.id), st = poemState(kid);
   const T0 = poemTasks(kid, p, P.seed), first = P.ans.filter(a => a && a.ok).length + (P.sOk || 0), tot = T0.length + (P.sN || 0), ratio = first / Math.max(1, tot);
