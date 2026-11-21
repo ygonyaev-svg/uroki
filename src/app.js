@@ -198,7 +198,7 @@ function vLesson(){
   const title = `<p class="eyebrow">${subjName(kid, subj, cur.ds)}</p><h1>${U.esc(subj === 'hw' ? 'Повторение ошибок' : u.t)}</h1>`;
   if (L.phase === 'theory') {
     const c = KIDS[kid].cur[subj];
-    body = `<article class="card theory"><div class="th">${u.th}</div><div class="row"><button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button>${subj !== 'hw' ? '<button class="btn ghost small" data-act="dunno">🤔 Не понимаю</button>' : ''}</div></article>${L.helpN ? vExample(kid, subj, L, u) : ''}
+    body = `<article class="card theory">${subjArt(kid, subj)}<div class="th">${u.th}</div><div class="row"><button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button>${subj !== 'hw' ? '<button class="btn ghost small" data-act="dunno">🤔 Не понимаю</button>' : ''}</div></article>${L.helpN ? vExample(kid, subj, L, u) : ''}
     <p class="src">По учебнику: ${U.esc(c.src)}</p><button class="btn big" data-act="topractice">Понятно, к заданиям</button>`;
   } else if (L.phase === 'practice') body = vTask(kid, subj, L);
   else if (L.phase === 'fread') body = vForeign(kid, L);
@@ -224,6 +224,8 @@ function vTask(kid, subj, L){
   ${fin ? `<button class="btn big" data-act="next">${L.i + 1 < T.length ? 'Дальше' : 'Закончить'}</button>` : ''}`;
 }
 /* Разбор на похожем примере: задание того же типа с ответом и объяснением */
+function subjArt(kid, subj){ const k = kid === 'yarik' ? 'y' : 'a'; let n = subj; if (kid === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (!['math','rus','world','logic','lang','read','hist','geo'].includes(n)) return '';
+  return `<img class="subjart" src="img/subj-${k}-${n}.webp" alt="" onerror="this.remove()">`; }
 function vExample(kid, subj, L, u, cur0){ const n = L.helpN || 1; const shape = x => strip(x.q).replace(/\d+([,.]\d+)?/g, '#').slice(0, 18);
   const cands = genTasks(u, (L.seed || 1) * 7 + n * 101, 14).filter(x => !cur0 || x.q !== cur0.q); const ex = (cur0 && cands.find(x => shape(x) === shape(cur0))) || (cur0 && cands.find(x => x.k === cur0.k && shape(x).slice(0, 8) === shape(cur0).slice(0, 8))) || cands[0]; if (!ex) return '';
   const ans = ex.k === 'n' ? U.dec(ex.a) : ex.a;

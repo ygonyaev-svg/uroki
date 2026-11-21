@@ -5,8 +5,11 @@ root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 src = os.path.join(root, 'src'); out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(root, 'docs')
 os.makedirs(out, exist_ok=True)
 parts = json.load(open(os.path.join(root, 'books', 'parts.json'), encoding='utf-8'))
+sys.path.insert(0, os.path.join(root, 'tools')); import meta2
+BX, _e = meta2.load()
+if _e: sys.exit('meta2: ' + '; '.join(_e))
 rd = lambda f: open(os.path.join(src, f), encoding='utf-8').read()
-js = '\n'.join([rd('core.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('cur_more_y.js'), rd('cur_more_a.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('app.js')])
+js = '\n'.join([rd('core.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('cur_more_y.js'), rd('cur_more_a.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', 'const BOOK_X = ' + json.dumps(BX, ensure_ascii=False) + ';', rd('books.js'), rd('pics.js'), rd('app.js')])
 import subprocess; subprocess.run([sys.executable, os.path.join(root, 'tools', 'theme_css.py')], check=True)
 css = open(os.path.join(src, 'style.css'), encoding='utf-8').read() + '\n' + open(os.path.join(src, 'theme.css'), encoding='utf-8').read()
 ver = hashlib.md5((js + css).encode()).hexdigest()[:8]
@@ -30,7 +33,7 @@ json.dump({'name': 'Уроки для Ярика и Ани', 'short_name': 'Ур
            'icons': [{'src': 'icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': 'icon-512.png', 'sizes': '512x512', 'type': 'image/png'}]},
           open(os.path.join(out, 'manifest.webmanifest'), 'w', encoding='utf-8'), ensure_ascii=False)
 open(os.path.join(out, 'sw.js'), 'w').write(f'''const C='uroki-{ver}';
-self.addEventListener('install',e=>{{e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icon-180.png'])));self.skipWaiting();}});
+self.addEventListener('install',e=>{{e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icon-180.png','img/bg-yarik.webp','img/bg-anya.webp'])));self.skipWaiting();}});
 self.addEventListener('activate',e=>{{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();}});
 self.addEventListener('fetch',e=>{{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==location.origin)return;
 e.respondWith(fetch(e.request).then(r=>{{const cp=r.clone();caches.open(C).then(c=>c.put(e.request,cp));return r;}}).catch(()=>caches.match(e.request,{{ignoreSearch:true}})));}});
