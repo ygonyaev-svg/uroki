@@ -14,7 +14,8 @@ let S;
 function newKid(){ return { pin:null, coins:0, pos:{}, lvl:{}, stats:{}, days:{}, reading:[], hard:{}, srs:[], purchases:[], words:0, texts:0, applied:[], msgs:[], hwText:[] }; }
 function defShop(){ return [
   { id:'s1', name:'15 минут игры на планшете', price:15 },
-  { id:'s2', name:'30 минут мультиков', price:25 },
+  { id:'s2', name:'30 минут мультиков', price:30 },
+  { id:'g60', name:'🎮 Час игры', price:60 },
   { id:'s3', name:'Сладость на выбор', price:30 },
   { id:'s4', name:'Выбрать ужин для всей семьи', price:80 },
   { id:'s5', name:'Поход в кафе с папой', price:200 },
@@ -24,6 +25,7 @@ function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e)
 const SYNC_URL = 'https://script.google.com/macros/s/AKfycbzlcMocKjYfldhFSe25-6w9_HVEN0sXMmlJrbj1VWuqMhHvQo5Fs-M0J7zZW2sDYEM3sw/exec';
 S = load();
 if (!S.cfg.sync) S.cfg.sync = SYNC_URL;
+if (!S.shopV2) { const fix = { s1: ['15 минут игры', 15], s2: ['30 минут мультиков', 30], t3: ['🎮 30 минут любимой игры', 30] }; for (const it of S.shop) if (fix[it.id]) { it.name = fix[it.id][0]; it.price = fix[it.id][1]; } if (!S.shop.some(x => x.id === 'g60')) S.shop.splice(2, 0, { id: 'g60', name: '🎮 Час игры', price: 60 }); S.shopV2 = true; }
 if (!S.themeShop) { for (const x of THEME_SHOP) if (!S.shop.some(y => y.id === x.id)) S.shop.push(Object.assign({}, x)); S.themeShop = true; }
 const hashPin = p => String(U.h('uroki:' + p));
 
@@ -74,7 +76,7 @@ function genTasks(unit, seed, n){ const r = U.rng(seed); const out = []; const s
   return out; }
 function grade(x){ return x >= .9 ? 5 : x >= .75 ? 4 : x >= .5 ? 3 : 2; }
 function dayRec(kid, ds){ const K = S.kids[kid]; if (!K.days[ds]) K.days[ds] = { les:{}, bonus:false }; return K.days[ds]; }
-function nTasks(kid, subj){ return KIDS[kid].n + (S.kids[kid].lvl[subj] || 0); }
+function nTasks(kid, subj){ return Math.max(3, KIDS[kid].n + (S.kids[kid].lvl[subj] || 0) + (S.kids[kid].extraN || 0)); }
 
 /* ===== Озвучка и распознавание речи ===== */
 function say(text, lang){ try { const s = window.speechSynthesis; if (!s) return; s.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = lang || 'ru-RU'; const vs = s.getVoices(); const v = vs.find(v => v.lang === u.lang) || vs.find(v => v.lang && v.lang.startsWith(u.lang.slice(0, 2))); if (v) u.voice = v; u.rate = lang && lang.startsWith('ru') ? .9 : .85; s.speak(u); } catch (e) {} }
@@ -95,6 +97,7 @@ function coinsHtml(n){ return `<span class="coin" aria-hidden="true"></span><b>$
 
 /* ===== Экраны ===== */
 function render(){
+  if (S.parentPin) for (const k of ['yarik', 'anya']) burnCheck(k);
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
   const v = !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'shop' ? vShop() : cur.view === 'parent' ? vParent() : vLogin();
   app().innerHTML = v; afterRender();
@@ -155,7 +158,7 @@ function vHome(){
     const locked = st !== 'done' && s !== nextOpen(kid);
     return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${s === 'lang' && track('lang', cur.ds) === '_alt' ? 'En' : SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && kid === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${kid}"><header class="bar"><button class="link" data-act="logout">Выйти</button><span class="coins">${coinsHtml(K.coins)}</span></header>
-  <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий.</p>
+  <div class="banner" aria-hidden="true">${THEME[kid].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[kid].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. 1 балл = 1 минута игры, за день можно заработать до 60.</p>
    <div class="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(m.text)} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}</section>
@@ -174,6 +177,7 @@ function startLesson(subj){
     if (subj === 'read') { const t = readText(kid); D.les.read = { tid: t.id, phase: 'warm', ans: [], seed: U.h(kid + cur.ds + 'read') }; }
     else if (subj === 'hw') { const due = hwDue(kid).slice(0, 8); D.les.hw = { items: due.map(x => x.task), keys: due.map(x => x.key), phase: 'practice', i: 0, ans: [], txt: S.kids[kid].hwText.filter(h => !h.done).map(h => h.id) }; }
     else { const tr = track(subj, cur.ds), { u } = unitAt(kid, subj, tr); D.les[subj] = { uid: u.id, tr, seed: U.h(kid + cur.ds + subj), phase: 'theory', i: 0, ans: [], n: nTasks(kid, subj) }; }
+    D.les[subj].t0 = Date.now();
     S.kids[kid].openDay = cur.ds; save(); ev(kid, 'урок начат', { subj: subjName(kid, subj, cur.ds), unit: lessonTitle(kid, subj, cur.ds) });
   }
   go('lesson', { subj });
@@ -193,7 +197,7 @@ function vLesson(){
   const title = `<p class="eyebrow">${subjName(kid, subj, cur.ds)}</p><h1>${U.esc(subj === 'hw' ? 'Повторение ошибок' : u.t)}</h1>`;
   if (L.phase === 'theory') {
     const c = KIDS[kid].cur[subj];
-    body = `<article class="card theory"><div class="th">${u.th}</div><button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button></article>
+    body = `<article class="card theory"><div class="th">${u.th}</div><div class="row"><button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button>${subj !== 'hw' ? '<button class="btn ghost small" data-act="dunno">🤔 Не понимаю</button>' : ''}</div></article>${L.helpN ? vExample(kid, subj, L, u) : ''}
     <p class="src">По учебнику: ${U.esc(c.src)}</p><button class="btn big" data-act="topractice">Понятно, к заданиям</button>`;
   } else if (L.phase === 'practice') body = vTask(kid, subj, L);
   else if (L.phase === 'fread') body = vForeign(kid, L);
@@ -210,12 +214,18 @@ function vTask(kid, subj, L){
   if (t.k === 'c') inp = `<div class="opts">${t.opts.map(o => { const cls = fin && o === t.a ? 'right' : (a.wrong || []).includes(o) ? 'wrong' : ''; return `<button class="opt ${cls}" data-act="choose" data-v="${U.esc(o)}" ${fin || (a.wrong || []).includes(o) ? 'disabled' : ''}>${o}</button>`; }).join('')}</div>`;
   else inp = `<form class="numf" data-form="num"><input id="numin" inputmode="decimal" autocomplete="off" ${fin ? 'disabled' : 'autofocus'} value="${fin ? U.esc(a.v) : ''}" aria-label="Ответ"><button class="btn" ${fin ? 'disabled' : ''}>Проверить</button></form>`;
   let fb = '';
-  if (fin) fb = a.ok ? `<div class="fb ok"><b>${a.tries === 1 ? U.rng(L.seed + L.i).pick(THEME[kid].win) + ' +1' : 'Верно!'}</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>` : `<div class="fb bad"><b>Правильный ответ: ${t.k === 'n' ? U.dec(t.a) : t.a}</b> ${t.e ? U.esc(strip(t.e)) : ''}<br><span class="hint">Это задание вернётся в домашнем задании.</span></div>`;
+  if (fin) fb = a.ok ? `<div class="fb ok"><b>${a.tries === 1 ? U.rng(L.seed + L.i).pick(THEME[kid].win) : 'Верно!'}</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>` : `<div class="fb bad"><b>Правильный ответ: ${t.k === 'n' ? U.dec(t.a) : t.a}</b> ${t.e ? U.esc(strip(t.e)) : ''}<br><span class="hint">Это задание вернётся в домашнем задании.</span></div>`;
   else if (a.tries) fb = `<div class="fb try">Не совсем. Подумай ещё раз.</div>`;
   const spk = t.sp ? `<button class="btn ghost small" data-act="sayq">🔊 Послушать</button>` : '';
-  return `<div class="counter">Задание ${L.i + 1} из ${T.length}</div><article class="card task"><span class="sticker" aria-hidden="true">${U.rng((L.seed || 7) + L.i * 31).pick(THEME[kid].pics)}</span><div class="q">${t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${t.sp && !t.spAfter ? spk : ''}${inp}${fb}${t.sp && t.spAfter && fin ? spk : ''}</article>
+  const u0 = subj !== 'hw' && unitById(kid, subj, L.uid);
+  const help = u0 && !fin ? (L.showTh === L.i ? `<details class="peek" open><summary>Правило</summary><div class="th">${u0.th}</div></details>${vExample(kid, subj, L, u0)}` : `<button class="link" data-act="dunnotask">🤔 Не понимаю</button>`) : '';
+  return `<div class="counter">Задание ${L.i + 1} из ${T.length}</div><article class="card task"><span class="sticker" aria-hidden="true">${U.rng((L.seed || 7) + L.i * 31).pick(THEME[kid].pics)}</span><div class="q">${t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${t.sp && !t.spAfter ? spk : ''}${inp}${fb}${t.sp && t.spAfter && fin ? spk : ''}${help}</article>
   ${fin ? `<button class="btn big" data-act="next">${L.i + 1 < T.length ? 'Дальше' : 'Закончить'}</button>` : ''}`;
 }
+/* Разбор на похожем примере: задание того же типа с ответом и объяснением */
+function vExample(kid, subj, L, u){ const n = L.helpN || 1; const ex = genTasks(u, (L.seed || 1) * 7 + n * 101, 1)[0]; if (!ex) return '';
+  const ans = ex.k === 'n' ? U.dec(ex.a) : ex.a;
+  return `<article class="card example"><h3>Разберём на похожем примере</h3><div class="q">${ex.q.replace(/_+/g, '<span class="gap">?</span>')}</div><p><b>Ответ: ${ans}</b></p>${ex.e ? `<p>${U.esc(strip(ex.e))}</p>` : ''}<div class="row"><button class="btn ghost small" data-act="sayex" data-t="${U.esc(strip(ex.q.replace(/_+/g, ' пропуск ')) + '. Ответ: ' + strip(String(ans)) + '. ' + (ex.e ? strip(ex.e) : ''))}">🔊 Послушать</button><button class="link" data-act="dunno">Ещё пример</button></div><p class="hint">Я написал папе, что эта тема трудная — он поможет.</p></article>`; }
 function vHwText(kid, L){ const K = S.kids[kid]; const items = K.hwText.filter(h => (L.txt || []).includes(h.id));
   return `<article class="card"><h2>Задание от папы</h2>${items.length ? items.map(h => `<label class="check"><input type="checkbox" data-act="hwtxt" data-id="${h.id}" ${h.done ? 'checked' : ''}> ${U.esc(h.text)}</label>`).join('') : '<p>Сегодня отдельных заданий нет.</p>'}</article><button class="btn big" data-act="hwdone">Готово</button>`; }
 function vSurvey(L){
@@ -230,7 +240,7 @@ function vSurvey(L){
 }
 function vResult(kid, subj, L){
   const msg = L.passed === true ? 'Тема пройдена! Завтра — следующая.' : L.passed === false ? 'Завтра повторим эту тему с новыми заданиями.' : '';
-  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[kid].win)}</div>` : ''}<div class="bigmark m${L.grade}">${L.grade}</div><p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано: ${coinsHtml(L.coins || 0)}</p></article><button class="btn big" data-act="home">К урокам</button>`;
+  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[kid].win)}</div>` : ''}<div class="bigmark m${L.grade}">${L.grade}</div><p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article><button class="btn big" data-act="home">К урокам</button>`;
 }
 
 /* ----- Ответы ----- */
@@ -248,7 +258,6 @@ function answer(v){
     const uid = subj === 'hw' ? (t.uid || 'hw') : L.uid;
     t.uid = uid;
     if (subj !== 'hw') { const s = K.stats[uid] || (K.stats[uid] = { n: 0, ok: 0 }); s.n++; if (ok && a.tries === 1) s.ok++; }
-    if (ok && a.tries === 1) K.coins += 1;
     if (!(ok && a.tries === 1)) addSrs(kid, subj, t);
     if (subj === 'hw') updSrs(kid, L.keys[L.i], ok && a.tries === 1);
     ev(kid, 'ответ', { subj: subjName(kid, subj, cur.ds), unit: subj === 'hw' ? 'повторение' : unitById(kid, subj, L.uid).t, q: strip(t.q), ans: String(v), right: t.k === 'n' ? U.dec(t.a) : t.a, ok: ok && a.tries === 1 ? 'верно' : ok ? 'со 2-й попытки' : 'ошибка' });
@@ -271,9 +280,7 @@ function finishLesson(){
   const first = ans.filter(a => a && a.ok && a.tries === 1).length + (L.fans ? L.fans.filter(a => a && a.ok && a.tries === 1).length : 0);
   const tot = total + (L.fans ? L.fq : 0);
   const ratio = tot ? first / tot : 1; L.score = first; L.total = tot; L.grade = grade(ratio);
-  let coins = 3 + (L.grade === 5 ? 2 : 0);
-  if (subj === 'read') { coins = 5 + (L.res && L.res.good ? 3 : 0); }
-  if (subj === 'hw') coins = 5;
+  const q = lessonQuality(kid, subj, L, ratio); L.q = q;
   if (subj !== 'read' && subj !== 'hw') {
     const key = subj + L.tr; L.passed = ratio >= .8;
     if (L.passed) K.pos[key] = (K.pos[key] || 0) + 1;
@@ -281,11 +288,39 @@ function finishLesson(){
     if (f.diff === 'легко' && ratio === 1) K.lvl[subj] = Math.min(lv + 1, 3); else if (f.diff === 'трудно' && ratio < .75) K.lvl[subj] = Math.max(lv - 1, -1);
   }
   if (subj === 'hw') K.hwText.forEach(h => { if ((L.txt || []).includes(h.id)) h.done = true; });
-  K.coins += coins; L.coins = coins + first; L.phase = 'done';
-  const subs = todaySubjects(kid); if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; K.coins += 10; L.coins += 10; ev(kid, 'день завершён', { coins: K.coins }); }
+  L.secs = Math.min(1500, Math.round((Date.now() - (L.t0 || Date.now())) / 1000)); D.secs = (D.secs || 0) + L.secs;
+  const subs = todaySubjects(kid), M = Math.floor(LESSON_POOL / Math.max(5, subs.length));
+  let pts = q < .6 ? 0 : Math.round(M * q * q); D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
+  K.coins += pts; L.coins = pts; L.phase = 'done';
+  if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; K.lastDone = U.today(); K.burnBase = 0;
+    if (subs.every(s => (D.les[s].q || 0) >= .9)) { const b = Math.max(0, DAY_MAX - D.pts); D.pts += b; K.coins += b; L.coins += b; L.perfect = true; }
+    const mins = Math.round(D.secs / 60); K.extraN = K.extraN || 0; if (mins < 40) K.extraN = Math.min(3, K.extraN + 1); else if (mins > 65) K.extraN = Math.max(-2, K.extraN - 1);
+    ev(kid, 'день завершён', { coins: K.coins, score: D.pts + ' мин игры заработано', secs: D.secs, text: `занимался ${mins} мин` }); }
   ev(kid, 'урок завершён', { subj: subjName(kid, subj, cur.ds), unit: lessonTitle(kid, subj, cur.ds), score: `${first}/${tot}`, grade: L.grade, passed: L.passed === undefined ? '' : L.passed ? 'тема пройдена' : 'повтор', mood: (L.fb || {}).mood, diff: (L.fb || {}).diff, like: (L.fb || {}).like, text: (L.fb || {}).text, coins: K.coins });
   save(); render();
 }
+
+/* ----- Баллы: 1 балл = 1 минута игры. За день максимум 60: 50 за уроки по качеству + 10 за безупречный день ----- */
+const DAY_MAX = 60, DAY_BONUS = 10, LESSON_POOL = DAY_MAX - DAY_BONUS;
+function lessonQuality(kid, subj, L, ratio){
+  if (subj === 'hw' && !(L.items && L.items.length) && !(L.ans && L.ans.length)) return .9;
+  if (subj !== 'read') return ratio;
+  const r = L.res || {}, norm = KIDS[kid].norm * .8 * progressFactor(kid);
+  const acc = r.acc == null ? .8 : r.acc;
+  const pace = !r.wpm ? .5 : r.wpm > KIDS[kid].norm * 3 ? .4 : Math.min(1, r.wpm / norm);
+  const parts = [[ratio, .4], [acc, .25], [pace, .15]];
+  if (L.rt) parts.push([L.rt.score, .2]);
+  const w = parts.reduce((a, x) => a + x[1], 0); return parts.reduce((a, x) => a + x[0] * x[1], 0) / w;
+}
+/* Пропуск дня: баллы сгорают. Пропущен 1 день — половина, 2 и больше — все. */
+function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) { K.lastDone = t; K.burnDate = t; return; } if (K.burnDate === t) return; K.burnDate = t;
+  let missed = 0, d = K.lastDone; while (U.addDays(d, 1) < t) { d = U.addDays(d, 1); missed++; }
+  const before = K.burnBase == null ? missed : missed - K.burnBase; K.burnBase = missed;
+  if (missed < 1 || before < 1 || K.coins <= 0) return;
+  const lost = missed >= 2 ? K.coins : Math.ceil(K.coins / 2); K.coins -= lost; K.burnMsg = `Ты пропустил(а) занятия — сгорело ${lost} мин игры.`;
+  ev(kid, 'баллы сгорели', { coins: K.coins, price: -lost, text: `пропущено дней: ${missed}` }); save(); }
+function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0) return '';
+  const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'} (${K.coins}).</div>`; }
 
 /* ----- Чтение ----- */
 let RD = null; /* текущая сессия чтения вслух */
@@ -297,9 +332,9 @@ function wordsLimit(kid){ const K = S.kids[kid]; return K.readWords || KIDS[kid]
 function tokensHtml(text, st, p){ let i = 0; return text.split('\n').map(line => '<p>' + line.split(/\s+/).filter(Boolean).map(w => { const k = i++; const c = st ? (st[k] === 1 ? 'r1' : st[k] === 2 ? 'r2' : k === p ? 'rc' : '') : ''; return `<span class="w ${c}" data-i="${k}">${U.esc(w)}</span>`; }).join(' ') + '</p>').join(''); }
 function vRead(kid, L){
   const t = readText(kid), K = S.kids[kid];
-  const { aloud, rest } = aloudPart(t.text, wordsLimit(kid));
+  const { aloud, rest } = aloudPart(t.text, readLim(kid, L));
   const head = `<section class="lesson"><p class="eyebrow">Чтение</p><h1>${U.esc(t.title)}</h1>${t.author ? `<p class="author">${U.esc(t.author)}</p>` : ''}
-   <ol class="steps">${['Разминка', 'Читаю вслух', 'Вопросы', 'Отзыв'].map((s, i) => { const ix = { warm:0, read:1, qs:2, survey:3, done:3 }[L.phase]; return `<li class="${i < ix ? 'ok' : i === ix ? 'now' : ''}">${s}</li>`; }).join('')}</ol>`;
+   <ol class="steps">${(() => { const st = readSteps(t, rest), ix = st.indexOf(PH_STEP[L.phase]); return st.map((s, i) => `<li class="${i < ix ? 'ok' : i === ix ? 'now' : ''}">${s}</li>`).join(''); })()}</ol>`;
   if (L.phase === 'warm') {
     const hard = Object.entries(K.hard).sort((a, b) => b[1].miss - a[1].miss).slice(0, 5).map(x => x[0]);
     const auto = t.text.split(/\s+/).map(w => w.replace(/[^\p{L}-]/gu, '')).filter(w => w.length >= 9);
@@ -310,26 +345,63 @@ function vRead(kid, L){
   }
   if (L.phase === 'read') {
     const live = RD && RD.active;
-    return head + `<article class="card reading" lang="${L.lang || 'ru'}"><div class="text" id="rtext">${tokensHtml(aloud, RD && RD.st, RD && RD.p)}</div>${rest ? `<details class="rest"><summary>Дальше — прочитай про себя</summary>${tokensHtml(rest)}</details>` : ''}</article>
+    return head + `<article class="card reading" lang="${L.lang || 'ru'}"><div class="text" id="rtext">${tokensHtml(aloud, RD && RD.st, RD && RD.p)}</div></article>${rest ? '<p class="hint">Это начало главы. Остальное потом дочитаешь сам(а), про себя.</p>' : ''}
     <div class="readbar">${SR ? (live ? `<button class="btn big stop" data-act="stopread">Я дочитал(а)</button><span id="rstat" class="rstat">Слушаю…</span>` : `<button class="btn big mic" data-act="startread">🎤 Читать вслух</button>`) : (live ? `<button class="btn big stop" data-act="stopread">Я дочитал(а)</button>` : `<button class="btn big" data-act="startread">Начать (засекаю время)</button><p class="hint">На этом устройстве нет распознавания речи. Читай вслух взрослому, я засеку время.</p>`)}</div></section>`;
+  }
+  if (L.phase === 'silent') {
+    if (!L.st0) { L.st0 = Date.now(); save(); }
+    return head + `<article class="card"><p>Теперь дочитай главу <b>про себя</b>, внимательно. Потом перескажешь и ответишь на вопросы с подвохом.</p><p class="hint">Не торопись: раньше чем через ${Math.max(1, Math.round(silentMin(kid, rest) / 60))} мин кнопка не сработает.</p></article>
+    <article class="card reading"><div class="text">${tokensHtml(rest)}</div></article><div class="readbar"><button class="btn big" data-act="silentdone">Я дочитал(а) главу</button></div></section>`;
+  }
+  if (L.phase === 'retell') {
+    const r = L.rt;
+    if (r) return head + `<article class="card"><h2>Пересказ</h2>${r.adult ? '<p>Хорошо! Теперь вопросы.</p>' : `<p>Ты вспомнил(а) ${r.hit.length} из ${r.n} главных вещей${r.hit.length ? ': ' + r.hit.map(U.esc).join(', ') : ''}.</p>${r.miss.length ? `<p class="hint">Не прозвучало: ${r.miss.map(U.esc).join(', ')}.</p>` : ''}`}</article><button class="btn big" data-act="toqs">К вопросам</button></section>`;
+    const live = RT && RT.active, voice = SR && !L.noSR;
+    return head + `<article class="card"><h2>Перескажи главу своими словами</h2><p class="hint">Кто там был? Что случилось? Чем всё закончилось? Расскажи подробно, не меньше минуты.</p>${voice ? `<div id="rtell" class="rtell">${U.esc(RT && RT.text || '')}</div>` : ''}</article>
+    <div class="readbar">${voice ? (live ? `<button class="btn big stop" data-act="retellstop">Я закончил(а)</button><span class="rstat">Слушаю…</span>` : `<button class="btn big mic" data-act="retellstart">🎤 Рассказать</button>`) : `<button class="btn big" data-act="retelladult">Пересказал(а) взрослому</button><p class="hint">Перескажи главу маме или папе.</p>`}</div></section>`;
   }
   if (L.phase === 'qs') {
     const r = L.res || {};
     const qs = readQs(kid, L), i = L.i || 0, q = qs[i], a = L.ans[i] || {};
     const sum = `<div class="readres"><span><b>${r.wpm || '—'}</b> слов в минуту</span>${r.acc != null ? `<span><b>${Math.round(r.acc * 100)}%</b> точность</span>` : ''}${r.errs && r.errs.length ? `<span>Трудные слова: ${r.errs.slice(0, 6).map(U.esc).join(', ')}</span>` : ''}</div>`;
-    return head + sum + `<div class="counter">Вопрос ${i + 1} из ${qs.length}</div><details class="peek"><summary>Посмотреть текст</summary><div class="text">${tokensHtml(t.text)}</div></details>
+    return head + sum + `<div class="counter">Вопрос ${i + 1} из ${qs.length}</div>${t.kw ? '' : `<details class="peek"><summary>Посмотреть текст</summary><div class="text">${tokensHtml(t.text)}</div></details>`}
     <article class="card task"><div class="q">${U.esc(q.q)}</div><div class="opts">${q.opts.map(o => `<button class="opt ${a.final && o === q.a ? 'right' : (a.wrong || []).includes(o) ? 'wrong' : ''}" data-act="rq" data-v="${U.esc(o)}" ${a.final || (a.wrong || []).includes(o) ? 'disabled' : ''}>${U.esc(o)}</button>`).join('')}</div>
-    ${a.final ? (a.ok ? `<div class="fb ok"><b>Верно!</b></div>` : `<div class="fb bad"><b>Правильный ответ: ${U.esc(q.a)}</b></div>`) : a.tries ? '<div class="fb try">Подумай ещё. Можно заглянуть в текст.</div>' : ''}</article>
+    ${a.final ? (a.ok ? `<div class="fb ok"><b>Верно!</b></div>` : `<div class="fb bad"><b>Правильный ответ: ${U.esc(q.a)}</b></div>`) : a.tries ? (t.kw ? '<div class="fb try">Подумай ещё. Тут есть подвох!</div>' : '<div class="fb try">Подумай ещё. Можно заглянуть в текст.</div>') : ''}</article>
     ${a.final ? `<button class="btn big" data-act="rnext">${i + 1 < qs.length ? 'Дальше' : 'Закончить'}</button>` : ''}</section>`;
   }
   if (L.phase === 'survey') return head + vSurvey(L) + '</section>';
   return head + vResult(kid, 'read', L) + `<p class="center hint">${L.res && L.res.good ? 'Отличный темп! Следующий текст будет чуть длиннее.' : L.res && L.res.repeat ? 'Завтра перечитаем этот текст ещё раз — так читать станет легче.' : ''}</p></section>`;
 }
+const PH_STEP = { warm:'Разминка', read:'Читаю вслух', silent:'Читаю сам', retell:'Пересказ', qs:'Вопросы', survey:'Отзыв', done:'Отзыв' };
+function readSteps(t, rest){ const s = ['Разминка', 'Читаю вслух']; if (rest) s.push('Читаю сам'); if (t.kw) s.push('Пересказ'); return s.concat(['Вопросы', 'Отзыв']); }
+function readLim(kid, L){ return (L && L.lim) || wordsLimit(kid); }
+function silentMin(kid, rest){ const w = rest.split(/\s+/).filter(Boolean).length; return Math.min(900, Math.round(w / (KIDS[kid].norm * 2.5) * 60)); }
+let RT = null; /* пересказ голосом */
+function retellStart(){
+  const R0 = RT = { active: true, base: '', cur: '', text: '', t0: Date.now() };
+  const rec = new SR(); rec.lang = 'ru-RU'; rec.continuous = true; rec.interimResults = true; R0.rec = rec;
+  rec.onresult = e => { let s = ''; for (let i = 0; i < e.results.length; i++) s += ' ' + e.results[i][0].transcript; R0.cur = s; R0.text = (R0.base + ' ' + s).trim(); const el = document.getElementById('rtell'); if (el) el.textContent = R0.text; };
+  rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') R0.denied = true; };
+  rec.onend = () => { R0.base += ' ' + R0.cur; R0.cur = ''; if (R0.active && !R0.denied) setTimeout(() => { try { rec.start(); } catch (e) {} }, 120); };
+  try { rec.start(); } catch (e) {}
+  render();
+}
+function kwHit(stem, words){ const k = normW(stem), n = Math.min(k.length, Math.max(4, k.length - 2)), p = k.slice(0, n); return words.some(w => w.startsWith(p)); }
+function retellStop(){
+  if (!RT) return; RT.active = false; try { RT.rec && RT.rec.stop(); } catch (e) {}
+  const kid = cur.kid, L = dayRec(kid, cur.ds).les.read, t = readText(kid);
+  const words = RT.text.split(/\s+/).map(normW).filter(Boolean);
+  if (words.length < 12) { L.rtTries = (L.rtTries || 0) + 1; if (RT.denied || L.rtTries >= 2) L.noSR = true; RT = null; save(); render(); alertMsg(L.noSR ? 'Не получилось услышать. Перескажи взрослому.' : 'Расскажи подробнее — хотя бы несколько предложений'); return; }
+  const hit = t.kw.filter(k => kwHit(k, words)), miss = t.kw.filter(k => !hit.includes(k));
+  L.rt = { n: t.kw.length, hit, miss, score: hit.length / t.kw.length, words: words.length };
+  ev(kid, 'пересказ', { subj: 'Чтение', unit: t.title, text: RT.text.slice(0, 1500), score: `${hit.length}/${t.kw.length}`, words: words.length, secs: Math.round((Date.now() - RT.t0) / 1000) });
+  RT = null; save(); render();
+}
 function readQs(kid, L){ const t = readText(kid); const r = U.rng(L.seed || 1); return t.qs.map(([q, a, ...w]) => ({ q, a, opts: r.shuffle([a, ...w]) })); }
 
 function startRead(lang){
   const kid = cur.kid, L = cur.subj === 'read' ? dayRec(kid, cur.ds).les.read : null;
-  const text = cur.subj === 'read' ? aloudPart(readText(kid).text, wordsLimit(kid)).aloud : RD_TEXT();
+  const text = cur.subj === 'read' ? aloudPart(readText(kid).text, readLim(kid, L)).aloud : RD_TEXT();
   const T = text.split(/\s+/).filter(Boolean).map(normW);
   RD = { active: true, t0: Date.now(), T, st: new Array(T.length).fill(0), p: 0, base: '', cur: '', lang: lang || 'ru-RU' };
   if (SR) {
@@ -355,12 +427,13 @@ function stopRead(){
   const useSR = SR && !RD.denied && RD.p > 0;
   const reached = useSR ? RD.p : RD.T.length;
   const wpm = Math.round(reached / (secs / 60));
-  const textWords = (cur.subj === 'read' ? aloudPart(readText(kid).text, wordsLimit(kid)).aloud : RD_TEXT()).split(/\s+/).filter(Boolean);
+  const LR = cur.subj === 'read' ? dayRec(kid, cur.ds).les.read : null; if (LR && !LR.lim) LR.lim = wordsLimit(kid);
+  const textWords = (cur.subj === 'read' ? aloudPart(readText(kid).text, readLim(kid, LR)).aloud : RD_TEXT()).split(/\s+/).filter(Boolean);
   let errs = [], acc = null;
   if (useSR) { let okc = 0, bad = 0; for (let k = 0; k < RD.p; k++) { if (RD.st[k] === 1) okc++; else if (RD.st[k] === 2) { bad++; errs.push(textWords[k].replace(/[^\p{L}-]/gu, '')); } } acc = okc / Math.max(1, okc + bad); }
   const res = { wpm, acc, errs, secs: Math.round(secs), words: reached, sr: useSR };
   if (cur.subj === 'read') {
-    const L = dayRec(kid, cur.ds).les.read; L.res = res; L.phase = 'qs'; L.i = 0;
+    const L = dayRec(kid, cur.ds).les.read; L.res = res; L.i = 0; { const sp = aloudPart(readText(kid).text, readLim(kid, L)); L.phase = sp.rest ? 'silent' : readText(kid).kw ? 'retell' : 'qs'; L.st0 = Date.now(); }
     const norm = KIDS[kid].norm; res.good = (acc == null || acc >= .9) && wpm >= norm * .8 * progressFactor(kid) && wpm <= norm * 3;
     res.repeat = acc != null && acc < .85;
     errs.forEach(w => { const h = K.hard[w] || (K.hard[w] = { miss: 0, ok: 0 }); h.miss++; });
@@ -376,7 +449,7 @@ function readAnswer(v){
   const kid = cur.kid, L = dayRec(kid, cur.ds).les.read, qs = readQs(kid, L), i = L.i || 0, q = qs[i];
   const a = L.ans[i] || (L.ans[i] = { tries: 0, wrong: [] }); if (a.final) return; a.tries++;
   const ok = v === q.a; if (!ok) a.wrong.push(v);
-  if (ok || a.tries >= 2) { a.final = true; a.ok = ok; if (ok && a.tries === 1) S.kids[kid].coins += 1; ev(kid, 'ответ', { subj: 'Чтение', unit: readText(kid).title, q: q.q, ans: v, right: q.a, ok: ok && a.tries === 1 ? 'верно' : ok ? 'со 2-й попытки' : 'ошибка' }); }
+  if (ok || a.tries >= 2) { a.final = true; a.ok = ok; ev(kid, 'ответ', { subj: 'Чтение', unit: readText(kid).title, q: q.q, ans: v, right: q.a, ok: ok && a.tries === 1 ? 'верно' : ok ? 'со 2-й попытки' : 'ошибка' }); }
   save(); render();
 }
 
@@ -395,7 +468,7 @@ function vForeign(kid, L){
 }
 function foreignAnswer(v){ const kid = cur.kid, L = dayRec(kid, cur.ds).les[cur.subj], t = curForeign(L); const r = U.rng(U.h(L.fid + cur.ds)); const qs = t.qs.map(([q, a, ...w]) => ({ q, a, opts: r.shuffle([a, ...w]) })); const q = qs[L.fi];
   const a = L.fans[L.fi] || (L.fans[L.fi] = { tries: 0, wrong: [] }); if (a.final) return; a.tries++; const ok = v === q.a; if (!ok) a.wrong.push(v);
-  if (ok || a.tries >= 2) { a.final = true; a.ok = ok; if (ok && a.tries === 1) S.kids[kid].coins++; ev(kid, 'ответ', { subj: L.tr === '_alt' ? 'English' : 'Português', unit: t.title, q: q.q, ans: v, right: q.a, ok: ok && a.tries === 1 ? 'верно' : ok ? 'со 2-й попытки' : 'ошибка' }); }
+  if (ok || a.tries >= 2) { a.final = true; a.ok = ok; ev(kid, 'ответ', { subj: L.tr === '_alt' ? 'English' : 'Português', unit: t.title, q: q.q, ans: v, right: q.a, ok: ok && a.tries === 1 ? 'верно' : ok ? 'со 2-й попытки' : 'ошибка' }); }
   save(); render(); }
 
 /* ----- Магазин ----- */
@@ -453,10 +526,13 @@ document.addEventListener('click', e => {
     case 'parent': askPin('parent', () => go('parent', { kid: null })); break;
     case 'cancelpin': go(cur.kid ? 'home' : 'login'); break;
     case 'key': pinKey(b.dataset.k); break;
-    case 'logout': if (RD && RD.active) stopRead(); cur.kid = null; go('login'); break;
+    case 'logout': if (RD && RD.active) stopRead(); if (RT && RT.active) { RT.active = false; try { RT.rec.stop(); } catch (e) {} RT = null; } cur.kid = null; go('login'); break;
     case 'home': if (RD && RD.active) { RD.active = false; try { RD.rec && RD.rec.stop(); } catch (x) {} } go('home'); break;
     case 'open': { const s0 = b.dataset.subj, L0 = D.les[s0]; if (!(L0 && L0.phase === 'done') && s0 !== nextOpen(kid)) { alertMsg('Сначала закончи предыдущий урок 🔒'); break; } startLesson(s0); break; }
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
+    case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); break; }
+    case 'dunnotask': { L.showTh = L.i; L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid), t = lessonTasks(L, kid, cur.subj)[L.i]; ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, q: strip(t.q) }); save(); render(); break; }
+    case 'sayex': say(b.dataset.t, 'ru-RU'); break;
     case 'saytheory': { const u = unitById(kid, cur.subj, L.uid); say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
     case 'topractice': L.phase = 'practice'; save(); render(); break;
     case 'choose': answer(b.dataset.v); break;
@@ -467,7 +543,16 @@ document.addEventListener('click', e => {
     case 'hwtxt': { const h = S.kids[kid].hwText.find(x => x.id === b.dataset.id); if (h) h.done = b.checked; save(); break; }
     case 'hwdone': L.phase = 'survey'; save(); render(); break;
     case 'sayw': say(b.dataset.w, 'ru-RU'); break;
-    case 'toread': L.phase = 'read'; RD = null; save(); render(); break;
+    case 'toread': L.phase = 'read'; L.lim = wordsLimit(kid); RD = null; save(); render(); break;
+    case 'silentdone': { const t = readText(kid), rest = aloudPart(t.text, readLim(kid, L)).rest, need = silentMin(kid, rest), el = (Date.now() - (L.st0 || 0)) / 1000;
+      if (el < need) { alertMsg(`Слишком быстро 🙂 Читай внимательно, ещё примерно ${Math.max(1, Math.ceil((need - el) / 60))} мин`); break; }
+      L.silentSecs = Math.round(el); ev(kid, 'чтение про себя', { subj: 'Чтение', unit: t.title, words: rest.split(/\s+/).filter(Boolean).length, secs: L.silentSecs });
+      L.phase = t.kw ? 'retell' : 'qs'; L.i = 0; save(); render(); break; }
+    case 'retellstart': retellStart(); break;
+    case 'retellstop': retellStop(); break;
+    case 'retelladult': { const t = readText(kid); L.rt = { n: t.kw.length, hit: [], miss: [], score: .7, adult: true }; ev(kid, 'пересказ', { subj: 'Чтение', unit: t.title, text: 'пересказал(а) взрослому' }); save(); render(); break; }
+    case 'toqs': L.phase = 'qs'; L.i = 0; save(); render(); break;
+    case 'burnseen': delete S.kids[kid].burnMsg; save(); render(); break;
     case 'startread': startRead('ru-RU'); break;
     case 'stopread': stopRead(); break;
     case 'rq': readAnswer(b.dataset.v); break;

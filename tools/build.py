@@ -4,7 +4,9 @@ import os, sys, json, hashlib
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 src = os.path.join(root, 'src'); out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(root, 'docs')
 os.makedirs(out, exist_ok=True)
-js = '\n'.join(open(os.path.join(src, f), encoding='utf-8').read() for f in ['core.js', 'cur_yarik.js', 'cur_anya.js', 'texts.js', 'themes.js', 'app.js'])
+parts = json.load(open(os.path.join(root, 'books', 'parts.json'), encoding='utf-8'))
+rd = lambda f: open(os.path.join(src, f), encoding='utf-8').read()
+js = '\n'.join([rd('core.js'), rd('cur_yarik.js'), rd('cur_anya.js'), rd('texts.js'), rd('themes.js'), 'const BOOK_TXT = ' + json.dumps(parts, ensure_ascii=False) + ';', rd('books.js'), rd('app.js')])
 css = open(os.path.join(src, 'style.css'), encoding='utf-8').read()
 ver = hashlib.md5((js + css).encode()).hexdigest()[:8]
 html = f'''<!doctype html>

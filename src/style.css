@@ -186,3 +186,9 @@ th{ color:var(--ink2); font-weight:600; }
 .tile.locked{ opacity:.45; filter:grayscale(.6); }
 .tile.locked .ico::after{ content:"🔒"; position:absolute; font-size:16px; transform:translate(22px,-22px); }
 .tile.locked .ico{ position:relative; }
+.rtell{ min-height:4em; margin-top:10px; padding:10px 12px; border:1.5px dashed var(--acc); border-radius:12px; color:var(--ink2); font-size:17px; }
+.note.warn{ background:#fff4e0; color:#7a4a00; }
+@media (prefers-color-scheme: dark){ .note.warn{ background:#3a2c12; color:#ffd99a; } }
+.card.example{ background:var(--accsoft); margin-top:12px; }
+.card.example h3{ margin-top:0; }
+.task .link[data-act="dunnotask"]{ display:block; margin-top:12px; }
