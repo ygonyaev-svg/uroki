@@ -1,6 +1,6 @@
 /* ===== Настройка детей ===== */
 CUR_Y.lang = { name:'Языки', src:'Português: 2.º–3.º ano (gramática, ortografia) и English', units: PT_NAT, old: PT_Y, alt: EN_UNITS, altName:'English' };
-CUR_A.logic.alt = A_FIN; CUR_A.logic.altName = '💶 Финансы'; CUR_Y.world.alt = Y_FIN; CUR_Y.world.altName = '💶 Деньги'; CUR_Y.world.altSrc = 'Финансовая грамотность (по стандартам Jump$tart, K-5)';
+CUR_A.logic.alt = A_FIN; CUR_A.logic.altName = 'Финансы'; CUR_Y.world.alt = Y_FIN; CUR_Y.world.altName = 'Деньги'; CUR_Y.world.altSrc = 'Финансовая грамотность (по стандартам Jump$tart, K-5)';
 delete CUR_Y.pt;
 /* Блок «Продолжение» (решение методсовета, п. 2): темы следующего класса помечены в программах cont:1 и стоят в конце своих списков,
    после основной программы; порядок внутри основной части и внутри «Продолжения» сохраняется. Позиция детей переносится по id (posmap.js). */
@@ -15,8 +15,8 @@ const KIDS = FAM ? {} : KIDS_TPL;
 /* Шаблон программы (yarik — младшие, anya — старшие) и оформление ребёнка; в семейной версии дети заводятся родителями */
 const TPL = k => T(k);
 function T(k){ return FAM ? ((KIDS[k] && KIDS[k].tpl) || 'yarik') : k; }
-function LK(k){ return FAM ? ((KIDS[k] && KIDS[k].look) || T(k)) : k; }
-function TH(k){ return FAM && THEME['k:' + k] ? 'k:' + k : LK(k); }
+function LK(k){ return FAM ? ((KIDS[k] && KIDS[k].look) || T(k)) : (typeof lookId === 'function' && lookId(k) ? LOOKS[lookId(k)].base : k); }
+function TH(k){ return FAM && THEME['k:' + k] ? 'k:' + k : !FAM && typeof lookTheme === 'function' && S && S.kids && S.kids[k] ? lookTheme(k) : LK(k); }
 function kidIds(){ return FAM ? Object.keys(KIDS) : ['yarik', 'anya']; }
 const SUBJ_ICON = { read:'Аа', math:'7+5', rus:'Ёё', world:'☼', hist:'XV', logic:'?!', lang:'Pt', hw:'ДЗ' };
 const STEPS = [1, 3, 7];
@@ -102,6 +102,7 @@ function applyCfg(rows){ let fresh = false;
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
     else if (type.startsWith('чтен')) { const n = Number(row.value); if (n > 0) K.readWords = n; }
     else if (type.startsWith('книг')) bkApply(kid, row);
+    else if (type.startsWith('врем')) { const t = U.today(), m = Math.round((Number(row.value) || 10) / 10) * 10; if (!K.xt || K.xt.d !== t) K.xt = { d: t, m: 0 }; K.xt.m = Math.max(0, Math.min(180, K.xt.m + m)); if (m > 0 && K.restForced && K.restUntil > Date.now()) { K.restUntil = 0; K.restForced = false; K.sess = Math.max(0, SESS_SECS + extraSecs(K) - m * 60); K.blkAt = Date.now(); } }
     else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; }
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     else continue; /* незнакомую команду не отмечаем — её выполнит следующая версия приложения */
@@ -179,7 +180,8 @@ function render(){
   if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vSleep(); }
   else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vRestScreen(cur.kid); }
   else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active)) v = vAsk(cur.kid);
-  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
+  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
+  if (typeof lookVars === 'function') lookVars(document.body.className ? cur.kid : null);
   if (FAM) famBody();
   app().innerHTML = (TEST ? testBar() : '') + v; afterRender();
 }
@@ -194,7 +196,7 @@ function vSetup(){
    <button class="btn big">Сохранить</button></form></main>`;
 }
 function vLogin(){
-  const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
+  const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}${typeof lookBody === 'function' ? lookBody(k) : ''}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
   return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header>
   <div class="kids">${kidIds().map(card).join('')}</div>${FAM ? famLoginExtra() : ''}
   ${alwaysTiles(null)}
@@ -445,7 +447,7 @@ function vTask(kid, subj, L){
   ${fin ? `<button class="btn big" data-act="next">${L.i + 1 < T.length ? 'Дальше' : 'Закончить'}</button>` : ''}`;
 }
 /* Разбор на похожем примере: задание того же типа с ответом и объяснением */
-function subjArt(kid, subj){ const k = T(kid) === 'yarik' ? 'y' : 'a'; let n = subj; if (T(kid) === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (T(kid) === 'yarik' && subj === 'world' && track('world', cur.ds) === '_alt') n = 'fin'; if (T(kid) === 'anya' && subj === 'logic' && track('logic', cur.ds) === '_alt') n = 'fin'; if (!['math','rus','world','logic','lang','read','hist','geo','fin'].includes(n)) return '';
+function subjArt(kid, subj){ const k = !FAM && typeof lookId === 'function' && lookId(kid) ? LOOKS[lookId(kid)].art : T(kid) === 'yarik' ? 'y' : 'a'; let n = subj; if (T(kid) === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (T(kid) === 'yarik' && subj === 'world' && track('world', cur.ds) === '_alt') n = 'fin'; if (T(kid) === 'anya' && subj === 'logic' && track('logic', cur.ds) === '_alt') n = 'fin'; if (!['math','rus','world','logic','lang','read','hist','geo','fin'].includes(n)) return '';
   return `<img class="subjart" src="img/subj-${k}-${n}.webp" alt="" onerror="this.remove()">`; }
 function vExample(kid, subj, L, u, cur0){ const n = L.helpN || 1; const shape = x => strip(x.q).replace(/\d+([,.]\d+)?/g, '#').slice(0, 18);
   const cands = genTasks(u, (L.seed || 1) * 7 + n * 101, 14).filter(x => !cur0 || x.q !== cur0.q); const ex = (cur0 && cands.find(x => shape(x) === shape(cur0))) || (cur0 && cands.find(x => x.k === cur0.k && shape(x).slice(0, 8) === shape(cur0).slice(0, 8))) || cands[0]; if (!ex) return '';
@@ -601,7 +603,7 @@ function hhmm(ts){ const d = new Date(ts), z = n => (n < 10 ? '0' : '') + n; ret
 function fmtLeft(ms){ const m = Math.ceil(ms / 60000), h = Math.floor(m / 60), r = m % 60; return h ? h + ' ч ' + r + ' мин' : r + ' мин'; }
 function restTick(kid, secs){ /* время теперь считает общий таймер экрана (screenTick) */ }
 function restTick0(kid, secs){ if (TEST) return; const K = S.kids[kid], now = Date.now(); if (!K.blkAt || now - K.blkAt > REST_MS) { K.blk = 0; K.sess = 0; } K.blk = (K.blk || 0) + (secs || 0); K.sess = (K.sess || 0) + (secs || 0); K.blkAt = now;
-  if (K.sess >= SESS_SECS) { K.blk = 0; K.sess = 0; K.ask = false; K.restUntil = now + REST_MS; K.restForced = true; ev(kid, 'перерыв', { text: 'час занятий за сессию; обязательный перерыв до ' + hhmm(K.restUntil) }); }
+  if (K.sess >= SESS_SECS + extraSecs(K)) { K.blk = 0; K.sess = 0; K.ask = false; K.restUntil = now + REST_MS; K.restForced = true; ev(kid, 'перерыв', { text: 'час занятий за сессию; обязательный перерыв до ' + hhmm(K.restUntil) }); }
   else if (K.blk >= BLOCK_SECS) { K.blk = 0; K.ask = true; } }
 /* Таймер экрана: считаем всё время в приложении (уроки, загадки, шахматы, программирование…), пока ребёнок реально нажимает. */
 let LAST_IN = Date.now(); ['pointerdown', 'touchstart', 'keydown'].forEach(e => document.addEventListener(e, () => { LAST_IN = Date.now(); }, true));
@@ -617,8 +619,10 @@ function vRestScreen(kid){ const K = S.kids[kid], ms = restLeft(kid), g = T(kid)
    : `<div class="cheer">😴</div><h1>Отдыхаешь</h1><p>Вернёшься через <b><span id="restleft">${fmtLeft(ms)}</span></b> (в ${hhmm(K.restUntil)}). Отойди от экрана: подвигайся, попей воды, посмотри в окно.</p>`}
    <p class="hint">Все баллы и прогресс сохранены.</p></article></section></main>`; }
 function vAsk(kid){ return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header><section class="lesson">${askCard(kid)}</section></main>`; }
+/* Родитель может добавить ребёнку время на сегодня, шагами по 10 минут */
+function extraSecs(K){ return K.xt && K.xt.d === U.today() ? K.xt.m * 60 : 0; }
 function restAsk(kid){ const K = S.kids[kid]; return !TEST && K.ask && !restLeft(kid); }
-function askCard(kid){ if (!restAsk(kid)) return ''; const K = S.kids[kid], m = Math.round((K.sess || 0) / 60), left = Math.max(5, Math.round((SESS_SECS - (K.sess || 0)) / 60)), g = T(kid) === 'anya';
+function askCard(kid){ if (!restAsk(kid)) return ''; const K = S.kids[kid], m = Math.round((K.sess || 0) / 60), left = Math.max(5, Math.round((SESS_SECS + extraSecs(K) - (K.sess || 0)) / 60)), g = T(kid) === 'anya';
   return `<div class="card askrest"><h2>${g ? 'Не устала?' : 'Не устал?'} 🙂</h2><p>Ты занимаешься уже <b>${m} мин</b>. Можно продолжить (сегодня ещё до ${left} мин подряд) или отдохнуть.</p>
    <div class="row"><button class="btn" data-act="restgo">💪 ${g ? 'Готова' : 'Готов'} ещё</button></div><p class="hint">Или отдохни — выбери сколько:</p>
    <div class="row">${[15, 20, 30].map(n => `<button class="btn ghost" data-act="restpick" data-m="${n}">😴 ${n} мин</button>`).join(' ')}</div></div>`; }
@@ -973,7 +977,7 @@ function devInfo(){ const ua = navigator.userAgent; const m = ua.match(/OS (\d+)
   return `Версия системы: ${ios}, открыто ${pwa}. Распознавание чтения вслух: ${SR ? '✅ есть' : '❌ нет — нужен iPadOS 14.5 или новее (Настройки → Основные → Обновление ПО); пока скорость чтения считается по таймеру'}. Микрофон: ${navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? 'доступен' : 'недоступен'}.`; }
 function vSettings(){
   const unitSel = kid => Object.entries(KIDS[kid].cur).filter(([, c]) => c.units).map(([k, c]) => [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []).map(([tr, list, nm]) => `<label>${KIDS[kid].name} · ${nm}<select id="sel_${kid}_${k}${tr}">${list.map((u, i) => `${u.cont && !(list[i - 1] || {}).cont ? '<optgroup label="Продолжение (следующий класс)">' : ''}<option value="${i}" ${(S.kids[kid].pos[k + tr] || 0) === i ? 'selected' : ''}>${i + 1}. ${CONT_MARK(u)}${U.esc(u.t)}</option>${u.cont && i === list.length - 1 ? '</optgroup>' : ''}`).join('')}</select></label>`).join('')).join('');
-  return `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
+  return (typeof lookSettings === 'function' ? lookSettings() : '') + `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => { const K0 = S.kids[k], x = extraSecs(K0) / 60, used = Math.round((K0.sess || 0) / 60); return `<div class="xtrow"><span><b>${KIDS[k].name}</b>: сегодня в сессии ${used} из ${60 + x} мин${x ? ` (+${x} от вас)` : ''}</span> <button class="btn small" data-act="xtadd" data-k="${k}" data-m="10">+10 мин</button> ${x ? `<button class="btn ghost small" data-act="xtadd" data-k="${k}" data-m="-10">−10</button>` : ''}</div>`; }).join('')}<p class="hint">Добавленное время — только на сегодня. Если ребёнок уже на большом перерыве, он сразу снимается.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
   ${FAM ? '' : `<div class="card form" ><h2>Связь с таблицей родителя</h2><label>Адрес скрипта Google<input id="syncurl" value="${U.esc(S.cfg.sync || '')}" autocomplete="off"></label><p class="hint">В очереди на отправку: ${S.queue.length}.</p><div class="row"><button class="btn small" data-act="savesync">Сохранить и отправить</button></div></div>`}
   <div class="card"><h2>Начать заново</h2><p class="hint">Стирает на этом айпаде весь прогресс, монеты, покупки и коды. После теста нажмите — и приложение будет как новое.</p><button class="btn small stop" data-act="resetall">Сбросить всё на этом устройстве</button></div>
   ${FAM ? famSettings() : `<form class="card form" data-form="pins"><h2>Коды</h2><label>Новый код родителя<input id="np" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ярика<input id="ny" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ани<input id="na" inputmode="numeric" maxlength="4" autocomplete="off"></label><button class="btn small">Сменить коды</button></form>`}`;
@@ -1011,6 +1015,7 @@ document.addEventListener('click', e => {
     case 'dripseen': { const R = S.kids[kid].drip; if (R) R.sess = 0; save(); render(); break; }
     case 'restgo': { const K0 = S.kids[kid]; K0.ask = false; K0.blk = 0; ev(kid, 'не устал', { text: 'занимается дальше; за сессию ' + Math.round((K0.sess || 0) / 60) + ' мин' }); save(); render(); break; }
     case 'restpick': { const K0 = S.kids[kid], m = +b.dataset.m; K0.ask = false; K0.blk = 0; K0.restForced = false; K0.restUntil = Date.now() + m * 60000; ev(kid, 'перерыв', { text: 'сам выбрал отдых ' + m + ' мин' }); save(); render(); break; }
+    case 'xtadd': { const K0 = S.kids[b.dataset.k], t = U.today(); if (!K0.xt || K0.xt.d !== t) K0.xt = { d: t, m: 0 }; K0.xt.m = Math.max(0, Math.min(180, K0.xt.m + (+b.dataset.m))); if (+b.dataset.m > 0 && K0.restForced && K0.restUntil > Date.now()) { K0.restUntil = 0; K0.restForced = false; K0.sess = Math.max(0, SESS_SECS + extraSecs(K0) - (+b.dataset.m) * 60); K0.blkAt = Date.now(); } ev(b.dataset.k, 'родитель добавил время', { text: (+b.dataset.m > 0 ? '+' : '') + b.dataset.m + ' мин; всего сверху ' + K0.xt.m + ' мин' }); save(); render(); break; }
     case 'norest': { const K0 = S.kids[b.dataset.k]; K0.restUntil = 0; K0.blk = 0; K0.sess = 0; K0.ask = false; save(); render(); break; }
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
     case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); if (L.phase === 'theory' && L.helpN === 1) say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
@@ -1073,7 +1078,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (testAct(act, b)) break; if (spotAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }

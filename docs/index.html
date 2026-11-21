@@ -425,6 +425,7 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .hwc .hwrow{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px solid var(--soft); }
 .hwc, .hwc p, .hwc b{ color:#2a2622; } .hwc .hint{ color:#5a524a !important; } .hwc{ border:2px solid var(--acc); }
 .restscr h1, .restscr p, .restscr h3, .restscr li{ color:#2a2622; } .restscr .hint{ color:#5a524a !important; } .tmr{ text-align:left; margin:8px 0 12px; padding-left:20px; } .tmr li{ margin:6px 0; }
+.xtrow{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:8px 0; }
 
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
@@ -858,12 +859,149 @@ body.anya.h-h .prog i{ background:linear-gradient(90deg,#f2c230,#fde68a); }
 /* картинки «Найди ошибку»: акварельные иллюстрации (tools/illustration_style.md) */
 .hppic.hpimg{ display:block; min-height:0; padding:0; overflow:hidden; background:#2a2140; box-shadow:0 0 0 2px #c9a35a,0 6px 16px rgba(0,0,0,.25); }
 .hppic.hpimg img{ display:block; width:100%; height:auto; aspect-ratio:4/3; }
+
+/* ===== Темы оформления на выбор (looks.js) ===== */
+/* --- общий интерактив --- */
+.lkrow{ display:flex; align-items:flex-start; } .lkrow > .lkprev{ margin-right:18px; }
+.lkprev{ flex:none; width:150px; display:flex; justify-content:center; padding:10px 0; border-radius:18px; background:var(--accsoft,#f1f5f9); }
+.lkmain{ flex:1; min-width:0; }
+.lkopts{ display:grid; grid-template-columns:1fr 1fr; grid-gap:10px; gap:10px; }
+.lkopts.grid{ grid-template-columns:repeat(4,1fr); }
+.lkopt{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:12px 8px; min-height:64px; }
+.lkopt > * + *{ margin-top:4px; } .lkopt small{ font-weight:500; font-size:13px; opacity:.75; line-height:1.25; }
+.lkopt.on{ border-color:var(--acc); background:var(--accsoft,#fff); }
+.lkopt .ic.big{ width:36px; height:36px; }
+.lksw{ display:inline-block; width:38px; height:38px; border-radius:50%; border:2px solid #1B2A44; }
+.lksw.sq{ border-radius:4px; }
+.lknum{ font-size:24px; }
+.lkform{ margin-top:12px; }
+.lkres{ text-align:center; }
+.lkbig{ display:flex; justify-content:center; margin:6px 0 10px; }
+.lksay{ font-size:20px; line-height:1.4; }
+.lktile .ico{ background:var(--accsoft,#fff) !important; overflow:hidden; }
+.lktile .ico .lkpic{ max-height:54px; }
+@media (max-width:620px){ .lkrow{ flex-direction:column; align-items:stretch; } .lkrow > .lkprev{ width:auto; margin:0 0 14px; } .lkopts.grid{ grid-template-columns:repeat(3,1fr); } }
+
+/* --- выбор темы родителем --- */
+.lkset h3{ margin:16px 0 8px; }
+.lkgrid{ display:grid; grid-template-columns:repeat(3,1fr); grid-gap:10px; gap:10px; }
+.lkcard{ display:flex; flex-direction:column; align-items:flex-start; text-align:left; padding:10px; border-radius:16px; border:3px solid transparent; background:#f8fafc; font:inherit; color:inherit; cursor:pointer; }
+.lkcard.on{ border-color:#2563eb; background:#eff6ff; }
+.lkcard > * + *{ margin-top:4px; } .lkcard b{ font-size:16px; } .lkcard small{ font-size:12.5px; opacity:.75; line-height:1.25; }
+.lkcard-sw{ display:flex; padding:8px; border-radius:12px; width:100%; box-sizing:border-box; justify-content:space-around; }
+.lkcard-sw .ic{ width:28px; height:28px; --iw:#fff; }
+@media (max-width:620px){ .lkgrid{ grid-template-columns:1fr 1fr; } }
+
+/* --- вход: карточки детей --- */
+.kidcard.th-hero{ background:linear-gradient(#2B4FA8,#1E2E6E); box-shadow:0 8px 0 #121B45,0 14px 30px rgba(0,0,0,.25); }
+.kidcard.th-cube{ background:linear-gradient(#FFB04A,#F28C28); box-shadow:0 8px 0 #A85A10,0 14px 30px rgba(0,0,0,.25); }
+.kidcard.th-prin{ background:linear-gradient(#E58AB8,#A8457F); box-shadow:0 8px 0 #6E2A54,0 14px 30px rgba(0,0,0,.25); }
+.kidcard.th-doll{ background:linear-gradient(#F48FC0,#E4479A); box-shadow:0 8px 0 #A3236A,0 14px 30px rgba(0,0,0,.25); }
+
+/* ======================= СУПЕРГЕРОИ: ночной город, комикс ======================= */
+body.th-hero{ background:#1D2350; --il:#141A33; --ia:#E23B3B; --ib:#FFD23F; --iw:#ffffff; }
+body.th-hero::before{ background:linear-gradient(rgba(10,12,40,.45),rgba(10,12,40,.15) 300px,rgba(10,12,40,.05)),url(img/bg-hero.webp) center 60%/cover no-repeat,linear-gradient(#141838,#3C2E6E 55%,#F08A4B) !important; }
+body.th-hero .wrap{ --acc:var(--b1,#E23B3B); --accsoft:#FFF3C4; }
+body.th-hero h1,body.th-hero h2,body.th-hero .sn{ font-style:italic; letter-spacing:.01em; }
+body.th-hero .hello > h1,body.th-hero .lesson > h1{ text-transform:uppercase; font-weight:900; color:#FFD23F; text-shadow:3px 3px 0 #141A33; }
+body.th-hero .card,body.th-hero .tile,body.th-hero .opt,body.th-hero .note{ border:3px solid #141A33 !important; box-shadow:5px 5px 0 #141A33 !important; border-radius:14px; }
+body.th-hero .btn{ background:var(--b1,#E23B3B); color:#fff; border:3px solid #141A33; box-shadow:4px 4px 0 #141A33; text-transform:uppercase; font-style:italic; }
+body.th-hero .btn:active{ transform:translate(3px,3px); box-shadow:1px 1px 0 #141A33; }
+body.th-hero .btn.ghost{ background:#FFD23F; color:#141A33; }
+body.th-hero .coins{ background:#FFD23F; color:#141A33; border:3px solid #141A33; box-shadow:3px 3px 0 #141A33; }
+body.th-hero .banner .ic{ background:#FFD23F; border:3px solid #141A33; border-radius:50%; box-shadow:3px 3px 0 #141A33; }
+body.th-hero .tile .ico{ border:3px solid #141A33; border-radius:12px; }
+body.th-hero .prog i{ background:repeating-linear-gradient(45deg,#E23B3B 0 10px,#FFD23F 10px 20px); }
+body.th-hero .wrap > .hello::after{ content:""; display:block; height:8px; margin-top:10px; background:repeating-linear-gradient(90deg,#E23B3B 0 30px,#FFD23F 30px 60px,#2B4FA8 60px 90px); border:2px solid #141A33; border-radius:4px; }
+
+/* ======================= КУБИЧЕСКИЙ МИР: яркие игрушечные кубики ======================= */
+body.th-cube{ background:#BDEBFF; --il:#1B2A44; --ia:#FFC46B; --ib:#F28C28; --iw:#C9661A; }
+body.th-cube::before{ background:linear-gradient(rgba(20,30,60,.35),rgba(20,30,60,.05) 300px),url(img/bg-cube.webp) center 60%/cover no-repeat,linear-gradient(#BDEBFF,#FFF1D6) !important; }
+body.th-cube .wrap{ --acc:var(--b2,#E07A12); --accsoft:#FFF1D6; }
+body.th-cube .ic-vtree{ --ia:#8EE08F; --ib:#4CB860; --iw:#2E8F48; } body.th-cube .ic-vcrystal{ --ia:#C7A8FF; --iw:#8B5CF6; } body.th-cube .ic-vrocket{ --ia:#F2545B; --ib:#1FB5A8; --iw:#fff; } body.th-cube .ic-vgear{ --ia:#3CCFC0; --iw:#fff; } body.th-cube .ic-vhouse{ --ia:#FF8FA3; --ib:#FFD84D; --iw:#E0B400; }
+body.th-cube .hello > h1,body.th-cube .lesson > h1{ color:#FFD84D; text-shadow:3px 3px 0 #1B2A44,-1px -1px 0 #1B2A44,1px -1px 0 #1B2A44,-1px 1px 0 #1B2A44; letter-spacing:.02em; }
+body.th-cube .card,body.th-cube .tile,body.th-cube .opt,body.th-cube .note,body.th-cube .chip{ border-radius:12px !important; border:3px solid #1B2A44 !important; box-shadow:0 6px 0 #1B2A44 !important; }
+body.th-cube .card{ background:#FFFDF7; }
+body.th-cube .btn{ border-radius:12px; background:var(--b1,#FFB04A); color:#1B2A44; border:3px solid #1B2A44; box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 5px 0 #1B2A44; }
+body.th-cube .btn:active{ transform:translateY(4px); box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),0 1px 0 #1B2A44; }
+body.th-cube .btn.ghost{ background:#fff; }
+body.th-cube .coins{ border-radius:10px; background:#1B2A44; color:#FFD84D; border:3px solid #1B2A44; }
+body.th-cube .banner .ic{ background:#fff; border:3px solid #1B2A44; border-radius:10px; box-shadow:0 4px 0 #1B2A44; }
+body.th-cube .bar .link{ background:rgba(27,42,68,.75); border-radius:10px; padding:6px 12px; text-shadow:none; }
+body.th-cube .tile .ico{ border-radius:10px; }
+body.th-cube .prog i{ background:repeating-linear-gradient(90deg,#FFB04A 0 16px,#3CCFC0 16px 32px,#B08CF7 32px 48px); }
+body.th-cube .wrap > .hello::after{ content:""; display:block; height:14px; margin-top:10px; border:3px solid #1B2A44; border-radius:6px; background:repeating-linear-gradient(90deg,#FFB04A 0 24px,#3CCFC0 24px 48px,#B08CF7 48px 72px,#FFD84D 72px 96px); }
+
+/* ======================= ПРИНЦЕССЫ: сказочный замок, розовое золото ======================= */
+body.th-prin{ background:#F7C9DD; --il:#5A2C52; --ia:#F4A6C8; --ib:#F2C14E; --iw:#FFF8FB; }
+body.th-prin::before{ background:linear-gradient(rgba(90,30,70,.35),rgba(90,30,70,.05) 320px),url(img/bg-prin.webp) center 50%/cover no-repeat,linear-gradient(#F9D5E5,#FCE9D6 60%,#BFE3C4) !important; }
+body.th-prin .wrap{ --acc:var(--b2,#A8457F); --accsoft:#FCE4F0; --gold:#F2C14E; }
+body.th-prin .card,body.th-prin .tile,body.th-prin .opt,body.th-prin .chip,body.th-prin .note{ background:#FFF8FB !important; color:#4A2340; --ink:#4A2340; --ink2:#7D5A72; --soft:#FCE4F0; box-shadow:0 0 0 2px #E3B65B inset,0 6px 0 rgba(120,40,90,.25),0 10px 30px rgba(120,40,90,.25) !important; border-radius:22px; }
+body.th-prin .card h2,body.th-prin .card h3{ color:var(--b2,#A8457F); }
+body.th-prin .hello > h1,body.th-prin .lesson > h1{ color:#FFF3D1; text-shadow:0 2px 10px rgba(90,30,70,.6); }
+body.th-prin .btn{ background:linear-gradient(var(--b1,#E58AB8),var(--b2,#A8457F)); color:#fff; box-shadow:0 0 0 2px #F2C14E inset,0 4px 0 rgba(90,30,70,.5),0 8px 16px rgba(90,30,70,.3); }
+body.th-prin .btn.ghost{ background:#FCE4F0; color:#7A2E5E; }
+body.th-prin .coins{ background:rgba(90,30,70,.85); color:#FFE29A; box-shadow:inset 0 0 0 1.5px #E3B65B,0 4px 14px rgba(0,0,0,.25); }
+body.th-prin .banner .ic{ background:rgba(255,248,251,.92); box-shadow:inset 0 0 0 1.5px #E3B65B,0 4px 14px rgba(90,30,70,.3); --iw:#FFF8FB; }
+body.th-prin .kb .ic{ background:rgba(255,248,251,.9); }
+body.th-prin .alwh,body.th-prin .hello > .hint{ background:rgba(90,30,70,.72); }
+body.th-prin .tiles.always .tile .ico{ --sct:#FCE4F0; --sc:#E58AB8; --scd:#5A2C52; }
+body.th-prin .tile.locked{ background:rgba(240,225,232,.95) !important; }
+body.th-prin .steps li{ background:rgba(255,248,251,.92); color:#7D5A72; } body.th-prin .steps li.now{ background:var(--b2,#A8457F); color:#fff; }
+body.th-prin .prog i{ background:linear-gradient(90deg,#F2C14E,#F4A6C8); }
+body.th-prin .wrap > .hello::after{ height:2px; margin:12px 0 2px; background:linear-gradient(90deg,rgba(242,193,78,0),#F2C14E 15%,#F2C14E 85%,rgba(242,193,78,0)); }
+
+/* ======================= КУКОЛЬНЫЙ МИР: всё розовое ======================= */
+body.th-doll{ background:#FFD6EA; --fh:"Rubik","Nunito",-apple-system,sans-serif; --il:#7A1F4F; --ia:#F48FC0; --ib:#FFFFFF; --iw:#FFE3F1; }
+body.th-doll::before{ background:linear-gradient(rgba(160,30,100,.25),rgba(160,30,100,0) 320px),url(img/bg-doll.webp) center 50%/cover no-repeat,radial-gradient(circle at 20% 15%,#fff 0 6%,transparent 7%),linear-gradient(#FFC2DF,#FFE3F1 60%,#FFD1E8) !important; }
+body.th-doll .wrap{ --acc:var(--b1,#E4479A); --accsoft:#FFE3F1; }
+body.th-doll h1,body.th-doll h2,body.th-doll .hello > h1{ font-family:var(--fh); font-weight:800; }
+body.th-doll .hello > h1,body.th-doll .lesson > h1{ color:#fff; text-shadow:0 2px 12px rgba(160,30,100,.55); }
+body.th-doll .card,body.th-doll .tile,body.th-doll .opt,body.th-doll .chip,body.th-doll .note{ background:#fff !important; color:#5A1A3E; --ink:#5A1A3E; --ink2:#9A5A7E; --soft:#FFE3F1; border:2px solid #F9B4D6 !important; border-radius:26px !important; box-shadow:0 8px 24px rgba(228,71,154,.22) !important; }
+body.th-doll .card h2,body.th-doll .card h3{ color:var(--b1,#E4479A); }
+body.th-doll .btn{ border-radius:999px; background:linear-gradient(#F77DB8,var(--b1,#E4479A)); color:#fff; box-shadow:0 4px 0 #B8287A,0 8px 18px rgba(228,71,154,.35); }
+body.th-doll .btn.ghost{ background:#FFE3F1; color:#B8287A; }
+body.th-doll .coins{ background:#fff; color:#E4479A; border-radius:999px; box-shadow:0 4px 14px rgba(228,71,154,.3); }
+body.th-doll .banner .ic{ background:#fff; border-radius:50%; box-shadow:0 4px 14px rgba(228,71,154,.3); --ib:#FFD1E8; }
+body.th-doll .tile .ico{ border-radius:50%; }
+body.th-doll .alwh,body.th-doll .hello > .hint{ background:rgba(184,40,122,.72); }
+body.th-doll .prog i{ background:linear-gradient(90deg,#F9B4D6,#E4479A); }
+body.th-doll .wrap > .hello::after{ content:""; display:block; height:10px; margin-top:10px; border-radius:5px; background:radial-gradient(circle,#fff 0 3px,transparent 3.5px) 0 0/16px 10px,#F48FC0; }
+
+/* иконки на ярких кнопках-предметах остаются белыми; рисунки интерактива не перекрашиваются */
+.lkpic .ics{ stroke-width:2; }
+
+/* светлые темы: текст прямо на фоне — тёмный со светлым ореолом, ссылки шапки — в капсулах */
+body.th-prin .hello > h1,body.th-prin .lesson > h1,body.th-prin .alw .hello h1{ color:#6E2A54; text-shadow:0 0 2px #fff,0 0 14px rgba(255,255,255,.95),0 0 24px rgba(255,255,255,.8); }
+body.th-doll .hello > h1,body.th-doll .lesson > h1,body.th-doll .alw .hello h1{ color:#B8287A; text-shadow:0 0 2px #fff,0 0 14px rgba(255,255,255,.95),0 0 24px rgba(255,255,255,.8); }
+body.th-prin .hello .eyebrow,body.th-doll .hello .eyebrow,body.th-prin .hello > p,body.th-doll .hello > p{ display:inline-block; width:auto; color:#fff; text-shadow:none; background:rgba(110,42,84,.78); border-radius:10px; padding:3px 10px; }
+body.th-doll .hello .eyebrow,body.th-doll .hello > p{ background:rgba(184,40,122,.8); }
+body.th-prin .bar .link,body.th-doll .bar .link{ background:rgba(110,42,84,.72); border-radius:999px; padding:6px 12px; text-shadow:none; }
+body.th-doll .bar .link{ background:rgba(184,40,122,.75); }
+body.th-cube .hello > p,body.th-hero .hello > p,body.th-cube .hello .eyebrow{ display:inline-block; width:auto; background:rgba(20,26,51,.7); color:#fff; text-shadow:none; border-radius:6px; padding:3px 10px; }
+
+/* правки по отзывам: маска героя не в «чужих» цветах, иконки шапки на белом */
+body.th-hero .ic-hmask{ --ia:#2BB3A6; } body.th-hero .banner .ic{ background:#fff; }
+body.th-hero .hello > h1,body.th-hero .lesson > h1{ text-shadow:3px 3px 0 #141A33,-1.5px -1.5px 0 #141A33,1.5px -1.5px 0 #141A33,-1.5px 1.5px 0 #141A33; }
+body.th-hero .bar .link{ background:rgba(20,26,51,.75); border-radius:10px; padding:6px 12px; text-shadow:none; }
+body.th-prin{ --ia:#E86AA6; --il:#5A2C52; }
+
+/* принцессы: темнее верх неба, ярче иконки */
+body.th-prin::after{ content:""; position:fixed; left:0; right:0; top:0; height:220px; z-index:-1; pointer-events:none; background:linear-gradient(rgba(90,30,80,.55),rgba(90,30,80,0)); }
+body.th-prin .banner .ic{ background:#fff; box-shadow:inset 0 0 0 2px #C9A35A,0 4px 14px rgba(90,30,70,.35); --ia:#E0559A; --ib:#E8B53A; --iw:#FFF; --il:#4A1E44; }
+/* кукольный мир: свой характер — розовый + мятный, современный округлый шрифт */
+body.th-doll .banner .ic{ background:#fff; box-shadow:0 0 0 3px #3CCFC0,0 4px 14px rgba(228,71,154,.35); --ia:#FF5FA8; --ib:#3CCFC0; --iw:#FFE3F1; --il:#5A1A3E; }
+body.th-doll::after{ content:""; position:fixed; left:0; right:0; top:0; height:200px; z-index:-1; pointer-events:none; background:linear-gradient(rgba(150,20,90,.45),rgba(150,20,90,0)); }
+body.th-doll .btn.ghost{ background:#DFF8F4; color:#0E7C72; }
+body.th-doll .wrap > .hello::after{ background:radial-gradient(circle,#fff 0 3px,transparent 3.5px) 0 0/16px 10px,linear-gradient(90deg,#FF8CC6,#3CCFC0); }
+body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v2356363a */
+<script>/* v6f5443db */
 var FAM = 0;
 const CH_IMG_LIST = ["bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac7", "bac8", "bac9", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bgt1", "bgt2", "bgt3", "bka3", "blg1", "blg2", "bmi1", "bmi2", "bmi3", "bnp7", "bsh3", "bsh4"];
+var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -880,7 +1018,7 @@ const U = {
   dec(x){ return String(Math.round(x * 1000) / 1000).replace('.', ','); },
   big(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); },
   esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); },
-  today(){ const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
+  today(){ const d = new Date(Date.now() + (typeof TEST_SHIFT === 'number' ? TEST_SHIFT : 0) * 864e5); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
   dayNum(ds){ const [y, m, d] = ds.split('-').map(Number); return Math.floor(Date.UTC(y, m - 1, d) / 864e5); },
   addDays(ds, n){ const [y, m, d] = ds.split('-').map(Number); const t = new Date(Date.UTC(y, m - 1, d + n)); return t.toISOString().slice(0, 10); },
   roman(n){ const r = [[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let s = ''; for (const [v, c] of r) while (n >= v) { s += c; n -= v; } return s; },
@@ -4448,7 +4586,7 @@ const SCENES = {
     () => PX.svg(400, 90, `<rect width="400" height="90" fill="#831843"/><g stroke="#fbcfe8" stroke-width="2"><line x1="0" y1="70" x2="400" y2="70"/></g><text x="30" y="62" font-size="30">🦄</text><text x="110" y="62" font-size="28">🌙</text><text x="180" y="62" font-size="28">🧙‍♀️</text><text x="250" y="62" font-size="28">🐈‍⬛</text><text x="320" y="62" font-size="28">🏰</text>`, 'scene')
   ]
 };
-function scene(kid, seed){ const S0 = SCENES[T(kid)] || SCENES.yarik; return S0[Math.abs(seed | 0) % S0.length](); }
+function scene(kid, seed){ const S0 = (!FAM && typeof LOOK_SCENES !== 'undefined' && LOOK_SCENES[lookId(kid)]) || (!FAM && lookId(kid) === 'magic' && SCENES.anya) || (!FAM && lookId(kid) === 'foot' && SCENES.yarik) || SCENES[T(kid)] || SCENES.yarik; return S0[Math.abs(seed | 0) % S0.length](); }
 
 /* Обложки книг */
 const COVERS = {
@@ -4479,7 +4617,7 @@ const COVER_IMG = { 'Пёстрая лента':'cover-holmes.webp', 'Серая
 /* ===== Мои книги: бумажные книги из дома =====
    Ребёнок фотографирует обложку, оборот титульного листа (издательство, год, тираж, ISBN), заднюю обложку со штрихкодом, по желанию оглавление; для незнакомых книг — страницы главы → фото уходят в скрипт таблицы → папка «Уроки — фото книг» на Диске
    и строка в листе «Фото книг». Вечером Claude смотрит фото, узнаёт книгу и присылает задания строкой в «Указания»:
-   тип «книга», значение — JSON { book, title, author, msg, tasks:[{ id, title, read, min, qs, kw, snap }] }.
+   тип «книга», значение — JSON { book, title, author, msg, hidden, tasks:[{ id, title, read, min, qs, kw, snap }] }.
    qs: ["вопрос","верно","неверно1","неверно2"] — выбор; { q, a, alt:[...] } — ответ словом.
    Чтение — по бумаге, вне экрана: таймер идёт, даже если айпад отложили. До +10 баллов в день за книги. */
 var BOOK_PTS = 10;
@@ -4527,6 +4665,7 @@ function bkApply(kid, row){
   if (d.replace) b.tasks = [];
   (d.tasks || []).forEach(function(t){ if (!t || !t.id) return; var have = false; for (var i = 0; i < b.tasks.length; i++) if (b.tasks[i].id === t.id) { b.tasks[i] = t; have = true; } if (!have) b.tasks.push(t); });
   if (d.finished) b.finished = true;
+  if (d.hidden) b.hidden = true;
   b.st = 'ready'; b.upd = U.today();
 }
 
@@ -5275,6 +5414,7 @@ function zdAnswer(v){ var kid = cur.kid; if (!kid || cur.fq) return; var z = zdC
    Названия глав ниже — наши короткие описания, а не названия из изданий (номера глав одинаковы в «Росмэн» и «Махаон»).
    Имена — по «Росмэн»; для «Махаон» подставляет HP_MAH (src/hp.js).
    Формат строки HP_Q: книга|глава|уровень(2 — знаток, 3 — эксперт)|вопрос|верный ответ|неверный1;неверный2;неверный3|пояснение
+   Необязательное 8-е поле HP_Q — картинка к вопросу: имя файла docs/img/hp/q/<имя>.webp (стиль — tools/illustration_style.md; сцена не должна подсказывать ответ).
    Ежедневная подстройка дописывает новые строки В КОНЕЦ массива (id = хэш вопроса, порядок не важен). Главу проверять обязательно. */
 var HP_BOOKS = ['', 'Философский камень', 'Тайная комната', 'Узник Азкабана', 'Кубок огня', 'Орден Феникса', 'Принц-полукровка', 'Дары Смерти'];
 var HP_CH = [[],
@@ -5288,36 +5428,36 @@ var HP_CH = [[],
 ];
 var HP_Q = [
  /* ---------- Книга 1 ---------- */
- '1|1|2|На какой улице жили Дурсли?|Тисовая|Липовая;Кленовая;Вязовая|Дом номер четыре по Тисовой улице, городок Литтл-Уингинг.',
- '1|1|3|Что выпускала фирма, которой руководил мистер Дурсль?|Дрели|Зонты;Автомобили;Пылесосы|Мистер Дурсль был директором фирмы, которая делала дрели.',
- '1|1|2|На чём Хагрид привёз маленького Гарри к дому Дурслей?|На летающем мотоцикле|На метле;На гиппогрифе;На волшебном автобусе|Мотоцикл Хагриду одолжил молодой Сириус Блэк — это выяснится позже.',
- '1|1|3|В какое животное превращалась профессор Макгонагалл, поджидая Дамблдора?|В полосатую кошку|В сову;В чёрную кошку;В ворону|Кошка весь день сидела на ограде, а вокруг глаз у неё были полоски, похожие на очки.',
- '1|1|3|Чем Дамблдор погасил фонари на Тисовой улице?|Серебряной штукой, похожей на зажигалку|Волшебной палочкой;Заклинанием;Просто дунул на них|Щелчок — и свет фонаря «улетал» внутрь. В последней книге этот предмет снова сыграет важную роль.',
- '1|2|2|Какую змею Гарри случайно выпустил в зоопарке?|Удава|Кобру;Гадюку;Питона-альбиноса|Удав рассказал, что родился в зоопарке и ни разу не видел свою родину — Бразилию.',
- '1|2|2|Где спал Гарри у Дурслей, пока не пришло письмо из Хогвартса?|В чулане под лестницей|На чердаке;В кладовке на кухне;В гараже|После писем Дурсли перевели его во вторую спальню Дадли.',
- '1|3|3|Куда в конце концов увёз семью мистер Дурсль, спасаясь от писем?|В хижину на скале в море|В гостиницу в Лондоне;К тёте Мардж;В палатку в лесу|Он думал, что туда письма точно не доберутся. Но туда пришёл Хагрид.',
- '1|4|2|Что Хагрид наколдовал Дадли?|Поросячий хвостик|Ослиные уши;Свиной пятачок;Кошачьи усы|Хагрид хотел превратить его в поросёнка, но, по его словам, Дадли и так был на него слишком похож.',
- '1|4|3|Что подарил Хагрид Гарри на одиннадцатилетие в хижине?|Шоколадный торт|Сову;Палочку;Мешочек галлеонов|Помятый торт с поздравлением зелёным кремом. Сову Хагрид подарил позже, в Косом переулке.',
- '1|5|2|Сколько заплатил Гарри за свою волшебную палочку?|Семь галлеонов|Один галлеон;Семнадцать сиклей;Двенадцать галлеонов|Палочку Гарри купил сам у мистера Олливандера.',
- '1|5|2|Что находится внутри палочки Гарри?|Перо феникса|Волос единорога;Жила из сердца дракона;Волос вейлы|Олливандер сказал: тот же феникс дал всего два пера. Второе — в палочке Волан-де-Морта.',
- '1|5|3|Из какого дерева палочка Гарри?|Остролист|Тис;Ива;Дуб|Остролист, одиннадцать дюймов. Палочка Волан-де-Морта — из тиса.',
- '1|5|2|Что Хагрид забрал из сейфа номер 713?|Маленький грязный свёрток|Мешок золота;Ключ от школы;Письмо Дамблдору|В свёртке был философский камень — его перевезли в Хогвартс.',
- '1|5|2|Какую сову подарил Гарри Хагрид?|Белую полярную|Серую сипуху;Бурую неясыть;Маленького сыча|Гарри назвал её Буклей, имя он нашёл в учебнике по истории магии.',
- '1|6|2|Чья карточка первой попалась Гарри в шоколадной лягушке?|Дамблдора|Мерлина;Николаса Фламеля;Агриппы|На обороте карточки упоминалось имя Фламеля — потом это помогло разгадать тайну.',
- '1|6|2|Как попасть на платформу девять и три четверти?|Пройти сквозь стену между девятой и десятой платформами|Постучать по колонне три раза;Сказать пароль контролёру;Сесть в последний вагон|Объяснила это миссис Уизли — так Гарри и познакомился с Уизли.',
- '1|7|2|Куда сначала хотела отправить Гарри Распределяющая шляпа?|В Слизерин|В Когтевран;В Пуффендуй;Сразу в Гриффиндор|Шляпа говорила, что Слизерин помог бы ему стать великим. Гарри про себя повторял: только не Слизерин.',
- '1|7|3|Кого распределили первым на курсе Гарри?|Ханну Аббот|Гермиону Грейнджер;Сьюзен Боунс;Драко Малфоя|Ханна Аббот попала в Пуффендуй.',
- '1|7|2|Как звали привидение Гриффиндора?|Почти Безголовый Ник|Толстый Монах;Кровавый Барон;Серая Дама|Толстый Монах — привидение Пуффендуя, Кровавый Барон — Слизерина.',
- '1|8|3|Где, по словам Снегга, нужно искать безоар?|В желудке козла|В печени дракона;В гнезде феникса;На дне озера|Безоар — камень, который спасает от большинства ядов. Пригодится в шестой книге.',
- '1|8|2|Сколько баллов снял Снегг с Гриффиндора на первом же уроке у Гарри?|Два балла|Пять баллов;Десять баллов;Ни одного|Сначала балл за «дерзость» Гарри, потом ещё один — за то, что Гарри не подсказал Невиллу.',
- '1|9|2|Кто вызвал Гарри на ночную дуэль?|Драко Малфой|Невилл Долгопупс;Кребб;Перси Уизли|Малфой и не думал приходить — он хотел, чтобы Гарри поймали.',
- '1|9|2|Что охранял трёхголовый пёс на третьем этаже?|Люк в полу|Сундук с золотом;Дверь в библиотеку;Волшебное зеркало|Гермиона заметила люк под лапами пса, пока мальчишки смотрели на его головы.',
- '1|10|2|Какое заклинание учили на уроке, после которого Рон обидел Гермиону?|Вингардиум левиоса|Люмос;Алохомора;Петрификус тоталус|Гермиона поправила, как правильно произносить, и у неё перо взлетело первым.',
- '1|10|2|Что Рон поднял в воздух, чтобы победить тролля?|Дубинку тролля|Камень;Раковину;Метлу|Дубинка упала троллю на голову, и он рухнул.',
- '1|10|3|Куда попала палочка Гарри в схватке с троллем?|Троллю в нос|В глаз;В ухо;В рот|Гарри прыгнул троллю на шею, и палочка воткнулась прямо в нос.',
- '1|11|2|Как Гарри поймал снитч в своём первом матче?|Чуть не проглотил его|Поймал на лету рукой;Сбил метлой;Снитч сел ему на ладонь|Ловец спрыгнул вниз, закашлялся — и снитч оказался у него во рту.',
- '1|17|3|Кто на самом деле заколдовал метлу Гарри во время матча?|Квиррелл|Снегг;Малфой;Маркус Флинт|Снегг в это время произносил контрзаклятие и пытался спасти Гарри.',
- '1|11|2|Какая метла была у Гарри на первом курсе?|«Нимбус-2000»|«Чистомёт-7»;«Молния»;«Комета-260»|Метлу прислала профессор Макгонагалл, хотя первокурсникам свои мётлы не разрешались.',
+ '1|1|2|На какой улице жили Дурсли?|Тисовая|Липовая;Кленовая;Вязовая|Дом номер четыре по Тисовой улице, городок Литтл-Уингинг.|q000',
+ '1|1|3|Что выпускала фирма, которой руководил мистер Дурсль?|Дрели|Зонты;Автомобили;Пылесосы|Мистер Дурсль был директором фирмы, которая делала дрели.|q001',
+ '1|1|2|На чём Хагрид привёз маленького Гарри к дому Дурслей?|На летающем мотоцикле|На метле;На гиппогрифе;На волшебном автобусе|Мотоцикл Хагриду одолжил молодой Сириус Блэк — это выяснится позже.|q002',
+ '1|1|3|В какое животное превращалась профессор Макгонагалл, поджидая Дамблдора?|В полосатую кошку|В сову;В чёрную кошку;В ворону|Кошка весь день сидела на ограде, а вокруг глаз у неё были полоски, похожие на очки.|q003',
+ '1|1|3|Чем Дамблдор погасил фонари на Тисовой улице?|Серебряной штукой, похожей на зажигалку|Волшебной палочкой;Заклинанием;Просто дунул на них|Щелчок — и свет фонаря «улетал» внутрь. В последней книге этот предмет снова сыграет важную роль.|q004',
+ '1|2|2|Какую змею Гарри случайно выпустил в зоопарке?|Удава|Кобру;Гадюку;Питона-альбиноса|Удав рассказал, что родился в зоопарке и ни разу не видел свою родину — Бразилию.|q005',
+ '1|2|2|Где спал Гарри у Дурслей, пока не пришло письмо из Хогвартса?|В чулане под лестницей|На чердаке;В кладовке на кухне;В гараже|После писем Дурсли перевели его во вторую спальню Дадли.|q006',
+ '1|3|3|Куда в конце концов увёз семью мистер Дурсль, спасаясь от писем?|В хижину на скале в море|В гостиницу в Лондоне;К тёте Мардж;В палатку в лесу|Он думал, что туда письма точно не доберутся. Но туда пришёл Хагрид.|q007',
+ '1|4|2|Что Хагрид наколдовал Дадли?|Поросячий хвостик|Ослиные уши;Свиной пятачок;Кошачьи усы|Хагрид хотел превратить его в поросёнка, но, по его словам, Дадли и так был на него слишком похож.|q008',
+ '1|4|3|Что подарил Хагрид Гарри на одиннадцатилетие в хижине?|Шоколадный торт|Сову;Палочку;Мешочек галлеонов|Помятый торт с поздравлением зелёным кремом. Сову Хагрид подарил позже, в Косом переулке.|q009',
+ '1|5|2|Сколько заплатил Гарри за свою волшебную палочку?|Семь галлеонов|Один галлеон;Семнадцать сиклей;Двенадцать галлеонов|Палочку Гарри купил сам у мистера Олливандера.|q010',
+ '1|5|2|Что находится внутри палочки Гарри?|Перо феникса|Волос единорога;Жила из сердца дракона;Волос вейлы|Олливандер сказал: тот же феникс дал всего два пера. Второе — в палочке Волан-де-Морта.|q011',
+ '1|5|3|Из какого дерева палочка Гарри?|Остролист|Тис;Ива;Дуб|Остролист, одиннадцать дюймов. Палочка Волан-де-Морта — из тиса.|q012',
+ '1|5|2|Что Хагрид забрал из сейфа номер 713?|Маленький грязный свёрток|Мешок золота;Ключ от школы;Письмо Дамблдору|В свёртке был философский камень — его перевезли в Хогвартс.|q013',
+ '1|5|2|Какую сову подарил Гарри Хагрид?|Белую полярную|Серую сипуху;Бурую неясыть;Маленького сыча|Гарри назвал её Буклей, имя он нашёл в учебнике по истории магии.|q014',
+ '1|6|2|Чья карточка первой попалась Гарри в шоколадной лягушке?|Дамблдора|Мерлина;Николаса Фламеля;Агриппы|На обороте карточки упоминалось имя Фламеля — потом это помогло разгадать тайну.|q015',
+ '1|6|2|Как попасть на платформу девять и три четверти?|Пройти сквозь стену между девятой и десятой платформами|Постучать по колонне три раза;Сказать пароль контролёру;Сесть в последний вагон|Объяснила это миссис Уизли — так Гарри и познакомился с Уизли.|q016',
+ '1|7|2|Куда сначала хотела отправить Гарри Распределяющая шляпа?|В Слизерин|В Когтевран;В Пуффендуй;Сразу в Гриффиндор|Шляпа говорила, что Слизерин помог бы ему стать великим. Гарри про себя повторял: только не Слизерин.|q017',
+ '1|7|3|Кого распределили первым на курсе Гарри?|Ханну Аббот|Гермиону Грейнджер;Сьюзен Боунс;Драко Малфоя|Ханна Аббот попала в Пуффендуй.|q018',
+ '1|7|2|Как звали привидение Гриффиндора?|Почти Безголовый Ник|Толстый Монах;Кровавый Барон;Серая Дама|Толстый Монах — привидение Пуффендуя, Кровавый Барон — Слизерина.|q019',
+ '1|8|3|Где, по словам Снегга, нужно искать безоар?|В желудке козла|В печени дракона;В гнезде феникса;На дне озера|Безоар — камень, который спасает от большинства ядов. Пригодится в шестой книге.|q020',
+ '1|8|2|Сколько баллов снял Снегг с Гриффиндора на первом же уроке у Гарри?|Два балла|Пять баллов;Десять баллов;Ни одного|Сначала балл за «дерзость» Гарри, потом ещё один — за то, что Гарри не подсказал Невиллу.|q021',
+ '1|9|2|Кто вызвал Гарри на ночную дуэль?|Драко Малфой|Невилл Долгопупс;Кребб;Перси Уизли|Малфой и не думал приходить — он хотел, чтобы Гарри поймали.|q022',
+ '1|9|2|Что охранял трёхголовый пёс на третьем этаже?|Люк в полу|Сундук с золотом;Дверь в библиотеку;Волшебное зеркало|Гермиона заметила люк под лапами пса, пока мальчишки смотрели на его головы.|q023',
+ '1|10|2|Какое заклинание учили на уроке, после которого Рон обидел Гермиону?|Вингардиум левиоса|Люмос;Алохомора;Петрификус тоталус|Гермиона поправила, как правильно произносить, и у неё перо взлетело первым.|q024',
+ '1|10|2|Что Рон поднял в воздух, чтобы победить тролля?|Дубинку тролля|Камень;Раковину;Метлу|Дубинка упала троллю на голову, и он рухнул.|q025',
+ '1|10|3|Куда попала палочка Гарри в схватке с троллем?|Троллю в нос|В глаз;В ухо;В рот|Гарри прыгнул троллю на шею, и палочка воткнулась прямо в нос.|q026',
+ '1|11|2|Как Гарри поймал снитч в своём первом матче?|Чуть не проглотил его|Поймал на лету рукой;Сбил метлой;Снитч сел ему на ладонь|Ловец спрыгнул вниз, закашлялся — и снитч оказался у него во рту.|q027',
+ '1|17|3|Кто на самом деле заколдовал метлу Гарри во время матча?|Квиррелл|Снегг;Малфой;Маркус Флинт|Снегг в это время произносил контрзаклятие и пытался спасти Гарри.|q028',
+ '1|11|2|Какая метла была у Гарри на первом курсе?|«Нимбус-2000»|«Чистомёт-7»;«Молния»;«Комета-260»|Метлу прислала профессор Макгонагалл, хотя первокурсникам свои мётлы не разрешались.|q029',
  '1|12|2|Что увидел Гарри в зеркале Еиналеж?|Свою семью|Себя с кубком по квиддичу;Горы золота;Себя старостой|Рон увидел себя старостой и капитаном команды. Зеркало показывает самое заветное желание.',
  '1|12|3|Что, по его словам, видит в зеркале Дамблдор?|Себя с шерстяными носками|Свою семью;Кубок школы;Философский камень|Дамблдор пошутил, что носков ему никогда не дарят — все дарят книги.',
  '1|12|2|Кто прислал Гарри мантию-невидимку на Рождество?|Дамблдор|Хагрид;Миссис Уизли;Сириус Блэк|Записка была без подписи: мантия принадлежала отцу Гарри.',
@@ -5559,7 +5699,14 @@ var HP_Q = [
  '7|36|3|Кто победил Беллатрису в битве?|Миссис Уизли|Гермиона;Макгонагалл;Джинни|Она защищала свою дочь.',
  '7|36|3|Кому на самом деле подчинялась Бузинная палочка в последней битве?|Гарри|Снеггу;Малфою;Волан-де-Морту|Малфой обезоружил Дамблдора, а Гарри — Малфоя.',
  '7|37|2|Как зовут младшего сына Гарри?|Альбус Северус|Джеймс Сириус;Альбус Рубеус;Гарри Артур|Он боялся попасть в Слизерин.',
- '7|37|3|Через сколько лет после битвы происходит эпилог?|Через девятнадцать|Через десять;Через двадцать;Через двадцать пять|На вокзале Гарри и Джинни провожают детей в Хогвартс.'
+ '7|37|3|Через сколько лет после битвы происходит эпилог?|Через девятнадцать|Через десять;Через двадцать;Через двадцать пять|На вокзале Гарри и Джинни провожают детей в Хогвартс.',
+ '6|3|2|Что Гарри получил в наследство от Сириуса?|Дом на площади Гриммо и Кикимера|Сейф в Гринготтсе;Летающий мотоцикл;Мантию-невидимку|По завещанию Сириуса Гарри достались дом номер двенадцать и домовик Кикимер, а ещё Клювокрыл.',
+ '6|5|3|Как Джинни за глаза прозвала Флёр?|Флегма|Фифа;Мадама;Совушка|Джинни и миссис Уизли недолюбливали невесту Билла, отсюда прозвище «Флегма».',
+ '6|17|2|Что Дамблдор поручил Гарри добыть у Слизнорта?|Настоящее воспоминание о разговоре с Томом Реддлом|Рецепт зелья удачи;Ключ от его кабинета;Его старый учебник|Слизнорт подправил воспоминание, потому что стыдился того, что рассказал Реддлу о крестражах.',
+ '6|18|2|В кого влюбился Рон, съев конфеты в свой день рождения?|В Ромильду Вейн|В Лаванду Браун;В Гермиону;В Флёр|Конфеты с приворотным зельем Ромильда предназначала Гарри.',
+ '6|20|3|О чём взрослый Волан-де-Морт просил Дамблдора, придя в Хогвартс?|Взять его учителем защиты от тёмных искусств|Вернуть ему палочку;Принять в Орден Феникса;Простить Хагрида|Дамблдор отказал, и с тех пор ни один учитель защиты не задерживался дольше года.',
+ '6|22|2|Кого хоронил Хагрид, когда к нему пришли Гарри и Слизнорт?|Арагога|Клювокрыла;Пушка;Норберта|На похоронах гигантского паука Гарри с помощью зелья удачи добыл воспоминание Слизнорта.',
+ '6|25|3|Кто подслушал пророчество Трелони и пересказал его Волан-де-Морту?|Снегг|Хвост;Каркаров;Аберфорт|Об этом Гарри узнал от самой Трелони и возненавидел Снегга ещё сильнее.'
 ];
 /* «Найди ошибку»: картинка из своих символов с НАМЕРЕННОЙ ошибкой.
    Формат: книга|глава|уровень|картинка (имя файла docs/img/hp/<имя>.webp, стиль — tools/illustration_style.md)|подпись к картинке|ошибка (верный ответ)|три детали, которые нарисованы правильно (через ;)|пояснение.
@@ -5602,18 +5749,25 @@ var HOUSES = {
 var HP_BASE = { hello: THEME.anya.hello, win: THEME.anya.win.slice(), banner: THEME.anya.banner.slice() };
 function hpOn(kid){ return !FAM && kid === 'anya' && !!S.kids[kid]; }
 function hpK(kid){ var K = S.kids[kid]; if (!K.hp) K.hp = { house: '', tr: '', seen: {}, re: [], day: null }; return K.hp; }
-function hpHouse(kid){ return hpOn(kid) ? hpK(kid).house : ''; }
+/* Шляпа доступна любому ребёнку с темой «Волшебная школа» (см. looks.js) */
+function hatOn(kid){ return !FAM && !!S.kids[kid] && (typeof lookId === 'function' ? lookId(kid) === 'magic' : kid === 'anya'); }
+function hpHouse(kid){ return hatOn(kid) ? hpK(kid).house : ''; }
+/* Мужской род для мальчика (тексты Шляпы написаны для девочки) */
+var HP_M = [['Она была очень храброй', 'Он был очень храбрым'], ['Она добилась великого', 'Он добился великого'], ['Она была мудрой', 'Он был мудрым'], ['Она была доброй и верной', 'Он был добрым и верным'],
+  ['смелая волшебница', 'смелый волшебник'], ['волшебница', 'волшебник'], ['гриффиндорка', 'гриффиндорец'], ['слизеринка', 'слизеринец'], ['когтевранка', 'когтевранец'], ['пуффендуйка', 'пуффендуец'], ['трусиха', 'трус'],
+  ['добилась', 'добился'], ['выбрала', 'выбрал'], ['хотела', 'хотел'], ['ждала', 'ждал'], ['сделала', 'сделал'], ['пошла', 'пошёл'], ['сама', 'сам'], ['гордилась бы тобой', 'гордилась бы тобой'], ['ученица', 'ученик'], ['Первокурсница', 'Первокурсник']];
+var HP_MR = HP_M.map(function(p){ return [new RegExp('(^|[^А-Яа-яЁё])' + p[0] + '(?=[^А-Яа-яЁё]|$)', 'g'), '$1' + p[1]]; });
+function hpG(kid, s){ if (kid === 'anya' || s == null) return s; s = String(s); for (var i = 0; i < HP_MR.length; i++) s = s.replace(HP_MR[i][0], HP_MR[i][1]); return s; }
 /* Факультет влияет на приветствие, похвалу и цвета (класс на body) */
-function hpApply(){ var h = S && S.kids && S.kids.anya && S.kids.anya.hp && HOUSES[S.kids.anya.hp.house]; var A = THEME.anya;
-  if (!h) { A.hello = HP_BASE.hello; A.win = HP_BASE.win.slice(); A.banner = HP_BASE.banner.slice(); return; }
-  A.hello = h.hello; A.win = h.win.slice(); A.banner = HP_BASE.banner.slice(); }
+/* Приветствие и похвала факультета теперь собираются в lookTheme (looks.js) для каждого ребёнка отдельно */
+function hpApply(){}
 function hpBodyCls(kid){ var h = hpHouse(kid); return h ? ' h-' + h : ''; }
 
 /* Имена — по переводу «Росмэн». Номера глав одинаковы во всех переводах. (Перевод «Махаон» сильно расходится в именах и в разных тиражах — подстановку не делаем.) */
 function hpT(kid, s){ return s; }
 
 /* ---------- Банк вопросов ---------- */
-var HPQ = HP_Q.map(function(l){ var p = l.split('|'); return { id: 'h' + U.h(p[3]), b: +p[0], c: +p[1], lv: +p[2], q: p[3], a: p[4], w: p[5].split(';'), e: p[6] || '' }; });
+var HPQ = HP_Q.map(function(l){ var p = l.split('|'); return { id: 'h' + U.h(p[3]), b: +p[0], c: +p[1], lv: +p[2], q: p[3], a: p[4], w: p[5].split(';'), e: p[6] || '', img: p[7] || '' }; });
 var HP_PICQ = 'Художник ошибся. Что на картинке не так, как в книге?';
 (typeof HP_PIC !== 'undefined' ? HP_PIC : []).forEach(function(l){ var p = l.split('|'); HPQ.push({ id: 'p' + U.h(p[4]), b: +p[0], c: +p[1], lv: +p[2], pic: p[3], cap: p[4], q: HP_PICQ, a: p[5], w: p[6].split(';'), e: p[7] || '' }); });
 var HPQ_BY = {}; HPQ.forEach(function(x){ HPQ_BY[x.id] = x; });
@@ -5654,10 +5808,10 @@ ALWAYS.push({ id: 'hp', order: 1,
     if (x) {
       var r = (cur.hq && cur.hq.id === x.id) ? cur.hq : null, opts = hpOpts(kid, x);
       h += '<div class="counter">' + (mode === 're' || (r && r.re) ? '📖 Вопрос после перечитывания' : 'Вопрос ' + Math.min(D.ids.length, done + (r ? 0 : 1)) + ' из ' + D.ids.length) + (x.lv === 3 ? ' · <b>эксперт</b>' : '') + '</div>';
-      h += '<article class="card task hpcard"><p class="hpbook">📕 Книга ' + x.b + ' · «' + HP_BOOKS[x.b] + '»</p>' + (x.pic ? '<div class="hppic hpimg"><img src="img/hp/' + U.esc(x.pic) + '.webp" alt="' + U.esc(x.cap) + '" loading="lazy"></div><p class="hpcap">' + U.esc(x.cap) + '</p>' : '') + '<div class="q">' + U.esc(hpT(kid, x.q)) + '</div>' +
+      h += '<article class="card task hpcard"><p class="hpbook">📕 Книга ' + x.b + ' · «' + HP_BOOKS[x.b] + '»</p>' + (x.pic ? '<div class="hppic hpimg"><img src="img/hp/' + U.esc(x.pic) + '.webp" alt="' + U.esc(x.cap) + '" loading="lazy"></div><p class="hpcap">' + U.esc(x.cap) + '</p>' : x.img ? '<div class="hppic hpimg"><img src="img/hp/q/' + U.esc(x.img) + '.webp" alt="" loading="lazy"></div>' : '') + '<div class="q">' + U.esc(hpT(kid, x.q)) + '</div>' +
         '<div class="opts">' + opts.map(function(o){ var cls = r ? (o === x.a ? 'right' : o === r.v ? 'wrong' : '') : ''; return '<button class="opt ' + cls + '" data-act="hpans" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + U.esc(hpT(kid, o)) + '</button>'; }).join('') + '</div>';
       if (r) {
-        h += r.ok ? '<div class="fb ok"><b>' + U.rng(x.id).pick(THEME.anya.win) + '</b> ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') + '. ' : '') + U.esc(hpT(kid, x.e)) + '</div><p class="src">📖 ' + U.esc(hpT(kid, hpWhere(x))) + '</p>'
+        h += r.ok ? '<div class="fb ok"><b>' + U.rng(x.id).pick(THEME[TH(kid)].win) + '</b> ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') + '. ' : '') + U.esc(hpT(kid, x.e)) + '</div><p class="src">📖 ' + U.esc(hpT(kid, hpWhere(x))) + '</p>'
           : '<div class="fb bad"><b>Правильный ответ: ' + U.esc(hpT(kid, x.a)) + '.</b> ' + U.esc(hpT(kid, x.e)) + '</div>' +
             '<div class="note hpread">📖 <b>Где прочитать:</b> ' + U.esc(hpT(kid, hpWhere(x))) + '.<br>Перечитай эту главу в своей книге — вопрос будет ждать тебя в списке «Перечитать». Ответишь верно — получишь балл.</div>';
         h += (r.pts ? funBurst(r.pts) : '') + '</article><button class="btn big" data-act="hpnext">' + (hpCurId(kid) ? 'Следующий вопрос →' : 'Готово') + '</button>';
@@ -5705,9 +5859,10 @@ var HAT_Q = [
 ];
 ALWAYS.push({ id: 'hat', order: 2,
   open: function(kid){ cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 }, res: '' }; if (hpHouse(kid)) cur.hat.show = 1; },
-  tile: function(kid){ if (!hpOn(kid)) return ''; var hs = HOUSES[hpHouse(kid)];
+  tile: function(kid){ if (!hatOn(kid)) return ''; var hs = HOUSES[hpHouse(kid)];
     return '<button class="tile fun hptile hat" data-act="always" data-id="hat"><span class="ico">' + (hs ? hs.e : '🎩') + '</span><span class="tt"><span class="sn">' + (hs ? 'Мой факультет: ' + hs.n : 'Распределяющая шляпа') + '</span><span class="ut">' + (hs ? hs.val.charAt(0).toUpperCase() + hs.val.slice(1) + '. Цвета, приветствие и похвала — твоего факультета' : 'Пройди распределение и выбери свой факультет') + '</span></span></button>'; },
-  view: function(kid){ if (!hpOn(kid)) return ''; var H = hpK(kid), C = cur.hat || (cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 } });
+  view: function(kid){ return hpG(kid, hatView(kid)); },
+  view0: function(kid){ if (!hatOn(kid)) return ''; var H = hpK(kid), C = cur.hat || (cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 } });
     var h = '<section class="hello"><p class="eyebrow">Школа волшебства</p><h1>🎩 Распределяющая шляпа</h1></section>';
     if (C.show && H.house) { var hs = HOUSES[H.house];
       return h + '<article class="card hatres h-' + H.house + '"><div class="hatcrest">' + hs.e + '</div><h2>Ты — ' + hs.who + '!</h2><p>Факультет <b>' + hs.n + '</b>. Основатель — ' + hs.fnd + '. Здесь ценят ' + hs.val + '.</p><p>Теперь приложение встречает тебя цветами твоего факультета, а за верные ответы очки идут ' + hs.d + '.</p>' +
@@ -5720,13 +5875,288 @@ ALWAYS.push({ id: 'hat', order: 2,
       'Шляпа думает… ' + HOUSES[top[0]].e + ' <b>' + HOUSES[top[0]].n.toUpperCase() + '!</b> Но Шляпа всегда учитывает и желание ученика. Если сердце просит другой факультет — выбери его.';
     return h + '<article class="card"><p class="hatsay">' + say + '</p><div class="hatpick">' + ['g', 's', 'r', 'h'].map(function(k){ var x = HOUSES[k];
       return '<button class="hatbtn h-' + k + (top.indexOf(k) >= 0 ? ' rec' : '') + '" data-act="hatset" data-v="' + k + '"><span class="hatcrest">' + x.e + '</span><b>' + x.n + '</b><small>' + x.val + '</small><small>совпало ответов: ' + C.sc[k] + ' из ' + HAT_Q.length + '</small></button>'; }).join('') + '</div></article>'; },
-  act: function(act, b){ var kid = cur.kid; if (!hpOn(kid)) return; var H = hpK(kid), C = cur.hat || (cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 } });
+  act: function(act, b){ var kid = cur.kid; if (!hatOn(kid)) return; var H = hpK(kid), C = cur.hat || (cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 } });
     if (act === 'hatans') { C.sc[b.getAttribute('data-v')]++; C.i++; render(); window.scrollTo(0, 0); }
     else if (act === 'hatagain') { cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 } }; render(); }
     else if (act === 'hatset') { var v = b.getAttribute('data-v'); if (!HOUSES[v]) return; var old = H.house; H.house = v; hpApply(); C.show = 1;
       ev(kid, 'факультет', { subj: 'Гарри Поттер', text: HOUSES[v].n + (old && old !== v ? ' (был ' + HOUSES[old].n + ')' : '') + '; тест: ' + ['g', 's', 'r', 'h'].map(function(k){ return HOUSES[k].n + ' ' + C.sc[k]; }).join(', ') });
       save(); render(); window.scrollTo(0, 0); } }
 });
+
+function hatView(kid){ return alwaysGet('hat').view0(kid); }
+
+/* ===== Темы оформления на выбор (21.11.2026) =====
+   Родитель в «Для родителей» → «Настройки» выбирает каждому ребёнку тему. Любую тему может выбрать любой ребёнок.
+   Темы: футбол, супергерои, кубический мир, волшебная школа, принцессы, кукольный мир.
+   Все рисунки свои, без чужих персонажей, логотипов и названий. ES5 для старого Safari. */
+
+var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
+/* --- новые иконки (сетка 32, стиль как в icons.js) --- */
+(function(){ var I = {
+  /* супергерои */
+  hmask: '<path class="a" d="M3.5 12.5c3.5-3 8.5-3 12.5-.5 4-2.5 9-2.5 12.5.5 0 5.5-3 8.5-6.5 8.5-3 0-4.4-2-6-3.2-1.6 1.2-3 3.2-6 3.2-3.5 0-6.5-3-6.5-8.5z"/><path class="w" d="M7 14.6c1.3-1.4 3.7-1.6 5.2-.3-.7 1.6-3.6 2-5.2.3zM25 14.6c-1.3-1.4-3.7-1.6-5.2-.3.7 1.6 3.6 2 5.2.3z"/>',
+  hcape: '<path class="a" d="M10 6h12l1.5 3L28 27c-4 1.6-8 0-12 0s-8 1.6-12 0L8.5 9z"/><path class="b" d="M9.5 6.5c2.5 3 10.5 3 13 0"/><path d="M13 12l-2 13M19 12l2 13"/>',
+  bolt: '<path class="b" d="M18.5 3L6.5 18h8.5L12.5 29 25.5 13.5H17L18.5 3z"/>',
+  hshield: '<path class="a" d="M16 3.5l11 4V15c0 7-5 11.6-11 13.5C10 26.6 5 22 5 15V7.5z"/><path class="w" d="M16 9.5l2 4.2 4.5.6-3.3 3.1.8 4.5-4-2.2-4 2.2.8-4.5-3.3-3.1 4.5-.6z" stroke-width="1.6"/>',
+  city: '<path class="a" d="M3.5 28V15h7v13M11 28V7h9v21M20.5 28V11h8v17"/><path class="b" stroke="none" d="M14 10h2v2.5h-2zM17 10h2v2.5h-2zM14 15h2v2.5h-2zM17 20h2v2.5h-2zM23 14h2v2.5h-2zM23 19h2v2.5h-2zM6 18h2v2.5H6z"/><path d="M2 28h28"/>',
+  burst: '<path class="b" d="M16 2.5l2.6 6.4 6.5-3-1.8 6.8 6.4 2.6-6 3.8 3.5 6.1-7-.6-.9 7-4.3-5.6-5.2 4.7.6-7-6.9-.6L7.6 17 2.5 12.4l6.8-1L8.5 4.5l6 3.6z"/><circle class="w" cx="16" cy="16" r="5"/>',
+  /* кубический мир — объёмные игрушечные кубики (рисуются ниже через isoC) */
+  /* принцессы */
+  tiara: '<path class="b" d="M4 23l2.5-11 5 6L16 7l4.5 11 5-6L28 23z"/><path class="a" d="M4 23h24v4H4z"/><circle class="w" cx="16" cy="7" r="2"/><circle class="w" cx="6.5" cy="12" r="1.6"/><circle class="w" cx="25.5" cy="12" r="1.6"/><circle class="w" cx="16" cy="17.5" r="2"/>',
+  slipper: '<path class="a" d="M3.5 22c4.5 0 8-1.5 11-5 2.4-2.8 5-4.5 8.5-4.5 3.2 0 5 2 5 4.5V19H17c-3.5 0-6 3-9 3.8H4.5c-1.5 0-2-.8-1-.8z"/><path class="b" d="M24.5 19h3l-1 9h-1.5z"/><path class="w" stroke="none" d="M19 15.3c1.3-.8 2.7-1 4-.8-1.4.6-2.7 1.3-3.6 2.2z"/><path d="M9 6v4M7 8h4M24 5v3M22.5 6.5h3"/>',
+  carriage: '<path class="a" d="M5 19.5a11 10 0 0 1 22 0V22H5z"/><path class="w" d="M12 18v-4a4 4 0 0 1 8 0v4z"/><path class="b" d="M14 9l2-4 2 4z"/><circle class="w" cx="9.5" cy="25.5" r="3.5"/><circle class="w" cx="22.5" cy="25.5" r="3.5"/><path d="M16 9.5V8"/>',
+  rose: '<path d="M16 18v11"/><path class="b" d="M16 24c-3-.3-6-2.4-6.5-5.5 3 .2 5.6 2 6.5 5.5zM16 26c2-3 5-4.5 7.5-4-.8 3-4 4.6-7.5 4z"/><path class="a" d="M16 4c5 0 8.5 3 8.5 7.5S20.8 19 16 19s-8.5-3-8.5-7.5S11 4 16 4z"/><path d="M16 8.5c2.5 0 3.5 2 2.5 3.6-1 1.6-4 1.4-4.6-.4-.6-1.7.7-3 2.1-3.2M12 7.5c-.5 2.5 0 6 4 8"/>',
+  mirror: '<ellipse class="b" cx="16" cy="12.5" rx="8.5" ry="10"/><ellipse class="a" cx="16" cy="12.5" rx="5.5" ry="7"/><path class="w" stroke="none" d="M13.2 9.5c.5-2 1.8-3 3.3-3.2-1.2 1-2 2.3-2.2 4z"/><path d="M16 22.5V27M11 28.5h10"/>',
+  pcastle: '<path class="a" d="M6 14.5h5V28H6zM21 14.5h5V28h-5zM11 18.5h10V28H11z"/><path class="b" d="M5 14.5L8.5 6l3.5 8.5zM20 14.5L23.5 6l3.5 8.5zM12.5 18.5L16 10.5l3.5 8z"/><path class="w" d="M14 28v-3.5a2 2 0 0 1 4 0V28z"/><path d="M8.5 6V3.5l2 1-2 1M23.5 6V3.5l2 1-2 1"/><path d="M3 28h26"/>',
+  /* кукольный мир */
+  heart: '<path class="a" d="M16 27.5S4 20.5 4 12.3A6 6 0 0 1 16 9.8a6 6 0 0 1 12 2.5c0 8.2-12 15.2-12 15.2z"/><path class="w" stroke="none" d="M8.5 11.5c.4-1.8 2-2.8 3.6-2.6-1.4.6-2.4 1.6-2.8 3z"/>',
+  bow: '<path class="a" d="M16 16c-4-5-11.5-7.5-11.5-2.2v4.4c0 5.3 7.5 2.8 11.5-2.2zM16 16c4-5 11.5-7.5 11.5-2.2v4.4c0 5.3-7.5 2.8-11.5-2.2z"/><path class="a" d="M14 18.5l-3.5 9 3-1.5 1.5 2 1-9.5M18 18.5l3.5 9-3-1.5-1.5 2-1-9.5"/><circle class="b" cx="16" cy="16" r="3"/>',
+  dress: '<path class="a" d="M12.5 3.5h7l-.8 6 2.3 3.3-2 3.2L26 28H6l7-12-2-3.2 2.3-3.3z"/><path class="b" d="M12 16h8l.6 1.8H11.4z"/><path d="M11 22c3 1.2 7 1.2 10 0" opacity=".5"/>',
+  heel: '<path class="a" d="M3 20.5c5 0 9-3 12-7 1.8-2.4 4-3.5 7-3.5 4 0 6 3 6 6v3.5H15.5c-2.5 0-4.5 1.2-6.5 3H5c-1.2 0-2-.8-2-2z"/><path class="b" d="M24 19.5h3.5L26 28.5h-1.6z"/><path class="w" stroke="none" d="M18.5 12.5c1.2-.8 2.6-1.1 4-1-1.5.7-2.7 1.5-3.4 2.6z"/>',
+  handbag: '<path class="a" d="M5.5 13h21l-2 15h-17z"/><path d="M11 13V10a5 5 0 0 1 10 0v3"/><path class="b" d="M5.5 13h21l-.5 4h-20z"/><circle class="w" cx="16" cy="17" r="2"/>',
+  hglasses: '<path class="a" d="M10 22s-6-3.5-6-7.5a3 3 0 0 1 6-1 3 3 0 0 1 6 1c0 4-6 7.5-6 7.5zM22 22s-6-3.5-6-7.5a3 3 0 0 1 6-1 3 3 0 0 1 6 1c0 4-6 7.5-6 7.5z"/><path d="M4 13.5L2.5 10M28 13.5l1.5-3.5"/><path class="w" stroke="none" d="M7 14c.3-.8 1-1.3 1.8-1.3-.5.4-.9.9-1 1.6zM19 14c.3-.8 1-1.3 1.8-1.3-.5.4-.9.9-1 1.6z"/>'
+}; for (var k in I) ICONS[k] = I[k]; })();
+
+/* изометрический кубик: верх .a, левая грань .b, правая .w */
+function isoC(cx, t, r){ var h = r / 2; return '<path class="b" d="M' + (cx - r) + ' ' + (t + h) + 'L' + cx + ' ' + (t + r) + 'V' + (t + 2 * r) + 'L' + (cx - r) + ' ' + (t + 1.5 * r) + 'z"/><path class="w" d="M' + cx + ' ' + (t + r) + 'L' + (cx + r) + ' ' + (t + h) + 'V' + (t + 1.5 * r) + 'L' + cx + ' ' + (t + 2 * r) + 'z"/><path class="a" d="M' + cx + ' ' + t + 'L' + (cx + r) + ' ' + (t + h) + 'L' + cx + ' ' + (t + r) + 'L' + (cx - r) + ' ' + (t + h) + 'z"/>'; }
+(function(){ var I = {
+  cubes: isoC(9.5, 13, 6.5) + isoC(22.5, 13, 6.5) + isoC(16, 3.5, 6.5),
+  vtree: '<g style="--ia:#C98B55;--ib:#9A6236;--iw:#7A4A26">' + isoC(16, 19, 4) + '</g>' + isoC(16, 2, 9.5),
+  vhouse: isoC(16, 10, 10) + '<path class="l" d="M18.5 27.5v-5.2l3.5-1.8v5.2z"/><path class="l" d="M9 19l2.8 1.4v2.8L9 21.8z"/>',
+  vcrystal: '<path class="a" d="M16 2.5l7 6v14l-7 7-7-7v-14z"/><path class="w" d="M16 2.5v27l7-7v-14z"/><path d="M9 8.5l7 4 7-4M16 12.5v17"/>',
+  vgear: '<path class="a" d="M14 3h4l.7 3.3 2.6 1.1 2.8-1.9 2.8 2.8-1.9 2.8 1.1 2.6L29 14v4l-3.3.7-1.1 2.6 1.9 2.8-2.8 2.8-2.8-1.9-2.6 1.1L18 29h-4l-.7-3.3-2.6-1.1-2.8 1.9-2.8-2.8 1.9-2.8-1.1-2.6L3 18v-4l3.3-.7 1.1-2.6-1.9-2.8 2.8-2.8 2.8 1.9 2.6-1.1z"/><circle class="w" cx="16" cy="16" r="4.5"/>',
+  vrocket: '<path class="w" d="M12 10h8v14h-8z"/><path class="a" d="M12 10l4-7 4 7z"/><path class="b" d="M12 18l-5 5v4l5-3zM20 18l5 5v4l-5-3z"/><path class="b" d="M14 24h4l-2 5z"/><circle class="l" cx="16" cy="14.5" r="2"/>'
+}; for (var k in I) ICONS[k] = I[k]; })();
+function lic(n){ return icon(n); }
+/* рисунок-иконка внутри SVG-сцены */
+function lsi(n, x, y, s){ return '<g transform="translate(' + x + ',' + y + ') scale(' + (s / 32) + ')"><g class="ics ic-' + n + '">' + (ICONS[n] || '') + '</g></g>'; }
+
+/* --- темы --- */
+var LOOKS = {
+  foot:  { n: 'Футбол', d: 'Стадион, мяч и своя команда', base: 'yarik', art: 'y', bi: ['ball', 'boot', 'goal', 'trophy'], sw: ['#22c55e', '#15803d', '#f97316'] },
+  hero:  { n: 'Супергерои', d: 'Ночной город, плащ и своя суперсила', base: 'yarik', art: 'hero', bi: ['hmask', 'bolt', 'hshield', 'hcape'], sw: ['#E23B3B', '#1E3A8A', '#FFD23F'] },
+  cube:  { n: 'Кубический мир', d: 'Мир из ярких кубиков и свой герой', base: 'yarik', art: 'cube', bi: ['cubes', 'vtree', 'vcrystal', 'vrocket'], sw: ['#FFB04A', '#1FB5A8', '#8B5CF6'] },
+  magic: { n: 'Волшебная школа', d: 'Замок, свечи и свой факультет', base: 'anya', art: 'a', bi: ['owl', 'wand', 'potion', 'candle'], sw: ['#1e1250', '#7452B8', '#E2B04A'] },
+  prin:  { n: 'Принцессы', d: 'Сказочный замок и своё королевство', base: 'anya', art: 'prin', bi: ['tiara', 'pcastle', 'slipper', 'rose'], sw: ['#F4B6CF', '#A8457F', '#E3B65B'] },
+  doll:  { n: 'Кукольный мир', d: 'Розовый домик у моря, наряды и свой образ', base: 'yarik', art: 'doll', bi: ['heart', 'dress', 'heel', 'bow'], sw: ['#FF8CC6', '#3CCFC0', '#FFFFFF'] }
+};
+var LOOK_ORDER = ['foot', 'hero', 'cube', 'magic', 'prin', 'doll'];
+var LOOK_THEME = {
+  hero: { banner: ['hmask', 'bolt', 'hshield', 'city', 'hcape', 'burst', 'star', 'bolt'], pics: ['hmask', 'bolt', 'hshield', 'hcape', 'city', 'burst', 'star', 'medal'],
+    win: ['Суперсила сработала!', 'Город спасён!', 'Геройский ответ!', 'Бах! В точку!', 'Настоящий герой!'], hello: 'Город ждёт своего героя!', world: 'Лига героев знаний' },
+  cube: { banner: ['cubes', 'vtree', 'vcrystal', 'vhouse', 'vgear', 'vrocket', 'star', 'cubes'], pics: ['cubes', 'vtree', 'vcrystal', 'vhouse', 'vgear', 'vrocket'],
+    win: ['Кубик на месте!', 'Башня растёт!', 'Уровень пройден!', 'Ровно и крепко!', 'Найден кристалл!'], hello: 'Строим знания кубик за кубиком!', world: 'Кубический мир' },
+  prin: { banner: ['tiara', 'pcastle', 'slipper', 'rose', 'carriage', 'mirror', 'crown', 'sparkle'], pics: ['tiara', 'pcastle', 'slipper', 'rose', 'carriage', 'mirror', 'crown'],
+    win: ['Королевский ответ!', 'Бал в твою честь!', 'Волшебно верно!', 'Корона сияет!', 'Достойно королевства!'], hello: 'Добро пожаловать в сказочное королевство!', world: 'Сказочное королевство' },
+  doll: { banner: ['heart', 'dress', 'heel', 'bow', 'handbag', 'hglasses', 'mirror', 'sparkle'], pics: ['heart', 'dress', 'heel', 'bow', 'handbag', 'hglasses', 'mirror'],
+    win: ['Блестяще!', 'Идеальный образ!', 'Ты сияешь!', 'Супер-стиль!', 'Розово-верно!'], hello: 'Сегодня ты звезда!', world: 'Кукольный мир' }
+};
+
+function lookOn(){ return !FAM; }
+function lookId(kid){ if (!lookOn() || !kid || !S || !S.kids || !S.kids[kid]) return ''; var v = S.kids[kid].look; return LOOKS[v] ? v : (T(kid) === 'anya' ? 'magic' : 'foot'); }
+function lookSex(kid){ return kid === 'anya' ? 'f' : 'm'; }
+function lookG(kid, m, f){ return lookSex(kid) === 'f' ? f : m; }
+function lookO(kid){ var K = S.kids[kid], id = lookId(kid); if (!K.lks) K.lks = {}; return K.lks[id] || null; }
+
+/* Тема ребёнка для THEME[...] — с учётом его выбора в интерактиве */
+function lookTheme(kid){ var id = lookId(kid), base, key = 'p:' + kid;
+  if (id === 'foot') base = { banner: ['ball', 'boot', 'goal', 'whistle', 'trophy', 'medal', 'flag', 'ball'].map(lic), pics: THEME.yarik.pics, win: THEME.yarik.win, hello: THEME.yarik.hello, world: THEME.yarik.world }; else if (id === 'magic') base = typeof HP_BASE !== 'undefined' ? HP_BASE : THEME.anya;
+  else { var L = LOOK_THEME[id]; base = { banner: L.banner.map(lic), pics: L.pics.map(lic), win: L.win, hello: L.hello, world: L.world }; }
+  var t = { banner: base.banner, pics: base.pics, win: base.win.slice(), hello: base.hello, world: base.world };
+  if (id === 'magic') { t.hello = lookG(kid, 'Добро пожаловать в Школу волшебства, юный волшебник!', base.hello);
+    var hs = typeof hpHouse === 'function' && HOUSES[hpHouse(kid)]; if (hs) { t.hello = typeof hpG === 'function' ? hpG(kid, hs.hello) : hs.hello; t.win = hs.win.map(function(s){ return typeof hpG === 'function' ? hpG(kid, s) : s; }); } }
+  var B = LOOK_B[id], o = lookO(kid); if (B && o && B.done(o)) { var p = B.apply(kid, o); if (p.hello) t.hello = p.hello; if (p.win) t.win = p.win.concat(t.win.slice(0, 2)); }
+  THEME[key] = t; return key; }
+
+/* Класс и цвета для body */
+function lookBody(kid){ var id = lookId(kid); return id ? ' th-' + id : ''; }
+function lookVars(kid){ var st = document.body.style, names = ['--acc', '--b1', '--b2', '--b3', '--bt'];
+  for (var i = 0; i < names.length; i++) st.removeProperty(names[i]);
+  if (!kid || !lookOn()) return; var id = lookId(kid), B = LOOK_B[id], o = lookO(kid); if (!B || !o || !B.done(o)) return; var p = B.apply(kid, o).v || {};
+  for (var k in p) st.setProperty(k, p[k]); }
+
+/* ===== Интерактивы: «Моя команда», «Мой герой», «Персонаж из блоков», «Моё королевство», «Мой образ» ===== */
+var KITS = { rw: ['Красно-белые', '#D7263D', '#FFFFFF'], bw: ['Сине-белые', '#1F4E9E', '#FFFFFF'], gy: ['Зелёно-жёлтые', '#178A47', '#F7C531'], by: ['Чёрно-жёлтые', '#1E1E24', '#F7C531'], ob: ['Оранжево-синие', '#F26B1D', '#1F3E7A'], sk: ['Небесно-синие', '#5AAFE8', '#0E2A4D'] };
+var POSS = { gk: ['Вратарь', 'Последняя надежда команды: реакция и смелость', 'вратарь'], df: ['Защитник', 'Надёжная стена: никто не пройдёт', 'защитник'], mf: ['Полузащитник', 'Мозг команды: видит всё поле', 'полузащитник'], fw: ['Нападающий', 'Забивает голы и не боится ошибиться', 'нападающий'] };
+var HPOW = { spd: ['Скорость', 'bolt', 'быстрее ветра', ['Вихрь', 'Молния', 'Стриж']], str: ['Сила', 'burst', 'сильнее всех', ['Титан', 'Громобой', 'Утёс']], fly: ['Полёт', 'hcape', 'летает над городом', ['Сокол', 'Небесный', 'Ветер']],
+  inv: ['Невидимость', 'hmask', 'исчезает в одно мгновение', ['Тень', 'Призрак', 'Туман']], shd: ['Защита', 'hshield', 'защищает всех вокруг', ['Страж', 'Бастион', 'Щит']], mnd: ['Ум', 'brain', 'решает любую задачу', ['Гений', 'Профессор', 'Разум']] };
+var HCOL = { rb: ['Красный и синий', '#D7263D', '#1F4E9E'], gp: ['Зелёный и фиолетовый', '#2FA35B', '#5B2A86'], yb: ['Жёлтый и чёрный', '#F7C531', '#1E1E24'], ow: ['Оранжевый и белый', '#F26B1D', '#F3F4F6'], cs: ['Бирюзовый и серебро', '#13A8B8', '#9AA6B2'], pk: ['Розовый и фиолетовый', '#E64C9B', '#4B2A86'] };
+var HEMB = { star: 'Звезда', bolt: 'Молния', ring: 'Кольцо', wing: 'Крыло', heart: 'Сердце', eye: 'Глаз' };
+var CSKIN = { a: '#F3D3B5', b: '#E0AC7E', c: '#B97A4E', d: '#7A4B2C' }, CHAIR = { d: ['Рыжие', '#C8552B'], b: ['Светлые', '#E9C46A'], c: ['Чёрные', '#24211F'], a: ['Русые', '#7A5230'], e: ['Синие', '#3A7BD5'] };
+var CSHIRT = { d: '#F7C531', b: '#5DA130', c: '#D7263D', a: '#2FA3D9', e: '#8E44AD', f: '#ECEFF1' }, CPANT = { c: '#2B2B33', b: '#5B4636', d: '#6B8E23', a: '#33468F' };
+var CWORLD = { les: ['Оранжевый остров', '#FFB04A', '#E07A12'], pes: ['Бирюзовый остров', '#3CCFC0', '#13958A'], sneg: ['Лиловый остров', '#B08CF7', '#7349D6'], okean: ['Солнечный остров', '#FFD84D', '#D9A400'], podz: ['Ледяной остров', '#8FD3FF', '#3C9BDB'] };
+var KINGS = { flower: ['Цветочное', 'Цветочного', '#E86AA6', '#A8457F', '#FCE4F0'], sea: ['Морское', 'Морского', '#3FA7D6', '#1F5F99', '#E2F3FB'], snow: ['Снежное', 'Снежного', '#9CC9F0', '#4E6FA8', '#F1F6FD'],
+  forest: ['Лесное', 'Лесного', '#47A36B', '#23613D', '#E5F4EA'], sun: ['Солнечное', 'Солнечного', '#F2B33D', '#B86E12', '#FEF5E1'], star: ['Звёздное', 'Звёздного', '#8E6BD1', '#4B2A86', '#EFE9FA'] };
+var KEMB = { rose: ['Роза', 'rose'], star: ['Звезда', 'star'], moon: ['Луна', 'moon'], heart: ['Сердце', 'heart'], crown: ['Корона', 'crown'], slipper: ['Туфелька', 'slipper'] };
+var DHAIR = { a: ['Светлые', '#F2CF73'], b: ['Каштановые', '#7A4A2A'], c: ['Рыжие', '#D2602E'], d: ['Чёрные', '#26211F'], e: ['Розовые', '#F48FC0'] };
+var DDRESS = { pink: ['Розовое', '#F06AA8'], lil: ['Сиреневое', '#B48BE0'], mint: ['Мятное', '#6CD4B4'], sky: ['Голубое', '#78BDEB'], gold: ['Золотое', '#F2C14E'], red: ['Красное', '#E2433D'] };
+var DSTYLE = { ball: 'Пышное', short: 'Короткое', long: 'Длинное' }, DACC = { bow: ['Бант', 'bow'], tiara: ['Ободок', 'tiara'], glasses: ['Очки-сердечки', 'hglasses'], bag: ['Сумочка', 'handbag'] };
+
+/* рисунки результата */
+function jerseySvg(o, sz){ var k = KITS[o.kit] || KITS.rw, n = o.num || 10;
+  return '<svg class="lkpic noico" viewBox="0 0 120 120" width="' + (sz || 120) + '" height="' + (sz || 120) + '" aria-hidden="true"><path d="M38 12l-26 14 10 22 12-6v62h52V42l12 6 10-22-26-14c-3 8-11 12-22 12s-19-4-22-12z" fill="' + k[1] + '" stroke="#1B2A44" stroke-width="3" stroke-linejoin="round"/>' +
+    '<path d="M38 12c3 8 11 12 22 12s19-4 22-12" fill="none" stroke="' + k[2] + '" stroke-width="5"/><path d="M12 26l10 22M108 26l-10 22" stroke="' + k[2] + '" stroke-width="5"/>' +
+    '<text x="60" y="88" text-anchor="middle" font-family="Rubik,Nunito,sans-serif" font-weight="900" font-size="40" fill="' + k[2] + '" stroke="#1B2A44" stroke-width="1.5">' + n + '</text></svg>'; }
+function embSvg(e, c){ var S0 = { star: '<path d="M0-11l3.2 6.6 7.3 1-5.3 5.2 1.3 7.2L0 5.6-6.5 9l1.3-7.2-5.3-5.2 7.3-1z"/>', bolt: '<path d="M2-12L-7 2h6l-2 10L7-3H1z"/>', ring: '<circle r="9" fill="none" stroke-width="4" stroke="' + c + '"/><circle r="3"/>',
+    wing: '<path d="M-10 6C-8-6 2-11 11-11 6-8 9-5 4-3 8-1 5 1 1 2 3 4 0 6-10 6z"/>', heart: '<path d="M0 10S-10 4-10-3a5 5 0 0 1 10-2 5 5 0 0 1 10 2C10 4 0 10 0 10z"/>', eye: '<path d="M-11 0C-6-7 6-7 11 0 6 7-6 7-11 0z"/><circle r="3.5" fill="#fff"/>' };
+  return '<g fill="' + c + '">' + (S0[e] || S0.star) + '</g>'; }
+function heroSvg(o, sz){ var c = HCOL[o.col] || HCOL.rb, s = c[1], p = c[2], skin = '#F1C9A5';
+  return '<svg class="lkpic noico" viewBox="0 0 120 150" width="' + Math.round((sz || 120) * .8) + '" height="' + (sz || 120) + '" aria-hidden="true"><g stroke="#1B2A44" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">' +
+    '<path d="M38 44L18 136c14 6 28-2 42-2s28 8 42 2L82 44z" fill="' + p + '"/>' +
+    '<path d="M42 46h36l6 36-8 4-2 18H46l-2-18-8-4z" fill="' + s + '"/><path d="M36 50l-12 34 8 4 12-30M84 50l12 34-8 4-12-30" fill="' + s + '"/>' +
+    '<path d="M46 104l-2 34h12l4-28 4 28h12l-2-34z" fill="' + p + '"/><path d="M44 130h12v8H43zM64 130h12l1 8H64z" fill="' + s + '"/>' +
+    '<circle cx="60" cy="28" r="17" fill="' + skin + '"/><path d="M43 27c4-4 10-5 17-3 7-2 13-1 17 3-1 5-4 7-8 7-4 0-6-2-9-3-3 1-5 3-9 3-4 0-7-2-8-7z" fill="' + p + '"/><path d="M44 20c2-9 10-12 16-12s14 3 16 12c-6-4-26-4-32 0z" fill="#3A2A1E"/>' +
+    '<rect x="50" y="94" width="20" height="5" fill="#F7C531"/></g><circle cx="53" cy="28" r="2" fill="#fff"/><circle cx="67" cy="28" r="2" fill="#fff"/>' +
+    '<g transform="translate(60,66)"><circle r="13" fill="#fff" stroke="#1B2A44" stroke-width="2.5"/>' + embSvg(o.emb, p === '#F3F4F6' ? s : p) + '</g></svg>'; }
+function cubeSvg(o, sz){ var sk = CSKIN[o.skin] || CSKIN.a, hr = (CHAIR[o.hair] || CHAIR.d)[1], sh = CSHIRT[o.shirt] || CSHIRT.d, pn = CPANT[o.pant] || CPANT.c, wc = (CWORLD[o.world] || CWORLD.les)[1];
+  var blk = function(x, y, w, h, c){ return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="7" fill="' + c + '" stroke="#1B2A44" stroke-width="3"/><rect x="' + (x + w - 9) + '" y="' + (y + 5) + '" width="5" height="' + (h - 10) + '" rx="2.5" fill="#000" opacity=".12"/>'; };
+  return '<svg class="lkpic noico" viewBox="0 0 120 170" width="' + Math.round((sz || 120) * .7) + '" height="' + (sz || 120) + '" aria-hidden="true"><ellipse cx="60" cy="162" rx="40" ry="6" fill="' + wc + '" opacity=".5"/>' +
+    blk(40, 112, 18, 46, pn) + blk(62, 112, 18, 46, pn) + blk(18, 66, 18, 42, sh) + blk(84, 66, 18, 42, sh) + blk(36, 62, 48, 54, sh) +
+    '<rect x="50" y="76" width="20" height="20" rx="4" fill="#fff" opacity=".55"/>' + blk(32, 8, 56, 52, sk) +
+    '<path d="M32 30V15a7 7 0 0 1 7-7h42a7 7 0 0 1 7 7v15c-6-8-14-10-28-10s-22 2-28 10z" fill="' + hr + '" stroke="#1B2A44" stroke-width="3" stroke-linejoin="round"/>' +
+    '<circle cx="49" cy="36" r="5" fill="#fff" stroke="#1B2A44" stroke-width="2"/><circle cx="71" cy="36" r="5" fill="#fff" stroke="#1B2A44" stroke-width="2"/><circle cx="50" cy="37" r="2.4" fill="#1B2A44"/><circle cx="72" cy="37" r="2.4" fill="#1B2A44"/>' +
+    '<path d="M52 47c5 4 11 4 16 0" fill="none" stroke="#1B2A44" stroke-width="2.5" stroke-linecap="round"/><circle cx="42" cy="45" r="3" fill="#F7A9B8" opacity=".7"/><circle cx="78" cy="45" r="3" fill="#F7A9B8" opacity=".7"/></svg>'; }
+function crestSvg(kid, o, sz){ var k = KINGS[o.king] || KINGS.flower, e = (KEMB[o.emb] || KEMB.rose)[1];
+  return '<svg class="lkpic noico" viewBox="0 0 120 140" width="' + Math.round((sz || 120) * .86) + '" height="' + (sz || 120) + '" aria-hidden="true"><g stroke="#1B2A44" stroke-width="3" stroke-linejoin="round">' +
+    '<path d="M36 30l-6-20 15 10 15-16 15 16 15-10-6 20z" fill="#F2C14E"/><circle cx="45" cy="20" r="3" fill="' + k[2] + '"/><circle cx="60" cy="6" r="3.5" fill="#fff"/><circle cx="75" cy="20" r="3" fill="' + k[2] + '"/>' +
+    '<path d="M18 34h84v40c0 30-20 48-42 60-22-12-42-30-42-60z" fill="' + k[2] + '"/><path d="M60 34v100c-22-12-42-30-42-60V34z" fill="' + k[3] + '" opacity=".9"/>' +
+    '<path d="M24 40h72v34c0 25-16 40-36 51-20-11-36-26-36-51z" fill="none" stroke="#F2C14E" stroke-width="3"/></g>' +
+    '<g transform="translate(36,58) scale(1.5)"><circle cx="16" cy="16" r="15" fill="' + k[4] + '" stroke="#F2C14E" stroke-width="2"/><g class="ics ic-' + e + '">' + ICONS[e] + '</g></g></svg>'; }
+function dollSvg(o, sz){ var h = (DHAIR[o.hair] || DHAIR.a)[1], d = (DDRESS[o.dress] || DDRESS.pink)[1], st = o.style || 'ball', sk = '#F6D2BC', acc = o.acc || 'bow';
+  var skirt = st === 'ball' ? 'M44 74h32l22 50c-14 6-62 6-76 0z' : st === 'long' ? 'M46 74h28l10 64c-14 4-34 4-48 0z' : 'M45 74h30l10 32c-14 5-36 5-50 0z';
+  var legs = st === 'long' ? '' : '<path d="M52 ' + (st === 'ball' ? 124 : 106) + 'v26M68 ' + (st === 'ball' ? 124 : 106) + 'v26" stroke="' + sk + '" stroke-width="7" stroke-linecap="round"/><path d="M46 150h10M64 150h10" stroke="' + d + '" stroke-width="6" stroke-linecap="round"/>';
+  var a = acc === 'bow' ? '<path d="M60 12c-5-6-14-8-14-2v5c0 6 9 3 14-3zM60 12c5-6 14-8 14-2v5c0 6-9 3-14-3z" fill="' + d + '" stroke="#1B2A44" stroke-width="2"/><circle cx="60" cy="12" r="3.5" fill="#fff" stroke="#1B2A44" stroke-width="2"/>' :
+    acc === 'tiara' ? '<path d="M44 16l4-9 6 6 6-9 6 9 6-6 4 9z" fill="#F2C14E" stroke="#1B2A44" stroke-width="2" stroke-linejoin="round"/>' :
+    acc === 'glasses' ? '<path d="M53 36s-6-3-6-7a3 3 0 0 1 6-1 3 3 0 0 1 6 1c0 4-6 7-6 7zM67 36s-6-3-6-7a3 3 0 0 1 6-1 3 3 0 0 1 6 1c0 4-6 7-6 7z" fill="' + d + '" stroke="#1B2A44" stroke-width="1.6"/>' :
+    '<path d="M86 92h18l-2 18H88z" fill="' + d + '" stroke="#1B2A44" stroke-width="2"/><path d="M90 92v-4a5 5 0 0 1 10 0v4" fill="none" stroke="#1B2A44" stroke-width="2"/>';
+  return '<svg class="lkpic noico" viewBox="0 0 120 160" width="' + Math.round((sz || 120) * .75) + '" height="' + (sz || 120) + '" aria-hidden="true">' + legs +
+    '<path d="M40 20c0-12 9-18 20-18s20 6 20 18v36c-6 4-34 4-40 0z" fill="' + h + '" stroke="#1B2A44" stroke-width="2.5"/>' +
+    '<g stroke="#1B2A44" stroke-width="2.5" stroke-linejoin="round"><path d="M56 44h8v8h-8z" fill="' + sk + '"/><path d="M38 58l-8 30M82 58l8 30" stroke="' + sk + '" stroke-width="7" stroke-linecap="round"/>' +
+    '<path d="M46 52h28l4 22H42z" fill="' + d + '"/><path d="' + skirt + '" fill="' + d + '"/><path d="M44 74h32" stroke="#fff" stroke-width="3"/>' +
+    '<ellipse cx="60" cy="30" rx="15" ry="17" fill="' + sk + '"/><path d="M45 26c3-10 9-12 15-12s12 2 15 12c-6-6-24-6-30 0z" fill="' + h + '"/></g>' +
+    '<circle cx="54" cy="31" r="2" fill="#2B3A67"/><circle cx="66" cy="31" r="2" fill="#2B3A67"/><path d="M56 39c2 2 6 2 8 0" stroke="#C2185B" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="50" cy="36" r="2.5" fill="#F7A9B8" opacity=".7"/><circle cx="70" cy="36" r="2.5" fill="#F7A9B8" opacity=".7"/>' + a + '</svg>'; }
+
+/* описание каждого интерактива: шаги (выбор из вариантов), рисунок, что меняется в приложении */
+function lkOpts(map, f){ return Object.keys(map).map(function(k){ return f(k, map[k]); }); }
+function sw2(a, b){ return '<span class="lksw" style="background:linear-gradient(135deg,' + a + ' 50%,' + b + ' 50%)"></span>'; }
+var LOOK_B = {
+  foot: { t: 'Моя команда', sub: 'Позиция, цвета формы и номер на футболке', ic: 'boot',
+    steps: [
+      { k: 'pos', q: 'Кем ты играешь в команде?', o: function(){ return lkOpts(POSS, function(k, x){ return [k, '<b>' + x[0] + '</b><small>' + x[1] + '</small>']; }); } },
+      { k: 'kit', q: 'Какие цвета у формы твоей команды?', o: function(){ return lkOpts(KITS, function(k, x){ return [k, sw2(x[1], x[2]) + '<b>' + x[0] + '</b>']; }); } },
+      { k: 'num', q: 'Какой номер будет на футболке?', grid: 1, o: function(){ return [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 14, 17, 19, 21, 23, 99].map(function(n){ return [String(n), '<b class="lknum">' + n + '</b>']; }); } }
+    ],
+    pic: function(kid, o, sz){ return jerseySvg(o, sz); },
+    done: function(o){ return o.pos && o.kit && o.num; },
+    say: function(kid, o){ return 'Ты — ' + POSS[o.pos][2] + ' под номером ' + o.num + '. Форма: ' + KITS[o.kit][0].toLowerCase() + '.'; },
+    apply: function(kid, o){ var k = KITS[o.kit]; var dark = k[2] === '#FFFFFF' ? k[1] : k[1];
+      return { hello: 'Номер ' + o.num + ', ' + POSS[o.pos][2] + ' — на поле!', win: ['Гол! Номер ' + o.num + ' забивает!', o.pos === 'gk' ? 'Отличный сейв!' : 'Точный пас!'], v: { '--acc': dark, '--b1': k[1], '--b2': dark, '--bt': k[2] === '#FFFFFF' || k[2] === '#F7C531' ? k[2] : '#fff' } }; } },
+  hero: { t: 'Мой супергерой', sub: 'Придумай героя: суперсила, имя, костюм и эмблема', ic: 'hmask',
+    steps: [
+      { k: 'pow', q: 'Какая у твоего героя суперсила?', o: function(){ return lkOpts(HPOW, function(k, x){ return [k, icon(x[1], 'big') + '<b>' + x[0] + '</b><small>Герой ' + x[2] + '</small>']; }); } },
+      { k: 'nm', q: 'Как зовут твоего героя? Выбери имя или напиши своё.', input: 1, o: function(o){ var p = HPOW[o.pow] || HPOW.spd; return p[3].concat(['Капитан ' + p[3][0]]).map(function(n){ return [n, '<b>' + n + '</b>']; }); } },
+      { k: 'col', q: 'Какого цвета костюм и плащ?', o: function(){ return lkOpts(HCOL, function(k, x){ return [k, sw2(x[1], x[2]) + '<b>' + x[0] + '</b>']; }); } },
+      { k: 'emb', q: 'Какая эмблема на груди?', grid: 1, o: function(o){ var c = (HCOL[o.col] || HCOL.rb)[2]; return lkOpts(HEMB, function(k, x){ return [k, '<svg class="lkemb noico" viewBox="-16 -16 32 32" width="44" height="44"><circle r="15" fill="#fff" stroke="#1B2A44" stroke-width="2"/>' + embSvg(k, c === '#F3F4F6' ? '#1B2A44' : c) + '</svg><b>' + x + '</b>']; }); } }
+    ],
+    pic: function(kid, o, sz){ return heroSvg(o, sz); },
+    done: function(o){ return o.pow && o.nm && o.col && o.emb; },
+    say: function(kid, o){ return 'Твой герой — <b>' + U.esc(o.nm) + '</b>. Суперсила: ' + HPOW[o.pow][0].toLowerCase() + ', ' + HPOW[o.pow][2] + '.'; },
+    apply: function(kid, o){ var c = HCOL[o.col]; return { hello: U.esc(o.nm) + ', город ждёт тебя!', win: [U.esc(o.nm) + ' спасает день!', 'Суперсила «' + HPOW[o.pow][0] + '» сработала!'], v: { '--acc': c[1], '--b1': c[1], '--b2': c[1], '--b3': c[2] } }; } },
+  cube: { t: 'Герой из кубиков', sub: 'Собери своего героя из кубиков и выбери остров', ic: 'cubes',
+    steps: [
+      { k: 'skin', q: 'Цвет кожи', grid: 1, o: function(){ return lkOpts(CSKIN, function(k, x){ return [k, '<span class="lksw sq" style="background:' + x + '"></span>']; }); } },
+      { k: 'hair', q: 'Волосы', grid: 1, o: function(){ return lkOpts(CHAIR, function(k, x){ return [k, '<span class="lksw sq" style="background:' + x[1] + '"></span><b>' + x[0] + '</b>']; }); } },
+      { k: 'shirt', q: 'Футболка', grid: 1, o: function(){ return lkOpts(CSHIRT, function(k, x){ return [k, '<span class="lksw sq" style="background:' + x + '"></span>']; }); } },
+      { k: 'pant', q: 'Штаны', grid: 1, o: function(){ return lkOpts(CPANT, function(k, x){ return [k, '<span class="lksw sq" style="background:' + x + '"></span>']; }); } },
+      { k: 'world', q: 'На каком острове живёт твой герой?', o: function(){ return lkOpts(CWORLD, function(k, x){ return [k, sw2(x[1], x[2]) + '<b>' + x[0] + '</b>']; }); } }
+    ],
+    live: 1, pic: function(kid, o, sz){ return cubeSvg(o, sz); },
+    done: function(o){ return o.skin && o.hair && o.shirt && o.pant && o.world; },
+    say: function(kid, o){ return 'Герой готов! Его дом — ' + CWORLD[o.world][0].toLowerCase() + '.'; },
+    apply: function(kid, o){ var w = CWORLD[o.world]; return { hello: w[0] + ': строим знания кубик за кубиком!', v: { '--acc': w[2], '--b1': w[1], '--b2': w[2] } }; } },
+  prin: { t: 'Моё королевство', sub: 'Выбери королевство, его цвета и герб', ic: 'tiara',
+    steps: [
+      { k: 'king', q: 'Каким королевством ты правишь?', o: function(){ return lkOpts(KINGS, function(k, x){ return [k, sw2(x[2], x[3]) + '<b>' + x[0] + ' королевство</b>']; }); } },
+      { k: 'emb', q: 'Что изображено на твоём гербе?', grid: 1, o: function(){ return lkOpts(KEMB, function(k, x){ return [k, icon(x[1], 'big') + '<b>' + x[0] + '</b>']; }); } }
+    ],
+    pic: function(kid, o, sz){ return crestSvg(kid, o, sz); },
+    done: function(o){ return o.king && o.emb; },
+    say: function(kid, o){ return lookG(kid, 'Ты — принц ', 'Ты — принцесса ') + KINGS[o.king][1] + ' королевства. На гербе — ' + KEMB[o.emb][0].toLowerCase() + '.'; },
+    apply: function(kid, o){ var k = KINGS[o.king]; return { hello: lookG(kid, 'Принц ', 'Принцесса ') + KINGS[o.king][1] + ' королевства, добро пожаловать!', win: ['Слава ' + KINGS[o.king][1].replace(/ого$/, 'ому') + ' королевству!'], v: { '--acc': k[3], '--b1': k[2], '--b2': k[3] } }; } },
+  doll: { t: 'Мой образ', sub: 'Причёска, платье и аксессуар — собери свой образ', ic: 'dress',
+    steps: [
+      { k: 'hair', q: 'Какие волосы?', grid: 1, o: function(){ return lkOpts(DHAIR, function(k, x){ return [k, '<span class="lksw" style="background:' + x[1] + '"></span><b>' + x[0] + '</b>']; }); } },
+      { k: 'style', q: 'Какое платье?', o: function(){ return lkOpts(DSTYLE, function(k, x){ return [k, '<b>' + x + '</b>']; }); } },
+      { k: 'dress', q: 'Какого цвета?', grid: 1, o: function(){ return lkOpts(DDRESS, function(k, x){ return [k, '<span class="lksw" style="background:' + x[1] + '"></span><b>' + x[0] + '</b>']; }); } },
+      { k: 'acc', q: 'И последний штрих — аксессуар', grid: 1, o: function(){ return lkOpts(DACC, function(k, x){ return [k, icon(x[1], 'big') + '<b>' + x[0] + '</b>']; }); } }
+    ],
+    live: 1, pic: function(kid, o, sz){ return dollSvg(o, sz); },
+    done: function(o){ return o.hair && o.style && o.dress && o.acc; },
+    say: function(kid, o){ return 'Образ готов: ' + DSTYLE[o.style].toLowerCase() + ' ' + DDRESS[o.dress][0].toLowerCase() + ' платье и ' + DACC[o.acc][0].toLowerCase() + '.'; },
+    apply: function(kid, o){ var d = DDRESS[o.dress][1]; return { hello: 'Сегодня ты звезда! Образ дня готов.', v: { '--acc': d, '--b1': d, '--b2': d } }; } }
+};
+var LOOK_DEF = { foot: { pos: 'fw', kit: 'rw', num: '10' }, hero: { pow: 'spd', nm: 'Вихрь', col: 'rb', emb: 'bolt' }, cube: { skin: 'a', hair: 'd', shirt: 'd', pant: 'c', world: 'les' }, prin: { king: 'flower', emb: 'rose' }, doll: { hair: 'a', style: 'ball', dress: 'pink', acc: 'bow' } };
+
+/* --- плитка во «Всегда доступно» и экран интерактива --- */
+ALWAYS.push({ id: 'mylook', order: 1,
+  open: function(kid){ var o = lookO(kid), B = LOOK_B[lookId(kid)]; cur.lk = { i: 0, o: {}, show: !!(o && B && B.done(o)) }; },
+  tile: function(kid){ var id = lookId(kid), B = LOOK_B[id]; if (!B) return ''; var o = lookO(kid), ok = o && B.done(o);
+    return '<button class="tile fun lktile" data-act="always" data-id="mylook"><span class="ico">' + (ok ? B.pic(kid, o, 54) : icon(B.ic, 'big')) + '</span><span class="tt"><span class="sn">' + B.t + '</span><span class="ut">' + (ok ? B.say(kid, o).replace(/<[^>]+>/g, '') + ' Изменить можно в любой момент.' : B.sub + '. Цвета и приветствие станут твоими') + '</span></span></button>'; },
+  view: function(kid){ var id = lookId(kid), B = LOOK_B[id]; if (!B) return ''; var C = cur.lk || (cur.lk = { i: 0, o: {} }), K = S.kids[kid], saved = lookO(kid);
+    var h = '<section class="hello"><p class="eyebrow">' + LOOKS[id].n + '</p><h1>' + B.t + '</h1></section>';
+    if (C.show && saved && B.done(saved)) return h + '<article class="card lkres"><div class="lkbig">' + B.pic(kid, saved, 190) + '</div><p class="lksay">' + B.say(kid, saved) + '</p><p class="hint">Теперь приложение встречает тебя по-твоему: свои цвета, приветствие и похвала.</p><div class="row"><button class="btn" data-act="home">На главную</button> <button class="btn ghost" data-act="lkagain">Придумать заново</button></div></article>';
+    var st = B.steps[C.i], o = C.o, prev = Object.keys(o).length ? o : (saved || LOOK_DEF[id]), pv = {}; for (var k in LOOK_DEF[id]) pv[k] = o[k] || (saved && saved[k]) || LOOK_DEF[id][k];
+    var opts = st.o(o).map(function(x){ return '<button class="opt lkopt' + (o[st.k] === x[0] ? ' on' : '') + '" data-act="lkset" data-v="' + U.esc(x[0]) + '">' + x[1] + '</button>'; }).join('');
+    return h + '<div class="counter">Шаг ' + (C.i + 1) + ' из ' + B.steps.length + '</div><article class="card task lkstep"><div class="lkrow"><div class="lkprev">' + B.pic(kid, pv, 150) + '</div><div class="lkmain"><div class="q">' + st.q + '</div>' +
+      '<div class="opts lkopts' + (st.grid ? ' grid' : '') + '">' + opts + '</div>' +
+      (st.input ? '<form class="form lkform" data-form="mylook-name"><label>Своё имя героя<input id="lkname" maxlength="18" autocomplete="off" value="' + U.esc(o.nm || '') + '"></label><button class="btn small">Готово</button></form>' : '') + '</div></div>' +
+      (C.i ? '<button class="link" data-act="lkback">← Назад</button>' : '') + '</article>'; },
+  act: function(act, b){ var kid = cur.kid, id = lookId(kid), B = LOOK_B[id]; if (!B) return; var C = cur.lk || (cur.lk = { i: 0, o: {} });
+    if (act === 'lkset') { C.o[B.steps[C.i].k] = b.getAttribute('data-v'); lkNext(kid); }
+    else if (act === 'lkback') { C.i = Math.max(0, C.i - 1); render(); }
+    else if (act === 'lkagain') { cur.lk = { i: 0, o: {} }; render(); window.scrollTo(0, 0); } },
+  form: function(k, f){ if (k !== 'mylook-name') return; var C = cur.lk, v = (document.getElementById('lkname').value || '').replace(/[<>"&]/g, '').trim().slice(0, 18); if (!C || !v) return; C.o.nm = v.charAt(0).toUpperCase() + v.slice(1); lkNext(cur.kid); }
+});
+function lkNext(kid){ var id = lookId(kid), B = LOOK_B[id], C = cur.lk; C.i++;
+  if (C.i >= B.steps.length) { var K = S.kids[kid]; if (!K.lks) K.lks = {}; K.lks[id] = C.o; C.show = 1;
+    ev(kid, 'моя тема', { subj: LOOKS[id].n, text: B.say(kid, C.o).replace(/<[^>]+>/g, '') }); save(); }
+  render(); window.scrollTo(0, 0); }
+
+/* --- выбор темы родителем --- */
+function lookCardSvg(id){ var L = LOOKS[id]; return '<span class="lkcard-sw" style="background:linear-gradient(135deg,' + L.sw[0] + ',' + L.sw[1] + ')">' + L.bi.map(function(n){ return icon(n); }).join('') + '</span>'; }
+function lookSettings(){ if (!lookOn()) return '';
+  return '<div class="card lkset"><h2>Оформление</h2><p class="hint">Выберите каждому ребёнку тему: фон, цвета, рисунки и похвала поменяются сразу. Любую тему может выбрать любой ребёнок. В каждой теме есть своя игра-выбор во «Всегда доступно».</p>' +
+    kidIds().map(function(k){ var cu = lookId(k); return '<h3>' + KIDS[k].name + '</h3><div class="lkgrid">' + LOOK_ORDER.map(function(id){ var L = LOOKS[id];
+      return '<button class="lkcard th-' + id + (cu === id ? ' on' : '') + '" data-act="setlook" data-k="' + k + '" data-v="' + id + '">' + lookCardSvg(id) + '<b>' + L.n + '</b><small>' + L.d + '</small></button>'; }).join('') + '</div>'; }).join('') + '</div>'; }
+function lookAct(act, b){ if (act !== 'setlook') return false; var k = b.getAttribute('data-k'), v = b.getAttribute('data-v'); if (!S.kids[k] || !LOOKS[v]) return true;
+  var old = lookId(k); S.kids[k].look = v; if (old !== v) ev(k, 'тема оформления', { subj: LOOKS[v].n, text: 'было: ' + (LOOKS[old] ? LOOKS[old].n : '—') }); save(); render(); return true; }
+
+/* --- сцены над заданием для новых тем --- */
+var LOOK_SCENES = {
+  hero: [
+    function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#22285C"/><circle cx="330" cy="22" r="12" fill="#FFF1B8"/><path d="M200 90L120 0h40z" fill="#FFF1B8" opacity=".18"/><g fill="#141838"><rect x="0" y="40" width="40" height="50"/><rect x="44" y="24" width="34" height="66"/><rect x="82" y="48" width="44" height="42"/><rect x="230" y="30" width="36" height="60"/><rect x="270" y="50" width="50" height="40"/><rect x="324" y="36" width="34" height="54"/><rect x="362" y="56" width="38" height="34"/></g><g fill="#F7C531" opacity=".8"><rect x="50" y="32" width="5" height="6"/><rect x="64" y="46" width="5" height="6"/><rect x="238" y="40" width="5" height="6"/><rect x="332" y="48" width="5" height="6"/><rect x="284" y="60" width="5" height="6"/></g>' + lsi('hcape', 160, 14, 44) + lsi('bolt', 214, 30, 30)); },
+    function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#FFD23F"/><g fill="#F7B500">' + [0, 1, 2, 3, 4, 5, 6, 7].map(function(i){ return '<path d="M200 45L' + (i * 60 - 30) + ' -10h30z"/>'; }).join('') + '</g>' + lsi('burst', 30, 14, 60) + lsi('hshield', 120, 18, 54) + lsi('hmask', 200, 22, 50) + lsi('bolt', 280, 16, 56) + lsi('star', 345, 22, 44)); },
+    function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#7FB8E6"/><path d="M0 70h400v20H0z" fill="#4A6FA5"/><g fill="#E9F2FB"><ellipse cx="80" cy="28" rx="34" ry="10"/><ellipse cx="300" cy="20" rx="40" ry="11"/></g>' + lsi('city', 20, 30, 50) + lsi('city', 320, 30, 50) + lsi('hcape', 170, 8, 52) + '<path d="M140 40h-50M150 52h-40" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".8"/>'); }
+  ],
+  cube: [
+    function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#BDEBFF"/><rect y="74" width="400" height="16" fill="#FFE3B8"/>' + lsi('cubes', 20, 30, 46) + lsi('vtree', 90, 10, 64) + lsi('vhouse', 170, 20, 56) + lsi('vcrystal', 250, 28, 44) + lsi('cubes', 320, 26, 52)); },
+    function(){ var g = '<rect width="400" height="90" fill="#2B2350"/>', i; for (i = 0; i < 30; i++) g += '<rect x="' + (i * 37 % 400) + '" y="' + (i * 23 % 70) + '" width="3" height="3" fill="#fff" opacity=".7"/>';
+      return PX.svg(400, 90, g + lsi('vrocket', 60, 14, 60) + lsi('vcrystal', 160, 30, 40) + lsi('vgear', 240, 24, 46) + lsi('star', 320, 20, 40)); },
+    function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#FFF1D6"/><path d="M0 70h400v20H0z" fill="#9EE6DC"/>' + lsi('vtree', 20, 6, 60) + lsi('cubes', 110, 24, 50) + lsi('vhouse', 200, 14, 60) + lsi('vtree', 300, 10, 58)); }
+  ],
+  prin: [
+    function(){ return PX.svg(400, 90, '<defs><linearGradient id="pg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FCD5E5"/><stop offset="1" stop-color="#FFF1DA"/></linearGradient></defs><rect width="400" height="90" fill="url(#pg)"/><path d="M0 90V70c60-14 120-10 200 0s140 6 200-6v26z" fill="#BFE3C4"/>' + lsi('pcastle', 160, 6, 76) + lsi('sparkle', 60, 14, 26) + lsi('sparkle', 320, 20, 22) + lsi('rose', 40, 52, 30) + lsi('rose', 330, 54, 30)); },
+    function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#7A3E6E"/><g fill="#F2C14E" opacity=".9">' + [40, 120, 200, 280, 360].map(function(x){ return '<circle cx="' + x + '" cy="10" r="6"/><path d="M' + x + ' 0v4"/>'; }).join('') + '</g><rect y="66" width="400" height="24" fill="#5A2C52"/>' + lsi('carriage', 30, 30, 48) + lsi('slipper', 170, 38, 40) + lsi('mirror', 260, 22, 46) + lsi('tiara', 335, 34, 40)); },
+    function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#E6F3FB"/><path d="M0 64c40-6 80 6 120 0s80-6 120 0 80 6 160-2v28H0z" fill="#9CC9F0"/>' + lsi('crown', 40, 18, 44) + lsi('tiara', 130, 22, 44) + lsi('rose', 220, 16, 46) + lsi('heart', 310, 22, 40)); }
+  ],
+  doll: [
+    function(){ var g = '<rect width="400" height="90" fill="#FFD6EA"/>', i; for (i = 0; i < 14; i++) g += '<rect x="' + i * 30 + '" width="15" height="90" fill="#FFC2DF"/>';
+      return PX.svg(400, 90, g + lsi('heart', 30, 20, 44) + lsi('dress', 110, 14, 56) + lsi('heel', 190, 26, 44) + lsi('handbag', 260, 18, 48) + lsi('bow', 330, 22, 46)); },
+    function(){ return PX.svg(400, 90, '<rect width="400" height="90" fill="#FFE3F1"/><rect y="62" width="400" height="28" fill="#7FD3F0"/><path d="M0 62h400" stroke="#fff" stroke-width="4"/><g fill="#F48FC0"><rect x="120" y="22" width="160" height="40" rx="6"/><path d="M110 24l90-20 90 20z"/></g><g fill="#fff"><rect x="140" y="32" width="24" height="18" rx="3"/><rect x="236" y="32" width="24" height="18" rx="3"/><rect x="188" y="34" width="24" height="28" rx="12"/></g>' + lsi('heart', 40, 18, 36) + lsi('hglasses', 320, 14, 46)); },
+    function(){ var g = '<rect width="400" height="90" fill="#3A1E3F"/>', i; for (i = 0; i < 9; i++) g += '<circle cx="' + (i * 50 + 20) + '" cy="8" r="5" fill="#FFE3F1"/><path d="M' + (i * 50 + 20) + ' 10L' + (i * 50 + 5) + ' 90h30z" fill="#FFE3F1" opacity=".08"/>';
+      return PX.svg(400, 90, g + '<rect x="0" y="70" width="400" height="20" fill="#F48FC0"/>' + lsi('dress', 80, 18, 52) + lsi('mirror', 175, 14, 52) + lsi('sparkle', 260, 18, 40) + lsi('heel', 320, 30, 40)); }
+  ]
+};
 
 /* ===== Курс «Учимся играть в шахматы» (свои тексты) =====
    Шаги: text — объяснение (фигуру можно нажать и увидеть её ходы); quiz — вопрос; stars — собери звёзды (best — наименьшее число ходов);
@@ -7256,7 +7686,7 @@ function testCard(){ return `<div class="card testc"><h2>🧪 Тестовый �
 function testEnter(k){ const real = S; S = JSON.parse(JSON.stringify(real)); S.queue = []; S.test = true; TEST = true;
   Object.keys(S.kids).forEach(x => { S.kids[x].restUntil = 0; S.kids[x].blk = 0; S.kids[x].prizesSet = true; });
   cur.kid = k; go('home'); }
-function testExit(){ TEST = false; S = load(); cur.kid = null; go('login'); }
+function testExit(){ TEST = false; TEST_SHIFT = 0; S = load(); cur.kid = null; go('login'); }
 function testBar(){ return `<div class="testbar">🧪 Тест · ${U.esc(cur.kid ? KIDS[cur.kid].name : '')} <button class="link" data-act="testkid">сменить ребёнка</button> <button class="link" data-act="testday">новый день</button> <button class="link" data-act="testexit">выйти из теста</button></div><button class="notebtn" data-act="noteopen">📝 Замечание</button>`; }
 function noteCtx(){ const h = document.querySelector('#app h1'), q = document.querySelector('#app .q'); return [cur.kid ? KIDS[cur.kid].name : '', cur.view, cur.subj && cur.view === 'lesson' ? cur.subj : '', h ? h.textContent.trim().slice(0, 80) : ''].filter(Boolean).join(' / ') + (q ? ' — ' + q.textContent.trim().slice(0, 200) : ''); }
 function noteOpen(){ const ctx = noteCtx(); const d = document.createElement('div'); d.className = 'tipbox'; d.id = 'notebox';
@@ -7273,7 +7703,7 @@ function testAct(act, b){ switch (act) {
   case 'testgo': testEnter(b.dataset.k); return true;
   case 'testexit': testExit(); return true;
   case 'testkid': { const ks = kidIds(), i = ks.indexOf(cur.kid); cur.kid = ks[(i + 1) % ks.length]; go('home'); return true; }
-  case 'testday': { if (!cur.kid) return true; const K = S.kids[cur.kid]; delete K.days[U.today()]; K.restUntil = 0; K.blk = 0; go('home'); alertMsg('Тестовый день начат заново'); return true; }
+  case 'testday': { if (!cur.kid) return true; TEST_SHIFT++; Object.keys(S.kids).forEach(x => { const K = S.kids[x]; K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; K.restForced = false; }); go('home'); alertMsg('Тестовый день: ' + U.today().split('-').reverse().join('.') + ' (календарь сдвинут на ' + TEST_SHIFT + ' ' + U.pl(TEST_SHIFT, 'день', 'дня', 'дней') + ' вперёд)'); return true; }
   case 'noteopen': noteOpen(); return true;
   case 'noteclose': { try { micStop(); } catch (x) {} const o = document.getElementById('notebox'); if (o) o.remove(); return true; }
   case 'notesend': noteSend(); return true;
@@ -7302,7 +7732,7 @@ function posMark(kid){ const K = S.kids && S.kids[kid]; if (!K || !KIDS[kid] || 
 
 /* ===== Настройка детей ===== */
 CUR_Y.lang = { name:'Языки', src:'Português: 2.º–3.º ano (gramática, ortografia) и English', units: PT_NAT, old: PT_Y, alt: EN_UNITS, altName:'English' };
-CUR_A.logic.alt = A_FIN; CUR_A.logic.altName = '💶 Финансы'; CUR_Y.world.alt = Y_FIN; CUR_Y.world.altName = '💶 Деньги'; CUR_Y.world.altSrc = 'Финансовая грамотность (по стандартам Jump$tart, K-5)';
+CUR_A.logic.alt = A_FIN; CUR_A.logic.altName = 'Финансы'; CUR_Y.world.alt = Y_FIN; CUR_Y.world.altName = 'Деньги'; CUR_Y.world.altSrc = 'Финансовая грамотность (по стандартам Jump$tart, K-5)';
 delete CUR_Y.pt;
 /* Блок «Продолжение» (решение методсовета, п. 2): темы следующего класса помечены в программах cont:1 и стоят в конце своих списков,
    после основной программы; порядок внутри основной части и внутри «Продолжения» сохраняется. Позиция детей переносится по id (posmap.js). */
@@ -7317,8 +7747,8 @@ const KIDS = FAM ? {} : KIDS_TPL;
 /* Шаблон программы (yarik — младшие, anya — старшие) и оформление ребёнка; в семейной версии дети заводятся родителями */
 const TPL = k => T(k);
 function T(k){ return FAM ? ((KIDS[k] && KIDS[k].tpl) || 'yarik') : k; }
-function LK(k){ return FAM ? ((KIDS[k] && KIDS[k].look) || T(k)) : k; }
-function TH(k){ return FAM && THEME['k:' + k] ? 'k:' + k : LK(k); }
+function LK(k){ return FAM ? ((KIDS[k] && KIDS[k].look) || T(k)) : (typeof lookId === 'function' && lookId(k) ? LOOKS[lookId(k)].base : k); }
+function TH(k){ return FAM && THEME['k:' + k] ? 'k:' + k : !FAM && typeof lookTheme === 'function' && S && S.kids && S.kids[k] ? lookTheme(k) : LK(k); }
 function kidIds(){ return FAM ? Object.keys(KIDS) : ['yarik', 'anya']; }
 const SUBJ_ICON = { read:'Аа', math:'7+5', rus:'Ёё', world:'☼', hist:'XV', logic:'?!', lang:'Pt', hw:'ДЗ' };
 const STEPS = [1, 3, 7];
@@ -7404,6 +7834,7 @@ function applyCfg(rows){ let fresh = false;
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
     else if (type.startsWith('чтен')) { const n = Number(row.value); if (n > 0) K.readWords = n; }
     else if (type.startsWith('книг')) bkApply(kid, row);
+    else if (type.startsWith('врем')) { const t = U.today(), m = Math.round((Number(row.value) || 10) / 10) * 10; if (!K.xt || K.xt.d !== t) K.xt = { d: t, m: 0 }; K.xt.m = Math.max(0, Math.min(180, K.xt.m + m)); if (m > 0 && K.restForced && K.restUntil > Date.now()) { K.restUntil = 0; K.restForced = false; K.sess = Math.max(0, SESS_SECS + extraSecs(K) - m * 60); K.blkAt = Date.now(); } }
     else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; }
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     else continue; /* незнакомую команду не отмечаем — её выполнит следующая версия приложения */
@@ -7481,7 +7912,8 @@ function render(){
   if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vSleep(); }
   else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vRestScreen(cur.kid); }
   else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active)) v = vAsk(cur.kid);
-  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
+  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
+  if (typeof lookVars === 'function') lookVars(document.body.className ? cur.kid : null);
   if (FAM) famBody();
   app().innerHTML = (TEST ? testBar() : '') + v; afterRender();
 }
@@ -7496,7 +7928,7 @@ function vSetup(){
    <button class="btn big">Сохранить</button></form></main>`;
 }
 function vLogin(){
-  const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
+  const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}${typeof lookBody === 'function' ? lookBody(k) : ''}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
   return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header>
   <div class="kids">${kidIds().map(card).join('')}</div>${FAM ? famLoginExtra() : ''}
   ${alwaysTiles(null)}
@@ -7747,7 +8179,7 @@ function vTask(kid, subj, L){
   ${fin ? `<button class="btn big" data-act="next">${L.i + 1 < T.length ? 'Дальше' : 'Закончить'}</button>` : ''}`;
 }
 /* Разбор на похожем примере: задание того же типа с ответом и объяснением */
-function subjArt(kid, subj){ const k = T(kid) === 'yarik' ? 'y' : 'a'; let n = subj; if (T(kid) === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (T(kid) === 'yarik' && subj === 'world' && track('world', cur.ds) === '_alt') n = 'fin'; if (T(kid) === 'anya' && subj === 'logic' && track('logic', cur.ds) === '_alt') n = 'fin'; if (!['math','rus','world','logic','lang','read','hist','geo','fin'].includes(n)) return '';
+function subjArt(kid, subj){ const k = !FAM && typeof lookId === 'function' && lookId(kid) ? LOOKS[lookId(kid)].art : T(kid) === 'yarik' ? 'y' : 'a'; let n = subj; if (T(kid) === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (T(kid) === 'yarik' && subj === 'world' && track('world', cur.ds) === '_alt') n = 'fin'; if (T(kid) === 'anya' && subj === 'logic' && track('logic', cur.ds) === '_alt') n = 'fin'; if (!['math','rus','world','logic','lang','read','hist','geo','fin'].includes(n)) return '';
   return `<img class="subjart" src="img/subj-${k}-${n}.webp" alt="" onerror="this.remove()">`; }
 function vExample(kid, subj, L, u, cur0){ const n = L.helpN || 1; const shape = x => strip(x.q).replace(/\d+([,.]\d+)?/g, '#').slice(0, 18);
   const cands = genTasks(u, (L.seed || 1) * 7 + n * 101, 14).filter(x => !cur0 || x.q !== cur0.q); const ex = (cur0 && cands.find(x => shape(x) === shape(cur0))) || (cur0 && cands.find(x => x.k === cur0.k && shape(x).slice(0, 8) === shape(cur0).slice(0, 8))) || cands[0]; if (!ex) return '';
@@ -7903,7 +8335,7 @@ function hhmm(ts){ const d = new Date(ts), z = n => (n < 10 ? '0' : '') + n; ret
 function fmtLeft(ms){ const m = Math.ceil(ms / 60000), h = Math.floor(m / 60), r = m % 60; return h ? h + ' ч ' + r + ' мин' : r + ' мин'; }
 function restTick(kid, secs){ /* время теперь считает общий таймер экрана (screenTick) */ }
 function restTick0(kid, secs){ if (TEST) return; const K = S.kids[kid], now = Date.now(); if (!K.blkAt || now - K.blkAt > REST_MS) { K.blk = 0; K.sess = 0; } K.blk = (K.blk || 0) + (secs || 0); K.sess = (K.sess || 0) + (secs || 0); K.blkAt = now;
-  if (K.sess >= SESS_SECS) { K.blk = 0; K.sess = 0; K.ask = false; K.restUntil = now + REST_MS; K.restForced = true; ev(kid, 'перерыв', { text: 'час занятий за сессию; обязательный перерыв до ' + hhmm(K.restUntil) }); }
+  if (K.sess >= SESS_SECS + extraSecs(K)) { K.blk = 0; K.sess = 0; K.ask = false; K.restUntil = now + REST_MS; K.restForced = true; ev(kid, 'перерыв', { text: 'час занятий за сессию; обязательный перерыв до ' + hhmm(K.restUntil) }); }
   else if (K.blk >= BLOCK_SECS) { K.blk = 0; K.ask = true; } }
 /* Таймер экрана: считаем всё время в приложении (уроки, загадки, шахматы, программирование…), пока ребёнок реально нажимает. */
 let LAST_IN = Date.now(); ['pointerdown', 'touchstart', 'keydown'].forEach(e => document.addEventListener(e, () => { LAST_IN = Date.now(); }, true));
@@ -7919,8 +8351,10 @@ function vRestScreen(kid){ const K = S.kids[kid], ms = restLeft(kid), g = T(kid)
    : `<div class="cheer">😴</div><h1>Отдыхаешь</h1><p>Вернёшься через <b><span id="restleft">${fmtLeft(ms)}</span></b> (в ${hhmm(K.restUntil)}). Отойди от экрана: подвигайся, попей воды, посмотри в окно.</p>`}
    <p class="hint">Все баллы и прогресс сохранены.</p></article></section></main>`; }
 function vAsk(kid){ return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header><section class="lesson">${askCard(kid)}</section></main>`; }
+/* Родитель может добавить ребёнку время на сегодня, шагами по 10 минут */
+function extraSecs(K){ return K.xt && K.xt.d === U.today() ? K.xt.m * 60 : 0; }
 function restAsk(kid){ const K = S.kids[kid]; return !TEST && K.ask && !restLeft(kid); }
-function askCard(kid){ if (!restAsk(kid)) return ''; const K = S.kids[kid], m = Math.round((K.sess || 0) / 60), left = Math.max(5, Math.round((SESS_SECS - (K.sess || 0)) / 60)), g = T(kid) === 'anya';
+function askCard(kid){ if (!restAsk(kid)) return ''; const K = S.kids[kid], m = Math.round((K.sess || 0) / 60), left = Math.max(5, Math.round((SESS_SECS + extraSecs(K) - (K.sess || 0)) / 60)), g = T(kid) === 'anya';
   return `<div class="card askrest"><h2>${g ? 'Не устала?' : 'Не устал?'} 🙂</h2><p>Ты занимаешься уже <b>${m} мин</b>. Можно продолжить (сегодня ещё до ${left} мин подряд) или отдохнуть.</p>
    <div class="row"><button class="btn" data-act="restgo">💪 ${g ? 'Готова' : 'Готов'} ещё</button></div><p class="hint">Или отдохни — выбери сколько:</p>
    <div class="row">${[15, 20, 30].map(n => `<button class="btn ghost" data-act="restpick" data-m="${n}">😴 ${n} мин</button>`).join(' ')}</div></div>`; }
@@ -8275,7 +8709,7 @@ function devInfo(){ const ua = navigator.userAgent; const m = ua.match(/OS (\d+)
   return `Версия системы: ${ios}, открыто ${pwa}. Распознавание чтения вслух: ${SR ? '✅ есть' : '❌ нет — нужен iPadOS 14.5 или новее (Настройки → Основные → Обновление ПО); пока скорость чтения считается по таймеру'}. Микрофон: ${navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? 'доступен' : 'недоступен'}.`; }
 function vSettings(){
   const unitSel = kid => Object.entries(KIDS[kid].cur).filter(([, c]) => c.units).map(([k, c]) => [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []).map(([tr, list, nm]) => `<label>${KIDS[kid].name} · ${nm}<select id="sel_${kid}_${k}${tr}">${list.map((u, i) => `${u.cont && !(list[i - 1] || {}).cont ? '<optgroup label="Продолжение (следующий класс)">' : ''}<option value="${i}" ${(S.kids[kid].pos[k + tr] || 0) === i ? 'selected' : ''}>${i + 1}. ${CONT_MARK(u)}${U.esc(u.t)}</option>${u.cont && i === list.length - 1 ? '</optgroup>' : ''}`).join('')}</select></label>`).join('')).join('');
-  return `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
+  return (typeof lookSettings === 'function' ? lookSettings() : '') + `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => { const K0 = S.kids[k], x = extraSecs(K0) / 60, used = Math.round((K0.sess || 0) / 60); return `<div class="xtrow"><span><b>${KIDS[k].name}</b>: сегодня в сессии ${used} из ${60 + x} мин${x ? ` (+${x} от вас)` : ''}</span> <button class="btn small" data-act="xtadd" data-k="${k}" data-m="10">+10 мин</button> ${x ? `<button class="btn ghost small" data-act="xtadd" data-k="${k}" data-m="-10">−10</button>` : ''}</div>`; }).join('')}<p class="hint">Добавленное время — только на сегодня. Если ребёнок уже на большом перерыве, он сразу снимается.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
   ${FAM ? '' : `<div class="card form" ><h2>Связь с таблицей родителя</h2><label>Адрес скрипта Google<input id="syncurl" value="${U.esc(S.cfg.sync || '')}" autocomplete="off"></label><p class="hint">В очереди на отправку: ${S.queue.length}.</p><div class="row"><button class="btn small" data-act="savesync">Сохранить и отправить</button></div></div>`}
   <div class="card"><h2>Начать заново</h2><p class="hint">Стирает на этом айпаде весь прогресс, монеты, покупки и коды. После теста нажмите — и приложение будет как новое.</p><button class="btn small stop" data-act="resetall">Сбросить всё на этом устройстве</button></div>
   ${FAM ? famSettings() : `<form class="card form" data-form="pins"><h2>Коды</h2><label>Новый код родителя<input id="np" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ярика<input id="ny" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ани<input id="na" inputmode="numeric" maxlength="4" autocomplete="off"></label><button class="btn small">Сменить коды</button></form>`}`;
@@ -8313,6 +8747,7 @@ document.addEventListener('click', e => {
     case 'dripseen': { const R = S.kids[kid].drip; if (R) R.sess = 0; save(); render(); break; }
     case 'restgo': { const K0 = S.kids[kid]; K0.ask = false; K0.blk = 0; ev(kid, 'не устал', { text: 'занимается дальше; за сессию ' + Math.round((K0.sess || 0) / 60) + ' мин' }); save(); render(); break; }
     case 'restpick': { const K0 = S.kids[kid], m = +b.dataset.m; K0.ask = false; K0.blk = 0; K0.restForced = false; K0.restUntil = Date.now() + m * 60000; ev(kid, 'перерыв', { text: 'сам выбрал отдых ' + m + ' мин' }); save(); render(); break; }
+    case 'xtadd': { const K0 = S.kids[b.dataset.k], t = U.today(); if (!K0.xt || K0.xt.d !== t) K0.xt = { d: t, m: 0 }; K0.xt.m = Math.max(0, Math.min(180, K0.xt.m + (+b.dataset.m))); if (+b.dataset.m > 0 && K0.restForced && K0.restUntil > Date.now()) { K0.restUntil = 0; K0.restForced = false; K0.sess = Math.max(0, SESS_SECS + extraSecs(K0) - (+b.dataset.m) * 60); K0.blkAt = Date.now(); } ev(b.dataset.k, 'родитель добавил время', { text: (+b.dataset.m > 0 ? '+' : '') + b.dataset.m + ' мин; всего сверху ' + K0.xt.m + ' мин' }); save(); render(); break; }
     case 'norest': { const K0 = S.kids[b.dataset.k]; K0.restUntil = 0; K0.blk = 0; K0.sess = 0; K0.ask = false; save(); render(); break; }
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
     case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); if (L.phase === 'theory' && L.helpN === 1) say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
@@ -8375,7 +8810,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (testAct(act, b)) break; if (spotAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }

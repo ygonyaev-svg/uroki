@@ -1,7 +1,7 @@
 /* ===== Мои книги: бумажные книги из дома =====
    Ребёнок фотографирует обложку, оборот титульного листа (издательство, год, тираж, ISBN), заднюю обложку со штрихкодом, по желанию оглавление; для незнакомых книг — страницы главы → фото уходят в скрипт таблицы → папка «Уроки — фото книг» на Диске
    и строка в листе «Фото книг». Вечером Claude смотрит фото, узнаёт книгу и присылает задания строкой в «Указания»:
-   тип «книга», значение — JSON { book, title, author, msg, tasks:[{ id, title, read, min, qs, kw, snap }] }.
+   тип «книга», значение — JSON { book, title, author, msg, hidden, tasks:[{ id, title, read, min, qs, kw, snap }] }.
    qs: ["вопрос","верно","неверно1","неверно2"] — выбор; { q, a, alt:[...] } — ответ словом.
    Чтение — по бумаге, вне экрана: таймер идёт, даже если айпад отложили. До +10 баллов в день за книги. */
 var BOOK_PTS = 10;
@@ -49,6 +49,7 @@ function bkApply(kid, row){
   if (d.replace) b.tasks = [];
   (d.tasks || []).forEach(function(t){ if (!t || !t.id) return; var have = false; for (var i = 0; i < b.tasks.length; i++) if (b.tasks[i].id === t.id) { b.tasks[i] = t; have = true; } if (!have) b.tasks.push(t); });
   if (d.finished) b.finished = true;
+  if (d.hidden) b.hidden = true;
   b.st = 'ready'; b.upd = U.today();
 }
 

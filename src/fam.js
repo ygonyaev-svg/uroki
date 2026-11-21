@@ -86,7 +86,12 @@ function famInit(){
     if (mt === 0) { mk = 'yarik'; mp = 0; } else if (mt === 1) { mk = 'yarik'; mp = 5; }
     else if (mt === 2) { if (c.age <= 9) { mk = 'yarik'; mp = 11; } else { mk = 'anya'; mp = 0; } }
     else if (mt === 3) { if (c.age >= 8) { mk = 'anya'; mp = 0; } else { mk = 'yarik'; mp = 13; } }
-    if (mk) a.cur = Object.assign({}, KIDS_TPL[a.tpl].cur, { math: KIDS_TPL[mk].cur.math });
+    /* Курс своего возраста (src/cur_ages.js): его предметы заменяют предметы шаблона */
+    var ac = typeof AGE_CUR !== 'undefined' && AGE_CUR[+c.age];
+    if (ac) a.cur = Object.assign({}, KIDS_TPL[a.tpl].cur, ac);
+    /* Анкета «отстаёт» (mt 0–1) или «опережает» (mt 3) — математика из соседнего курса; «по возрасту» (mt 2) — своя */
+    if (ac && ac.math && (mt == null || mt === 2)) { mk = null; if (mt === 2) { mk = 'age'; mp = 0; } }
+    if (mk && mk !== 'age') a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur, { math: KIDS_TPL[mk].cur.math });
     var ls = famLangs(c), lset = ls.map(function(k){ return k + (+c.lg[k]); }).join(',');
     if (ls.length) { var l0 = ls[0], l1 = ls[1], lc = { '': FAM_LANGS[l0][1] };
       var lang = { name: FAM_LANGS[l0][0], src: 'Словоход', units: famLangCourse(l0, +c.lg[l0], c.age) };
@@ -97,6 +102,7 @@ function famInit(){
     var th = famThemeOf(c); if (th) THEME['k:' + c.id] = th; else delete THEME['k:' + c.id];
     if (!S.kids[c.id]) S.kids[c.id] = newKid(); if (c.pin) S.kids[c.id].pin = c.pin;
     var K = S.kids[c.id], ms = mk ? mt + '|' + mk : ''; if (ms && K.mathSet !== ms) { K.pos.math = mp; K.mathSet = ms; }
+    var as = ac ? c.age + ':' + Object.keys(ac).join(',') : ''; if ((K.ageSet || '') !== as) { if (ac) Object.keys(ac).forEach(function(sj){ delete K.pos[sj]; delete K.pos[sj + '_alt']; }); K.ageSet = as; }
     if ((K.langSet || '') !== lset) { delete K.pos.lang; delete K.pos.lang_alt; K.langSet = lset; } });
   if (S.fam && S.fam.ppin) S.parentPin = S.fam.ppin;
 }
@@ -156,7 +162,7 @@ function vFamKids(){
     '<label>Что уже прочитал(а) из русских книг<input id="fkd' + i + '" value="' + U.esc(c.done || '') + '" maxlength="300" autocomplete="off" placeholder="Например: Денискины рассказы, Каштанка"></label>' +
     '<p class="fkql">Любимый цвет</p><div class="row fkcols">' + FAM_COLORS.map(function(x){ return '<button type="button" class="fkcol' + (c.color === x[0] ? ' on' : '') + '" data-act="fkcol" data-i="' + i + '" data-k="' + x[0] + '" style="background:' + x[1] + '" aria-label="' + x[0] + '"></button>'; }).join('') + '</div>' +
     '<label>Код ребёнка, 4 цифры' + (c.has ? ' (оставьте пустым, чтобы не менять)' : '') + '<input id="fkp' + i + '" inputmode="numeric" maxlength="4" autocomplete="off" value="' + U.esc(c.pinNew || '') + '"></label></fieldset>'; }).join('');
-  return famWrap(famBrand(false) + '<header class="hero"><p class="eyebrow">' + U.esc((S.fam && S.fam.email) || '') + '</p><h1>' + (first ? 'Добавьте детей' : 'Дети') + '</h1><p>Программа подстраивается под возраст: 6–9 лет — младшая, 10–13 лет — старшая. Дальше сложность меняется по ответам ребёнка.</p></header>' +
+  return famWrap(famBrand(false) + '<header class="hero"><p class="eyebrow">' + U.esc((S.fam && S.fam.email) || '') + '</p><h1>' + (first ? 'Добавьте детей' : 'Дети') + '</h1><p>Программа подбирается по возрасту ребёнка — от подготовки к школе до седьмого класса. Дальше сложность меняется по его ответам.</p></header>' +
     '<form data-form="fkids">' + rows + (L.length < 5 ? '<p class="center"><button type="button" class="btn ghost" data-act="fkadd">+ Ещё ребёнок</button></p>' : '') +
     '<div class="card form"><label>Код родителя, 4 цифры' + (first ? '' : ' (оставьте пустым, чтобы не менять)') + '<input id="fkpp" inputmode="numeric" maxlength="4" autocomplete="off"></label><p class="hint">Код родителя открывает отчёты и подтверждает призы. Коды детей — чтобы брат или сестра не заходили друг за друга.</p>' +
     '<button class="btn big">Сохранить</button>' + (first ? '' : ' <button type="button" class="link" data-act="fkback">Отмена</button>') + '</div></form>');

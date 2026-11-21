@@ -217,7 +217,7 @@ const SCENES = {
     () => PX.svg(400, 90, `<rect width="400" height="90" fill="#831843"/><g stroke="#fbcfe8" stroke-width="2"><line x1="0" y1="70" x2="400" y2="70"/></g><text x="30" y="62" font-size="30">🦄</text><text x="110" y="62" font-size="28">🌙</text><text x="180" y="62" font-size="28">🧙‍♀️</text><text x="250" y="62" font-size="28">🐈‍⬛</text><text x="320" y="62" font-size="28">🏰</text>`, 'scene')
   ]
 };
-function scene(kid, seed){ const S0 = SCENES[T(kid)] || SCENES.yarik; return S0[Math.abs(seed | 0) % S0.length](); }
+function scene(kid, seed){ const S0 = (!FAM && typeof LOOK_SCENES !== 'undefined' && LOOK_SCENES[lookId(kid)]) || (!FAM && lookId(kid) === 'magic' && SCENES.anya) || (!FAM && lookId(kid) === 'foot' && SCENES.yarik) || SCENES[T(kid)] || SCENES.yarik; return S0[Math.abs(seed | 0) % S0.length](); }
 
 /* Обложки книг */
 const COVERS = {

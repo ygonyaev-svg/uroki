@@ -20,18 +20,25 @@ var HOUSES = {
 var HP_BASE = { hello: THEME.anya.hello, win: THEME.anya.win.slice(), banner: THEME.anya.banner.slice() };
 function hpOn(kid){ return !FAM && kid === 'anya' && !!S.kids[kid]; }
 function hpK(kid){ var K = S.kids[kid]; if (!K.hp) K.hp = { house: '', tr: '', seen: {}, re: [], day: null }; return K.hp; }
-function hpHouse(kid){ return hpOn(kid) ? hpK(kid).house : ''; }
+/* Шляпа доступна любому ребёнку с темой «Волшебная школа» (см. looks.js) */
+function hatOn(kid){ return !FAM && !!S.kids[kid] && (typeof lookId === 'function' ? lookId(kid) === 'magic' : kid === 'anya'); }
+function hpHouse(kid){ return hatOn(kid) ? hpK(kid).house : ''; }
+/* Мужской род для мальчика (тексты Шляпы написаны для девочки) */
+var HP_M = [['Она была очень храброй', 'Он был очень храбрым'], ['Она добилась великого', 'Он добился великого'], ['Она была мудрой', 'Он был мудрым'], ['Она была доброй и верной', 'Он был добрым и верным'],
+  ['смелая волшебница', 'смелый волшебник'], ['волшебница', 'волшебник'], ['гриффиндорка', 'гриффиндорец'], ['слизеринка', 'слизеринец'], ['когтевранка', 'когтевранец'], ['пуффендуйка', 'пуффендуец'], ['трусиха', 'трус'],
+  ['добилась', 'добился'], ['выбрала', 'выбрал'], ['хотела', 'хотел'], ['ждала', 'ждал'], ['сделала', 'сделал'], ['пошла', 'пошёл'], ['сама', 'сам'], ['гордилась бы тобой', 'гордилась бы тобой'], ['ученица', 'ученик'], ['Первокурсница', 'Первокурсник']];
+var HP_MR = HP_M.map(function(p){ return [new RegExp('(^|[^А-Яа-яЁё])' + p[0] + '(?=[^А-Яа-яЁё]|$)', 'g'), '$1' + p[1]]; });
+function hpG(kid, s){ if (kid === 'anya' || s == null) return s; s = String(s); for (var i = 0; i < HP_MR.length; i++) s = s.replace(HP_MR[i][0], HP_MR[i][1]); return s; }
 /* Факультет влияет на приветствие, похвалу и цвета (класс на body) */
-function hpApply(){ var h = S && S.kids && S.kids.anya && S.kids.anya.hp && HOUSES[S.kids.anya.hp.house]; var A = THEME.anya;
-  if (!h) { A.hello = HP_BASE.hello; A.win = HP_BASE.win.slice(); A.banner = HP_BASE.banner.slice(); return; }
-  A.hello = h.hello; A.win = h.win.slice(); A.banner = HP_BASE.banner.slice(); }
+/* Приветствие и похвала факультета теперь собираются в lookTheme (looks.js) для каждого ребёнка отдельно */
+function hpApply(){}
 function hpBodyCls(kid){ var h = hpHouse(kid); return h ? ' h-' + h : ''; }
 
 /* Имена — по переводу «Росмэн». Номера глав одинаковы во всех переводах. (Перевод «Махаон» сильно расходится в именах и в разных тиражах — подстановку не делаем.) */
 function hpT(kid, s){ return s; }
 
 /* ---------- Банк вопросов ---------- */
-var HPQ = HP_Q.map(function(l){ var p = l.split('|'); return { id: 'h' + U.h(p[3]), b: +p[0], c: +p[1], lv: +p[2], q: p[3], a: p[4], w: p[5].split(';'), e: p[6] || '' }; });
+var HPQ = HP_Q.map(function(l){ var p = l.split('|'); return { id: 'h' + U.h(p[3]), b: +p[0], c: +p[1], lv: +p[2], q: p[3], a: p[4], w: p[5].split(';'), e: p[6] || '', img: p[7] || '' }; });
 var HP_PICQ = 'Художник ошибся. Что на картинке не так, как в книге?';
 (typeof HP_PIC !== 'undefined' ? HP_PIC : []).forEach(function(l){ var p = l.split('|'); HPQ.push({ id: 'p' + U.h(p[4]), b: +p[0], c: +p[1], lv: +p[2], pic: p[3], cap: p[4], q: HP_PICQ, a: p[5], w: p[6].split(';'), e: p[7] || '' }); });
 var HPQ_BY = {}; HPQ.forEach(function(x){ HPQ_BY[x.id] = x; });
@@ -72,10 +79,10 @@ ALWAYS.push({ id: 'hp', order: 1,
     if (x) {
       var r = (cur.hq && cur.hq.id === x.id) ? cur.hq : null, opts = hpOpts(kid, x);
       h += '<div class="counter">' + (mode === 're' || (r && r.re) ? '📖 Вопрос после перечитывания' : 'Вопрос ' + Math.min(D.ids.length, done + (r ? 0 : 1)) + ' из ' + D.ids.length) + (x.lv === 3 ? ' · <b>эксперт</b>' : '') + '</div>';
-      h += '<article class="card task hpcard"><p class="hpbook">📕 Книга ' + x.b + ' · «' + HP_BOOKS[x.b] + '»</p>' + (x.pic ? '<div class="hppic hpimg"><img src="img/hp/' + U.esc(x.pic) + '.webp" alt="' + U.esc(x.cap) + '" loading="lazy"></div><p class="hpcap">' + U.esc(x.cap) + '</p>' : '') + '<div class="q">' + U.esc(hpT(kid, x.q)) + '</div>' +
+      h += '<article class="card task hpcard"><p class="hpbook">📕 Книга ' + x.b + ' · «' + HP_BOOKS[x.b] + '»</p>' + (x.pic ? '<div class="hppic hpimg"><img src="img/hp/' + U.esc(x.pic) + '.webp" alt="' + U.esc(x.cap) + '" loading="lazy"></div><p class="hpcap">' + U.esc(x.cap) + '</p>' : x.img ? '<div class="hppic hpimg"><img src="img/hp/q/' + U.esc(x.img) + '.webp" alt="" loading="lazy"></div>' : '') + '<div class="q">' + U.esc(hpT(kid, x.q)) + '</div>' +
         '<div class="opts">' + opts.map(function(o){ var cls = r ? (o === x.a ? 'right' : o === r.v ? 'wrong' : '') : ''; return '<button class="opt ' + cls + '" data-act="hpans" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + U.esc(hpT(kid, o)) + '</button>'; }).join('') + '</div>';
       if (r) {
-        h += r.ok ? '<div class="fb ok"><b>' + U.rng(x.id).pick(THEME.anya.win) + '</b> ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') + '. ' : '') + U.esc(hpT(kid, x.e)) + '</div><p class="src">📖 ' + U.esc(hpT(kid, hpWhere(x))) + '</p>'
+        h += r.ok ? '<div class="fb ok"><b>' + U.rng(x.id).pick(THEME[TH(kid)].win) + '</b> ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') + '. ' : '') + U.esc(hpT(kid, x.e)) + '</div><p class="src">📖 ' + U.esc(hpT(kid, hpWhere(x))) + '</p>'
           : '<div class="fb bad"><b>Правильный ответ: ' + U.esc(hpT(kid, x.a)) + '.</b> ' + U.esc(hpT(kid, x.e)) + '</div>' +
             '<div class="note hpread">📖 <b>Где прочитать:</b> ' + U.esc(hpT(kid, hpWhere(x))) + '.<br>Перечитай эту главу в своей книге — вопрос будет ждать тебя в списке «Перечитать». Ответишь верно — получишь балл.</div>';
         h += (r.pts ? funBurst(r.pts) : '') + '</article><button class="btn big" data-act="hpnext">' + (hpCurId(kid) ? 'Следующий вопрос →' : 'Готово') + '</button>';
@@ -123,9 +130,10 @@ var HAT_Q = [
 ];
 ALWAYS.push({ id: 'hat', order: 2,
   open: function(kid){ cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 }, res: '' }; if (hpHouse(kid)) cur.hat.show = 1; },
-  tile: function(kid){ if (!hpOn(kid)) return ''; var hs = HOUSES[hpHouse(kid)];
+  tile: function(kid){ if (!hatOn(kid)) return ''; var hs = HOUSES[hpHouse(kid)];
     return '<button class="tile fun hptile hat" data-act="always" data-id="hat"><span class="ico">' + (hs ? hs.e : '🎩') + '</span><span class="tt"><span class="sn">' + (hs ? 'Мой факультет: ' + hs.n : 'Распределяющая шляпа') + '</span><span class="ut">' + (hs ? hs.val.charAt(0).toUpperCase() + hs.val.slice(1) + '. Цвета, приветствие и похвала — твоего факультета' : 'Пройди распределение и выбери свой факультет') + '</span></span></button>'; },
-  view: function(kid){ if (!hpOn(kid)) return ''; var H = hpK(kid), C = cur.hat || (cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 } });
+  view: function(kid){ return hpG(kid, hatView(kid)); },
+  view0: function(kid){ if (!hatOn(kid)) return ''; var H = hpK(kid), C = cur.hat || (cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 } });
     var h = '<section class="hello"><p class="eyebrow">Школа волшебства</p><h1>🎩 Распределяющая шляпа</h1></section>';
     if (C.show && H.house) { var hs = HOUSES[H.house];
       return h + '<article class="card hatres h-' + H.house + '"><div class="hatcrest">' + hs.e + '</div><h2>Ты — ' + hs.who + '!</h2><p>Факультет <b>' + hs.n + '</b>. Основатель — ' + hs.fnd + '. Здесь ценят ' + hs.val + '.</p><p>Теперь приложение встречает тебя цветами твоего факультета, а за верные ответы очки идут ' + hs.d + '.</p>' +
@@ -138,10 +146,12 @@ ALWAYS.push({ id: 'hat', order: 2,
       'Шляпа думает… ' + HOUSES[top[0]].e + ' <b>' + HOUSES[top[0]].n.toUpperCase() + '!</b> Но Шляпа всегда учитывает и желание ученика. Если сердце просит другой факультет — выбери его.';
     return h + '<article class="card"><p class="hatsay">' + say + '</p><div class="hatpick">' + ['g', 's', 'r', 'h'].map(function(k){ var x = HOUSES[k];
       return '<button class="hatbtn h-' + k + (top.indexOf(k) >= 0 ? ' rec' : '') + '" data-act="hatset" data-v="' + k + '"><span class="hatcrest">' + x.e + '</span><b>' + x.n + '</b><small>' + x.val + '</small><small>совпало ответов: ' + C.sc[k] + ' из ' + HAT_Q.length + '</small></button>'; }).join('') + '</div></article>'; },
-  act: function(act, b){ var kid = cur.kid; if (!hpOn(kid)) return; var H = hpK(kid), C = cur.hat || (cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 } });
+  act: function(act, b){ var kid = cur.kid; if (!hatOn(kid)) return; var H = hpK(kid), C = cur.hat || (cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 } });
     if (act === 'hatans') { C.sc[b.getAttribute('data-v')]++; C.i++; render(); window.scrollTo(0, 0); }
     else if (act === 'hatagain') { cur.hat = { i: 0, sc: { g: 0, s: 0, r: 0, h: 0 } }; render(); }
     else if (act === 'hatset') { var v = b.getAttribute('data-v'); if (!HOUSES[v]) return; var old = H.house; H.house = v; hpApply(); C.show = 1;
       ev(kid, 'факультет', { subj: 'Гарри Поттер', text: HOUSES[v].n + (old && old !== v ? ' (был ' + HOUSES[old].n + ')' : '') + '; тест: ' + ['g', 's', 'r', 'h'].map(function(k){ return HOUSES[k].n + ' ' + C.sc[k]; }).join(', ') });
       save(); render(); window.scrollTo(0, 0); } }
 });
+
+function hatView(kid){ return alwaysGet('hat').view0(kid); }
