@@ -622,6 +622,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 .cgdemop{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
 .cgdb{ display:inline-flex; align-items:center; gap:4px; min-width:38px; height:38px; padding:0 6px; border-radius:10px; color:#fff; font-size:20px; font-weight:800; }
 .cgdb .cgdb{ height:30px; min-width:30px; font-size:16px; }
+.cgover{ color:#c62828; font-weight:800; }
 
 /* ===== Дизайн-система (21.11.2026): шрифты, чистый текст без двойных теней, свои иконки =====
    Шрифты: Ярик — Rubik (заголовки) + Nunito (текст); Аня — Playfair Display (заголовки) + Manrope (текст).
@@ -846,9 +847,9 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v08765c50 */
+<script>/* vc882cd36 */
 var FAM = 1;
-const CH_IMG_LIST = ["bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac7", "bac8", "bac9", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bgt1", "bgt2", "bgt3", "bka3", "blg1", "blg2", "bmi1", "bmi2", "bmi3", "bnp7", "bsh3", "bsh4"];
+const CH_IMG_LIST = ["bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac7", "bac8", "bac9", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bgt1", "bgt2", "bgt3", "bka3", "bkm1", "bkm2", "bkz1", "blg1", "blg2", "bmi1", "bmi2", "bmi3", "bnp7", "bsh1", "bsh3", "bsh4", "bvv1", "bvv2", "bvv3", "bzy1"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
 /* ===== Общие утилиты ===== */
 const U = {
@@ -7386,7 +7387,7 @@ function cgBoard(lv, grid){ const W = grid[0].length, H = grid.length, ch = CG_C
   return `<div class="cgbwrap" style="max-width:${Math.round(40 * W / H)}vh;margin:0 auto"><div class="cgboard th-${ch.bg}" style="padding-bottom:${H / W * 100}%"><div class="cggrid" style="grid-template-columns:repeat(${W},1fr);grid-template-rows:repeat(${H},1fr)">${cells}</div>${hint}${items}${b ? `<div class="cgsp ball" id="cgball" style="${pos(b[0], b[1])}">${cgSprite('ball')}</div>` : ''}<div class="cgsp hero dR" id="cghero" style="${pos(s[0], s[1])}">${cgSprite('toby')}</div></div></div>`; }
 function vCodeLv(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids(lv), n = cgCount(CG.prog), r = cgK(kid).lv[lv.id] || {};
   const bl = lv.b.split('').filter(c => c !== 'P' && c !== 'W' && c !== 'I');
-  const full = lv.max && n >= lv.max;
+  const full = false, over = lv.max && n > lv.max;
   const tut = lv.id === '1.1' && !CG.prog.length ? 'R' : lv.id === '1.1' && CG.prog.length < 4 ? 'R' : ''; const pal = bl.map(c => `<button class="cgb cg${c}${c === tut ? ' tut' : ''}" data-act="cgadd" data-t="${c}" ${CG.run || full ? 'disabled' : ''}>${CG_BLK[c]}</button>`).join('')
     + (lv.b.indexOf('P') >= 0 ? `<button class="cgb cgP wide" data-act="cgadd" data-t="P" ${CG.run || full ? 'disabled' : ''}>🔁 Повтори</button>` : '')
     + (lv.b.indexOf('W') >= 0 ? `<button class="cgb cgW wide" data-act="cgadd" data-t="W" ${CG.run || full ? 'disabled' : ''}>⟳ Пока не 🏁</button>` : '')
@@ -7398,7 +7399,7 @@ function vCodeLv(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGri
   <p class="cgsay">${CG.sayok || voiceFree(cur.kid) ? '<button class="cgsaybtn" data-act="cgsay">🔊</button> ' : ''}${U.esc(lv.say)}${CG.sayok || voiceFree(cur.kid) ? '' : ' <button class="link" data-act="cgsayhelp">🤔 Не понял</button>'}</p><div class="cgtop"><button class="btn ghost cgshow" data-act="cgdemo" ${CG.run ? 'disabled' : ''}>👀 Покажи</button></div>${tabs}
   <div id="cgdemo" class="cgdemo" style="display:none"></div><div id="cgbwrap">${cgBoard(lv, grids[CG.vi])}</div>
   ${res && !CG.run ? `<div class="fb ${res.ok ? 'ok' : 'try'}">${res.ok ? `Ура! ${'⭐'.repeat(res.stars)} ${res.pts ? `+${res.pts} ${U.pl(res.pts, 'балл', 'балла', 'баллов')}${res.pend ? ' (придут после уроков дня)' : ''}` : ''}${res.badge ? `<div class="cgbadge big">Глава пройдена! Награда: ${U.esc(res.badge)}</div>` : ''}${res.stars < 3 && !CG.used ? `<br><small>Можно короче: попробуй уложиться в ${cgCount(cgParse(lv.sol))} ${U.pl(cgCount(cgParse(lv.sol)), 'блок', 'блока', 'блоков')}, чтобы получить 3 звезды.</small>` : ''}` : U.esc(res.msg)}</div>` : ''}
-  <section class="cgprog card"><div class="cgph"><b>Программа</b><span class="hint">${lv.max ? `блоков ${n} из ${lv.max}` : `блоков: ${n}`}</span></div>${cgListHtml(CG.prog, '', '')}</section>
+  <section class="cgprog card"><div class="cgph"><b>Программа</b><span class="hint">${lv.max ? `<span class="${over ? 'cgover' : ''}">блоков ${n} из ${lv.max}${over ? ' — многовато!' : ''}</span>` : `блоков: ${n}`}</span></div>${cgListHtml(CG.prog, '', '')}</section>
   <section class="cgpal">${pal}</section>
   <div class="cgctl">${res && res.ok && !CG.run ? `<button class="btn" data-act="cgnext">Дальше ▶</button>` : `<button class="btn cgrun" data-act="cgrun" ${CG.run || !CG.prog.length ? 'disabled' : ''}>▶ Пуск</button>`}
     <button class="btn ghost" data-act="cgclear" ${CG.run ? 'disabled' : ''}>🗑 Очистить</button>
@@ -7415,12 +7416,12 @@ function cgApply(t){ const h = document.getElementById('cghero'); if (!h) return
   Array.prototype.forEach.call(document.querySelectorAll('.cgprog .run'), el => el.classList.remove('run'));
   if (t.hl) { const el = document.querySelector(`.cgprog [data-id="${t.hl}"]`); if (el) el.classList.add('run'); } }
 function cgRun(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids(lv);
-  if (lv.max && cgCount(CG.prog) > lv.max) { alertMsg(`Не больше ${lv.max} блоков`); return; }
+  if (lv.max && cgCount(CG.prog) > lv.max) { const C0 = cgK(kid), r0 = C0.lv[lv.id] || (C0.lv[lv.id] = { s: 0, t: 0, w: 0 }); r0.t = (r0.t || 0) + 1; const m = `Слишком много блоков: можно не больше ${lv.max}. Одинаковые стрелки подряд замени одним блоком Повтори.`; CG.res = { ok: false, msg: m }; save(); render(); say(m); return; }
   const R = grids.map(g => cgSim(lv, g, CG.prog)); const vr = R.map(x => x.ok);
   CG.run = true; CG.res = null; CG.vi = 0; render(); let vi = 0, i = 0;
   const done = () => { CG.run = false; const ok = vr.every(Boolean), bad = R.find(x => !x.ok);
     const C = cgK(kid), rec = C.lv[lv.id] || (C.lv[lv.id] = { s: 0, t: 0, w: 0 });
-    if (!ok) { rec.t = (rec.t || 0) + 1; CG.res = { ok: false, msg: (grids.length > 1 ? `Улица ${R.indexOf(bad) + 1}: ` : '') + bad.msg, vr: vr }; CG.vi = R.indexOf(bad); save(); render(); if (CG.sayok || CG.hint || voiceFree(cur.kid)) say(bad.msg); return; }
+    if (!ok) { rec.t = (rec.t || 0) + 1; const tip = lv.max && lv.b.indexOf('P') >= 0 && cgCount(CG.prog) >= lv.max - 1 && !JSON.stringify(CG.prog).match(/"P"/) ? ' Блоков не хватает? Замени одинаковые стрелки одним блоком Повтори 🔁.' : ''; CG.res = { ok: false, msg: (grids.length > 1 ? `Улица ${R.indexOf(bad) + 1}: ` : '') + bad.msg + tip, vr: vr }; CG.vi = R.indexOf(bad); save(); render(); if (CG.sayok || CG.hint || voiceFree(cur.kid)) say(bad.msg + tip); return; }
     const n = cgCount(CG.prog), stars = cgStars(lv, n, CG.used); const prev = rec.s || 0; if (!prev && !rec.first) rec.first = (rec.t || 0) + 1;
     rec.w = (rec.w || 0) + 1; rec.prog = JSON.parse(JSON.stringify(CG.prog));
     let pts = 0, pend = false; if (stars > prev && !CG.used) { const room = Math.max(0, CODE_DAY_MAX - cgToday(kid)); pts = Math.min(stars - prev, room); }
