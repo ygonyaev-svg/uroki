@@ -56,3 +56,8 @@ body.anya.h-h .prog i{ background:linear-gradient(90deg,#f2c230,#fde68a); }
 .hpcap{ margin:0 0 6px; font-style:italic; opacity:.85; }
 @media (max-width:520px){ .hppic span{ font-size:40px; letter-spacing:3px; } }
 .hprank .rlvb{ background:#f5d27a; color:#3b2a1a; }
+
+/* картинки «Найди ошибку»: наши рисунки на светлых медальонах */
+.hppic span{ display:block; }
+.hppic .ic{ width:72px; height:72px; padding:9px; margin:6px 7px; box-sizing:border-box; border-radius:50%; background:#FBF6EC; box-shadow:inset 0 0 0 2px #C9A35A,0 4px 12px rgba(0,0,0,.35); vertical-align:middle; --il:#2A2140; }
+@media (max-width:520px){ .hppic .ic{ width:54px; height:54px; padding:7px; margin:4px; } }

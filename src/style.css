@@ -163,7 +163,7 @@ th{ color:var(--ink2); font-weight:600; }
 .form input,.form select,.shoprow input{ display:block; width:100%; margin-top:4px; padding:10px 12px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); font-size:18px; color:var(--ink); }
 .shoprow{ display:grid; grid-template-columns:1fr 90px auto; gap:8px; align-items:center; margin:6px 0; }
 .shoprow input{ margin:0; }
-.toast{ position:fixed; left:50%; bottom:30px; transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:12px 20px; border-radius:12px; z-index:9; }
+.toast{ position:fixed; left:50%; bottom:30px; transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:12px 20px; border-radius:12px; z-index:2000; }
 
 @media (max-width:520px){
   body{ font-size:17px; } h1{ font-size:25px; }
