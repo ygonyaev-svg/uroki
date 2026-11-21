@@ -29,17 +29,37 @@ function busyTyping(){ const a = document.activeElement; if (a && (a.tagName ===
 function softRender(){ if (busyTyping() || (typeof RT !== 'undefined' && RT && RT.active)) return; render(); }
 /* Голосовой ввод в любое поле текста: кнопка 🎤 под полем; без распознавания — подсказка про микрофон на клавиатуре */
 let MIC = null;
-function micStop(){ if (!MIC) return; MIC.on = false; try { MIC.rec.stop(); } catch (e) {} const b = document.querySelector(`[data-mic="${MIC.id}"]`); if (b) { b.textContent = '🎤 Сказать голосом'; b.classList.remove('live'); } MIC = null; }
-function micStart(id, btn){ if (MIC) { const same = MIC.id === id; micStop(); if (same) return; } const el = document.getElementById(id); if (!el || !SR) return;
-  const M = MIC = { id, on: true, base: el.value.trim(), cur: '' }; const rec = new SR(); M.rec = rec; rec.lang = 'ru-RU'; rec.continuous = true; rec.interimResults = true;
-  rec.onresult = e => { let s = ''; for (let i = 0; i < e.results.length; i++) s += ' ' + e.results[i][0].transcript; M.cur = s.trim(); const t = document.getElementById(id); if (t) { t.value = (M.base + ' ' + M.cur).trim(); t.dispatchEvent(new Event('input', { bubbles: true })); } };
-  rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { alertMsg('Разреши микрофон в настройках, чтобы говорить голосом'); micStop(); } };
-  rec.onend = () => { M.base = (M.base + ' ' + M.cur).trim(); M.cur = ''; if (M.on) setTimeout(() => { try { rec.start(); } catch (e) {} }, 150); };
-  try { rec.start(); } catch (e) {} btn.textContent = '⏹ Готово'; btn.classList.add('live'); }
+const MIC_SAFARI = /Safari/.test(navigator.userAgent) && !/Chrome|Chromium|CriOS|Edg|OPR/.test(navigator.userAgent);
+const MIC_MAC = /Macintosh/.test(navigator.userAgent) && !('ontouchend' in document);
+const micLbl = on => on ? icon('stop') + ' Готово' : icon('mic') + ' Сказать голосом';
+const MIC_HINT = 'Говори — текст появится сам. Потом можно поправить.';
+function micNote(id, txt, bad){ const b = document.querySelector(`[data-mic="${id}"]`), h = b && b.parentNode.querySelector('.hint'); if (h) { h.textContent = txt; h.classList.toggle('micerr', !!bad); } }
+const MIC_SYS = MIC_MAC ? 'Можно иначе: нажми на поле и дважды нажми клавишу Fn (или 🎤 на клавиатуре) — включится диктовка Mac.' : 'Можно иначе: нажми на поле и на микрофон на клавиатуре.';
+function micStop(){ if (!MIC) return; const id = MIC.id; MIC.on = false; clearTimeout(MIC.tm); try { MIC.rec.stop(); } catch (e) {} const b = document.querySelector(`[data-mic="${id}"]`); if (b) { b.innerHTML = micLbl(false); b.classList.remove('live'); } MIC = null; }
+function micFail(id, txt){ micStop(); micNote(id, txt + ' ' + MIC_SYS, true); const t = document.getElementById(id); if (t) t.focus(); }
+function micStart(id, btn){ if (MIC) { const same = MIC.id === id; micStop(); if (same) { micNote(id, MIC_HINT); return; } } const el = document.getElementById(id); if (!el || !SR) return;
+  const M = MIC = { id, on: true, base: el.value.trim(), cur: '', got: false, empty: 0 }; let rec;
+  try { rec = new SR(); } catch (e) { micFail(id, 'Этот браузер не умеет распознавать речь.'); return; }
+  M.rec = rec; rec.lang = 'ru-RU'; rec.interimResults = true; rec.maxAlternatives = 1;
+  /* Safari: непрерывный режим часто молчит — слушаем фразами и сразу перезапускаем */
+  rec.continuous = !MIC_SAFARI;
+  rec.onstart = () => { if (MIC === M) micNote(id, 'Слушаю… говори.'); };
+  rec.onresult = e => { if (MIC !== M) return; let s = ''; for (let i = 0; i < e.results.length; i++) s += ' ' + e.results[i][0].transcript; M.cur = s.trim(); if (M.cur) { M.got = true; M.empty = 0; }
+    const t = document.getElementById(id); if (t) { t.value = (M.base + ' ' + M.cur).trim(); t.dispatchEvent(new Event('input', { bubbles: true })); } micNote(id, 'Слушаю… Нажми «Готово», когда закончишь.'); };
+  rec.onerror = e => { if (MIC !== M) return; const er = e.error;
+    if (er === 'not-allowed' || er === 'service-not-allowed') micFail(id, MIC_SAFARI && MIC_MAC ? 'Safari не даёт распознавать речь: включи «Диктовку» (Системные настройки → Клавиатура → Диктовка) и разреши микрофон для сайта.' : 'Нет доступа к распознаванию речи: разреши микрофон в настройках.');
+    else if (er === 'audio-capture') micFail(id, 'Микрофон не найден или занят другой программой.');
+    else if (er === 'network') micFail(id, 'Нет связи с сервисом распознавания речи.');
+    else if (er === 'language-not-supported') micFail(id, 'Распознавание русской речи здесь недоступно.'); };
+  rec.onend = () => { if (MIC !== M) return; M.base = (M.base + ' ' + M.cur).trim(); M.cur = ''; if (!M.on) return;
+    if (!M.got && ++M.empty >= 4) { micFail(id, 'Не слышу речи — распознавание не отвечает.'); return; }
+    setTimeout(() => { if (MIC === M && M.on) { try { rec.start(); } catch (e) {} } }, 150); };
+  M.tm = setTimeout(() => { if (MIC === M && !M.got) micNote(id, 'Пока ничего не слышу. Говори ближе к микрофону. ' + MIC_SYS, true); }, 7000);
+  try { rec.start(); } catch (e) { micFail(id, 'Не получилось включить распознавание.'); return; } btn.innerHTML = micLbl(true); btn.classList.add('live'); }
 document.addEventListener('click', e => { const b = e.target.closest('[data-mic]'); if (b) { e.preventDefault(); micStart(b.dataset.mic, b); } });
 function micDecorate(root){ (root || document).querySelectorAll('textarea[id]:not([data-micd])').forEach(t => { t.setAttribute('data-micd', '1'); if (t.id === 'rtxt' || t.id === 'prec') return;
   const d = document.createElement('div'); d.className = 'micbar';
-  d.innerHTML = SR ? `<button type="button" class="btn ghost small mic2" data-mic="${t.id}">🎤 Сказать голосом</button><span class="hint">Говори — текст появится сам. Потом можно поправить.</span>` : '<span class="hint">🎤 Можно не печатать: нажми на поле, потом на микрофон на клавиатуре рядом с пробелом, и говори.</span>';
+  d.innerHTML = SR ? `<button type="button" class="btn ghost small mic2" data-mic="${t.id}">${micLbl(false)}</button><span class="hint">${MIC_HINT}</span>` : '<span class="hint">🎤 Можно не печатать: нажми на поле, потом на микрофон на клавиатуре рядом с пробелом, и говори.</span>';
   t.insertAdjacentElement('afterend', d); }); }
 try { new MutationObserver(() => micDecorate()).observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
 /* Озвучка заданий — только после «Не понимаю»: сначала ребёнок читает сам. Совсем маленьким (6 лет и младше, семейная версия) — сразу. */

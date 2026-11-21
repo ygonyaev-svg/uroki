@@ -163,3 +163,6 @@ body.anya .reading .text,body.anya .peek .text,body.anya .ptext p{ font-family:"
 /* круглые «медальки» и мелкие значки в тексте */
 .card .ic{ --iw:#fff; }
 .toast .ic{ --il:#fff; }
+
+.micbar .hint.micerr{ color:#B42318; font-weight:600; }
+.tipin h3 .ic{ margin-right:6px; }
