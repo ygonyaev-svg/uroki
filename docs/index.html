@@ -369,6 +369,8 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .tipbox{ position:fixed; inset:0; background:rgba(10,15,30,.45); z-index:1000; display:flex; align-items:flex-end; justify-content:center; padding:16px; }
 .tipin{ background:var(--card); color:var(--ink); border-radius:18px; padding:18px 18px 14px; max-width:520px; width:100%; box-shadow:0 10px 40px rgba(0,0,0,.3); margin-bottom:env(safe-area-inset-bottom); }
 .tipin h3{ margin:0 0 8px; font-size:20px; } .tipin p{ font-size:18px; line-height:1.45; margin:0 0 12px; } .tiprow{ display:flex; gap:10px; flex-wrap:wrap; }
+.micbar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:6px 0 4px; } .mic2.live{ background:var(--red); color:#fff; animation:pulse 1.2s infinite; }
+@keyframes pulse{ 50%{ opacity:.7; } }
 
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
@@ -568,7 +570,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* va64a7fa8 */
+<script>/* va15ed177 */
 var FAM = 0;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -4540,10 +4542,25 @@ document.addEventListener('click', e => { const s = e.target.closest('[data-tips
   if (e.target.closest('[data-act]')) return; const el = e.target.closest('[data-tip]'); if (el) tipShow(el.dataset.tip); });
 /* Набранный текст не теряется при перерисовке экрана */
 document.addEventListener('input', e => { const el = e.target; if (!el || el.tagName !== 'TEXTAREA' || !cur.kid) return; try { const D = dayRec(cur.kid, cur.ds);
-  if (el.id === 'rtxt' && D.les.read) D.les.read.rtDraft = el.value; else if (el.id === 'prec' && D.poem) D.poem.rec = el.value; else if (el.id === 'pcomp' && D.poem) D.poem.comp = el.value; else return;
+  if (el.id === 'rtxt' && D.les.read) D.les.read.rtDraft = el.value; else if (el.id === 'prec' && D.poem) D.poem.rec = el.value; else if (el.id === 'pcomp' && D.poem) D.poem.comp = el.value; else if (el.id === 'fbtext' && cur.subj && D.les[cur.subj]) { const L = D.les[cur.subj]; L.fb = L.fb || {}; L.fb.text = el.value; } else return;
   clearTimeout(window.TXT_T); window.TXT_T = setTimeout(save, 800); } catch (x) {} });
 function busyTyping(){ const a = document.activeElement; if (a && (a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && a.type !== 'button'))) return true; return [].some.call(document.querySelectorAll('textarea'), t => t.value.trim()); }
 function softRender(){ if (busyTyping() || (typeof RT !== 'undefined' && RT && RT.active)) return; render(); }
+/* Голосовой ввод в любое поле текста: кнопка 🎤 под полем; без распознавания — подсказка про микрофон на клавиатуре */
+let MIC = null;
+function micStop(){ if (!MIC) return; MIC.on = false; try { MIC.rec.stop(); } catch (e) {} const b = document.querySelector(`[data-mic="${MIC.id}"]`); if (b) { b.textContent = '🎤 Сказать голосом'; b.classList.remove('live'); } MIC = null; }
+function micStart(id, btn){ if (MIC) { const same = MIC.id === id; micStop(); if (same) return; } const el = document.getElementById(id); if (!el || !SR) return;
+  const M = MIC = { id, on: true, base: el.value.trim(), cur: '' }; const rec = new SR(); M.rec = rec; rec.lang = 'ru-RU'; rec.continuous = true; rec.interimResults = true;
+  rec.onresult = e => { let s = ''; for (let i = 0; i < e.results.length; i++) s += ' ' + e.results[i][0].transcript; M.cur = s.trim(); const t = document.getElementById(id); if (t) { t.value = (M.base + ' ' + M.cur).trim(); t.dispatchEvent(new Event('input', { bubbles: true })); } };
+  rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { alertMsg('Разреши микрофон в настройках, чтобы говорить голосом'); micStop(); } };
+  rec.onend = () => { M.base = (M.base + ' ' + M.cur).trim(); M.cur = ''; if (M.on) setTimeout(() => { try { rec.start(); } catch (e) {} }, 150); };
+  try { rec.start(); } catch (e) {} btn.textContent = '⏹ Готово'; btn.classList.add('live'); }
+document.addEventListener('click', e => { const b = e.target.closest('[data-mic]'); if (b) { e.preventDefault(); micStart(b.dataset.mic, b); } });
+function micDecorate(root){ (root || document).querySelectorAll('textarea[id]:not([data-micd])').forEach(t => { t.setAttribute('data-micd', '1'); if (t.id === 'rtxt' || t.id === 'prec') return;
+  const d = document.createElement('div'); d.className = 'micbar';
+  d.innerHTML = SR ? `<button type="button" class="btn ghost small mic2" data-mic="${t.id}">🎤 Сказать голосом</button><span class="hint">Говори — текст появится сам. Потом можно поправить.</span>` : '<span class="hint">🎤 Можно не печатать: нажми на поле, потом на микрофон на клавиатуре рядом с пробелом, и говори.</span>';
+  t.insertAdjacentElement('afterend', d); }); }
+try { new MutationObserver(() => micDecorate()).observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
 
 /* Резервная копия прогресса: снимок каждого ребёнка хранится в таблице (лист «Снимки»).
    При входе ребёнка сверяемся: если в таблице снимок новее — берём его (другой айпад, значок вместо Safari, стёртые данные).
@@ -4701,7 +4718,7 @@ function align(T, spoken){ const st = new Array(T.length).fill(0); let p = 0, ex
 /* ===== Состояние экрана ===== */
 const cur = { kid:null, view:'login', subj:null, ds:U.today(), K(){ return KIDS[this.kid]; }, pinFor:null, onPin:null, parentTab:'report', parentKid:'yarik', msg:'' };
 const app = () => document.getElementById('app');
-function go(view, extra){ try { sayStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
+function go(view, extra){ try { sayStop(); } catch (e) {} try { micStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
   if (view === 'lesson' && cur.kid && cur.subj) { const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L && L.scrollY && L.scrollY.ph === (L.phase || '') + (L.fphase || '')) { const y = L.scrollY.y; setTimeout(() => window.scrollTo(0, y), 60); } } }
 /* Запоминаем, докуда ребёнок долистал текст, чтобы вернуться на то же место */
 function rememberScroll(){ if (cur.view !== 'lesson' || !cur.kid || !cur.subj) return; const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L) { L.scrollY = { ph: (L.phase || '') + (L.fphase || ''), y: window.scrollY || 0 }; save(); } }

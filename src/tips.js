@@ -23,7 +23,22 @@ document.addEventListener('click', e => { const s = e.target.closest('[data-tips
   if (e.target.closest('[data-act]')) return; const el = e.target.closest('[data-tip]'); if (el) tipShow(el.dataset.tip); });
 /* Набранный текст не теряется при перерисовке экрана */
 document.addEventListener('input', e => { const el = e.target; if (!el || el.tagName !== 'TEXTAREA' || !cur.kid) return; try { const D = dayRec(cur.kid, cur.ds);
-  if (el.id === 'rtxt' && D.les.read) D.les.read.rtDraft = el.value; else if (el.id === 'prec' && D.poem) D.poem.rec = el.value; else if (el.id === 'pcomp' && D.poem) D.poem.comp = el.value; else return;
+  if (el.id === 'rtxt' && D.les.read) D.les.read.rtDraft = el.value; else if (el.id === 'prec' && D.poem) D.poem.rec = el.value; else if (el.id === 'pcomp' && D.poem) D.poem.comp = el.value; else if (el.id === 'fbtext' && cur.subj && D.les[cur.subj]) { const L = D.les[cur.subj]; L.fb = L.fb || {}; L.fb.text = el.value; } else return;
   clearTimeout(window.TXT_T); window.TXT_T = setTimeout(save, 800); } catch (x) {} });
 function busyTyping(){ const a = document.activeElement; if (a && (a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && a.type !== 'button'))) return true; return [].some.call(document.querySelectorAll('textarea'), t => t.value.trim()); }
 function softRender(){ if (busyTyping() || (typeof RT !== 'undefined' && RT && RT.active)) return; render(); }
+/* Голосовой ввод в любое поле текста: кнопка 🎤 под полем; без распознавания — подсказка про микрофон на клавиатуре */
+let MIC = null;
+function micStop(){ if (!MIC) return; MIC.on = false; try { MIC.rec.stop(); } catch (e) {} const b = document.querySelector(`[data-mic="${MIC.id}"]`); if (b) { b.textContent = '🎤 Сказать голосом'; b.classList.remove('live'); } MIC = null; }
+function micStart(id, btn){ if (MIC) { const same = MIC.id === id; micStop(); if (same) return; } const el = document.getElementById(id); if (!el || !SR) return;
+  const M = MIC = { id, on: true, base: el.value.trim(), cur: '' }; const rec = new SR(); M.rec = rec; rec.lang = 'ru-RU'; rec.continuous = true; rec.interimResults = true;
+  rec.onresult = e => { let s = ''; for (let i = 0; i < e.results.length; i++) s += ' ' + e.results[i][0].transcript; M.cur = s.trim(); const t = document.getElementById(id); if (t) { t.value = (M.base + ' ' + M.cur).trim(); t.dispatchEvent(new Event('input', { bubbles: true })); } };
+  rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { alertMsg('Разреши микрофон в настройках, чтобы говорить голосом'); micStop(); } };
+  rec.onend = () => { M.base = (M.base + ' ' + M.cur).trim(); M.cur = ''; if (M.on) setTimeout(() => { try { rec.start(); } catch (e) {} }, 150); };
+  try { rec.start(); } catch (e) {} btn.textContent = '⏹ Готово'; btn.classList.add('live'); }
+document.addEventListener('click', e => { const b = e.target.closest('[data-mic]'); if (b) { e.preventDefault(); micStart(b.dataset.mic, b); } });
+function micDecorate(root){ (root || document).querySelectorAll('textarea[id]:not([data-micd])').forEach(t => { t.setAttribute('data-micd', '1'); if (t.id === 'rtxt' || t.id === 'prec') return;
+  const d = document.createElement('div'); d.className = 'micbar';
+  d.innerHTML = SR ? `<button type="button" class="btn ghost small mic2" data-mic="${t.id}">🎤 Сказать голосом</button><span class="hint">Говори — текст появится сам. Потом можно поправить.</span>` : '<span class="hint">🎤 Можно не печатать: нажми на поле, потом на микрофон на клавиатуре рядом с пробелом, и говори.</span>';
+  t.insertAdjacentElement('afterend', d); }); }
+try { new MutationObserver(() => micDecorate()).observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}

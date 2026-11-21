@@ -137,7 +137,7 @@ function align(T, spoken){ const st = new Array(T.length).fill(0); let p = 0, ex
 /* ===== Состояние экрана ===== */
 const cur = { kid:null, view:'login', subj:null, ds:U.today(), K(){ return KIDS[this.kid]; }, pinFor:null, onPin:null, parentTab:'report', parentKid:'yarik', msg:'' };
 const app = () => document.getElementById('app');
-function go(view, extra){ try { sayStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
+function go(view, extra){ try { sayStop(); } catch (e) {} try { micStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
   if (view === 'lesson' && cur.kid && cur.subj) { const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L && L.scrollY && L.scrollY.ph === (L.phase || '') + (L.fphase || '')) { const y = L.scrollY.y; setTimeout(() => window.scrollTo(0, y), 60); } } }
 /* Запоминаем, докуда ребёнок долистал текст, чтобы вернуться на то же место */
 function rememberScroll(){ if (cur.view !== 'lesson' || !cur.kid || !cur.subj) return; const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L) { L.scrollY = { ph: (L.phase || '') + (L.fphase || ''), y: window.scrollY || 0 }; save(); } }
