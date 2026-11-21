@@ -996,8 +996,9 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v01c8a5b8 */
+<script>/* vcdefbecf */
 var FAM = 0;
+var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -1014,7 +1015,7 @@ const U = {
   dec(x){ return String(Math.round(x * 1000) / 1000).replace('.', ','); },
   big(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); },
   esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); },
-  today(){ const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
+  today(){ const d = new Date(Date.now() + (typeof TEST_SHIFT === 'number' ? TEST_SHIFT : 0) * 864e5); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
   dayNum(ds){ const [y, m, d] = ds.split('-').map(Number); return Math.floor(Date.UTC(y, m - 1, d) / 864e5); },
   addDays(ds, n){ const [y, m, d] = ds.split('-').map(Number); const t = new Date(Date.UTC(y, m - 1, d + n)); return t.toISOString().slice(0, 10); },
   roman(n){ const r = [[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let s = ''; for (const [v, c] of r) while (n >= v) { s += c; n -= v; } return s; },
@@ -7668,7 +7669,7 @@ function testCard(){ return `<div class="card testc"><h2>🧪 Тестовый �
 function testEnter(k){ const real = S; S = JSON.parse(JSON.stringify(real)); S.queue = []; S.test = true; TEST = true;
   Object.keys(S.kids).forEach(x => { S.kids[x].restUntil = 0; S.kids[x].blk = 0; S.kids[x].prizesSet = true; });
   cur.kid = k; go('home'); }
-function testExit(){ TEST = false; S = load(); cur.kid = null; go('login'); }
+function testExit(){ TEST = false; TEST_SHIFT = 0; S = load(); cur.kid = null; go('login'); }
 function testBar(){ return `<div class="testbar">🧪 Тест · ${U.esc(cur.kid ? KIDS[cur.kid].name : '')} <button class="link" data-act="testkid">сменить ребёнка</button> <button class="link" data-act="testday">новый день</button> <button class="link" data-act="testexit">выйти из теста</button></div><button class="notebtn" data-act="noteopen">📝 Замечание</button>`; }
 function noteCtx(){ const h = document.querySelector('#app h1'), q = document.querySelector('#app .q'); return [cur.kid ? KIDS[cur.kid].name : '', cur.view, cur.subj && cur.view === 'lesson' ? cur.subj : '', h ? h.textContent.trim().slice(0, 80) : ''].filter(Boolean).join(' / ') + (q ? ' — ' + q.textContent.trim().slice(0, 200) : ''); }
 function noteOpen(){ const ctx = noteCtx(); const d = document.createElement('div'); d.className = 'tipbox'; d.id = 'notebox';
@@ -7685,7 +7686,7 @@ function testAct(act, b){ switch (act) {
   case 'testgo': testEnter(b.dataset.k); return true;
   case 'testexit': testExit(); return true;
   case 'testkid': { const ks = kidIds(), i = ks.indexOf(cur.kid); cur.kid = ks[(i + 1) % ks.length]; go('home'); return true; }
-  case 'testday': { if (!cur.kid) return true; const K = S.kids[cur.kid]; delete K.days[U.today()]; K.restUntil = 0; K.blk = 0; go('home'); alertMsg('Тестовый день начат заново'); return true; }
+  case 'testday': { if (!cur.kid) return true; TEST_SHIFT++; Object.keys(S.kids).forEach(x => { const K = S.kids[x]; K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; K.restForced = false; }); go('home'); alertMsg('Тестовый день: ' + U.today().split('-').reverse().join('.') + ' (календарь сдвинут на ' + TEST_SHIFT + ' ' + U.pl(TEST_SHIFT, 'день', 'дня', 'дней') + ' вперёд)'); return true; }
   case 'noteopen': noteOpen(); return true;
   case 'noteclose': { try { micStop(); } catch (x) {} const o = document.getElementById('notebox'); if (o) o.remove(); return true; }
   case 'notesend': noteSend(); return true;
