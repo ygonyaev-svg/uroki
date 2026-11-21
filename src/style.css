@@ -303,6 +303,16 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .pzsvg g.pze.was .ghost{ stroke:#e74c3c; }
 .anya .pzsvg .ghost{ stroke:#6d5fa0; }
 .pzsvg .pzfix{ stroke:#8a7a5a; stroke-width:.12; stroke-linecap:round; }
+/* Равенства из спичек: пустые места не видны (иначе пунктир «достраивает» цифры: 0 похож на 8), появляются только когда спичка выбрана или её тащат */
+.pzsvg.eq .wood{ stroke-width:.17; }
+.pzsvg.eq g.sel .wood{ stroke-width:.2; }
+.pzsvg.eq .pzfix{ stroke-width:.17; }
+.pzsvg.eq g.pze .ghost{ stroke:transparent; }
+/* Квадраты из спичек: пунктир пустых мест не рисует «лишние квадраты» — виден только при выборе/перетаскивании; убранные спички — бледный пунктир (на него можно нажать, чтобы вернуть) */
+.pzsvg.st g.pze .ghost{ stroke:transparent; }
+.pzsvg.st g.pze.was .ghost{ stroke:#c9bfa8; opacity:.6; }
+.pzsvg.st g.pze.on .ghost, .pzsvg.st.dragging g.pze .ghost{ stroke:#f39c12; stroke-width:.05; opacity:.75; }
+.pzsvg.eq g.pze.on .ghost, .pzsvg.eq.dragging g.pze .ghost{ stroke:#f39c12; stroke-width:.05; stroke-dasharray:.1 .08; opacity:.75; }
 .anya .pzsvg .pzfix{ stroke:#cbb9ff; }
 .pzsvg.coins .pzc circle{ fill:#e8b923; stroke:#a67c00; stroke-width:.05; }
 .pzsvg.coins .pzc circle.in{ fill:none; stroke:#c99a10; stroke-width:.04; }
