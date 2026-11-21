@@ -36,7 +36,7 @@ function famRoute_(d){
   if (d.fam === 'admin') {
     if (String(d.key || '') !== String(famSh('Настройки').getRange('A1').getValue())) return { ok: false, msg: 'Неверный ключ' };
     R = famRows();
-    if (d.op === 'inv') { famInvSh().appendRow([Utilities.getUuid().replace(/-/g, '').slice(0, 10), String(d.label || '').slice(0, 60), now, 'свободно', '', '']); }
+    if (d.op === 'inv') { famInvSh().appendRow(['s' + Utilities.getUuid().replace(/-/g, '').slice(0, 9), String(d.label || '').slice(0, 60), now, 'свободно', '', '']); }
     if (d.op === 'invoff') { var IS = famInvSh(), IL = IS.getDataRange().getValues(), ix = famFind(IL, 0, d.code); if (ix > 0 && IL[ix][3] === 'свободно') IS.getRange(ix + 1, 4).setValue('отозвано'); }
     if (d.op === 'set') { i = famFind(R.v, 0, d.fid); if (i < 0) return { ok: false, msg: 'Нет такой семьи' }; R.sh.getRange(i + 1, 9).setValue(d.on ? 'активна' : 'отключена'); R = famRows(); }
     var fams = R.v.slice(1).filter(function(r){ return r[0]; }).map(function(r){ return { fid: String(r[0]), created: r[1], email: r[2], name: r[3], kids: famKids(r[6]).map(function(k){ return { name: k.name, age: k.age, ints: k.ints || [], hero: k.hero || '', books: k.books || '', done: k.done || '', rd: k.rd, rt: k.rt, vw: k.vw, wr: k.wr, mt: k.mt, at: k.at, er: k.er, dk: k.dk, mo: k.mo }; }), off: r[8] === 'отключена', last: r[10], events: r[11] || 0 }; });
