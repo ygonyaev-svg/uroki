@@ -178,7 +178,7 @@ function poemFinish(kid){ const D = dayRec(kid, cur.ds), P = D.poem, K = S.kids[
   let pts = ratio >= .8 ? 5 : ratio >= .6 ? 3 : 0; if (P.secs < 120) pts = Math.round(pts / 2);
   if (P.recRes >= .85 && !st.learned.includes(p.id)) { st.learned.push(p.id); pts += 10; P.learnedNow = true; ev(kid, 'стих наизусть', { subj: 'Стихи', unit: p.a + ' «' + p.t + '»', text: Math.round(P.recRes * 100) + '% слов' }); }
   if (st.learned.includes(p.id) || st.n >= 3) { st.i = (st.i || 0) + 1; st.n = 0; }
-  P.coins = pts; piggyAdd(K, pts); D.secs = (D.secs || 0) + P.secs; restTick(kid, P.secs); P.phase = 'done';
+  pts = piggyAdd(K, pts); P.coins = pts; D.secs = (D.secs || 0) + P.secs; restTick(kid, P.secs); P.phase = 'done';
   ev(kid, 'стихи', { subj: 'Стихи', unit: p.a + ' «' + p.t + '»', score: `${first}/${T0.length}`, grade: P.grade, secs: P.secs, text: `+${pts} баллов` + (P.comp ? '; своя строчка: ' + P.comp : '') });
   save(); render(); window.scrollTo(0, 0); }
 function poemAct(act, b){ if (cur.view !== 'poem' && act !== 'openpoem') return false; const kid = cur.kid; if (act === 'openpoem') { poemOpen(kid); return true; }
