@@ -620,7 +620,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v29bba833 */
+<script>/* vcdb8c85d */
 var FAM = 1;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -4705,6 +4705,8 @@ function famApi(o){
     .then(function(r){ return r.json(); });
 }
 var FAM_BUSY = false;
+/* Регистрация только по личному одноразовому приглашению: ссылка …/semya/#i=КОД */
+var FAM_INV = (function(){ var c = ''; try { var m = (location.hash + '&' + location.search).match(/[#?&]i=([A-Za-z0-9]{6,20})/); if (m) { c = m[1]; localStorage.setItem('slovohod.inv', c); history.replaceState(null, '', location.pathname); } c = c || localStorage.getItem('slovohod.inv') || ''; } catch (e) {} return c; })();
 function famStatus(){
   if (!S.fam || !S.fam.fid || !navigator.onLine) return;
   return famApi({ fam: 'st', fid: S.fam.fid, token: S.fam.token }).then(function(j){
@@ -4713,7 +4715,7 @@ function famStatus(){
 function famGate(){
   if (!KIDS[cur.parentKid]) cur.parentKid = kidIds()[0] || null;
   if (S.fam && S.fam.off) return famWrap(famBrand(true) + '<header class="hero"><h1>Доступ приостановлен</h1><p>Тестовый доступ для вашей семьи сейчас отключён. Свяжитесь с организатором теста.</p></header><p class="center"><button class="btn ghost" data-act="fkrecheck">Проверить ещё раз</button></p>');
-  if (!S.fam) return cur.fview === 'login' ? vFamLogin() : vFamReg();
+  if (!S.fam) return cur.fview === 'login' || (!cur.fview && !FAM_INV) ? vFamLogin() : vFamReg();
   if (!S.parentPin || !kidIds().length || cur.view === 'fkids') return vFamKids();
   return null;
 }
@@ -4722,6 +4724,8 @@ var FAM_MOTTO = 'Слово за словом, шаг за шагом — к р�
 function famBrand(big){ return '<div class="fambrand' + (big ? ' big' : '') + '"><img src="semya/logo.webp" alt="" width="' + (big ? 160 : 64) + '" height="' + (big ? 160 : 64) + '"><div><div class="famlogo">Слово<span>ход</span></div>' + (big ? '<p class="fammotto">' + FAM_MOTTO + '</p>' : '') + '</div></div>'; }
 function famIn(id, label, type, extra){ return '<label>' + label + '<input id="' + id + '" type="' + (type || 'text') + '" autocomplete="off" ' + (extra || '') + '></label>'; }
 function vFamReg(){
+  if (!FAM_INV) return famWrap(famBrand(true) + '<header class="hero"><p class="eyebrow">Закрытая тестовая версия</p><h1>Только по приглашению</h1><p>Зарегистрироваться можно по личной ссылке-приглашению. Каждая ссылка действует для одной семьи. Если вы уже зарегистрированы — войдите.</p></header>' +
+    '<p class="center"><button class="btn big" data-act="fklogin">Войти</button></p>');
   return famWrap(famBrand(true) + '<header class="hero"><p class="eyebrow">Бесплатная тестовая версия</p><p class="famintro">Всё начинается со слова. Родная речь — корни, из которых растёт человек, где бы он ни жил. Русский язык, чтение вслух, математика и логика для детей 6–13 лет. 20–40 минут в день, уроки ведёт приложение, отчёт — родителю.</p></header>' +
     '<form class="card form" data-form="freg"><h2>Регистрация семьи</h2>' + famIn('fname', 'Ваше имя') + famIn('femail', 'Email', 'email', 'inputmode="email" autocapitalize="off"') + famIn('fpass', 'Пароль (не короче 6 знаков)', 'password') +
     '<button class="btn big"' + (FAM_BUSY ? ' disabled' : '') + '>' + (FAM_BUSY ? 'Подождите…' : 'Зарегистрироваться') + '</button></form>' +
@@ -4778,6 +4782,8 @@ function famAct(act, b){
 }
 function famAuthDone(j){
   FAM_BUSY = false;
+  if (j && j.inv === 'bad') { FAM_INV = ''; try { localStorage.removeItem('slovohod.inv'); } catch (e) {} }
+  if (j && j.ok && FAM_INV) { FAM_INV = ''; try { localStorage.removeItem('slovohod.inv'); } catch (e) {} }
   if (!j || !j.ok) { render(); return alertMsg(j && j.msg ? j.msg : 'Не получилось. Проверьте интернет и попробуйте ещё раз'); }
   S.fam = { fid: j.fid, token: j.token, email: j.email, name: j.name || '', kids: j.kids || [], ppin: j.ppin || null, off: !!j.off };
   famInit(); save(); cur.fk = null; go('login');
@@ -4789,7 +4795,7 @@ function famForm(k, f, val){
     if (pw.length < 6) { alertMsg('Пароль — не короче 6 знаков'); return true; }
     if (k === 'freg' && !nm) { alertMsg('Напишите ваше имя'); return true; }
     if (FAM_BUSY) return true; FAM_BUSY = true; render();
-    famApi({ fam: k === 'freg' ? 'reg' : 'login', email: em, pass: pw, name: nm }).then(famAuthDone).catch(function(){ famAuthDone(null); });
+    famApi({ fam: k === 'freg' ? 'reg' : 'login', email: em, pass: pw, name: nm, inv: k === 'freg' ? FAM_INV : '' }).then(famAuthDone).catch(function(){ famAuthDone(null); });
     return true;
   }
   if (k === 'fkids') {
