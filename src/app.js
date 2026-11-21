@@ -99,7 +99,7 @@ function coinsHtml(n){ return `<span class="coin" aria-hidden="true"></span><b>$
 function render(){
   if (S.parentPin) for (const k of ['yarik', 'anya']) burnCheck(k);
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
-  const v = !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'shop' ? vShop() : cur.view === 'parent' ? vParent() : vLogin();
+  const v = !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'parent' ? vParent() : vLogin();
   app().innerHTML = v; afterRender();
 }
 function afterRender(){ const f = app().querySelector('[autofocus]'); if (f) try { f.focus(); } catch (e) {} }
@@ -164,7 +164,7 @@ function vHome(){
   <section class="tiles">${tiles}</section>
   ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.bonus ? 'Бонус +10 уже получен.' : ''}</p></div>` : ''}
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
-  <p class="center"><button class="btn ghost" data-act="shop">Магазин наград</button></p></main>`;
+  <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
 }
 function lastReading(kid){ const R = S.kids[kid].reading.filter(x => x.lang === 'ru').slice(-5); if (!R.length) return ''; return '<div class="speeds">' + R.map(x => `<span title="${U.esc(x.title)}"><b>${x.wpm}</b> сл/мин</span>`).join('') + `</div><p class="hint">Цель к концу года: ${KIDS[kid].norm} слов в минуту.</p>`; }
 function readStreak(kid){ const K = S.kids[kid]; let n = 0, d = cur.ds; if (!(K.days[d] && K.days[d].les.read && K.days[d].les.read.phase === 'done')) d = U.addDays(d, -1); while (K.days[d] && K.days[d].les.read && K.days[d].les.read.phase === 'done') { n++; d = U.addDays(d, -1); } return n; }
@@ -225,9 +225,9 @@ function vTask(kid, subj, L){
 /* Разбор на похожем примере: задание того же типа с ответом и объяснением */
 function vExample(kid, subj, L, u){ const n = L.helpN || 1; const ex = genTasks(u, (L.seed || 1) * 7 + n * 101, 1)[0]; if (!ex) return '';
   const ans = ex.k === 'n' ? U.dec(ex.a) : ex.a;
-  return `<article class="card example"><h3>Разберём на похожем примере</h3><div class="q">${ex.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, subj, ex)}<p><b>Ответ: ${ans}</b></p>${ex.e ? `<p>${U.esc(strip(ex.e))}</p>` : ''}<div class="row"><button class="btn ghost small" data-act="sayex" data-t="${U.esc(strip(ex.q.replace(/_+/g, ' пропуск ')) + '. Ответ: ' + strip(String(ans)) + '. ' + (ex.e ? strip(ex.e) : ''))}">🔊 Послушать</button><button class="link" data-act="dunno">Ещё пример</button></div><p class="hint">Я написал папе, что эта тема трудная — он поможет.</p></article>`; }
+  return `<article class="card example"><h3>Разберём на похожем примере</h3><div class="q">${ex.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, subj, ex)}<p><b>Ответ: ${ans}</b></p>${ex.e ? `<p>${U.esc(strip(ex.e))}</p>` : ''}<div class="row"><button class="btn ghost small" data-act="sayex" data-t="${U.esc(strip(ex.q.replace(/_+/g, ' пропуск ')) + '. Ответ: ' + strip(String(ans)) + '. ' + (ex.e ? strip(ex.e) : ''))}">🔊 Послушать</button><button class="link" data-act="dunno">Ещё пример</button></div><p class="hint">Я отметил, что тема трудная: Юра увидит и поможет разобраться.</p></article>`; }
 function vHwText(kid, L){ const K = S.kids[kid]; const items = K.hwText.filter(h => (L.txt || []).includes(h.id));
-  return `<article class="card"><h2>Задание от папы</h2>${items.length ? items.map(h => `<label class="check"><input type="checkbox" data-act="hwtxt" data-id="${h.id}" ${h.done ? 'checked' : ''}> ${U.esc(h.text)}</label>`).join('') : '<p>Сегодня отдельных заданий нет.</p>'}</article><button class="btn big" data-act="hwdone">Готово</button>`; }
+  return `<article class="card"><h2>Задание от Юры</h2>${items.length ? items.map(h => `<label class="check"><input type="checkbox" data-act="hwtxt" data-id="${h.id}" ${h.done ? 'checked' : ''}> ${U.esc(h.text)}</label>`).join('') : '<p>Сегодня отдельных заданий нет.</p>'}</article><button class="btn big" data-act="hwdone">Готово</button>`; }
 function vSurvey(L){
   const f = L.fb || {};
   const b = (k, v, t) => `<button class="chip ${f[k] === v ? 'on' : ''}" data-act="fb" data-k="${k}" data-v="${v}">${t}</button>`;
@@ -358,7 +358,7 @@ function vRead(kid, L){
     if (r) return head + `<article class="card"><h2>Пересказ</h2>${r.adult ? '<p>Хорошо! Теперь вопросы.</p>' : `<p>Ты вспомнил(а) ${r.hit.length} из ${r.n} главных вещей${r.hit.length ? ': ' + r.hit.map(U.esc).join(', ') : ''}.</p>${r.miss.length ? `<p class="hint">Не прозвучало: ${r.miss.map(U.esc).join(', ')}.</p>` : ''}`}</article><button class="btn big" data-act="toqs">К вопросам</button></section>`;
     const live = RT && RT.active, voice = SR && !L.noSR;
     return head + `<article class="card"><h2>Перескажи главу своими словами</h2><p class="hint">Кто там был? Что случилось? Чем всё закончилось? Расскажи подробно, не меньше минуты.</p>${voice ? `<div id="rtell" class="rtell">${U.esc(RT && RT.text || '')}</div>` : ''}</article>
-    <div class="readbar">${voice ? (live ? `<button class="btn big stop" data-act="retellstop">Я закончил(а)</button><span class="rstat">Слушаю…</span>` : `<button class="btn big mic" data-act="retellstart">🎤 Рассказать</button>`) : `<button class="btn big" data-act="retelladult">Пересказал(а) взрослому</button><p class="hint">Перескажи главу маме или папе.</p>`}</div></section>`;
+    <div class="readbar">${voice ? (live ? `<button class="btn big stop" data-act="retellstop">Я закончил(а)</button><span class="rstat">Слушаю…</span>` : `<button class="btn big mic" data-act="retellstart">🎤 Рассказать</button>`) : `<button class="btn big" data-act="retelladult">Пересказал(а) взрослому</button><p class="hint">Перескажи главу маме или Юре.</p>`}</div></section>`;
   }
   if (L.phase === 'qs') {
     const r = L.res || {};
@@ -475,17 +475,40 @@ function foreignAnswer(v){ const kid = cur.kid, L = dayRec(kid, cur.ds).les[cur.
 function vShop(){
   const kid = cur.kid, K = S.kids[kid];
   return `<main class="wrap ${kid}"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(K.coins)}</span></header>
-  <section class="lesson"><p class="eyebrow">Магазин наград</p><h1>На что потратить монеты?</h1><p class="hint">Обмен подтверждает родитель своим кодом.</p>
-  <div class="shop">${S.shop.map(it => `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span><button class="btn small" data-act="buy" data-id="${it.id}" ${K.coins < it.price ? 'disabled' : ''}>${K.coins < it.price ? `ещё ${it.price - K.coins}` : 'Обменять'}</button></div>`).join('')}</div>
+  <section class="lesson"><p class="eyebrow">Призы</p><h1>Мои призы</h1><p class="hint">1 балл = 1 минута игры. Обмен подтверждает взрослый своим кодом.</p>
+  <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от Юры</span></div>` : `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span><button class="btn small" data-act="buy" data-id="${it.id}" ${K.coins < it.price ? 'disabled' : ''}>${K.coins < it.price ? `ещё ${it.price - K.coins}` : 'Обменять'}</button></div>`).join('')}</div>
+  <button class="btn ghost" data-act="editprizes">✏️ Изменить мои призы</button>
   ${K.purchases.length ? `<h2>Мои награды</h2><ul class="plain">${K.purchases.slice(-10).reverse().map(p => `<li>${p.d} — ${U.esc(p.name)} (${p.price})</li>`).join('')}</ul>` : ''}</section></main>`;
+}
+
+/* ----- Выбор призов: ребёнок выбирает сам, цену ставит взрослый ----- */
+function prizeIdeas(kid){
+  const c = [['g15', '🎮 15 минут игры', 15], ['g30', '🎮 30 минут игры', 30], ['g60', '🎮 Час игры', 60], ['tv', '📺 30 минут мультиков или сериала', 30], ['sw', '🍬 Сладость на выбор', 30], ['late', '🌙 Лечь спать на 30 минут позже', 40],
+    ['din', '🍕 Выбрать ужин для всей семьи', 80], ['film', '🎬 Семейный вечер кино — фильм выбираю я', 60], ['cafe', '🍽️ Всей семьёй в кафе или ресторан', 400], ['trip', '🏝️ Семейная поездка — место выбираю я', 600], ['gift', '🎁 Подарок до 10 €', 400]];
+  const y = [['ball', '⚽ Новый мяч или футбольная форма', 500], ['zoo', '🐬 Всей семьёй в океанариум или зоопарк', 350], ['noclean', '🧸 День без уборки игрушек', 50], ['match', '🏟️ Сходить на футбольный матч', 600]];
+  const a = [['book', '📚 Новая книга на выбор', 150], ['stick', '🦉 Наклейки или значок', 50], ['self', '💅 Что-то для себя до 5 €', 200], ['friend', '👭 Позвать подругу в гости', 120], ['nochore', '🧹 Выходной от домашних дел', 60]];
+  return c.concat(kid === 'yarik' ? y : a).map(([id, name, price]) => ({ id, name, price }));
+}
+function vPrizes(){
+  const kid = cur.kid, ideas = prizeIdeas(kid).concat(cur.prOwn || []), sel = cur.prSel || [];
+  return `<main class="wrap ${kid}"><header class="bar">${S.kids[kid].prizesSet ? '<button class="link" data-act="home">← Назад</button>' : '<span></span>'}<span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header>
+  <section class="lesson"><p class="eyebrow">Мои призы</p><h1>${S.kids[kid].prizesSet ? 'Измени свои призы' : 'Сначала выбери, ради чего будешь учиться'}</h1>
+  <p>За уроки ты получаешь баллы: <b>1 балл = 1 минута игры</b>, за день можно заработать до 60. Баллы можно копить и менять на призы. Выбери хотя бы 3 приза или придумай свои.</p>
+  <div class="prizes">${ideas.map(it => `<button class="chip ${sel.includes(it.id) ? 'on' : ''}" data-act="prtoggle" data-id="${it.id}">${U.esc(it.name)}${it.price != null ? ` · ${it.price}` : ' · цену назначит Юра'}</button>`).join('')}</div>
+  <form class="card form" data-form="prize"><label>Свой приз<input id="prname" maxlength="60" autocomplete="off" placeholder="Например: новая игра, поход в кино…"></label><button class="btn small">Добавить</button><p class="hint">Цену в баллах для своего приза поставит Юра.</p></form>
+  <button class="btn big" data-act="prdone" ${sel.length < 3 ? 'disabled' : ''}>Готово (${sel.length})</button></section></main>`;
 }
 
 /* ----- Родителям ----- */
 function vParent(){
-  const tabs = [['report', 'Отчёт'], ['shop', 'Магазин'], ['set', 'Настройки']];
+  const tabs = [['report', 'Отчёт'], ['shop', 'Призы'], ['set', 'Настройки']];
   let body = '';
   if (cur.parentTab === 'report') body = vReport(cur.parentKid);
-  else if (cur.parentTab === 'shop') body = `<div class="card"><h2>Награды и цены</h2>${S.shop.map((it, i) => `<div class="shoprow"><input id="sn${i}" value="${U.esc(it.name)}" aria-label="Награда"><input id="sp${i}" inputmode="numeric" value="${it.price}" aria-label="Цена"><button class="link" data-act="delshop" data-i="${i}">Удалить</button></div>`).join('')}<div class="row"><button class="btn small ghost" data-act="addshop">Добавить</button><button class="btn small" data-act="saveshop">Сохранить</button></div></div>`;
+  else if (cur.parentTab === 'shop') { const pk = cur.parentKid, sh = S.kids[pk].shop || [], wait = sh.filter(x => x.price == null).length;
+    body = `<div class="row">${['yarik', 'anya'].map(k => `<button class="chip ${pk === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}${(S.kids[k].shop || []).some(x => x.price == null) ? ' •' : ''}</button>`).join('')}</div>
+    <div class="card"><h2>Призы, которые выбрал(а) ${KIDS[pk].name}</h2><p class="hint">Призы выбирает сам ребёнок. Вы только ставите цену в баллах (1 балл = 1 минута игры, за день максимум 60).${wait ? ` <b>Ждут цены: ${wait}.</b>` : ''}</p>
+    ${sh.length ? sh.map((it, i) => `<div class="shoprow"><span>${U.esc(it.name)}${it.own ? ' <em class="hint">(своё)</em>' : ''}</span><input id="sp${i}" inputmode="numeric" value="${it.price == null ? '' : it.price}" placeholder="цена" aria-label="Цена"><button class="link" data-act="delshop" data-i="${i}">Убрать</button></div>`).join('') : '<p>Ещё не выбирал(а). Список появится после первого входа ребёнка.</p>'}
+    ${sh.length ? '<button class="btn small" data-act="saveshop">Сохранить цены</button>' : ''}</div>`; }
   else body = vSettings();
   return `<main class="wrap"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span>Родителям</span></header>
   <nav class="tabs">${tabs.map(([k, t]) => `<button class="tab ${cur.parentTab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${t}</button>`).join('')}</nav>${body}</main>`;
@@ -522,7 +545,7 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act;
   const kid = cur.kid; const D = kid && dayRec(kid, cur.ds); const L = D && cur.subj && D.les[cur.subj];
   switch (act) {
-    case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; ev(cur.kid, 'вход', {}); go('home'); }); break;
+    case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;
     case 'parent': askPin('parent', () => go('parent', { kid: null })); break;
     case 'cancelpin': go(cur.kid ? 'home' : 'login'); break;
     case 'key': pinKey(b.dataset.k); break;
@@ -562,13 +585,20 @@ document.addEventListener('click', e => {
     case 'fq': foreignAnswer(b.dataset.v); break;
     case 'fnext': { if (L.fi + 1 < L.fq) L.fi++; else { L.phase = 'survey'; const key = L.tr === '_alt' ? 'enRead' : 'ptRead'; S.kids[kid].pos[key] = (S.kids[kid].pos[key] || 0) + 1; } save(); render(); break; }
     case 'shop': go('shop'); break;
-    case 'buy': { const it = S.shop.find(x => x.id === b.dataset.id); const k0 = kid; askPin('parent', () => { const K = S.kids[k0]; if (K.coins >= it.price) { K.coins -= it.price; K.purchases.push({ d: cur.ds, name: it.name, price: it.price }); ev(k0, 'награда', { unit: it.name, coins: K.coins, price: it.price }); save(); } cur.kid = k0; go('shop'); }, `Подтвердите: «${it.name}» за ${it.price} монет`); break; }
+    case 'buy': { const it = (S.kids[kid].shop || []).find(x => x.id === b.dataset.id); if (!it || it.price == null) break; const k0 = kid; askPin('parent', () => { const K = S.kids[k0]; if (K.coins >= it.price) { K.coins -= it.price; K.purchases.push({ d: cur.ds, name: it.name, price: it.price }); ev(k0, 'награда', { unit: it.name, coins: K.coins, price: it.price }); save(); } cur.kid = k0; go('shop'); }, `Подтвердите: «${it.name}» за ${it.price} монет`); break; }
     case 'resetall': if (window.confirm('Стереть весь прогресс, монеты и коды на этом айпаде?')) { ev('yarik', 'сброс устройства', {}); flush().finally(() => { try { localStorage.removeItem(KEY); } catch (x) {} location.reload(); }); } break;
     case 'ptab': go('parent', { parentTab: b.dataset.t }); break;
     case 'pkid': go('parent', { parentKid: b.dataset.k }); break;
-    case 'addshop': S.shop.push({ id: 's' + Date.now(), name: 'Новая награда', price: 50 }); save(); render(); break;
-    case 'delshop': S.shop.splice(+b.dataset.i, 1); save(); render(); break;
-    case 'saveshop': S.shop.forEach((it, i) => { it.name = document.getElementById('sn' + i).value.trim() || it.name; it.price = Math.max(1, parseInt(document.getElementById('sp' + i).value) || it.price); }); save(); render(); break;
+    case 'delshop': S.kids[cur.parentKid].shop.splice(+b.dataset.i, 1); save(); render(); break;
+    case 'saveshop': { const K = S.kids[cur.parentKid]; K.shop.forEach((it, i) => { const v = parseInt(document.getElementById('sp' + i).value); if (v > 0) { if (it.price !== v) ev(cur.parentKid, 'цена приза', { unit: it.name, price: v }); it.price = v; } }); save(); alertMsg('Цены сохранены'); render(); break; }
+    case 'editprizes': { const K = S.kids[kid]; cur.prSel = (K.shop || []).map(x => x.id); cur.prOwn = (K.shop || []).filter(x => x.own).map(x => Object.assign({}, x)); cur.prBack = 'shop'; go('prizes'); break; }
+    case 'prtoggle': { const id = b.dataset.id, i = cur.prSel.indexOf(id); if (i >= 0) cur.prSel.splice(i, 1); else cur.prSel.push(id); render(); break; }
+    case 'prdone': { const K = S.kids[kid]; if (cur.prSel.length < 3) { alertMsg('Выбери хотя бы 3 приза'); break; }
+      const all = prizeIdeas(kid).concat(cur.prOwn), old = K.shop || [];
+      K.shop = cur.prSel.map(id => { const o = old.find(x => x.id === id); if (o) return o; const it = all.find(x => x.id === id); return it ? Object.assign({}, it) : null; }).filter(Boolean);
+      const fresh = K.shop.filter(x => !old.some(o => o.id === x.id)); K.prizesSet = true;
+      ev(kid, 'призы выбраны', { text: K.shop.map(x => x.name + (x.price == null ? ' (нужна цена)' : ` — ${x.price}`)).join('; ') });
+      save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of ['yarik', 'anya']) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
   }
@@ -579,6 +609,7 @@ document.addEventListener('submit', e => {
   const val = id => (document.getElementById(id) || {}).value || '';
   if (k === 'setup') { const p = val('pp'), y = val('py'), a = val('pa'); if (![p, y, a].every(x => /^\d{4}$/.test(x))) return alertMsg('Нужно по четыре цифры'); S.parentPin = hashPin(p); S.kids.yarik.pin = hashPin(y); S.kids.anya.pin = hashPin(a); save(); go('login'); }
   if (k === 'num') answer(val('numin'));
+  if (k === 'prize') { const t = val('prname').trim().slice(0, 60); if (t) { const it = { id: 'o' + Date.now(), name: t, price: null, own: true }; cur.prOwn.push(it); cur.prSel.push(it.id); render(); } }
   if (k === 'pins') { const p = val('np'), y = val('ny'), a = val('na'); if (/^\d{4}$/.test(p)) S.parentPin = hashPin(p); if (/^\d{4}$/.test(y)) S.kids.yarik.pin = hashPin(y); if (/^\d{4}$/.test(a)) S.kids.anya.pin = hashPin(a); save(); alertMsg('Коды обновлены'); render(); }
   if (k === 'hw') { const t = val('hwtext').trim(); if (t) { S.kids[cur.parentKid].hwText.push({ id: 'h' + Date.now(), text: t, done: false }); save(); alertMsg('Задание добавлено'); render(); } }
   if (k === 'coins') { const n = parseInt(val('coinadd')); if (n) { S.kids[cur.parentKid].coins += n; ev(cur.parentKid, 'монеты от родителя', { coins: S.kids[cur.parentKid].coins, price: n }); save(); alertMsg('Готово'); render(); } }
