@@ -238,6 +238,9 @@ body{ box-sizing:border-box; overflow-x:hidden; }
 
 .subjart{ float:right; width:min(34%,230px); aspect-ratio:1; object-fit:cover; border-radius:18px; margin:0 0 10px 14px; box-shadow:0 4px 14px rgba(0,0,0,.18); }
 @media (max-width:560px){ .subjart{ float:none; display:block; width:100%; max-height:220px; margin:0 0 12px; } }
+.steps li.tap{ cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.rtxt{ width:100%; box-sizing:border-box; font:inherit; font-size:18px; padding:12px; border-radius:12px; border:2px solid var(--accsoft); margin:8px 0; min-height:150px; }
+.card .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
@@ -314,7 +317,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v3a002f69 */
+<script>/* vc70004d5 */
 /* ===== Общие утилиты ===== */
 const U = {
   h(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; },
@@ -2371,7 +2374,7 @@ function align(T, spoken){ const st = new Array(T.length).fill(0); let p = 0, ex
 /* ===== Состояние экрана ===== */
 const cur = { kid:null, view:'login', subj:null, ds:U.today(), K(){ return KIDS[this.kid]; }, pinFor:null, onPin:null, parentTab:'report', parentKid:'yarik', msg:'' };
 const app = () => document.getElementById('app');
-function go(view, extra){ Object.assign(cur, { view }, extra || {}); render(); window.scrollTo(0, 0);
+function go(view, extra){ Object.assign(cur, { view, rview: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
   if (view === 'lesson' && cur.kid && cur.subj) { const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L && L.scrollY && L.scrollY.ph === (L.phase || '') + (L.fphase || '')) { const y = L.scrollY.y; setTimeout(() => window.scrollTo(0, y), 60); } } }
 /* Запоминаем, докуда ребёнок долистал текст, чтобы вернуться на то же место */
 function rememberScroll(){ if (cur.view !== 'lesson' || !cur.kid || !cur.subj) return; const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L) { L.scrollY = { ph: (L.phase || '') + (L.fphase || ''), y: window.scrollY || 0 }; save(); } }
@@ -2634,7 +2637,9 @@ function vRead(kid, L){
   const t = readText(kid), K = S.kids[kid];
   const { aloud, rest } = aloudPart(t.text, readLim(kid, L));
   const head = `<section class="lesson"><p class="eyebrow">Чтение</p><h1>${U.esc(t.title)}</h1>${t.author ? `<p class="author">${U.esc(t.author)}</p>` : ''}
-   <ol class="steps">${(() => { const st = readSteps(t, rest), ix = st.indexOf(PH_STEP[L.phase]); return st.map((s, i) => `<li class="${i < ix ? 'ok' : i === ix ? 'now' : ''}">${s}</li>`).join(''); })()}</ol>`;
+   <ol class="steps">${(() => { const st = readSteps(t, rest), ix = st.indexOf(PH_STEP[L.phase]); return st.map((s, i) => { const on = cur.rview ? s === cur.rview : i === ix; const can = i < ix || (i === ix && cur.rview);
+      return `<li class="${i < ix ? 'ok' : ''} ${on ? 'now' : ''} ${can ? 'tap' : ''}" ${can ? `data-act="rview" data-s="${i === ix ? '' : s}" role="button"` : ''}>${s}</li>`; }).join(''); })()}</ol>`;
+  if (cur.rview && cur.rview !== PH_STEP[L.phase]) return head + vReview(kid, L, t, aloud, rest) + '</section>';
   if (L.phase === 'warm') {
     const hard = Object.entries(K.hard).sort((a, b) => b[1].miss - a[1].miss).slice(0, 5).map(x => x[0]);
     const auto = t.text.split(/\s+/).map(w => w.replace(/[^\p{L}-]/gu, '')).filter(w => w.length >= 9);
@@ -2655,10 +2660,8 @@ function vRead(kid, L){
   }
   if (L.phase === 'retell') {
     const r = L.rt;
-    if (r) return head + `<article class="card"><h2>Пересказ</h2>${r.adult ? '<p>Хорошо! Теперь вопросы.</p>' : `<p>Ты вспомнил(а) ${r.hit.length} из ${r.n} главных вещей${r.hit.length ? ': ' + r.hit.map(U.esc).join(', ') : ''}.</p>${r.miss.length ? `<p class="hint">Не прозвучало: ${r.miss.map(U.esc).join(', ')}.</p>` : ''}`}</article><button class="btn big" data-act="toqs">К вопросам</button></section>`;
-    const live = RT && RT.active, voice = SR && !L.noSR;
-    return head + `<article class="card"><h2>Перескажи главу своими словами</h2><p class="hint">Кто там был? Что случилось? Чем всё закончилось? Расскажи подробно, не меньше минуты.</p>${voice ? `<div id="rtell" class="rtell">${U.esc(RT && RT.text || '')}</div>` : ''}</article>
-    <div class="readbar">${voice ? (live ? `<button class="btn big stop" data-act="retellstop">Я закончил(а)</button><span class="rstat">Слушаю…</span>` : `<button class="btn big mic" data-act="retellstart">🎤 Рассказать</button>`) : `<button class="btn big" data-act="retelladult">Пересказал(а) взрослому</button><p class="hint">Перескажи главу маме или Юре.</p>`}</div></section>`;
+    if (r) return head + `<article class="card"><h2>Пересказ</h2>${r.adult ? '<p>Хорошо! Теперь вопросы.</p>' : `<p>Ты вспомнил(а) ${r.hit.length} из ${r.n} главных вещей${r.hit.length ? ': ' + r.hit.map(U.esc).join(', ') : ''}.</p>${r.miss.length ? `<p class="hint">Не прозвучало: ${r.miss.map(U.esc).join(', ')}.</p>` : ''}${retellTips(r)}`}</article>${!r.adult && r.score < .5 && (L.rtTries || 0) < 3 ? `<button class="btn ghost" data-act="retellmore">✍️ Дополнить пересказ</button>` : ''}<button class="btn big" data-act="toqs">К вопросам</button></section>`;
+    return head + retellBox(L, false) + '</section>';
   }
   if (L.phase === 'qs') {
     const r = L.res || {};
@@ -2673,30 +2676,61 @@ function vRead(kid, L){
   return head + vResult(kid, 'read', L) + `<p class="center hint">${L.res && L.res.good ? 'Отличный темп! Следующий текст будет чуть длиннее.' : L.res && L.res.repeat ? 'Завтра перечитаем этот текст ещё раз — так читать станет легче.' : ''}</p></section>`;
 }
 const PH_STEP = { warm:'Разминка', read:'Читаю вслух', silent:'Читаю сам', retell:'Пересказ', qs:'Вопросы', survey:'Отзыв', done:'Отзыв' };
+/* Повтор пройденного этапа: можно перечитать, послушать, пересказать ещё раз — баллы не меняются */
+function vReview(kid, L, t, aloud, rest){
+  const s = cur.rview, K = S.kids[kid], r = L.res || {};
+  const back = `<div class="note">Это повторение — баллы не меняются. <button class="link" data-act="rview" data-s="">Вернуться к уроку →</button></div>`;
+  if (s === 'Разминка') { const hard = Object.keys(K.hard).slice(0, 5), auto = t.text.split(/\s+/).map(w => w.replace(/[^\p{L}-]/gu, '')).filter(w => w.length >= 9);
+    const list = [...new Set(hard.concat(auto))].slice(0, 8);
+    return back + `<article class="card"><h2>Разминка</h2><div class="warm">${list.map(w => `<button class="ww" data-act="sayw" data-w="${U.esc(w)}">${U.esc(w)}</button>`).join('')}</div></article>`; }
+  if (s === 'Читаю вслух') return back + `<article class="card"><div class="readres"><span><b>${r.wpm || '—'}</b> слов в минуту</span>${r.acc != null ? `<span><b>${Math.round(r.acc * 100)}%</b> точность</span>` : ''}${r.errs && r.errs.length ? `<span>Трудные слова: ${r.errs.slice(0, 8).map(w => `<button class="ww" data-act="sayw" data-w="${U.esc(w)}">${U.esc(w)}</button>`).join(' ')}</span>` : ''}</div><p class="hint">Прочитай ещё раз вслух — для тренировки.</p></article><article class="card reading"><div class="text">${tokensHtml(aloud)}</div></article>`;
+  if (s === 'Читаю сам') return back + `<article class="card reading"><div class="text">${tokensHtml(rest)}</div></article>`;
+  if (s === 'Пересказ') return back + (L.rt && L.rt.text ? `<article class="card"><h2>Твой пересказ</h2><p class="rtell">${U.esc(L.rt.text)}</p>${retellResHtml(L.rt)}</article>` : '') + retellBox(L, true);
+  if (s === 'Вопросы') { const qs = readQs(kid, L);
+    return back + `<article class="card"><h2>Вопросы</h2><ol class="plain">${qs.map((q, i) => { const a = L.ans[i] || {}; return `<li><b>${U.esc(q.q)}</b><br>Правильно: ${U.esc(q.a)}${a.wrong && a.wrong.length ? `<br><span class="hint">Сначала ответил(а): ${a.wrong.map(U.esc).join(', ')}</span>` : a.final ? ' ✓' : ''}</li>`; }).join('')}</ol></article><details class="peek"><summary>Посмотреть текст</summary><div class="text">${tokensHtml(t.text)}</div></details>`; }
+  return back;
+}
 function readSteps(t, rest){ const s = ['Разминка', 'Читаю вслух']; if (rest) s.push('Читаю сам'); if (t.kw) s.push('Пересказ'); return s.concat(['Вопросы', 'Отзыв']); }
 function readLim(kid, L){ return (L && L.lim) || wordsLimit(kid); }
 function silentMin(kid, rest){ const w = rest.split(/\s+/).filter(Boolean).length; return Math.min(900, Math.round(w / (KIDS[kid].norm * 2.5) * 60)); }
 let RT = null; /* пересказ голосом */
 function retellStart(){
-  const R0 = RT = { active: true, base: '', cur: '', text: '', t0: Date.now() };
+  const ta = document.getElementById('rtxt'), had = ta ? ta.value.trim() : '';
+  const R0 = RT = { active: true, base: had, cur: '', text: had, t0: Date.now() };
   const rec = new SR(); rec.lang = 'ru-RU'; rec.continuous = true; rec.interimResults = true; R0.rec = rec;
-  rec.onresult = e => { let s = ''; for (let i = 0; i < e.results.length; i++) s += ' ' + e.results[i][0].transcript; R0.cur = s; R0.text = (R0.base + ' ' + s).trim(); const el = document.getElementById('rtell'); if (el) el.textContent = R0.text; };
+  rec.onresult = e => { let s = ''; for (let i = 0; i < e.results.length; i++) s += ' ' + e.results[i][0].transcript; R0.cur = s; R0.text = (R0.base + ' ' + s).trim(); const el = document.getElementById('rtxt'); if (el) el.value = R0.text; };
   rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') R0.denied = true; };
   rec.onend = () => { R0.base += ' ' + R0.cur; R0.cur = ''; if (R0.active && !R0.denied) setTimeout(() => { try { rec.start(); } catch (e) {} }, 120); };
   try { rec.start(); } catch (e) {}
   render();
 }
 function kwHit(stem, words){ const k = normW(stem), n = Math.min(k.length, Math.max(4, k.length - 2)), p = k.slice(0, n); return words.some(w => w.startsWith(p)); }
-function retellStop(){
-  if (!RT) return; RT.active = false; try { RT.rec && RT.rec.stop(); } catch (e) {}
-  const kid = cur.kid, L = dayRec(kid, cur.ds).les.read, t = readText(kid);
-  const words = RT.text.split(/\s+/).map(normW).filter(Boolean);
-  if (words.length < 12) { L.rtTries = (L.rtTries || 0) + 1; if (RT.denied || L.rtTries >= 2) L.noSR = true; RT = null; save(); render(); alertMsg(L.noSR ? 'Не получилось услышать. Перескажи взрослому.' : 'Расскажи подробнее — хотя бы несколько предложений'); return; }
+function retellStop(){ if (RT) { RT.active = false; try { RT.rec && RT.rec.stop(); } catch (e) {} } const el = document.getElementById('rtxt'); if (el && RT) { el.value = RT.text; } RT = null; render(); }
+/* Пересказ: ребёнок надиктовывает (кнопка 🎤 или микрофон на клавиатуре iPad) или пишет, приложение проверяет по главным словам главы */
+function retellBox(L, practice){
+  const live = RT && RT.active, prev = practice ? (cur.rtDraft || '') : (L.rtDraft || (L.rt && L.rt.text) || '');
+  return `<article class="card"><h2>${practice ? 'Перескажи ещё раз (для себя, без баллов)' : 'Перескажи главу своими словами'}</h2>
+   <p class="hint">Кто там был? Что случилось? Чем всё закончилось? ${SR ? 'Нажми «🎤 Надиктовать» и рассказывай.' : 'Нажми на поле, потом на 🎤 на клавиатуре и рассказывай — слова появятся сами.'} Потом нажми «Проверить».</p>
+   <textarea id="rtxt" class="rtxt" rows="7" placeholder="Здесь появится твой пересказ…">${U.esc(live ? RT.text : prev)}</textarea>
+   <div class="row">${SR ? (live ? `<button class="btn stop" data-act="retellstop">⏹ Стоп</button><span class="rstat">Слушаю…</span>` : `<button class="btn mic" data-act="retellstart">🎤 Надиктовать</button>`) : ''}
+   <button class="btn big" data-act="${practice ? 'rtpractice' : 'retellcheck'}">Проверить пересказ</button></div>
+   ${practice && cur.rtCheck ? retellResHtml(cur.rtCheck) : ''}
+   ${!practice && (L.rtTries || 0) >= 2 ? `<p class="hint">Не получается? <button class="link" data-act="retelladult">Пересказал(а) взрослому</button></p>` : ''}</article>`; }
+function retellScore(t, text){ const words = text.split(/\s+/).map(normW).filter(Boolean);
   const hit = t.kw.filter(k => kwHit(k, words)), miss = t.kw.filter(k => !hit.includes(k));
-  L.rt = { n: t.kw.length, hit, miss, score: hit.length / t.kw.length, words: words.length };
-  ev(kid, 'пересказ', { subj: 'Чтение', unit: t.title, text: RT.text.slice(0, 1500), score: `${hit.length}/${t.kw.length}`, words: words.length, secs: Math.round((Date.now() - RT.t0) / 1000) });
-  RT = null; save(); render();
-}
+  const lenK = Math.min(1, words.length / 40); /* короткий пересказ из одних ключевых слов не засчитываем полностью */
+  return { n: t.kw.length, hit, miss, score: Math.round(hit.length / t.kw.length * (.6 + .4 * lenK) * 100) / 100, words: words.length, text: text.slice(0, 2000) }; }
+function retellTips(r){ const tips = []; if (r.words < 40) tips.push('Расскажи подробнее: что было в начале, в середине и в конце.'); if (r.miss.length) tips.push('Вспомни, что было про: ' + r.miss.slice(0, 3).map(U.esc).join(', ') + '.'); if (r.score >= .8 && r.words >= 40) tips.push('Молодец, всё главное рассказал(а)!');
+  return tips.length ? `<p class="hint">${tips.join(' ')}</p>` : ''; }
+function retellResHtml(r){ return `<div class="fb ${r.score >= .6 ? 'ok' : 'try'}">Ты вспомнил(а) ${r.hit.length} из ${r.n} главных вещей. ${retellTips(r)}</div>`; }
+function retellCheck(){
+  const kid = cur.kid, L = dayRec(kid, cur.ds).les.read, t = readText(kid), el = document.getElementById('rtxt'), text = ((el && el.value) || '').trim();
+  if (RT) { RT.active = false; try { RT.rec && RT.rec.stop(); } catch (e) {} RT = null; }
+  L.rtDraft = text; const r = retellScore(t, text);
+  if (r.words < 12) { L.rtTries = (L.rtTries || 0) + 1; save(); render(); alertMsg('Расскажи подробнее — хотя бы несколько предложений'); return; }
+  L.rtTries = (L.rtTries || 0) + 1; L.rt = [L.rt, L.rtKeep, r].filter(Boolean).sort((a, b) => b.score - a.score)[0]; if (L.rt !== r) L.rt = Object.assign({}, L.rt, { text: r.text }); delete L.rtKeep;
+  ev(kid, 'пересказ', { subj: 'Чтение', unit: t.title, text: text.slice(0, 1500), score: `${r.hit.length}/${r.n}`, words: r.words });
+  save(); render(); }
 function readQs(kid, L){ const t = readText(kid); const r = U.rng(L.seed || 1); return t.qs.map(([q, a, ...w]) => ({ q, a, opts: r.shuffle([a, ...w]) })); }
 
 function startRead(lang){
@@ -2894,6 +2928,10 @@ document.addEventListener('click', e => {
       L.phase = t.kw ? 'retell' : 'qs'; L.i = 0; save(); render(); break; }
     case 'retellstart': retellStart(); break;
     case 'retellstop': retellStop(); break;
+    case 'retellcheck': retellCheck(); break;
+    case 'retellmore': { L.rtDraft = (L.rt && L.rt.text) || L.rtDraft || ''; L.rtKeep = L.rt; L.rt = null; save(); render(); break; }
+    case 'rtpractice': { const el = document.getElementById('rtxt'); cur.rtDraft = el ? el.value : ''; if (RT) { RT.active = false; try { RT.rec && RT.rec.stop(); } catch (x) {} RT = null; } cur.rtCheck = retellScore(readText(kid), cur.rtDraft); render(); break; }
+    case 'rview': { cur.rview = b.dataset.s || null; cur.rtCheck = null; if (RD && RD.active) pauseRead(); render(); window.scrollTo(0, 0); break; }
     case 'retelladult': { const t = readText(kid); L.rt = { n: t.kw.length, hit: [], miss: [], score: .7, adult: true }; ev(kid, 'пересказ', { subj: 'Чтение', unit: t.title, text: 'пересказал(а) взрослому' }); save(); render(); break; }
     case 'toqs': L.phase = 'qs'; L.i = 0; save(); render(); break;
     case 'burnseen': delete S.kids[kid].burnMsg; save(); render(); break;
