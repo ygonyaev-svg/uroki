@@ -15,8 +15,8 @@ const KIDS = FAM ? {} : KIDS_TPL;
 /* Шаблон программы (yarik — младшие, anya — старшие) и оформление ребёнка; в семейной версии дети заводятся родителями */
 const TPL = k => T(k);
 function T(k){ return FAM ? ((KIDS[k] && KIDS[k].tpl) || 'yarik') : k; }
-function LK(k){ return FAM ? ((KIDS[k] && KIDS[k].look) || T(k)) : k; }
-function TH(k){ return FAM && THEME['k:' + k] ? 'k:' + k : LK(k); }
+function LK(k){ return FAM ? ((KIDS[k] && KIDS[k].look) || T(k)) : (typeof lookId === 'function' && lookId(k) ? LOOKS[lookId(k)].base : k); }
+function TH(k){ return FAM && THEME['k:' + k] ? 'k:' + k : !FAM && typeof lookTheme === 'function' && S && S.kids && S.kids[k] ? lookTheme(k) : LK(k); }
 function kidIds(){ return FAM ? Object.keys(KIDS) : ['yarik', 'anya']; }
 const SUBJ_ICON = { read:'Аа', math:'7+5', rus:'Ёё', world:'☼', hist:'XV', logic:'?!', lang:'Pt', hw:'ДЗ' };
 const STEPS = [1, 3, 7];
@@ -179,7 +179,8 @@ function render(){
   if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vSleep(); }
   else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vRestScreen(cur.kid); }
   else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active)) v = vAsk(cur.kid);
-  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
+  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
+  if (typeof lookVars === 'function') lookVars(document.body.className ? cur.kid : null);
   if (FAM) famBody();
   app().innerHTML = (TEST ? testBar() : '') + v; afterRender();
 }
@@ -194,7 +195,7 @@ function vSetup(){
    <button class="btn big">Сохранить</button></form></main>`;
 }
 function vLogin(){
-  const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
+  const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}${typeof lookBody === 'function' ? lookBody(k) : ''}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
   return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header>
   <div class="kids">${kidIds().map(card).join('')}</div>${FAM ? famLoginExtra() : ''}
   ${alwaysTiles(null)}
@@ -445,7 +446,7 @@ function vTask(kid, subj, L){
   ${fin ? `<button class="btn big" data-act="next">${L.i + 1 < T.length ? 'Дальше' : 'Закончить'}</button>` : ''}`;
 }
 /* Разбор на похожем примере: задание того же типа с ответом и объяснением */
-function subjArt(kid, subj){ const k = T(kid) === 'yarik' ? 'y' : 'a'; let n = subj; if (T(kid) === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (T(kid) === 'yarik' && subj === 'world' && track('world', cur.ds) === '_alt') n = 'fin'; if (T(kid) === 'anya' && subj === 'logic' && track('logic', cur.ds) === '_alt') n = 'fin'; if (!['math','rus','world','logic','lang','read','hist','geo','fin'].includes(n)) return '';
+function subjArt(kid, subj){ const k = !FAM && typeof lookId === 'function' && lookId(kid) ? LOOKS[lookId(kid)].art : T(kid) === 'yarik' ? 'y' : 'a'; let n = subj; if (T(kid) === 'anya' && subj === 'hist' && track('hist', cur.ds) === '_alt') n = 'geo'; if (T(kid) === 'yarik' && subj === 'world' && track('world', cur.ds) === '_alt') n = 'fin'; if (T(kid) === 'anya' && subj === 'logic' && track('logic', cur.ds) === '_alt') n = 'fin'; if (!['math','rus','world','logic','lang','read','hist','geo','fin'].includes(n)) return '';
   return `<img class="subjart" src="img/subj-${k}-${n}.webp" alt="" onerror="this.remove()">`; }
 function vExample(kid, subj, L, u, cur0){ const n = L.helpN || 1; const shape = x => strip(x.q).replace(/\d+([,.]\d+)?/g, '#').slice(0, 18);
   const cands = genTasks(u, (L.seed || 1) * 7 + n * 101, 14).filter(x => !cur0 || x.q !== cur0.q); const ex = (cur0 && cands.find(x => shape(x) === shape(cur0))) || (cur0 && cands.find(x => x.k === cur0.k && shape(x).slice(0, 8) === shape(cur0).slice(0, 8))) || cands[0]; if (!ex) return '';
@@ -973,7 +974,7 @@ function devInfo(){ const ua = navigator.userAgent; const m = ua.match(/OS (\d+)
   return `Версия системы: ${ios}, открыто ${pwa}. Распознавание чтения вслух: ${SR ? '✅ есть' : '❌ нет — нужен iPadOS 14.5 или новее (Настройки → Основные → Обновление ПО); пока скорость чтения считается по таймеру'}. Микрофон: ${navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? 'доступен' : 'недоступен'}.`; }
 function vSettings(){
   const unitSel = kid => Object.entries(KIDS[kid].cur).filter(([, c]) => c.units).map(([k, c]) => [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []).map(([tr, list, nm]) => `<label>${KIDS[kid].name} · ${nm}<select id="sel_${kid}_${k}${tr}">${list.map((u, i) => `${u.cont && !(list[i - 1] || {}).cont ? '<optgroup label="Продолжение (следующий класс)">' : ''}<option value="${i}" ${(S.kids[kid].pos[k + tr] || 0) === i ? 'selected' : ''}>${i + 1}. ${CONT_MARK(u)}${U.esc(u.t)}</option>${u.cont && i === list.length - 1 ? '</optgroup>' : ''}`).join('')}</select></label>`).join('')).join('');
-  return `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
+  return (typeof lookSettings === 'function' ? lookSettings() : '') + `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
   ${FAM ? '' : `<div class="card form" ><h2>Связь с таблицей родителя</h2><label>Адрес скрипта Google<input id="syncurl" value="${U.esc(S.cfg.sync || '')}" autocomplete="off"></label><p class="hint">В очереди на отправку: ${S.queue.length}.</p><div class="row"><button class="btn small" data-act="savesync">Сохранить и отправить</button></div></div>`}
   <div class="card"><h2>Начать заново</h2><p class="hint">Стирает на этом айпаде весь прогресс, монеты, покупки и коды. После теста нажмите — и приложение будет как новое.</p><button class="btn small stop" data-act="resetall">Сбросить всё на этом устройстве</button></div>
   ${FAM ? famSettings() : `<form class="card form" data-form="pins"><h2>Коды</h2><label>Новый код родителя<input id="np" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ярика<input id="ny" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ани<input id="na" inputmode="numeric" maxlength="4" autocomplete="off"></label><button class="btn small">Сменить коды</button></form>`}`;
@@ -1073,7 +1074,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (testAct(act, b)) break; if (spotAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }
