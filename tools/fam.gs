@@ -8,6 +8,7 @@ function famHash(salt, p){ return Utilities.base64Encode(Utilities.computeDigest
 function famRows(){ var sh = famSh('Семьи'), v = sh.getDataRange().getValues(); return { sh: sh, v: v }; }
 function famFind(v, col, val){ for (var i = 1; i < v.length; i++) if (String(v[i][col]) === String(val)) return i; return -1; }
 function famN(v){ return v == null || v === '' || isNaN(+v) ? null : Math.max(0, Math.min(9, Math.round(+v))); }
+function famInvSh(){ var ss = SpreadsheetApp.openById(FAM_SID), sh = ss.getSheetByName('Приглашения'); if (!sh) { sh = ss.insertSheet('Приглашения'); sh.appendRow(['Код', 'Кому', 'Создано', 'Статус', 'Email', 'Использовано']); } return sh; }
 function famKids(s){ try { return JSON.parse(s || '[]'); } catch (e) { return []; } }
 function famAuth(d){ var R = famRows(), i = famFind(R.v, 0, d.fid); if (i < 0 || String(R.v[i][9]) !== String(d.token)) return null; return { R: R, i: i, row: R.v[i] }; }
 function famResp(row){ return { ok: true, fid: String(row[0]), token: String(row[9]), email: String(row[2]), name: String(row[3]), kids: famKids(row[6]), ppin: row[7] === '' ? null : String(row[7]), off: row[8] === 'отключена' }; }
@@ -23,6 +24,9 @@ function famRoute_(d){
     R = famRows(); i = famFind(R.v, 2, em);
     if (d.fam === 'reg') {
       if (i >= 0) return { ok: false, msg: 'Этот email уже зарегистрирован — нажмите «Войти»' };
+      var IV = famInvSh(), iv = IV.getDataRange().getValues(), ii = famFind(iv, 0, String(d.inv || '').trim());
+      if (!d.inv || ii < 0 || iv[ii][3] !== 'свободно') return { ok: false, inv: 'bad', msg: 'Регистрация только по личному приглашению, а эта ссылка уже использована или отозвана. Попросите новую.' };
+      IV.getRange(ii + 1, 4, 1, 3).setValues([['использовано', em, now]]);
       var salt = Utilities.getUuid(), row = ['f' + now.getTime().toString(36), now, em, String(d.name || '').slice(0, 60), salt, famHash(salt, pw), '[]', '', 'активна', Utilities.getUuid(), now, 0];
       R.sh.appendRow(row); return famResp(row);
     }
@@ -32,10 +36,13 @@ function famRoute_(d){
   if (d.fam === 'admin') {
     if (String(d.key || '') !== String(famSh('Настройки').getRange('A1').getValue())) return { ok: false, msg: 'Неверный ключ' };
     R = famRows();
+    if (d.op === 'inv') { famInvSh().appendRow(['s' + Utilities.getUuid().replace(/-/g, '').slice(0, 9), String(d.label || '').slice(0, 60), now, 'свободно', '', '']); }
+    if (d.op === 'invoff') { var IS = famInvSh(), IL = IS.getDataRange().getValues(), ix = famFind(IL, 0, d.code); if (ix > 0 && IL[ix][3] === 'свободно') IS.getRange(ix + 1, 4).setValue('отозвано'); }
     if (d.op === 'set') { i = famFind(R.v, 0, d.fid); if (i < 0) return { ok: false, msg: 'Нет такой семьи' }; R.sh.getRange(i + 1, 9).setValue(d.on ? 'активна' : 'отключена'); R = famRows(); }
     var fams = R.v.slice(1).filter(function(r){ return r[0]; }).map(function(r){ return { fid: String(r[0]), created: r[1], email: r[2], name: r[3], kids: famKids(r[6]).map(function(k){ return { name: k.name, age: k.age, ints: k.ints || [], hero: k.hero || '', books: k.books || '', done: k.done || '', rd: k.rd, rt: k.rt, vw: k.vw, wr: k.wr, mt: k.mt, at: k.at, er: k.er, dk: k.dk, mo: k.mo }; }), off: r[8] === 'отключена', last: r[10], events: r[11] || 0 }; });
     var fb = famSh('Отзывы').getDataRange().getValues().slice(1).slice(-50).reverse().map(function(r){ return { t: r[0], email: r[2], text: r[3] }; });
-    return { ok: true, fams: fams, fb: fb };
+    var invs = famInvSh().getDataRange().getValues().slice(1).filter(function(r){ return r[0]; }).map(function(r){ return { code: String(r[0]), label: r[1], t: r[2], st: r[3], email: r[4], used: r[5] }; }).reverse();
+    return { ok: true, fams: fams, fb: fb, invs: invs };
   }
   a = famAuth(d); if (!a) return { ok: false, err: 'auth' };
   var off = a.row[8] === 'отключена';

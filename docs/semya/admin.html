@@ -33,6 +33,7 @@ function keyForm(msg){ A.innerHTML = '<h1>Словоход — семьи</h1><d
 function draw(j){
   var F = j.fams || [], act = F.filter(function(f){ return !f.off; }).length;
   var h = '<h1>Словоход — семьи</h1><p class="mut">Всего ' + F.length + ', активных ' + act + '. <button class="gh" onclick="load()">Обновить</button></p>';
+  h += invBlock(j.invs || []) + '<h1 style="margin-top:20px">Семьи</h1>';
   if (!F.length) h += '<div class="card">Пока никто не зарегистрировался.</div>';
   F.slice().reverse().forEach(function(f){
     var kids = (f.kids || []).map(function(k){ return esc(k.name) + ', ' + esc(k.age) + ((k.ints && k.ints.length) || k.hero || k.rd != null || qs(k) ? ' <span class="mut">(' + esc((k.ints || []).join(', ') + (k.hero ? '; герои: ' + k.hero : '') + (k.books ? '; любит: ' + k.books : '') + (k.done ? '; прочитал(а): ' + k.done : '') + (k.rd != null ? '; чтение ' + k.rd + ' из 3' : '') + qs(k)) + ')</span>' : ''); }).join('; ') || 'детей ещё нет';
@@ -44,6 +45,19 @@ function draw(j){
   h += '<h1 style="margin-top:20px">Отзывы</h1><div class="card">' + (B.length ? B.map(function(b){ return '<div class="fb"><span class="mut">' + dt(b.t) + ' · ' + esc(b.email) + '</span><br>' + esc(b.text) + '</div>'; }).join('') : 'Пока нет.') + '</div>';
   A.innerHTML = h;
 }
+var APP = 'https://ygonyaev-svg.github.io/uroki/semya/#i=';
+var INV_ST = { 'свободно': ['ждёт регистрации', 'on'], 'использовано': ['использовано', 'mut'], 'отозвано': ['отозвано', 'off'] };
+function invBlock(L){
+  var h = '<h1 style="margin-top:20px">Приглашения</h1><div class="card"><p class="mut">Каждая ссылка — для одной регистрации. После регистрации она сгорает, неиспользованную можно отозвать.</p><input id="il" placeholder="Кому, например: Маша, мама Пети" maxlength="60" autocomplete="off"><button onclick="newInv()">Создать приглашение</button></div>';
+  L.forEach(function(v){ var st = INV_ST[v.st] || [v.st, 'mut'], free = v.st === 'свободно';
+    h += '<div class="card"><div class="top"><div><b>' + esc(v.label || 'без подписи') + '</b><br><span class="mut">создано ' + dt(v.t) + (v.email ? ' · ' + esc(v.email) + ', ' + dt(v.used) : '') + '</span></div><span class="st ' + (st[1] === 'off' ? 'off' : st[1] === 'on' ? 'on' : '') + '">' + st[0] + '</span></div>' +
+      (free ? '<input readonly value="' + APP + esc(v.code) + '" onclick="this.select()"><button onclick="shareInv(\'' + esc(v.code) + '\',\'' + esc(v.label || '').replace(/'/g, '') + '\')">Отправить</button> <button class="red" onclick="offInv(\'' + esc(v.code) + '\')">Отозвать</button>' : '') + '</div>'; });
+  return h;
+}
+function newInv(){ var l = document.getElementById('il').value.trim(); if (!l) { alert('Напишите, кому приглашение'); return; } api({ op: 'inv', label: l }).then(function(j){ if (j.ok) draw(j); else alert(j.msg || 'Ошибка'); }); }
+function offInv(c){ if (!confirm('Отозвать приглашение? Ссылка перестанет работать.')) return; api({ op: 'invoff', code: c }).then(function(j){ if (j.ok) draw(j); else alert(j.msg || 'Ошибка'); }); }
+function shareInv(c, l){ var u = APP + c, t = 'Приглашение в тестовую версию «Словохода». Ссылка личная и работает для одной регистрации: ' + u;
+  if (navigator.share) navigator.share({ text: t }).catch(function(){}); else if (navigator.clipboard) navigator.clipboard.writeText(t).then(function(){ alert('Скопировано'); }); else prompt('Скопируйте', t); }
 function load(){ if (!KEY) return keyForm(); api({}).then(function(j){ if (!j.ok) return keyForm(esc(j.msg || 'Ошибка')); draw(j); }).catch(function(){ A.innerHTML = '<div class="card">Нет связи. <button class="gh" onclick="load()">Повторить</button></div>'; }); }
 function setSt(fid, on){ if (!on && !confirm('Отключить эту семью? Приложение у них перестанет открываться.')) return; api({ op: 'set', fid: fid, on: on }).then(function(j){ if (j.ok) draw(j); else alert(j.msg || 'Ошибка'); }); }
 load();
