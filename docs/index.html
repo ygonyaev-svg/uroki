@@ -372,6 +372,14 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .micbar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:6px 0 4px; } .mic2.live{ background:var(--red); color:#fff; animation:pulse 1.2s infinite; }
 @keyframes pulse{ 50%{ opacity:.7; } }
 
+.bkpic{ display:block; width:100%; max-width:440px; height:auto; margin:6px auto 10px; background:#fff; border-radius:12px; padding:6px; }
+.bkstep.got{ border-color:var(--green); }
+
+.bktext{ font-size:22px; line-height:1.7; max-height:55vh; overflow:auto; padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:var(--card); margin:8px 0; }
+.bkbusy{ padding:24px 0; }
+.spin{ width:44px; height:44px; margin:0 auto 10px; border-radius:50%; border:5px solid var(--accsoft); border-top-color:var(--acc); animation:bkspin 1s linear infinite; }
+@keyframes bkspin{ to{ transform:rotate(360deg); } }
+
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
   --blue:#2563eb; --red:#e11d48; --green:#16a34a; --gold:#f59e0b; --sh:0 6px 0 rgba(15,23,42,.10),0 10px 24px rgba(15,23,42,.12); --r:22px; }
@@ -570,7 +578,7 @@ body.anya .opt.right{ background:#dcfce7; } body.anya .opt.wrong{ background:#ff
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v8206dffe */
+<script>/* v9455fea1 */
 var FAM = 0;
 /* ===== Общие утилиты ===== */
 const U = {
@@ -2781,7 +2789,7 @@ const COVER_IMG = { 'Пёстрая лента':'cover-holmes.webp', 'Серая
   'Сказка о мёртвой царевне':'cover-carevna.webp', 'Филипок':'cover-filipok.webp' };
 
 /* ===== Мои книги: бумажные книги из дома =====
-   Ребёнок фотографирует обложку и оглавление (или страницы) → фото уходят в скрипт таблицы → папка «Уроки — фото книг» на Диске
+   Ребёнок фотографирует обложку, оборот титульного листа (издательство, год, тираж, ISBN), заднюю обложку со штрихкодом, по желанию оглавление; для незнакомых книг — страницы главы → фото уходят в скрипт таблицы → папка «Уроки — фото книг» на Диске
    и строка в листе «Фото книг». Вечером Claude смотрит фото, узнаёт книгу и присылает задания строкой в «Указания»:
    тип «книга», значение — JSON { book, title, author, msg, tasks:[{ id, title, read, min, qs, kw, snap }] }.
    qs: ["вопрос","верно","неверно1","неверно2"] — выбор; { q, a, alt:[...] } — ответ словом.
@@ -2819,7 +2827,7 @@ function bkFlush(){
 function bkStatus(){ var el = document.getElementById('bkup'); if (el) el.innerHTML = bkUpHtml(); }
 function bkUpHtml(){ var n = BK_UPQ.length; return n ? '⏳ Отправляется ' + n + ' ' + U.pl(n, 'фото', 'фото', 'фото') + '… Не закрывай приложение.' : ''; }
 function bkSnapBtn(kind, label, extra){ return '<label class="btn big bksnap">' + label + '<input type="file" accept="image/*" capture="environment" data-bkkind="' + kind + '"' + (extra || '') + ' style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"></label>'; }
-function bkSay(text){ return ' <button class="link" data-act="bksay" data-t="' + U.esc(text) + '" title="Прочитать вслух">🔊</button>'; }
+function bkSay(text){ return ' ' + sayGate('bk' + U.h(text), '<button class="link" data-act="bksay" data-t="' + U.esc(text) + '" title="Прочитать вслух">🔊</button>'); }
 
 /* --- задания от Claude из листа «Указания» --- */
 function bkApply(kid, row){
@@ -2839,7 +2847,7 @@ function bkHomeCard(kid){
   var a = bkK(kid).filter(function(b){ return !b.hidden; }), ready = 0, wait = 0;
   a.forEach(function(b){ if (bkCurTask(b)) ready++; else if (!b.finished) wait++; });
   var news = a.some(function(b){ return b.msg && !b.msgSeen; });
-  return '<section class="card bkhome"><h2>📚 Мои бумажные книги</h2><p>' + (T(kid) === 'yarik' ? 'Читай настоящую книжку! Сфотографируй книгу, которая есть дома, а Claude придумает к ней задания.' : 'Читай настоящие книги. Сфотографируй обложку и оглавление — Claude составит план чтения и задания по главам.') +
+  return '<section class="card bkhome"><h2>📚 Мои бумажные книги</h2><p>' + (T(kid) === 'yarik' ? 'Читай настоящую книжку! Сфотографируй книгу, которая есть дома, а Claude придумает к ней задания.' : 'Читай настоящие книги. Сфотографируй обложку, оборот титульного листа и штрихкод — Claude узнает издание и составит задания по главам.') +
     ' За задание по книге — до +' + BOOK_PTS + ' баллов в день.</p>' +
     (a.length ? '<p class="hint">' + (ready ? '✅ Есть задания: ' + ready + ' ' + U.pl(ready, 'книга', 'книги', 'книг') + '. ' : '') + (wait ? '⏳ Ждём задания: ' + wait + '. ' : '') + (news ? '✉ Есть сообщение по книге.' : '') + '</p>' : '') +
     '<button class="btn big" data-act="bkopen">' + (a.length ? 'Открыть мои книги' : '📷 Добавить первую книгу') + '</button></section>';
@@ -2855,15 +2863,52 @@ function vBooks(){
     (list ? '<section class="tiles">' + list + '</section>' : '<div class="card"><p>Пока книг нет. Найди дома книгу, которую хочешь прочитать, и сфотографируй её.</p></div>') +
     '<button class="btn big ghost" data-act="bkadd">📷 Добавить книгу</button></main>';
 }
+/* Наглядные подсказки: что фотографировать (пример — Л. Н. Толстой «Рассказы для детей»; выходные данные условные) */
+var BK_ARR = '<defs><marker id="bka" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#e0322b"/></marker></defs>';
+function bkArrow(x1, y1, x2, y2, label, lx, ly, anchor){ return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="#e0322b" stroke-width="3" marker-end="url(#bka)"/><text x="' + lx + '" y="' + ly + '" fill="#e0322b" font-size="15" font-weight="800" text-anchor="' + (anchor || 'start') + '">' + label + '</text>'; }
+function bkPic(kind){
+  var o = '<svg class="bkpic" viewBox="0 0 360 250" role="img" aria-label="Пример: что фотографировать">' + BK_ARR, f = 'font-family="Georgia,serif"';
+  if (kind === 'обложка') o += '<rect x="20" y="10" width="170" height="230" rx="6" fill="#2f6b4f"/><rect x="20" y="10" width="14" height="230" fill="#24553e"/>' +
+    '<text x="112" y="45" fill="#f6e7b0" font-size="13" text-anchor="middle" ' + f + '>Л. Н. ТОЛСТОЙ</text><text x="112" y="78" fill="#fff" font-size="20" font-weight="700" text-anchor="middle" ' + f + '>РАССКАЗЫ</text><text x="112" y="100" fill="#fff" font-size="17" font-weight="700" text-anchor="middle" ' + f + '>ДЛЯ ДЕТЕЙ</text>' +
+    '<circle cx="112" cy="160" r="38" fill="#f6e7b0"/><path d="M90 172q22-34 44 0z" fill="#2f6b4f"/><circle cx="104" cy="146" r="6" fill="#2f6b4f"/>' +
+    '<rect x="8" y="2" width="194" height="246" rx="10" fill="none" stroke="#e0322b" stroke-width="2.5" stroke-dasharray="8 6"/>' +
+    bkArrow(300, 88, 196, 88, 'название', 296, 80, 'end') + bkArrow(300, 50, 196, 42, 'автор', 296, 40, 'end') + '<text x="210" y="210" fill="#e0322b" font-size="14" font-weight="700">Вся обложка</text><text x="210" y="228" fill="#e0322b" font-size="14" font-weight="700">в кадре, без бликов</text>';
+  else if (kind === 'титул') o += '<rect x="10" y="10" width="160" height="230" fill="#fbf7ea" stroke="#c9bd98"/>' +
+    '<text x="90" y="34" font-size="9" fill="#555" text-anchor="middle" ' + f + '>Для младшего школьного возраста</text>' +
+    '<g fill="#aaa">' + [60, 70, 80, 90].map(function(y){ return '<rect x="24" y="' + y + '" width="' + (y === 90 ? 80 : 132) + '" height="4"/>'; }).join('') + '</g>' +
+    '<rect x="20" y="128" width="140" height="24" fill="#ffe8a3"/><text x="24" y="138" font-size="8.5" fill="#333" ' + f + '>© Издательство «Детская литература»,</text><text x="24" y="149" font-size="8.5" fill="#333" ' + f + '>оформление, 1987</text>' +
+    '<rect x="20" y="168" width="140" height="14" fill="#ffe8a3"/><text x="24" y="178" font-size="8.5" fill="#333" ' + f + '>Тираж 300 000 экз.  Цена 45 к.</text>' +
+    '<rect x="20" y="196" width="140" height="14" fill="#ffe8a3"/><text x="24" y="206" font-size="8.5" fill="#333" ' + f + '>ISBN 5-08-000000-0</text>' +
+    '<text x="90" y="250" font-size="12" font-weight="800" fill="#e0322b" text-anchor="middle">оборот страницы с названием</text>' +
+    bkArrow(355, 140, 166, 140, 'издательство, год', 352, 132, 'end') + bkArrow(355, 175, 166, 175, 'тираж', 352, 168, 'end') + bkArrow(355, 203, 166, 203, 'ISBN', 352, 196, 'end');
+  else if (kind === 'штрихкод') o += '<rect x="20" y="10" width="170" height="230" rx="6" fill="#2f6b4f"/><text x="105" y="60" fill="#f6e7b0" font-size="12" text-anchor="middle" ' + f + '>Задняя обложка</text>' +
+    '<rect x="60" y="160" width="100" height="62" fill="#fff"/><g fill="#111">' + [0, 4, 6, 11, 14, 16, 21, 25, 27, 32, 35, 38, 43, 46, 49, 53, 57, 60, 64, 68, 71, 76, 80, 84].map(function(x, i){ return '<rect x="' + (66 + x) + '" y="165" width="' + (i % 3 ? 1.6 : 2.8) + '" height="42"/>'; }).join('') + '</g><text x="110" y="218" font-size="9" text-anchor="middle" fill="#111">9 785080 000000</text>' +
+    bkArrow(300, 190, 166, 190, 'штрихкод', 296, 182, 'end') + '<text x="210" y="100" fill="#e0322b" font-size="14" font-weight="700">Если штрихкода нет —</text><text x="210" y="118" fill="#e0322b" font-size="14" font-weight="700">этот шаг пропусти</text>';
+  else o += '<rect x="20" y="10" width="160" height="230" fill="#fbf7ea" stroke="#c9bd98"/><text x="100" y="40" font-size="14" font-weight="700" text-anchor="middle" ' + f + '>СОДЕРЖАНИЕ</text>' +
+    ['Филипок', 'Котёнок', 'Акула', 'Прыжок', 'Лев и собачка', 'Пожарные собаки'].map(function(n, i){ return '<text x="32" y="' + (70 + i * 24) + '" font-size="11" ' + f + '>' + n + '</text><text x="168" y="' + (70 + i * 24) + '" font-size="11" text-anchor="end" ' + f + '>' + (3 + i * 4) + '</text>'; }).join('') +
+    bkArrow(320, 120, 186, 120, 'главы и страницы', 316, 112, 'end');
+  return o + '</svg>';
+}
+var BK_STEPS = [
+  { k: 'обложка', h: 'Обложка', must: true, y: 'Положи книгу на стол и сфотографируй обложку целиком, чтобы было видно название и автора.', a: 'Обложка целиком: название и автор, без бликов.' },
+  { k: 'титул', h: 'Оборот титульного листа', must: true, y: 'Открой книгу. Найди страницу с названием книги. Переверни её: на обратной стороне мелкий текст — издательство, год, тираж. Сфотографируй эту страницу поближе, чтобы буквы были чёткие.', a: 'Страница после титула с мелким текстом: издательство, год, тираж, ISBN. Снимай близко, чтобы читались цифры. Это самое точное фото — по нему находится именно твоё издание.' },
+  { k: 'штрихкод', h: 'Задняя обложка со штрихкодом', y: 'Переверни книгу. Если сзади есть штрихкод — полоски с цифрами, сфотографируй его. Если нет — пропусти.', a: 'Штрихкод с цифрами ISBN на задней обложке. У старых книг его нет — тогда пропусти.' },
+  { k: 'оглавление', h: 'Оглавление (по желанию)', y: 'Если найдёшь страницу Содержание, сфотографируй её. Так Claude разделит книгу на кусочки.', a: 'Оглавление (все его страницы) — по нему Claude составит план чтения по главам.' }
+];
 function vBkAdd(){
-  var kid = cur.kid, A = cur.bkAdd || {}, b = bkFind(kid, A.id);
-  var cover = b && b.thumb, n2 = (b && b.nToc) || 0;
-  return '<main class="wrap ' + kid + '">' + bkHead('bkopen') + '<section class="hello"><h1>Новая книга</h1></section>' +
-    '<article class="card"><h2>1. Обложка ' + (cover ? '✅' : '') + '</h2><p>Положи книгу на стол и сфотографируй обложку целиком, чтобы было видно название.' + bkSay('Положи книгу на стол и сфотографируй обложку целиком, чтобы было видно название.') + '</p>' +
-    (cover ? '<img class="bkcover" src="' + b.thumb + '" alt="обложка">' : '') + bkSnapBtn('обложка', cover ? '📷 Переснять обложку' : '📷 Сфотографировать обложку') + '</article>' +
-    (cover ? '<article class="card"><h2>2. Оглавление ' + (n2 ? '✅ ' + n2 + ' фото' : '') + '</h2><p>' + (T(kid) === 'yarik' ? 'Найди страницу «Содержание» (обычно в конце книги) и сфотографируй. Если её нет — сфотографируй первую страницу с текстом.' : 'Сфотографируй оглавление (все его страницы по очереди). Если оглавления нет — первый разворот с текстом.') + bkSay(T(kid) === 'yarik' ? 'Найди страницу Содержание, обычно она в конце книги, и сфотографируй. Если её нет, сфотографируй первую страницу с текстом.' : 'Сфотографируй оглавление. Если его нет, первый разворот с текстом.') + '</p>' +
-      bkSnapBtn('оглавление', n2 ? '📷 Ещё страница' : '📷 Сфотографировать') +
-      '<label class="hint">Как называется книга? (можно не писать)<input id="bktitle" class="bkinp" maxlength="80" value="' + U.esc((b && b.title) || '') + '"></label>' +
+  var kid = cur.kid, A = cur.bkAdd || {}, b = bkFind(kid, A.id), Y = T(kid) === 'yarik', got = (b && b.got) || {};
+  if (b && b.thumb) got['обложка'] = got['обложка'] || 1;
+  var cards = BK_STEPS.map(function(st, i){
+    var n = got[st.k] || 0, txt = Y ? st.y : st.a, open = i === 0 || got['обложка'];
+    if (!open) return '';
+    return '<article class="card bkstep' + (n ? ' got' : '') + '"><h2>' + (i + 1) + '. ' + st.h + ' ' + (n ? '✅' + (n > 1 ? ' ' + n + ' фото' : '') : '') + '</h2>' + bkPic(st.k) + '<p>' + txt + bkSay(st.y) + '</p>' +
+      (st.k === 'обложка' && b && b.thumb ? '<img class="bkcover" src="' + b.thumb + '" alt="обложка">' : '') +
+      bkSnapBtn(st.k, n ? (st.k === 'оглавление' ? '📷 Ещё страница' : '📷 Переснять') : '📷 Сфотографировать') + '</article>'; }).join('');
+  var ready = got['обложка'];
+  return '<main class="wrap ' + kid + '">' + bkHead('bkopen') + '<section class="hello"><h1>Новая книга</h1><p>Три фото — и Claude узнает книгу. Смотри на картинки: красные стрелки показывают, что должно попасть в кадр.</p></section>' + cards +
+    (ready ? '<article class="card"><label class="hint">Как называется книга? (можно не писать)<input id="bktitle" class="bkinp" maxlength="80" value="' + U.esc((b && b.title) || '') + '"></label>' +
+      (!got['титул'] ? '<p class="hint">⚠ Без оборота титульного листа Claude может не узнать издание. Лучше сфотографируй его.</p>' : '') +
+      '<p class="hint">Если книга редкая, Claude попросит сфотографировать страницы главы, которую ты читаешь, и задаст вопросы по ним.</p>' +
       '<button class="btn big" data-act="bkaddok">Готово — отправить Claude</button></article>' : '') +
     '<p id="bkup" class="hint">' + bkUpHtml() + '</p></main>';
 }
@@ -2884,13 +2929,15 @@ function vBook(){
 function bkTaskView(kid, b, t){
   var P = bkProg(b, t.id), now = Date.now();
   var steps = ['Читаю'].concat(t.kw && t.kw.length ? ['Пересказ'] : [], (t.qs || []).length ? ['Вопросы'] : [], t.snap ? ['Фото'] : []);
-  var cur0 = { intro: 0, read: 0, retell: 1, qs: steps.indexOf('Вопросы'), snap: steps.length - 1 }[P.ph] || 0;
+  var cur0 = { intro: 0, read: 0, photo: 0, aloud: 0, listen: 0, between: 0, retell: 1, qs: steps.indexOf('Вопросы'), snap: steps.length - 1 }[P.ph] || 0;
   var sbar = '<ul class="steps">' + steps.map(function(s, i){ return '<li class="' + (i < cur0 ? 'ok' : i === cur0 ? 'now' : '') + '">' + s + '</li>'; }).join('') + '</ul>';
   var h = '<article class="card"><h2>' + U.esc(t.title || 'Задание') + '</h2>' + sbar;
   if (P.ph === 'intro' || P.ph === 'read') {
     h += '<p class="bkread">' + U.esc(t.read || '') + bkSay(t.read || '') + '</p>' + (t.min ? '<p class="hint">Читай спокойно, примерно ' + t.min + ' ' + U.pl(t.min, 'минуту', 'минуты', 'минут') + '. Айпад можно отложить.</p>' : '');
-    if (P.ph === 'intro') h += '<button class="btn big" data-act="bkstart">📖 Начинаю читать</button>';
+    if (P.ph === 'intro') h += (bkAloudN(kid, t) > 0 ? '<button class="btn big mic" data-act="bkaloud">🎤 Читать вслух по книге</button><button class="btn big ghost" data-act="bkstart">📖 Читать про себя</button>' : '<button class="btn big" data-act="bkstart">📖 Начинаю читать</button>');
     else h += '<p class="center">Читаешь уже <b>' + bkMins(now - P.t0) + ' мин</b></p><button class="btn big" data-act="bkreaddone">✅ Я прочитал(а)</button>';
+  } else if (['photo', 'aloud', 'listen', 'between'].indexOf(P.ph) >= 0) {
+    h += '<p class="bkread">' + U.esc(t.read || '') + '</p>' + bkAloudView(kid, b, t, P);
   } else if (P.ph === 'retell') {
     var live = RT && RT.active;
     h += '<p>Перескажи своими словами, что ты прочитал(а): кто там был, что случилось, чем закончилось.' + bkSay('Перескажи своими словами, что ты прочитал. Кто там был, что случилось, чем закончилось.') + '</p>' +
@@ -2931,6 +2978,7 @@ function bkAnswer(v){
 function bkFinish(kid, b, t){
   var P = bkProg(b, t.id), qs = bkQs(t), n = qs.length, ok = P.ans.filter(function(a){ return a && a.ok; }).length;
   var ratio = n ? ok / n : 1, q = t.kw && t.kw.length ? (n ? .65 * ratio + .35 * ((P.rt && P.rt.score) || 0) : ((P.rt && P.rt.score) || 0)) : ratio;
+  var accs = (P.sp || []).filter(function(r){ return r.acc != null; }); if (accs.length) q = .8 * q + .2 * accs.reduce(function(a, r){ return a + r.acc; }, 0) / accs.length;
   var pts = q < .6 ? 0 : Math.round(BOOK_PTS * q * q);
   var D = dayRec(kid, U.today()); D.bookPts = D.bookPts || 0; pts = Math.max(0, Math.min(pts, BOOK_PTS - D.bookPts)); D.bookPts += pts;
   var K = S.kids[kid]; piggyAdd(K, pts); P.pts = pts; P.ph = 'done'; P.end = Date.now(); K.texts = (K.texts || 0) + 1;
@@ -2941,6 +2989,7 @@ function bkPhoto(input){
   var kid = cur.kid, f = input.files && input.files[0], kind = input.getAttribute('data-bkkind'); if (!f || !kid) return;
   var bid = input.getAttribute('data-bk') || (cur.bkAdd && cur.bkAdd.id), tid = input.getAttribute('data-task') || '';
   if (!bid) return; alertMsg('Готовлю фото…');
+  if (kind === 'разворот') { bkPrep(f, 1800, .85, function(data){ var b0 = bkFind(kid, bid), t0 = b0 && bkCurTask(b0); if (!data) { alertMsg('Не получилось прочитать фото, попробуй ещё раз'); return; } if (t0) bkSpreadPhoto(kid, b0, t0, data); }); try { input.value = ''; } catch (e) {} return; }
   bkPrep(f, 1600, .8, function(data){
     if (!data) { alertMsg('Не получилось прочитать фото, попробуй ещё раз'); return; }
     var b = bkFind(kid, bid); if (!b) return;
@@ -2948,6 +2997,7 @@ function bkPhoto(input){
     bkSend(kid, bid, kind, tid, note, data);
     if (kind === 'обложка') bkPrep(f, 220, .7, function(th){ if (th) { b.thumb = th; save(); render(); } });
     if (kind === 'оглавление') b.nToc = (b.nToc || 0) + 1;
+    if (kind !== 'страницы') { b.got = b.got || {}; b.got[kind] = (b.got[kind] || 0) + 1; }
     if (tid) { var P = bkProg(b, tid); P.snaps = (P.snaps || 0) + 1; }
     if (kind === 'страницы' && !tid) { b.st = 'wait'; b.morePics = U.today(); }
     ev(kid, 'книга: фото', { subj: '📚 Книга', unit: b.title || bid, text: kind + (note ? ': ' + note : '') });
@@ -2965,14 +3015,15 @@ document.addEventListener('click', function(e){
     case 'bkbook': go('book', { bk: btn.getAttribute('data-id') }); break;
     case 'bkadd': { var id = 'b' + (T(kid) === 'yarik' ? 'y' : 'a') + Date.now().toString(36); bkK(kid).push({ id: id, title: '', added: U.today(), tasks: [], prog: {}, st: 'new', hidden: true }); cur.bkAdd = { id: id }; save(); go('bkadd', { bkAdd: { id: id } }); break; }
     case 'bkaddok': { var A = cur.bkAdd && bkFind(kid, cur.bkAdd.id); if (!A || !A.thumb) { alertMsg('Сначала сфотографируй обложку'); break; } var tl = document.getElementById('bktitle'); if (tl && tl.value.trim()) A.title = tl.value.trim().slice(0, 80);
-      A.hidden = false; A.st = 'wait'; ev(kid, 'книга добавлена', { subj: '📚 Книга', unit: A.id, text: (A.title || 'без названия') + '; фото оглавления: ' + (A.nToc || 0) });
+      A.hidden = false; A.st = 'wait'; ev(kid, 'книга добавлена', { subj: '📚 Книга', unit: A.id, text: (A.title || 'без названия') + '; фото: ' + Object.keys(A.got || {}).map(function(k){ return k + ' ' + A.got[k]; }).join(', ') });
       save(); cur.bk = A.id; go('book', { bk: A.id }); break; }
     case 'bksay': say(btn.getAttribute('data-t'), 'ru-RU'); break;
     case 'bkmsgseen': if (b) { b.msgSeen = true; save(); render(); } break;
+    case 'bkaloud': if (P) { P.ph = 'photo'; P.t0 = P.t0 || Date.now(); ev(kid, 'книга: читаю вслух', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || '') }); save(); render(); } break;
     case 'bkstart': if (P) { P.ph = 'read'; P.t0 = Date.now(); ev(kid, 'книга: читаю', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || '') }); save(); render(); } break;
-    case 'bkreaddone': { if (!P) break; var el = (Date.now() - (P.t0 || Date.now())) / 1000, need = (t.min || 5) * 60 * .6;
+    case 'bkreaddone': { if (!P) break; var el = (Date.now() - (P.t0 || Date.now())) / 1000, need = P.silent ? Math.max(60, (t.min || 5) * 60 * .6 - (P.secs || 0)) : (t.min || 5) * 60 * .6;
       if (el < need) { alertMsg('Слишком быстро 🙂 Почитай ещё примерно ' + Math.max(1, Math.ceil((need - el) / 60)) + ' мин'); break; }
-      P.secs = Math.round(el); P.ph = t.kw && t.kw.length ? 'retell' : (t.qs || []).length ? 'qs' : t.snap ? 'snap' : 'end'; P.i = 0; save(); if (P.ph === 'end') bkFinish(kid, b, t); else render(); break; }
+      P.secs = (P.secs || 0) + Math.round(el); P.ph = t.kw && t.kw.length ? 'retell' : (t.qs || []).length ? 'qs' : t.snap ? 'snap' : 'end'; P.i = 0; save(); if (P.ph === 'end') bkFinish(kid, b, t); else render(); break; }
     case 'bkretell': { var ta = document.getElementById('rtxt'), text = ((ta && ta.value) || '').trim(); if (RT) { RT.active = false; try { RT.rec && RT.rec.stop(); } catch (x) {} RT = null; }
       P.rtDraft = text; P.rtTries = (P.rtTries || 0) + 1; var r = retellScore({ kw: t.kw }, text);
       if (r.words < (T(kid) === 'yarik' ? 8 : 15)) { save(); render(); alertMsg('Расскажи подробнее — хотя бы несколько предложений'); break; }
@@ -2985,6 +3036,159 @@ document.addEventListener('click', function(e){
   }
 });
 setInterval(function(){ if (cur.view === 'book' && cur.kid) { var b = bkFind(cur.kid, cur.bk), t = b && bkCurTask(b), P = t && b.prog && b.prog[t.id]; if (P && P.ph === 'read' && !(document.activeElement && document.activeElement.tagName === 'INPUT')) render(); } }, 30000);
+
+/* ===== Мои книги: чтение вслух по бумажной книге =====
+   Ребёнок фотографирует разворот → проверка фото (темно/пересвет/размыто) → распознавание текста скриптом таблицы (Google OCR)
+   → на экране тот же текст, прочитанное подсвечивается зелёным, пропуски — красным, считаются темп и точность → следующий разворот.
+   Две неудачи с фото подряд → режим «просто слушаю»: темп по услышанным словам, без точных ошибок. */
+var BR = null, BK_OCR_BUSY = false;
+function bkAloudN(kid, t){ return t.aloud != null ? +t.aloud : (T(kid) === 'yarik' ? 99 : 1); }
+/* Проверка фото до отправки: средняя яркость и резкость (дисперсия лапласиана) на уменьшенной копии */
+function bkQuality(data, cb){
+  var img = new Image();
+  img.onload = function(){ try {
+    var w = 320, h = Math.max(1, Math.round(img.height * w / img.width)), c = document.createElement('canvas'); c.width = w; c.height = h;
+    var g = c.getContext('2d'); g.drawImage(img, 0, 0, w, h); var d = g.getImageData(0, 0, w, h).data, L = new Float32Array(w * h), sum = 0;
+    for (var i = 0, j = 0; i < d.length; i += 4, j++) { L[j] = .299 * d[i] + .587 * d[i + 1] + .114 * d[i + 2]; sum += L[j]; }
+    var mean = sum / (w * h), s1 = 0, s2 = 0, n = 0;
+    for (var y = 1; y < h - 1; y++) for (var x = 1; x < w - 1; x++) { var k = y * w + x, v = 4 * L[k] - L[k - 1] - L[k + 1] - L[k - w] - L[k + w]; s1 += v; s2 += v * v; n++; }
+    var lap = n ? s2 / n - (s1 / n) * (s1 / n) : 0;
+    cb({ mean: Math.round(mean), lap: Math.round(lap), dark: mean < 75, bright: mean > 245, blur: lap < 30 });
+  } catch (e) { cb({ ok: true }); } };
+  img.onerror = function(){ cb({ ok: true }); }; img.src = data;
+}
+function bkWords(text){ return String(text || '').replace(/\r/g, '').replace(/([А-Яа-яЁё])[-\u00AD]\s*\n\s*([а-яё])/g, '$1$2').replace(/([А-Яа-яЁё])-([А-Яа-яЁё])/g, '$1- $2').split('\n').filter(function(l){ return /[А-Яа-яЁё]{2,}/.test(l); }).join('\n').split(/\s+/).filter(function(w){ return /[А-Яа-яЁё]/.test(w); }); }
+function bkOcr(kid, b, t, data){
+  var P = bkProg(b, t.id); BK_OCR_BUSY = true; P.ocrMsg = 'Читаю текст с фото…'; save(); render();
+  var done = false, to = setTimeout(function(){ fin(null, 'долго нет ответа'); }, 45000);
+  function fin(res, why){ if (done) return; done = true; clearTimeout(to); BK_OCR_BUSY = false;
+    var words = res && res.ok ? bkWords(res.text) : [], need = T(kid) === 'yarik' ? 8 : 25;
+    if (words.length >= need) { P.bad = 0; P.ocrMsg = ''; P.cur = { text: words.join(' '), n: words.length, t: Date.now() }; P.ph = 'aloud'; BR = null;
+      ev(kid, 'книга: разворот распознан', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || ''), words: words.length }); }
+    else bkBadPhoto(kid, b, t, res && !res.ok ? 'server' : 'few', why || (res && res.msg));
+    save(); render(); }
+  try {
+    fetch(S.cfg.sync, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ ocr: { kid: KIDS[kid].name, book: b.id, kind: 'разворот', task: t.id, n: ++BK_SEQ, data: data } }) })
+      .then(function(r){ return r.text(); }).then(function(x){ var j = null; try { j = JSON.parse(x); } catch (e) {} fin(j || { ok: false, msg: 'нет ответа' }); })
+      .catch(function(e){ fin({ ok: false, msg: String(e) }); });
+  } catch (e) { fin({ ok: false, msg: String(e) }); }
+}
+var BK_BAD = {
+  dark: 'Темновато. Включи свет или подойди к окну и сфотографируй ещё раз.',
+  bright: 'Слишком ярко, блики. Отодвинься от лампы и сфотографируй ещё раз.',
+  blur: 'Фото размытое. Держи айпад крепко двумя руками, подожди секунду и сфотографируй ещё раз.',
+  few: 'Не получилось прочитать текст. Положи книгу ровно, чтобы обе страницы были целиком в кадре, и сфотографируй ещё раз.',
+  server: 'Не получилось прочитать текст. Попробуй ещё раз.'
+};
+function bkBadPhoto(kid, b, t, why, info){
+  var P = bkProg(b, t.id); P.bad = (P.bad || 0) + 1; P.ocrMsg = '';
+  ev(kid, 'книга: фото не подошло', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || ''), text: why + (info ? ': ' + String(info).slice(0, 200) : '') + '; попытка ' + P.bad });
+  if (P.bad >= 2) { P.mode = 'listen'; P.ph = 'listen'; P.bad = 0; BR = null; say('Ничего страшного. Читай вслух по книге, а я буду слушать.', 'ru-RU'); return; }
+  P.badMsg = BK_BAD[why] || BK_BAD.few; say(P.badMsg, 'ru-RU');
+}
+function bkSpreadPhoto(kid, b, t, data){
+  var P = bkProg(b, t.id); P.badMsg = '';
+  bkQuality(data, function(q){
+    if (q.dark || q.bright || q.blur) { bkBadPhoto(kid, b, t, q.dark ? 'dark' : q.bright ? 'bright' : 'blur', 'яркость ' + q.mean + ', резкость ' + q.lap); save(); render(); return; }
+    bkOcr(kid, b, t, data);
+  });
+}
+/* --- живое чтение --- */
+function brStart(){
+  var kid = cur.kid, b = bkFind(kid, cur.bk), t = b && bkCurTask(b), P = t && bkProg(b, t.id); if (!P) return;
+  var listen = P.ph === 'listen', Tw = listen ? null : P.cur.text.split(/\s+/).map(normW);
+  var sv = BR && BR.paused ? BR : null;
+  BR = { active: true, t0: Date.now(), acc: sv ? sv.acc : 0, T: Tw, st: sv ? sv.st : (Tw ? new Array(Tw.length).fill(0) : null), p: sv ? sv.p : 0, base: sv ? sv.base : '', cur: '', heard: sv ? sv.heard : 0, denied: false };
+  if (SR) { var rec = new SR(); rec.lang = 'ru-RU'; rec.continuous = true; rec.interimResults = true; BR.rec = rec; var R0 = BR;
+    rec.onresult = function(e){ var s = ''; for (var i = 0; i < e.results.length; i++) s += ' ' + e.results[i][0].transcript; R0.cur = s; brUpd(); };
+    rec.onerror = function(e){ if (e.error === 'not-allowed' || e.error === 'service-not-allowed') R0.denied = true; };
+    rec.onend = function(){ R0.base += ' ' + R0.cur; R0.cur = ''; if (R0.active && !R0.denied) setTimeout(function(){ try { rec.start(); } catch (x) {} }, 120); };
+    try { rec.start(); } catch (e) {} }
+  render();
+}
+function brSecs(){ return BR ? (BR.acc || 0) + (BR.active ? (Date.now() - BR.t0) / 1000 : 0) : 0; }
+function brPause(){ if (!BR || !BR.active) return; BR.acc = brSecs(); BR.active = false; try { BR.rec && BR.rec.stop(); } catch (e) {} BR.base += ' ' + (BR.cur || ''); BR.cur = ''; BR.paused = true; render(); }
+function brUpd(){
+  var spoken = (BR.base + ' ' + BR.cur).split(/\s+/).map(normW).filter(Boolean); BR.heard = spoken.length;
+  var stat = document.getElementById('brstat');
+  if (!BR.T) { if (stat) stat.textContent = 'Слышу тебя: ' + spoken.length + ' ' + U.pl(spoken.length, 'слово', 'слова', 'слов'); return; }
+  var r = align(BR.T, spoken); BR.st = r.st; BR.p = r.p;
+  var els = document.querySelectorAll('#bktext .w'); for (var i = 0; i < els.length; i++) { var k = +els[i].getAttribute('data-i'); els[i].className = 'w ' + (r.st[k] === 1 ? 'r1' : r.st[k] === 2 ? 'r2' : k === r.p ? 'rc' : ''); }
+  var c = document.querySelector('#bktext .w.rc'); if (c && c.scrollIntoView) try { c.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { c.scrollIntoView(); }
+  if (stat) stat.textContent = 'Прочитано ' + r.p + ' из ' + BR.T.length;
+}
+function brDone(){
+  var kid = cur.kid, b = bkFind(kid, cur.bk), t = b && bkCurTask(b), P = t && bkProg(b, t.id); if (!P || !BR) return;
+  var secs = Math.max(5, brSecs()), K = S.kids[kid], listen = !BR.T, useSR = SR && !BR.denied && (listen ? BR.heard > 0 : BR.p > 0);
+  var n = listen ? 0 : BR.T.length, minS = (listen ? 60 : n / (KIDS[kid].norm * 1.8) * 60);
+  if (!useSR && secs < minS) { alertMsg('Слишком быстро 🙂 Почитай ещё примерно ' + Math.max(1, Math.ceil((minS - secs) / 60)) + ' мин'); return; }
+  if (!listen && useSR && BR.p < n * .7 && secs < n / (KIDS[kid].norm * 1.2) * 60) { alertMsg('Дочитай разворот до конца 🙂'); return; }
+  BR.active = false; try { BR.rec && BR.rec.stop(); } catch (e) {}
+  var words = listen ? (useSR ? BR.heard : 0) : (useSR ? Math.max(BR.p, Math.round(n * .7)) : n);
+  var wpm = words ? Math.round(words / (secs / 60)) : 0, acc = null, errs = [];
+  if (!listen && useSR) { var tw = P.cur.text.split(/\s+/), okc = 0, bad = 0; for (var k = 0; k < BR.p; k++) { if (BR.st[k] === 1) okc++; else if (BR.st[k] === 2) { bad++; errs.push(tw[k].replace(/[«»"'.,!?:;()—–-]/g, '')); } } acc = okc / Math.max(1, okc + bad); }
+  var rec = { words: words, secs: Math.round(secs), wpm: wpm, acc: acc, errs: errs.slice(0, 15), listen: listen };
+  (P.sp = P.sp || []).push(rec); P.secs = (P.secs || 0) + rec.secs; BR = null; P.cur = null;
+  K.words = (K.words || 0) + words; if (wpm) K.reading.push({ d: U.today(), title: (b.title || 'Книга'), wpm: wpm, acc: acc, lang: 'ru', errs: errs.slice(0, 10), paper: 1 });
+  errs.forEach(function(w){ if (!w) return; var h = K.hard[w] || (K.hard[w] = { miss: 0, ok: 0 }); h.miss++; });
+  ev(kid, 'чтение вслух', { subj: '📚 Книга', unit: (b.title || b.id) + ' · ' + (t.title || '') + (listen ? ' (без текста)' : ' (разворот ' + P.sp.length + ')'), wpm: wpm, acc: acc == null ? '' : Math.round(acc * 100) + '%', words: words, secs: rec.secs, errs: errs.join(', ') });
+  P.ph = 'between'; save(); render(); window.scrollTo(0, 0);
+}
+function bkAfterAloud(kid, b, t){ var P = bkProg(b, t.id); P.ph = t.kw && t.kw.length ? 'retell' : (t.qs || []).length ? 'qs' : t.snap ? 'snap' : 'end'; P.i = 0; save(); if (P.ph === 'end') bkFinish(kid, b, t); else render(); }
+/* Картинка: как фотографировать разворот */
+function bkSpreadPic(){
+  var bk = function(x, y, s, rot, dark, finger){ var w = 120 * s, h = 80 * s;
+    return '<g transform="translate(' + x + ' ' + y + ') rotate(' + rot + ')">' + '<rect x="' + (-w / 2) + '" y="' + (-h / 2) + '" width="' + w + '" height="' + h + '" fill="' + (dark ? '#8a8270' : '#fbf7ea') + '" stroke="#9c8f6a"/><line x1="0" y1="' + (-h / 2) + '" x2="0" y2="' + (h / 2) + '" stroke="#9c8f6a"/>' +
+      [0, 1, 2, 3, 4].map(function(i){ var yy = -h / 2 + 12 * s + i * 12 * s; return '<rect x="' + (-w / 2 + 8 * s) + '" y="' + yy + '" width="' + (w / 2 - 16 * s) + '" height="' + 3 * s + '" fill="' + (dark ? '#5d574a' : '#999') + '"/><rect x="' + (8 * s) + '" y="' + yy + '" width="' + (w / 2 - 16 * s) + '" height="' + 3 * s + '" fill="' + (dark ? '#5d574a' : '#999') + '"/>'; }).join('') +
+      (finger ? '<ellipse cx="' + (w / 2 - 14 * s) + '" cy="' + (h / 2 - 16 * s) + '" rx="' + 12 * s + '" ry="' + 22 * s + '" fill="#e8b48f"/>' : '') + '</g>'; };
+  return '<svg class="bkpic" viewBox="0 0 360 210" role="img" aria-label="Как фотографировать разворот">' + BK_ARR +
+    '<rect x="8" y="8" width="200" height="150" rx="14" fill="#222"/><rect x="18" y="18" width="180" height="130" rx="6" fill="#dfe9f2"/>' + bk(108, 83, 1.3, 0) +
+    '<rect x="22" y="24" width="172" height="118" fill="none" stroke="#23824a" stroke-width="2.5" stroke-dasharray="7 5"/><text x="108" y="178" font-size="15" font-weight="800" fill="#23824a" text-anchor="middle">✓ Так: ровно, целиком,</text><text x="108" y="196" font-size="15" font-weight="800" fill="#23824a" text-anchor="middle">обе страницы, светло</text>' +
+    bk(285, 35, .5, 18) + '<text x="285" y="72" font-size="12" font-weight="800" fill="#e0322b" text-anchor="middle">✗ косо</text>' +
+    bk(285, 105, .5, 0, true) + '<text x="285" y="140" font-size="12" font-weight="800" fill="#e0322b" text-anchor="middle">✗ темно</text>' +
+    bk(285, 168, .5, 0, false, true) + '<text x="285" y="204" font-size="12" font-weight="800" fill="#e0322b" text-anchor="middle">✗ палец на тексте</text></svg>';
+}
+function bkAloudView(kid, b, t, P){
+  var h = '', Y = T(kid) === 'yarik', nsp = (P.sp || []).length, left = bkAloudN(kid, t) - nsp;
+  var snapBtn = function(lbl){ return bkSnapBtn('разворот', lbl, ' data-bk="' + b.id + '" data-task="' + t.id + '"'); };
+  if (BK_OCR_BUSY || P.ocrMsg) return '<div class="center bkbusy"><div class="spin"></div><p><b>' + (P.ocrMsg || 'Читаю текст с фото…') + '</b></p><p class="hint">Несколько секунд.</p></div>';
+  if (P.ph === 'aloud') {
+    var live = BR && BR.active, paused = BR && BR.paused && !live;
+    h += '<p class="hint">Читай вслух по книге. Можно смотреть в книгу, а не на экран — я слушаю и отмечаю. Зелёное — прочитано, красное — пропущено или с ошибкой.</p>' +
+      '<div class="text reading bktext" id="bktext">' + tokensHtml(P.cur.text, BR && BR.st, BR && BR.p) + '</div><div class="row">' +
+      (live ? '<button class="btn big stop" data-act="brdone">✅ Разворот прочитан</button><button class="btn ghost" data-act="brpause">⏸ Пауза</button><span id="brstat" class="rstat">' + (SR ? 'Слушаю…' : 'Читай вслух, время идёт') + '</span>'
+        : '<button class="btn big mic" data-act="brstart">' + (paused ? '▶ Продолжить' : '🎤 Начинаю читать вслух') + '</button>' + (paused ? '<button class="btn ghost" data-act="brdone">Разворот прочитан</button>' : '')) + '</div>' +
+      '<p class="hint"><button class="link" data-act="brretake">📷 Текст не тот — переснять</button></p>';
+  } else if (P.ph === 'listen') {
+    var live2 = BR && BR.active;
+    h += '<div class="note">Текст с фото не прочитался — ничего страшного. Читай вслух по книге, я слушаю и считаю слова.</div>' +
+      '<div class="row">' + (live2 ? '<button class="btn big stop" data-act="brdone">✅ Я дочитал(а)</button><button class="btn ghost" data-act="brpause">⏸ Пауза</button><span id="brstat" class="rstat">Слушаю…</span>' : '<button class="btn big mic" data-act="brstart">' + (BR && BR.paused ? '▶ Продолжить' : '🎤 Начинаю читать вслух') + '</button>') + '</div>' +
+      (live2 ? '<p class="center">Читаешь <b id="brmin">' + bkMins(brSecs() * 1000) + ' мин</b></p>' : '') + '<p class="hint"><button class="link" data-act="brtryphoto">📷 Попробовать фото ещё раз</button></p>';
+  } else if (P.ph === 'between') {
+    var r = P.sp[nsp - 1] || {};
+    h += '<div class="fb ok">Разворот прочитан! ' + (r.wpm ? '<b>' + r.wpm + '</b> слов в минуту' : '') + (r.acc != null ? ', без ошибок ' + Math.round(r.acc * 100) + '%' : '') + '.' + (r.errs && r.errs.length ? '<br>Потренируй слова: ' + r.errs.slice(0, 6).map(U.esc).join(', ') : '') + '</div>' +
+      (left > 0 ? '<p>Переверни страницу и сфотографируй следующий разворот.' + bkSay('Переверни страницу и сфотографируй следующий разворот.') + '</p>' + snapBtn('📷 Следующий разворот') : !Y ? '<p>Дальше дочитай главу про себя.</p><button class="btn big" data-act="brsilent">📖 Читаю дальше про себя</button>' : '') +
+      '<button class="btn big ghost" data-act="brend">🏁 Глава закончилась</button>';
+  } else {
+    if (P.badMsg) h += '<div class="fb bad">📷 ' + U.esc(P.badMsg) + bkSay(P.badMsg) + '</div>';
+    h += '<p>' + (Y ? 'Положи книгу на стол, открой нужные страницы и сфотографируй разворот — обе страницы. Потом читай вслух, а я буду слушать.' : 'Сфотографируй разворот, который будешь читать вслух, — я буду следить по тексту.') + bkSay('Положи книгу на стол, открой нужные страницы и сфотографируй обе страницы. Потом читай вслух, а я буду слушать.') + '</p>' + bkSpreadPic() + snapBtn('📷 Сфотографировать разворот');
+  }
+  return h;
+}
+document.addEventListener('click', function(e){
+  var btn = e.target.closest ? e.target.closest('[data-act]') : null; if (!btn) return; var act = btn.getAttribute('data-act'); if (act.indexOf('br') !== 0) return;
+  var kid = cur.kid, b = kid && cur.bk ? bkFind(kid, cur.bk) : null, t = b ? bkCurTask(b) : null, P = t ? bkProg(b, t.id) : null; if (!P) return;
+  switch (act) {
+    case 'brstart': brStart(); break;
+    case 'brpause': brPause(); break;
+    case 'brdone': brDone(); break;
+    case 'brretake': if (BR) { BR.active = false; try { BR.rec && BR.rec.stop(); } catch (x) {} BR = null; } P.ph = 'photo'; P.cur = null; save(); render(); break;
+    case 'brtryphoto': if (BR) { BR.active = false; try { BR.rec && BR.rec.stop(); } catch (x) {} BR = null; } P.ph = 'photo'; P.mode = ''; save(); render(); break;
+    case 'brsilent': P.ph = 'read'; P.t0 = Date.now(); P.silent = 1; save(); render(); break;
+    case 'brend': bkAfterAloud(kid, b, t); break;
+  }
+});
+setInterval(function(){ var el = document.getElementById('brmin'); if (el && BR) el.textContent = bkMins(brSecs() * 1000) + ' мин'; }, 15000);
 
 /* ===== Загадки, задачи: данные =====
    Загадки — русские народные (фольклор, общественное достояние; по сборникам XIX века, напр. Д. Н. Садовников, «Загадки русского народа», 1876)
@@ -3206,7 +3410,7 @@ ALWAYS.push({ id: 'zag', order: 10,
       funTab('zgtab', lv, [[1, '🙂 Лёгкие · 7–9 лет'], [2, '🧠 Трудные · 10–12 лет']]) + '<p>Отгадано: <b>' + solved + '</b> из ' + L.length + (seen > solved ? ' · не угадано: ' + (seen - solved) : '') + '</p></section>';
     if (!z) return h + '<div class="card win"><h2>Все загадки этого уровня пройдены!</h2><p>Попробуй другой уровень. Скоро добавим новые.</p></div>';
     var r = cur.fz && cur.fz.id === z.id ? cur.fz : null, opts = U.rng(z.id + kid).shuffle([z.a].concat(z.w));
-    h += '<article class="card task zgcard">' + zgPic(kid, z) + '<div class="q zgtext">' + U.esc(z.q).replace(/\. /g, '.<br>') + '</div><div class="row"><button class="btn ghost small" data-act="zgsay">🔊 Послушать</button></div>' +
+    h += '<article class="card task zgcard">' + zgPic(kid, z) + '<div class="q zgtext">' + U.esc(z.q).replace(/\. /g, '.<br>') + '</div><div class="row">' + sayGate('zg' + z.id, '<button class="btn ghost small" data-act="zgsay">🔊 Послушать</button>') + '</div>' +
       '<div class="opts zgopts">' + opts.map(function(o){ var cls = r ? (o === z.a ? 'right' : o === r.v ? 'wrong' : '') : ''; return '<button class="opt ' + cls + '" data-act="zgans" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + zgOpt(o) + '</button>'; }).join('') + '</div>';
     if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! Это ' + U.esc(z.a.toLowerCase()) + '. ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Не угадал(а). Правильный ответ: <b>' + U.esc(z.a) + '</b> ' + (ZAG_EMO[z.a] || '')) + '</div>' + (r.pts ? funBurst(r.pts) : '');
     h += (z.own ? '<p class="src">Загадка придумана для этого приложения.</p>' : '<p class="src">Русская народная загадка.</p>') + '</article>';
@@ -3356,7 +3560,7 @@ ALWAYS.push({ id: 'zad', order: 40,
       funTab('zdtab', lv, [[1, 'Уровень 1 · 2–3 класс'], [2, 'Уровень 2 · 5 класс']]) + '<p>Решено: <b>' + solved + '</b> из ' + L.length + '</p></section>';
     if (!z) return h + '<div class="card win"><h2>Все задачи этого уровня решены!</h2><p>Скоро добавим новые.</p></div>';
     var r = cur.fq;
-    h += '<article class="card task"><span class="sticker" aria-hidden="true">' + U.rng(z.id).pick(THEME[TH(kid)].pics) + '</span><div class="q">' + U.esc(z.q) + '</div>' + (typeof picWords === 'function' ? picWords(z.q) : '') + '<div class="row"><button class="btn ghost small" data-act="zdsay">🔊 Послушать</button></div>' +
+    h += '<article class="card task"><span class="sticker" aria-hidden="true">' + U.rng(z.id).pick(THEME[TH(kid)].pics) + '</span><div class="q">' + U.esc(z.q) + '</div>' + (typeof picWords === 'function' ? picWords(z.q) : '') + '<div class="row">' + sayGate('zd' + z.id, '<button class="btn ghost small" data-act="zdsay">🔊 Послушать</button>') + '</div>' +
       '<form class="numf" data-form="zadf"><input id="zdin" inputmode="decimal" autocomplete="off" ' + (r ? 'disabled value="' + U.esc(r.v) + '"' : 'autofocus') + ' aria-label="Ответ"><button class="btn"' + (r ? ' disabled' : '') + '>Проверить</button></form>';
     if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Неверно. Ответ: <b>' + U.esc(z.as) + '</b>') + '</div><p class="hint">' + U.esc(z.e) + '</p>' + (r.ok ? funBurst(r.pts) : '');
     h += '</article>' + (r ? '<button class="btn big" data-act="zdnext">Следующая задача →</button>' : '');
@@ -3780,7 +3984,7 @@ function chStepInit(){
 }
 function chLesson(kid){
   var L = CH_COURSE[CHS.li], st = L.steps[CHS.si], h = '<div class="card chpz"><p class="eyebrow">Урок ' + (CHS.li + 1) + ': ' + L.t + ' · шаг ' + (CHS.si + 1) + ' из ' + L.steps.length + '</p>';
-  if (st.h) h += '<div class="chtext">' + st.h + ' <button class="link" data-act="chsay">🔊</button></div>';
+  if (st.h) h += '<div class="chtext">' + st.h + ' ' + sayGate('ch' + CHS.li + '-' + CHS.si, '<button class="link" data-act="chsay">🔊</button>') + '</div>';
   if (st.fen) { var mk = {}, k; if (CHS.stars) for (k in CHS.stars) mk[k] = 'star'; if (st.mk) for (k = 0; k < st.mk.length; k++) mk[CH.sqIdx(st.mk[k])] = 'ring';
     h += CHB.html({ P:CHS.P, sel:CHS.sel, last:CHS.last, marks:mk, hint:CHS.hint, noCheck: st.t === 'stars' }); }
   if (CHS.promo) h += CHB.promo('w', 'chlpromo');
@@ -4057,7 +4261,7 @@ function vCode(){ const kid = cur.kid, C = cgK(kid); cgPayPending(kid);
 let CG = null, CG_VIEW = 'map'; /* { id, prog, sel:{k,i}, run, vi, step, res, hint } */
 function cgStart(id){ const lv = CG_LV[cgIdx(id)]; const C = cgK(cur.kid); const r = C.lv[id] || {};
   CG = { id: id, prog: lv.bug ? cgParse(lv.bug) : (r.prog ? JSON.parse(JSON.stringify(r.prog)) : []), sel: { k: '', i: -1 }, run: false, vi: 0, res: null, hint: 0, used: false };
-  CG.sel.i = CG.prog.length; C.last = id; save(); CG_VIEW = 'lv'; go('always', { aid: 'code' }); say(lv.say);
+  CG.sel.i = CG.prog.length; C.last = id; save(); CG_VIEW = 'lv'; CG.sayok = 0; go('always', { aid: 'code' }); if (voiceFree(cur.kid)) say(lv.say);
   if (!r.demo) { r.demo = 1; C.lv[id] = r; save(); setTimeout(() => cgDemo(), 700); } }
 /* Показ: цель мигает, полупрозрачный Тоби проходит начало пути (на новых темах — весь путь и программу) */
 const CG_DEMO_FULL = ['1.1', '2.1', '3.1', '4.1', '4.2', '4.3', '4.5', '5.1'];
@@ -4104,7 +4308,7 @@ function vCodeLv(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGri
   const tabs = grids.length > 1 ? `<div class="cgtabs">${grids.map((g, i) => `<button class="chip ${i === CG.vi ? 'on' : ''}" data-act="cgvar" data-i="${i}" ${CG.run ? 'disabled' : ''}>Улица ${i + 1}${res && res.vr && res.vr[i] != null ? (res.vr[i] ? ' ✓' : ' ✗') : ''}</button>`).join('')}</div><p class="hint center">Программа одна — она должна сработать на каждой улице.</p>` : '';
   const goal = lv.ch === 2 || cgFind(grids[0], 'N').length ? '⚽ → 🥅' : grids[0].join('').indexOf('c') >= 0 ? '🐾 → 🏁' : grids[0].join('').indexOf('*') >= 0 ? '🦴 → 🏠' : lv.ch >= 4 ? '🏁' : '🦴';
   return `<main class="wrap ${LK(kid)} cg cglvl"><header class="bar"><button class="link" data-act="code">← Уровни</button><span class="cgttl">Уровень ${lv.id} · ${goal}</span><button class="link" data-act="cgsay">🔊</button></header>
-  <p class="cgsay"><button class="cgsaybtn" data-act="cgsay">🔊</button> ${U.esc(lv.say)}</p><div class="cgtop"><button class="btn ghost cgshow" data-act="cgdemo" ${CG.run ? 'disabled' : ''}>👀 Покажи</button></div>${tabs}
+  <p class="cgsay">${CG.sayok || voiceFree(cur.kid) ? '<button class="cgsaybtn" data-act="cgsay">🔊</button> ' : ''}${U.esc(lv.say)}${CG.sayok || voiceFree(cur.kid) ? '' : ' <button class="link" data-act="cgsayhelp">🤔 Не понял</button>'}</p><div class="cgtop"><button class="btn ghost cgshow" data-act="cgdemo" ${CG.run ? 'disabled' : ''}>👀 Покажи</button></div>${tabs}
   <div id="cgdemo" class="cgdemo" style="display:none"></div><div id="cgbwrap">${cgBoard(lv, grids[CG.vi])}</div>
   ${res && !CG.run ? `<div class="fb ${res.ok ? 'ok' : 'try'}">${res.ok ? `Ура! ${'⭐'.repeat(res.stars)} ${res.pts ? `+${res.pts} ${U.pl(res.pts, 'балл', 'балла', 'баллов')}${res.pend ? ' (придут после уроков дня)' : ''}` : ''}${res.badge ? `<div class="cgbadge big">Глава пройдена! Награда: ${U.esc(res.badge)}</div>` : ''}${res.stars < 3 && !CG.used ? `<br><small>Можно короче: попробуй уложиться в ${cgCount(cgParse(lv.sol))} ${U.pl(cgCount(cgParse(lv.sol)), 'блок', 'блока', 'блоков')}, чтобы получить 3 звезды.</small>` : ''}` : U.esc(res.msg)}</div>` : ''}
   <section class="cgprog card"><div class="cgph"><b>Программа</b><span class="hint">${lv.max ? `блоков ${n} из ${lv.max}` : `блоков: ${n}`}</span></div>${cgListHtml(CG.prog, '', '')}</section>
@@ -4129,7 +4333,7 @@ function cgRun(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids
   CG.run = true; CG.res = null; CG.vi = 0; render(); let vi = 0, i = 0;
   const done = () => { CG.run = false; const ok = vr.every(Boolean), bad = R.find(x => !x.ok);
     const C = cgK(kid), rec = C.lv[lv.id] || (C.lv[lv.id] = { s: 0, t: 0, w: 0 });
-    if (!ok) { rec.t = (rec.t || 0) + 1; CG.res = { ok: false, msg: (grids.length > 1 ? `Улица ${R.indexOf(bad) + 1}: ` : '') + bad.msg, vr: vr }; CG.vi = R.indexOf(bad); save(); render(); say(bad.msg); return; }
+    if (!ok) { rec.t = (rec.t || 0) + 1; CG.res = { ok: false, msg: (grids.length > 1 ? `Улица ${R.indexOf(bad) + 1}: ` : '') + bad.msg, vr: vr }; CG.vi = R.indexOf(bad); save(); render(); if (CG.sayok || CG.hint || voiceFree(cur.kid)) say(bad.msg); return; }
     const n = cgCount(CG.prog), stars = cgStars(lv, n, CG.used); const prev = rec.s || 0; if (!prev && !rec.first) rec.first = (rec.t || 0) + 1;
     rec.w = (rec.w || 0) + 1; rec.prog = JSON.parse(JSON.stringify(CG.prog));
     let pts = 0, pend = false; if (stars > prev && !CG.used) { const room = Math.max(0, CODE_DAY_MAX - cgToday(kid)); pts = Math.min(stars - prev, room); }
@@ -4156,6 +4360,7 @@ function codeAct(act, b){ const kid = cur.kid;
   const touch = () => { CG.res = null; };
   switch (act) {
     case 'cgsay': say(lv.say); return true;
+    case 'cgsayhelp': CG.sayok = 1; render(); say(lv.say); ev(kid, 'не понимаю', { subj: 'Программирование', unit: `Уровень ${lv.id}`, text: 'попросил прочитать задание' }); return true;
     case 'cgdemo': say('Смотри!'); cgDemo(); return true;
     case 'cgadd': { const t = b.dataset.t; const arr = cgSlot(CG.prog, CG.sel.k); const depth = CG.sel.k ? CG.sel.k.split('/').length : 0;
       if ((t === 'P' || t === 'W' || t === 'I') && depth >= 2) { alertMsg('Глубже класть нельзя'); return true; }
@@ -4561,6 +4766,12 @@ function micDecorate(root){ (root || document).querySelectorAll('textarea[id]:no
   d.innerHTML = SR ? `<button type="button" class="btn ghost small mic2" data-mic="${t.id}">🎤 Сказать голосом</button><span class="hint">Говори — текст появится сам. Потом можно поправить.</span>` : '<span class="hint">🎤 Можно не печатать: нажми на поле, потом на микрофон на клавиатуре рядом с пробелом, и говори.</span>';
   t.insertAdjacentElement('afterend', d); }); }
 try { new MutationObserver(() => micDecorate()).observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
+/* Озвучка заданий — только после «Не понимаю»: сначала ребёнок читает сам. Совсем маленьким (6 лет и младше, семейная версия) — сразу. */
+function voiceFree(kid){ try { return !!(FAM && KIDS[kid] && KIDS[kid].age && KIDS[kid].age <= 6); } catch (e) { return false; } }
+function sayGate(key, btn){ cur.heard = cur.heard || {}; if (voiceFree(cur.kid) || cur.heard[key]) return `<span data-hk="${U.esc(key)}">${btn}</span>`; return `<button class="link dunno2" data-heard="${U.esc(key)}">🤔 Не понимаю</button>`; }
+document.addEventListener('click', e => { const b = e.target.closest('[data-heard]'); if (!b) return; e.preventDefault(); const key = b.dataset.heard; cur.heard = cur.heard || {}; cur.heard[key] = 1;
+  try { if (cur.kid) ev(cur.kid, 'не понимаю', { text: 'попросил(а) прочитать вслух' }); } catch (x) {} render();
+  setTimeout(() => { const t = document.querySelector(`[data-hk="${key.replace(/"/g, '')}"] button`); if (t) t.click(); }, 60); });
 
 /* Резервная копия прогресса: снимок каждого ребёнка хранится в таблице (лист «Снимки»).
    При входе ребёнка сверяемся: если в таблице снимок новее — берём его (другой айпад, значок вместо Safari, стёртые данные).
@@ -4902,7 +5113,7 @@ function vLesson(){
   else if (cur.rview === 'Практика' || cur.rview === 'Задания') body = vPracList(kid, subj, L);
   else if (L.phase === 'theory') {
     const c = KIDS[kid].cur[subj];
-    body = `<article class="card theory">${subjArt(kid, subj)}<div class="th">${u.th}</div><div class="row"><button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button>${subj !== 'hw' ? '<button class="btn ghost small" data-act="dunno">🤔 Не понимаю</button>' : ''}</div></article>${L.helpN ? vExample(kid, subj, L, u) : ''}
+    body = `<article class="card theory">${subjArt(kid, subj)}<div class="th">${u.th}</div><div class="row">${L.helpN || voiceFree(kid) ? '<button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button>' : ''}${subj !== 'hw' ? '<button class="btn ghost small" data-act="dunno">🤔 Не понимаю</button>' : ''}</div></article>${L.helpN ? vExample(kid, subj, L, u) : ''}
     <p class="src">По учебнику: ${U.esc(c.src)}</p><button class="btn big" data-act="topractice">Понятно, к заданиям</button>`;
   } else if (L.phase === 'practice') body = vTask(kid, subj, L);
   else if (L.phase === 'fread') body = vForeign(kid, L);
@@ -4924,7 +5135,7 @@ function vTask(kid, subj, L){
   else if (a.tries) fb = `<div class="fb try">Не совсем. Подумай ещё раз.</div>`;
   const spk = t.sp ? `<button class="btn ghost small" data-act="sayq">🔊 Послушать</button>` : '';
   const u0 = (subj === 'extra' || subj === 'pro' || subj === 'train') && t.uid ? unitById(kid, t.sj, t.uid) : subj !== 'hw' && unitById(kid, subj, L.uid);
-  const help = u0 && !fin ? (L.showTh === L.i ? `<details class="peek" open><summary>Правило</summary><div class="th">${u0.th}</div></details>${vExample(kid, subj, L, u0, t)}` : `<button class="link" data-act="dunnotask">🤔 Не понимаю</button>`) : '';
+  const help = u0 && !fin ? (L.showTh === L.i ? `${t.sp ? '' : '<button class="btn ghost small" data-act="sayqtext">🔊 Прочитать задание</button>'}<details class="peek" open><summary>Правило</summary><div class="th">${u0.th}</div></details>${vExample(kid, subj, L, u0, t)}` : `<button class="link" data-act="dunnotask">🤔 Не понимаю</button>`) : '';
   const dots = `<div class="dots">${T.map((x, j) => { const aj = L.ans[j]; const st = aj && aj.final ? (aj.ok && aj.tries === 1 ? 'ok' : aj.ok ? 'mid' : 'bad') : j === L.i ? 'now' : ''; return `<span class="dot ${st}">${j + 1}</span>`; }).join('')}</div>`;
   return `<div class="counter">Задание ${L.i + 1} из ${T.length}</div>${dots}${L.i === 0 ? '<p class="hint small">Отвечай внимательно: засчитывается только первый ответ.</p>' : ''}<article class="card task">${(() => { const il = illus(kid, t.sj || subj, t); return il ? '' : `<div class="scenebar">${scene(kid, (L.seed || 7) + L.i)}</div>`; })()}<span class="sticker" aria-hidden="true">${U.rng((L.seed || 7) + L.i * 31).pick(THEME[TH(kid)].pics)}</span>${t.rev ? `<p class="revtag">🔁 Повторение: ${U.esc(t.rev)}</p>` : ''}<div class="q">${t.k === 't' ? t.q : t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, t.sj || subj, t)}${t.sp && !t.spAfter ? spk : ''}${inp}${fb}${t.sp && t.spAfter && fin ? spk : ''}${help}</article>
   ${fin ? `<button class="btn big" data-act="next">${L.i + 1 < T.length ? 'Дальше' : 'Закончить'}</button>` : ''}`;
@@ -5448,8 +5659,9 @@ document.addEventListener('click', e => {
     case 'dripseen': { const R = S.kids[kid].drip; if (R) R.sess = 0; save(); render(); break; }
     case 'norest': { const K0 = S.kids[b.dataset.k]; K0.restUntil = 0; K0.blk = 0; save(); render(); break; }
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
-    case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); break; }
-    case 'dunnotask': { L.showTh = L.i; L.helpN = (L.helpN || 0) + 1; const t = lessonTasks(L, kid, cur.subj)[L.i], u = (t.uid && t.sj ? unitById(kid, t.sj, t.uid) : unitById(kid, cur.subj, L.uid)) || { t: '' }; ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, q: strip(t.q) }); save(); render(); break; }
+    case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); if (L.phase === 'theory' && L.helpN === 1) say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
+    case 'dunnotask': { L.showTh = L.i; L.helpN = (L.helpN || 0) + 1; const t = lessonTasks(L, kid, cur.subj)[L.i], u = (t.uid && t.sj ? unitById(kid, t.sj, t.uid) : unitById(kid, cur.subj, L.uid)) || { t: '' }; ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, q: strip(t.q) }); save(); render(); if (!t.sp) say(strip(String(t.q)).replace(/_+/g, ' пропуск '), 'ru-RU'); break; }
+    case 'sayqtext': { const t = lessonTasks(L, kid, cur.subj)[L.i]; if (t) say(strip(String(t.q)).replace(/_+/g, ' пропуск '), 'ru-RU'); break; }
     case 'sayex': say(b.dataset.t, 'ru-RU'); break;
     case 'saytheory': { const u = unitById(kid, cur.subj, L.uid); say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
     case 'topractice': L.phase = 'practice'; save(); render(); break;

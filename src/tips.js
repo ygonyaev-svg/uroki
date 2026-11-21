@@ -42,3 +42,9 @@ function micDecorate(root){ (root || document).querySelectorAll('textarea[id]:no
   d.innerHTML = SR ? `<button type="button" class="btn ghost small mic2" data-mic="${t.id}">🎤 Сказать голосом</button><span class="hint">Говори — текст появится сам. Потом можно поправить.</span>` : '<span class="hint">🎤 Можно не печатать: нажми на поле, потом на микрофон на клавиатуре рядом с пробелом, и говори.</span>';
   t.insertAdjacentElement('afterend', d); }); }
 try { new MutationObserver(() => micDecorate()).observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
+/* Озвучка заданий — только после «Не понимаю»: сначала ребёнок читает сам. Совсем маленьким (6 лет и младше, семейная версия) — сразу. */
+function voiceFree(kid){ try { return !!(FAM && KIDS[kid] && KIDS[kid].age && KIDS[kid].age <= 6); } catch (e) { return false; } }
+function sayGate(key, btn){ cur.heard = cur.heard || {}; if (voiceFree(cur.kid) || cur.heard[key]) return `<span data-hk="${U.esc(key)}">${btn}</span>`; return `<button class="link dunno2" data-heard="${U.esc(key)}">🤔 Не понимаю</button>`; }
+document.addEventListener('click', e => { const b = e.target.closest('[data-heard]'); if (!b) return; e.preventDefault(); const key = b.dataset.heard; cur.heard = cur.heard || {}; cur.heard[key] = 1;
+  try { if (cur.kid) ev(cur.kid, 'не понимаю', { text: 'попросил(а) прочитать вслух' }); } catch (x) {} render();
+  setTimeout(() => { const t = document.querySelector(`[data-hk="${key.replace(/"/g, '')}"] button`); if (t) t.click(); }, 60); });

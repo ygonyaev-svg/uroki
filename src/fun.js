@@ -30,7 +30,7 @@ ALWAYS.push({ id: 'zag', order: 10,
       funTab('zgtab', lv, [[1, '🙂 Лёгкие · 7–9 лет'], [2, '🧠 Трудные · 10–12 лет']]) + '<p>Отгадано: <b>' + solved + '</b> из ' + L.length + (seen > solved ? ' · не угадано: ' + (seen - solved) : '') + '</p></section>';
     if (!z) return h + '<div class="card win"><h2>Все загадки этого уровня пройдены!</h2><p>Попробуй другой уровень. Скоро добавим новые.</p></div>';
     var r = cur.fz && cur.fz.id === z.id ? cur.fz : null, opts = U.rng(z.id + kid).shuffle([z.a].concat(z.w));
-    h += '<article class="card task zgcard">' + zgPic(kid, z) + '<div class="q zgtext">' + U.esc(z.q).replace(/\. /g, '.<br>') + '</div><div class="row"><button class="btn ghost small" data-act="zgsay">🔊 Послушать</button></div>' +
+    h += '<article class="card task zgcard">' + zgPic(kid, z) + '<div class="q zgtext">' + U.esc(z.q).replace(/\. /g, '.<br>') + '</div><div class="row">' + sayGate('zg' + z.id, '<button class="btn ghost small" data-act="zgsay">🔊 Послушать</button>') + '</div>' +
       '<div class="opts zgopts">' + opts.map(function(o){ var cls = r ? (o === z.a ? 'right' : o === r.v ? 'wrong' : '') : ''; return '<button class="opt ' + cls + '" data-act="zgans" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + zgOpt(o) + '</button>'; }).join('') + '</div>';
     if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! Это ' + U.esc(z.a.toLowerCase()) + '. ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Не угадал(а). Правильный ответ: <b>' + U.esc(z.a) + '</b> ' + (ZAG_EMO[z.a] || '')) + '</div>' + (r.pts ? funBurst(r.pts) : '');
     h += (z.own ? '<p class="src">Загадка придумана для этого приложения.</p>' : '<p class="src">Русская народная загадка.</p>') + '</article>';
@@ -180,7 +180,7 @@ ALWAYS.push({ id: 'zad', order: 40,
       funTab('zdtab', lv, [[1, 'Уровень 1 · 2–3 класс'], [2, 'Уровень 2 · 5 класс']]) + '<p>Решено: <b>' + solved + '</b> из ' + L.length + '</p></section>';
     if (!z) return h + '<div class="card win"><h2>Все задачи этого уровня решены!</h2><p>Скоро добавим новые.</p></div>';
     var r = cur.fq;
-    h += '<article class="card task"><span class="sticker" aria-hidden="true">' + U.rng(z.id).pick(THEME[TH(kid)].pics) + '</span><div class="q">' + U.esc(z.q) + '</div>' + (typeof picWords === 'function' ? picWords(z.q) : '') + '<div class="row"><button class="btn ghost small" data-act="zdsay">🔊 Послушать</button></div>' +
+    h += '<article class="card task"><span class="sticker" aria-hidden="true">' + U.rng(z.id).pick(THEME[TH(kid)].pics) + '</span><div class="q">' + U.esc(z.q) + '</div>' + (typeof picWords === 'function' ? picWords(z.q) : '') + '<div class="row">' + sayGate('zd' + z.id, '<button class="btn ghost small" data-act="zdsay">🔊 Послушать</button>') + '</div>' +
       '<form class="numf" data-form="zadf"><input id="zdin" inputmode="decimal" autocomplete="off" ' + (r ? 'disabled value="' + U.esc(r.v) + '"' : 'autofocus') + ' aria-label="Ответ"><button class="btn"' + (r ? ' disabled' : '') + '>Проверить</button></form>';
     if (r) h += '<div class="fb ' + (r.ok ? 'ok' : 'try') + '">' + (r.ok ? 'Верно! ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') : '') : 'Неверно. Ответ: <b>' + U.esc(z.as) + '</b>') + '</div><p class="hint">' + U.esc(z.e) + '</p>' + (r.ok ? funBurst(r.pts) : '');
     h += '</article>' + (r ? '<button class="btn big" data-act="zdnext">Следующая задача →</button>' : '');

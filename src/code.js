@@ -144,7 +144,7 @@ function vCode(){ const kid = cur.kid, C = cgK(kid); cgPayPending(kid);
 let CG = null, CG_VIEW = 'map'; /* { id, prog, sel:{k,i}, run, vi, step, res, hint } */
 function cgStart(id){ const lv = CG_LV[cgIdx(id)]; const C = cgK(cur.kid); const r = C.lv[id] || {};
   CG = { id: id, prog: lv.bug ? cgParse(lv.bug) : (r.prog ? JSON.parse(JSON.stringify(r.prog)) : []), sel: { k: '', i: -1 }, run: false, vi: 0, res: null, hint: 0, used: false };
-  CG.sel.i = CG.prog.length; C.last = id; save(); CG_VIEW = 'lv'; go('always', { aid: 'code' }); say(lv.say);
+  CG.sel.i = CG.prog.length; C.last = id; save(); CG_VIEW = 'lv'; CG.sayok = 0; go('always', { aid: 'code' }); if (voiceFree(cur.kid)) say(lv.say);
   if (!r.demo) { r.demo = 1; C.lv[id] = r; save(); setTimeout(() => cgDemo(), 700); } }
 /* Показ: цель мигает, полупрозрачный Тоби проходит начало пути (на новых темах — весь путь и программу) */
 const CG_DEMO_FULL = ['1.1', '2.1', '3.1', '4.1', '4.2', '4.3', '4.5', '5.1'];
@@ -191,7 +191,7 @@ function vCodeLv(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGri
   const tabs = grids.length > 1 ? `<div class="cgtabs">${grids.map((g, i) => `<button class="chip ${i === CG.vi ? 'on' : ''}" data-act="cgvar" data-i="${i}" ${CG.run ? 'disabled' : ''}>Улица ${i + 1}${res && res.vr && res.vr[i] != null ? (res.vr[i] ? ' ✓' : ' ✗') : ''}</button>`).join('')}</div><p class="hint center">Программа одна — она должна сработать на каждой улице.</p>` : '';
   const goal = lv.ch === 2 || cgFind(grids[0], 'N').length ? '⚽ → 🥅' : grids[0].join('').indexOf('c') >= 0 ? '🐾 → 🏁' : grids[0].join('').indexOf('*') >= 0 ? '🦴 → 🏠' : lv.ch >= 4 ? '🏁' : '🦴';
   return `<main class="wrap ${LK(kid)} cg cglvl"><header class="bar"><button class="link" data-act="code">← Уровни</button><span class="cgttl">Уровень ${lv.id} · ${goal}</span><button class="link" data-act="cgsay">🔊</button></header>
-  <p class="cgsay"><button class="cgsaybtn" data-act="cgsay">🔊</button> ${U.esc(lv.say)}</p><div class="cgtop"><button class="btn ghost cgshow" data-act="cgdemo" ${CG.run ? 'disabled' : ''}>👀 Покажи</button></div>${tabs}
+  <p class="cgsay">${CG.sayok || voiceFree(cur.kid) ? '<button class="cgsaybtn" data-act="cgsay">🔊</button> ' : ''}${U.esc(lv.say)}${CG.sayok || voiceFree(cur.kid) ? '' : ' <button class="link" data-act="cgsayhelp">🤔 Не понял</button>'}</p><div class="cgtop"><button class="btn ghost cgshow" data-act="cgdemo" ${CG.run ? 'disabled' : ''}>👀 Покажи</button></div>${tabs}
   <div id="cgdemo" class="cgdemo" style="display:none"></div><div id="cgbwrap">${cgBoard(lv, grids[CG.vi])}</div>
   ${res && !CG.run ? `<div class="fb ${res.ok ? 'ok' : 'try'}">${res.ok ? `Ура! ${'⭐'.repeat(res.stars)} ${res.pts ? `+${res.pts} ${U.pl(res.pts, 'балл', 'балла', 'баллов')}${res.pend ? ' (придут после уроков дня)' : ''}` : ''}${res.badge ? `<div class="cgbadge big">Глава пройдена! Награда: ${U.esc(res.badge)}</div>` : ''}${res.stars < 3 && !CG.used ? `<br><small>Можно короче: попробуй уложиться в ${cgCount(cgParse(lv.sol))} ${U.pl(cgCount(cgParse(lv.sol)), 'блок', 'блока', 'блоков')}, чтобы получить 3 звезды.</small>` : ''}` : U.esc(res.msg)}</div>` : ''}
   <section class="cgprog card"><div class="cgph"><b>Программа</b><span class="hint">${lv.max ? `блоков ${n} из ${lv.max}` : `блоков: ${n}`}</span></div>${cgListHtml(CG.prog, '', '')}</section>
@@ -216,7 +216,7 @@ function cgRun(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids
   CG.run = true; CG.res = null; CG.vi = 0; render(); let vi = 0, i = 0;
   const done = () => { CG.run = false; const ok = vr.every(Boolean), bad = R.find(x => !x.ok);
     const C = cgK(kid), rec = C.lv[lv.id] || (C.lv[lv.id] = { s: 0, t: 0, w: 0 });
-    if (!ok) { rec.t = (rec.t || 0) + 1; CG.res = { ok: false, msg: (grids.length > 1 ? `Улица ${R.indexOf(bad) + 1}: ` : '') + bad.msg, vr: vr }; CG.vi = R.indexOf(bad); save(); render(); say(bad.msg); return; }
+    if (!ok) { rec.t = (rec.t || 0) + 1; CG.res = { ok: false, msg: (grids.length > 1 ? `Улица ${R.indexOf(bad) + 1}: ` : '') + bad.msg, vr: vr }; CG.vi = R.indexOf(bad); save(); render(); if (CG.sayok || CG.hint || voiceFree(cur.kid)) say(bad.msg); return; }
     const n = cgCount(CG.prog), stars = cgStars(lv, n, CG.used); const prev = rec.s || 0; if (!prev && !rec.first) rec.first = (rec.t || 0) + 1;
     rec.w = (rec.w || 0) + 1; rec.prog = JSON.parse(JSON.stringify(CG.prog));
     let pts = 0, pend = false; if (stars > prev && !CG.used) { const room = Math.max(0, CODE_DAY_MAX - cgToday(kid)); pts = Math.min(stars - prev, room); }
@@ -243,6 +243,7 @@ function codeAct(act, b){ const kid = cur.kid;
   const touch = () => { CG.res = null; };
   switch (act) {
     case 'cgsay': say(lv.say); return true;
+    case 'cgsayhelp': CG.sayok = 1; render(); say(lv.say); ev(kid, 'не понимаю', { subj: 'Программирование', unit: `Уровень ${lv.id}`, text: 'попросил прочитать задание' }); return true;
     case 'cgdemo': say('Смотри!'); cgDemo(); return true;
     case 'cgadd': { const t = b.dataset.t; const arr = cgSlot(CG.prog, CG.sel.k); const depth = CG.sel.k ? CG.sel.k.split('/').length : 0;
       if ((t === 'P' || t === 'W' || t === 'I') && depth >= 2) { alertMsg('Глубже класть нельзя'); return true; }

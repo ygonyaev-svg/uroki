@@ -93,7 +93,7 @@ function famInit(){
       if (l1) { lang.alt = famLangCourse(l1, +c.lg[l1], c.age); lang.altName = FAM_LANGS[l1][0]; lc._alt = FAM_LANGS[l1][1]; }
       a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur, { lang: lang }); a.lc = lc; }
     a.read = famReadList(rd >= 3 && c.age >= 9 ? READ_A : rd === 0 && c.age <= 10 ? READ_Y : KIDS_TPL[a.tpl].read, c.done);
-    KIDS[c.id] = Object.assign({}, KIDS_TPL[a.tpl], a, { name: c.name, grade: c.age + ' ' + U.pl(+c.age, 'год', 'года', 'лет'), look: c.look || famLookOf(c) });
+    KIDS[c.id] = Object.assign({}, KIDS_TPL[a.tpl], a, { name: c.name, age: +c.age, grade: c.age + ' ' + U.pl(+c.age, 'год', 'года', 'лет'), look: c.look || famLookOf(c) });
     var th = famThemeOf(c); if (th) THEME['k:' + c.id] = th; else delete THEME['k:' + c.id];
     if (!S.kids[c.id]) S.kids[c.id] = newKid(); if (c.pin) S.kids[c.id].pin = c.pin;
     var K = S.kids[c.id], ms = mk ? mt + '|' + mk : ''; if (ms && K.mathSet !== ms) { K.pos.math = mp; K.mathSet = ms; }
