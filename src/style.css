@@ -183,3 +183,6 @@ th{ color:var(--ink2); font-weight:600; }
 .cheer{ font-size:28px; font-weight:700; color:var(--acc); margin-bottom:6px; }
 .anya .hello h1,.anya .cheer{ font-family:Georgia,"PT Serif",serif; }
 .anya .card.task{ border-color:#cdbf98; }
+.tile.locked{ opacity:.45; filter:grayscale(.6); }
+.tile.locked .ico::after{ content:"🔒"; position:absolute; font-size:16px; transform:translate(22px,-22px); }
+.tile.locked .ico{ position:relative; }
