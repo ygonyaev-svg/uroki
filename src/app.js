@@ -108,7 +108,7 @@ function unitAt(kid, subj, tr){ const list = unitsOf(kid, subj, tr); const K = S
 function acc(K, uid){ const s = K.stats[uid]; return s && s.n ? s.ok / s.n : 1; }
 function genTasks(unit, seed, n){ const r = U.rng(seed); const out = []; const seen = new Set(); let guard = 0;
   while (out.length < n && guard++ < n * 12) { const t = unit.g(r); t.q = agree(t.q); t.e = agree(t.e); if (t.k === 'c' && /^\d+([.,]\d+)?$/.test(t.a) && t.w.every(x => /^\d+([.,]\d+)?$/.test(String(x)))) { t.k = 'n'; t.a = Number(String(t.a).replace(',', '.')); delete t.w; } /* числа — только вводом, без угадывания */
-    else if (t.k === 'c' && /^[a-zà-üа-яё'’-]+$/i.test(String(t.a)) && t.w.every(x => /^[a-zà-üа-яё'’-]+$/i.test(String(x))) && !TXT_KEEP[strip(t.q)] && (/_/.test(t.q) || new RegExp('(^|[^a-zà-üа-яё])' + String(t.a).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-zà-üа-яё]|$)', 'i').test(strip(t.q)))) { t.k = 't'; t.alt = TXT_ALT[strip(t.q)] || []; t.a = String(t.a); t.wx = t.w; delete t.w; } /* слово из вопроса или пропуск — пишем сами */ if (seen.has(t.q)) continue; seen.add(t.q); if (t.k === 'c') t.opts = r.shuffle([t.a, ...t.w]); out.push(t); }
+    else if (t.k === 'c' && /^[a-zà-üа-яё'’-]+$/i.test(String(t.a)) && t.w.every(x => /^[a-zà-üа-яё'’-]+$/i.test(String(x))) && !TXT_KEEP[strip(t.q)] && !(FAM && (KIDS[cur.kid] || {}).noType) && (/_/.test(t.q) || new RegExp('(^|[^a-zà-üа-яё])' + String(t.a).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-zà-üа-яё]|$)', 'i').test(strip(t.q)))) { t.k = 't'; t.alt = TXT_ALT[strip(t.q)] || []; t.a = String(t.a); t.wx = t.w; delete t.w; } /* слово из вопроса или пропуск — пишем сами */ if (seen.has(t.q)) continue; seen.add(t.q); if (t.k === 'c') t.opts = r.shuffle([t.a, ...t.w]); out.push(t); }
   return out; }
 function grade(x){ return x >= .9 ? 5 : x >= .75 ? 4 : x >= .5 ? 3 : 2; }
 function dayRec(kid, ds){ const K = S.kids[kid]; if (!K.days[ds]) K.days[ds] = { les:{}, bonus:false }; return K.days[ds]; }
@@ -127,7 +127,7 @@ function sayRobot(text, lang){ try { const s = window.speechSynthesis; if (!s) r
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const normW = w => w.toLowerCase().replace(/ё/g, 'е').replace(/[^\p{L}\p{N}]/gu, '');
 function lev(a, b){ const m = a.length, n = b.length; if (!m) return n; if (!n) return m; let p = Array.from({ length: n + 1 }, (_, j) => j); for (let i = 1; i <= m; i++) { const c = [i]; for (let j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[n]; }
-function sim(a, b){ if (a === b) return true; if (Math.abs(a.length - b.length) > 2) return false; const d = lev(a, b); return d <= (b.length >= 7 ? 2 : b.length >= 4 ? 1 : 0); }
+function sim(a, b){ if (a === b) return true; if (Math.abs(a.length - b.length) > 2) return false; const d = lev(a, b); return d <= (b.length >= 7 ? 2 : b.length >= 4 ? 1 : 0) + (FAM && b.length >= 4 ? (KIDS[cur.kid] || {}).simPlus || 0 : 0); }
 function align(T, spoken){ const st = new Array(T.length).fill(0); let p = 0, extra = 0;
   for (const s of spoken) { if (!s) continue; let f = -1; for (let j = p; j < Math.min(T.length, p + 5); j++) if (T[j] && sim(s, T[j])) { f = j; break; }
     if (f < 0) { extra++; continue; } for (let k = p; k < f; k++) st[k] = T[k].length <= 2 ? 1 : 2; st[f] = 1; p = f + 1; }
@@ -239,7 +239,7 @@ const READ_LV = { yarik: [[0,'Новичок','🌱'],[20,'Ученик','📖']
   anya: [[0,'Ученица','🌱'],[80,'Читательница','📖'],[100,'Книжный знаток','📚'],[120,'Мастер слова','✒️'],[140,'Магистр чтения','🌟'],[160,'Архимаг книг','🔮']] };
 function readLvList(kid){ return READ_LV[T(kid) === 'anya' ? 'anya' : 'yarik']; }
 function readLv(kid, wpm){ const A = readLvList(kid); let i = 0; A.forEach((x, k) => { if (wpm >= x[0]) i = k; }); return { i, cur: A[i], next: A[i + 1] }; }
-function readOkRec(kid, x){ return (x.acc == null || x.acc >= .85) && x.wpm <= KIDS[kid].norm * 3; }
+function readOkRec(kid, x){ return (x.acc == null || x.acc >= (KIDS[kid].accMin || .9) - .05) && x.wpm <= KIDS[kid].norm * 3; }
 function readBestOf(kid){ const K = S.kids[kid]; if (K.readBest == null) K.readBest = Math.max(0, ...K.reading.filter(x => x.lang === 'ru' && readOkRec(kid, x)).map(x => x.wpm)); return K.readBest; }
 function badgesRow(kid){ const lv = readLv(kid, readBestOf(kid)).i; if (!lv) return ''; return `<div class="badges">${readLvList(kid).slice(1, lv + 1).map(x => `<span title="${x[1]}">${x[2]}</span>`).join('')}</div>`; }
 function vocabRow(kid){ const V = S.kids[kid].vocab || []; if (!V.length) return ''; return `<p class="hint">Новых слов в копилке слов: <b>${V.length}</b> — последние: ${V.slice(-4).map(v => U.esc(v.w)).join(', ')}.</p>`; }
@@ -721,8 +721,8 @@ function stopRead(){
   const res = { wpm, acc, errs, secs: Math.round(secs), words: reached, sr: useSR };
   if (cur.subj === 'read') {
     const L = dayRec(kid, cur.ds).les.read; L.res = res; L.i = 0; { const sp = aloudPart(readText(kid).text, readLim(kid, L)); L.phase = sp.rest ? 'silent' : readText(kid).kw ? 'retell' : 'qs'; L.st0 = Date.now(); }
-    const norm = KIDS[kid].norm; res.good = (acc == null || acc >= .9) && wpm >= norm * .8 * progressFactor(kid) && wpm <= norm * 3;
-    res.repeat = acc != null && acc < .85;
+    const norm = KIDS[kid].norm; res.good = (acc == null || acc >= (KIDS[kid].accMin || .9)) && wpm >= norm * .8 * progressFactor(kid) && wpm <= norm * 3;
+    res.repeat = acc != null && acc < (KIDS[kid].accMin || .9) - .05;
     errs.forEach(w => { const h = K.hard[w] || (K.hard[w] = { miss: 0, ok: 0 }); h.miss++; });
     if (useSR) RD.T.forEach((w, k) => { if (RD.st[k] === 1) { const orig = textWords[k].replace(/[^\p{L}-]/gu, ''); if (K.hard[orig]) { K.hard[orig].ok++; if (K.hard[orig].ok >= 2) delete K.hard[orig]; } } });
     const lim = wordsLimit(kid); K.readWords = Math.round(res.good ? lim * 1.15 : res.repeat ? Math.max(30, lim * .9) : lim);
