@@ -38,7 +38,7 @@ function hpBodyCls(kid){ var h = hpHouse(kid); return h ? ' h-' + h : ''; }
 function hpT(kid, s){ return s; }
 
 /* ---------- Банк вопросов ---------- */
-var HPQ = HP_Q.map(function(l){ var p = l.split('|'); return { id: 'h' + U.h(p[3]), b: +p[0], c: +p[1], lv: +p[2], q: p[3], a: p[4], w: p[5].split(';'), e: p[6] || '' }; });
+var HPQ = HP_Q.map(function(l){ var p = l.split('|'); return { id: 'h' + U.h(p[3]), b: +p[0], c: +p[1], lv: +p[2], q: p[3], a: p[4], w: p[5].split(';'), e: p[6] || '', img: p[7] || '' }; });
 var HP_PICQ = 'Художник ошибся. Что на картинке не так, как в книге?';
 (typeof HP_PIC !== 'undefined' ? HP_PIC : []).forEach(function(l){ var p = l.split('|'); HPQ.push({ id: 'p' + U.h(p[4]), b: +p[0], c: +p[1], lv: +p[2], pic: p[3], cap: p[4], q: HP_PICQ, a: p[5], w: p[6].split(';'), e: p[7] || '' }); });
 var HPQ_BY = {}; HPQ.forEach(function(x){ HPQ_BY[x.id] = x; });
@@ -79,7 +79,7 @@ ALWAYS.push({ id: 'hp', order: 1,
     if (x) {
       var r = (cur.hq && cur.hq.id === x.id) ? cur.hq : null, opts = hpOpts(kid, x);
       h += '<div class="counter">' + (mode === 're' || (r && r.re) ? '📖 Вопрос после перечитывания' : 'Вопрос ' + Math.min(D.ids.length, done + (r ? 0 : 1)) + ' из ' + D.ids.length) + (x.lv === 3 ? ' · <b>эксперт</b>' : '') + '</div>';
-      h += '<article class="card task hpcard"><p class="hpbook">📕 Книга ' + x.b + ' · «' + HP_BOOKS[x.b] + '»</p>' + (x.pic ? '<div class="hppic hpimg"><img src="img/hp/' + U.esc(x.pic) + '.webp" alt="' + U.esc(x.cap) + '" loading="lazy"></div><p class="hpcap">' + U.esc(x.cap) + '</p>' : '') + '<div class="q">' + U.esc(hpT(kid, x.q)) + '</div>' +
+      h += '<article class="card task hpcard"><p class="hpbook">📕 Книга ' + x.b + ' · «' + HP_BOOKS[x.b] + '»</p>' + (x.pic ? '<div class="hppic hpimg"><img src="img/hp/' + U.esc(x.pic) + '.webp" alt="' + U.esc(x.cap) + '" loading="lazy"></div><p class="hpcap">' + U.esc(x.cap) + '</p>' : x.img ? '<div class="hppic hpimg"><img src="img/hp/q/' + U.esc(x.img) + '.webp" alt="" loading="lazy"></div>' : '') + '<div class="q">' + U.esc(hpT(kid, x.q)) + '</div>' +
         '<div class="opts">' + opts.map(function(o){ var cls = r ? (o === x.a ? 'right' : o === r.v ? 'wrong' : '') : ''; return '<button class="opt ' + cls + '" data-act="hpans" data-v="' + U.esc(o) + '"' + (r ? ' disabled' : '') + '>' + U.esc(hpT(kid, o)) + '</button>'; }).join('') + '</div>';
       if (r) {
         h += r.ok ? '<div class="fb ok"><b>' + U.rng(x.id).pick(THEME[TH(kid)].win) + '</b> ' + (r.pts ? '+' + r.pts + ' ' + U.pl(r.pts, 'балл', 'балла', 'баллов') + '. ' : '') + U.esc(hpT(kid, x.e)) + '</div><p class="src">📖 ' + U.esc(hpT(kid, hpWhere(x))) + '</p>'
