@@ -12,7 +12,7 @@ function ppToday(kid){ const K = S.kids[kid], t = U.today(), D = K.days && K.day
   const done = order.filter(s => D && D.les && D.les[s] && D.les[s].phase === 'done'), left = order.filter(s => done.indexOf(s) < 0);
   const pts = K.dg && K.dg.d === t ? K.dg.n : 0, name = KIDS[kid].name;
   const evs = S.log.filter(e => e.kid === name && String(e.t).slice(0, 10) === t);
-  const last = evs.length ? new Date(evs[evs.length - 1].t).getTime() : 0;
+  let last = evs.length ? new Date(evs[evs.length - 1].t).getTime() : 0; if (K.modT && U.today() === t && new Date(K.modT).toDateString() === new Date().toDateString()) last = Math.max(last, K.modT);
   return { done, left, n: order.length, pts, evs, last }; }
 function ppSubj(kid, s){ if (s === 'read') return 'чтение'; if (s === 'hw') return 'домашнее задание'; const c = KIDS[kid].cur[s]; return c ? U.noEmo(c.name).toLowerCase() : s; }
 function ppWaitN(kid){ const K = S.kids[kid]; return { pr: (K.shop || []).filter(x => x.price == null).length, pt: typeof ptOf === 'function' ? ptOf(kid, ['wait']).length : 0 }; }
@@ -32,8 +32,14 @@ function ppTile(act, ic, title, sub, badge, wide){ return `<button class="pp-til
 function ppHead(title, back){ const k = cur.parentKid, many = kidIds().length > 1;
   return `<header class="bar"><button class="link" data-act="${back ? 'ptab' : 'logout'}" data-t="home">${back ? '← Назад' : '← Выйти'}</button><span>${title}</span>${back ? '' : `<button class="pp-gear" data-act="ptab" data-t="set" aria-label="Настройки">${icon('gear')}</button>`}</header>` +
     (back && many && k && cur.parentTab !== 'set' && !(FAM && cur.parentTab === 'sum') ? `<div class="row pp-sw">${kidIds().map(x => `<button class="chip ${x === k ? 'on' : ''}" data-act="pkid" data-k="${x}">${U.esc(KIDS[x].name)}${ppWait(x) ? ' •' : ''}</button>`).join('')}</div>` : ''); }
+/* Телефон родителя в «Уроках» (S.viewer): прогресс детей — со снимков на сервере (лист «Снимки»), только чтение. На сервер отсюда ничего не уходит. */
+let PP_PULL = 0;
+function ppPull(force){ if (FAM || !S.viewer || !S.cfg.sync || !navigator.onLine || (!force && Date.now() - PP_PULL < 30000)) return; PP_PULL = Date.now();
+  Promise.all(kidIds().map(kid => fetch(S.cfg.sync + (S.cfg.sync.includes('?') ? '&' : '?') + 'action=snap&kid=' + encodeURIComponent(kid)).then(r => r.json()).then(j => {
+    if (!j || !j.ok || !j.state || !(j.t > (S.kids[kid].modT || 0))) return false; const R = JSON.parse(j.state); if (!R || !R.days) return false; R.modT = j.t; S.kids[kid] = R; return true; }).catch(() => false)))
+    .then(a => { S.viewAt = Date.now(); save(); if (cur.view === 'parent' && !ptTyping()) render(); }); }
 function vParent(){
-  if (FAM) famParentPull();
+  if (FAM) famParentPull(); else ppPull();
   let tab = PP_OLD[cur.parentTab] || cur.parentTab || 'home'; cur.parentTab = tab;
   const k = ppKid();
   if (!k) return `<main class="wrap pp">${ppHead('Родителям')}<div class="card"><p>Детей пока нет.</p>${FAM ? '<button class="btn" data-act="fkedit">Добавить детей</button>' : ''}</div></main>`;
@@ -42,12 +48,13 @@ function vParent(){
   if (tab === 'home') {
     const K = S.kids[k], T0 = ppToday(k), w = ppWait(k), n = typeof ptOf === 'function' ? ptOf(k, ['new']).length : 0, x = extraSecs(K) / 60;
     return `<main class="wrap pp">${ppHead('Родителям')}<div class="pp-kids">${kidIds().map(x => ppKidCard(x, x === k)).join('')}</div>
-    ${w ? (W => `<button class="pp-attn" data-act="ptab" data-t="ok"><span>Ждут вашей проверки: ${[W.pt ? agree(W.pt + ' заданий') : '', W.pr ? (W.pr === 1 ? 'цена приза' : 'цены ' + W.pr + ' призов') : ''].filter(Boolean).join(', ')}</span><b>Проверить</b></button>`)(ppWaitN(k)) : ''}
+    ${S.viewer && !FAM ? `<div class="card pp-view"><p><b>Телефон родителя: только просмотр.</b> Данные с айпадов детей${S.viewAt ? ', обновлено в ' + hhmm(S.viewAt) : ''}. Цены призов, баллы и время меняются на айпаде ребёнка.</p><button class="btn small ghost" data-act="pppull">Обновить</button></div>` : ''}
+    ${w && !(S.viewer && !FAM) ? (W => `<button class="pp-attn" data-act="ptab" data-t="ok"><span>Ждут вашей проверки: ${[W.pt ? agree(W.pt + ' заданий') : '', W.pr ? (W.pr === 1 ? 'цена приза' : 'цены ' + W.pr + ' призов') : ''].filter(Boolean).join(', ')}</span><b>Проверить</b></button>`)(ppWaitN(k)) : ''}
     <div class="pp-grid">${ppTile('sum', 'note', 'Сводка сейчас', U.esc(KIDS[k].name) + ': что сделано за день', '', true)}
-    ${ppTile('tasks', 'pen', 'Дать задание', n ? 'активных: ' + n : 'дело, задачка, чтение')}
-    ${ppTile('ok', 'check', 'Проверить', w ? 'ждут вас: ' + w : 'задания и цены призов', w)}
-    ${ppTile('time', 'clock', 'Время', restLeft(k) ? 'отдых до ' + hhmm(K.restUntil) : (baseList(k).filter(x => x.m > 0).map(x => x.name.toLowerCase() + ' ' + x.m).join(', ') || 'настроить') + (baseList(k).some(x => x.m > 0) ? ' мин' : ''))}
-    ${ppTile('coins', 'coin', 'Баллы +/−', 'на счету ' + K.coins + (K.piggy ? ', в копилке ' + K.piggy : ''))}
+    ${S.viewer && !FAM ? '' : ppTile('tasks', 'pen', 'Дать задание', n ? 'активных: ' + n : 'дело, задачка, чтение')}
+    ${S.viewer && !FAM ? '' : ppTile('ok', 'check', 'Проверить', w ? 'ждут вас: ' + w : 'задания и цены призов', w)}
+    ${S.viewer && !FAM ? '' : ppTile('time', 'clock', 'Время', restLeft(k) ? 'отдых до ' + hhmm(K.restUntil) : (baseList(k).filter(x => x.m > 0).map(x => x.name.toLowerCase() + ' ' + x.m).join(', ') || 'настроить') + (baseList(k).some(x => x.m > 0) ? ' мин' : ''))}
+    ${S.viewer && !FAM ? '' : ppTile('coins', 'coin', 'Баллы +/−', 'на счету ' + K.coins + (K.piggy ? ', в копилке ' + K.piggy : ''))}
     ${ppTile('report', 'chart', 'Учёба', 'предметы, чтение, ошибки')}
     ${ppTile('portrait', 'brain', 'Развитие', 'сильные стороны')}</div>
     <button class="pp-setl" data-act="ptab" data-t="set">${icon('gear')} Настройки</button></main>`; }
@@ -130,6 +137,7 @@ function ppAct(act, b){ const k = cur.parentKid;
     case 'ppaldel': { const L = baseList(k).slice(), x = L.splice(+b.dataset.i, 1)[0]; if (x) ppAllowSave(k, L, 'Убрано: ' + x.name); return true; }
     case 'ppalidea': { const e = document.getElementById('ppaln'); cur.ppAl = Object.assign({}, cur.ppAl, { n: b.dataset.n }); if (e) e.value = b.dataset.n; return true; }
     case 'ppalnm': { const e = document.getElementById('ppaln'); cur.ppAl = Object.assign({}, cur.ppAl, { m: +b.dataset.m, n: e ? e.value : '' }); const y = window.scrollY; render(); window.scrollTo(0, y); return true; }
+    case 'pppull': ppPull(true); alertMsg('Обновляем…'); return true;
     case 'ppwhy': cur.ppWhy = cur.ppWhy === b.dataset.w ? '' : b.dataset.w; render(); return true;
     case 'ppcoins': ppCoinAdd(k, +b.dataset.n); return true;
     case 'ppprice': ppSetPrice(k, +b.dataset.i, +b.dataset.p); return true;
