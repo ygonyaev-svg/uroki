@@ -416,3 +416,24 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .libbar{ display:flex; align-items:center; gap:12px; margin:8px 0 14px; } .libbar .prog{ flex:1; margin:0; } .libbar span{ white-space:nowrap; font-weight:600; }
 .lib .reading .text{ font-size:22px; line-height:1.7; }
 @media (max-width:480px){ .libbar{ flex-direction:column; align-items:stretch; } .lib .reading .text{ font-size:20px; } }
+/* ===== Ярик читает сам (selfread.js) ===== */
+.srgate{ margin-top:8px; }
+.srh{ font-weight:700; color:var(--ink2); margin:0 0 8px; }
+.srtext{ font-size:1.55em; line-height:1.9; }
+.srtext .sw{ font:inherit; color:inherit; background:none; border:0; padding:0 3px; border-radius:6px; cursor:pointer; }
+.srtext .sw.swh{ background:rgba(224,164,23,.3); outline:2px solid var(--gold); }
+#srrow{ margin-top:12px; align-items:center; }
+.dnc{ font-size:.85em; color:var(--ink2); }
+.sycard{ text-align:center; }
+.syhow{ font-weight:700; margin:0 0 12px; }
+.syword{ font-size:2.6em; font-weight:800; letter-spacing:.08em; margin:10px 0 14px; color:var(--ink); }
+.sybuilt{ min-height:1.3em; color:var(--acc); }
+.sybig{ display:flex; justify-content:center; margin:6px 0; }
+.sypics{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:520px; margin:0 auto; }
+.sypic{ background:var(--card); border:2px solid var(--line); border-radius:18px; padding:14px 6px; cursor:pointer; font-size:3.2em; line-height:1; min-height:110px; display:flex; align-items:center; justify-content:center; }
+.sypic.solo{ cursor:default; width:140px; }
+.sypic .ic{ width:1.3em; height:1.3em; }
+.sypic.right{ border-color:var(--green); background:rgba(35,130,74,.12); }
+.sypic.wrong{ border-color:var(--red); opacity:.55; }
+.syopts .syo{ font-size:2em; font-weight:800; letter-spacing:.06em; min-height:72px; }
+@media (max-width:480px){ .syword{ font-size:2em; } .sypic{ min-height:90px; font-size:2.6em; } .srtext{ font-size:1.35em; } }
