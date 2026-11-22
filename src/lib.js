@@ -47,7 +47,7 @@ function vLib(){ var kid = cur.kid, K = S.kids[kid], B = libK(kid);
   var title = '<h1>' + U.esc(pg.t.title || '') + '</h1>' + (pg.t.author ? '<p class="author">' + U.esc(pg.t.author) + '</p>' : '');
   if (b.chk) return head + title + bar + libChkView(kid, b) + '</section></main>';
   if (b.aloud) { var live = LR && LR.active;
-    return head + title + bar + '<article class="card reading"><div class="text" id="ltext"><p>' + libWords(pg.text).map(function(w, i){ var st = LR && LR.st ? LR.st[i] : 0; return '<span class="w ' + (st === 1 ? 'r1' : st === 2 ? 'r2' : LR && i === LR.p ? 'rc' : '') + '" data-i="' + i + '">' + U.esc(w) + '</span>'; }).join(' ') + '</p></div></article>' +
+    return head + title + bar + '<article class="card reading"><div class="text" id="ltext"><p>' + libWords(pg.text).map(function(w, i){ return '<span class="w ' + (LR ? wCls(LR.st, i, LR.p) : '') + '" data-i="' + i + '">' + U.esc(w) + '</span>'; }).join(' ') + '</p></div></article>' +
       '<div class="readbar">' + (live ? '<button class="btn ghost" data-act="libpause">' + icon('pause') + ' Пауза</button><span id="lstat" class="rstat">Слушаю… читай вслух</span>' : '<button class="btn big mic" data-act="libmic">' + icon('mic') + ' ' + (b.pages ? 'Читать дальше вслух' : 'Читать вслух') + '</button>') + '</div>' +
       '<p class="hint">Страница засчитается, когда прочитаешь её вслух. Если молчать — время не идёт.</p></section></main>'; }
   if (!b.t0) { b.t0 = Date.now(); save(); }
@@ -76,7 +76,7 @@ function libUpd(R0){ var kid = R0.kid, b = libK(kid).blk; if (!b) return;
   if (r.p > R0.p) { b.sec = (b.sec || 0) + Math.min((now - R0.last) / 1000, LIB_GAP); b.words = (b.words || 0) + (r.p - R0.p); R0.last = now; }
   else if (now - R0.last > LIB_GAP * 1000) R0.last = now - LIB_GAP * 1000;
   R0.st = r.st; R0.p = r.p;
-  var els = document.querySelectorAll('#ltext .w'); for (var i = 0; i < els.length; i++) { var k = +els[i].getAttribute('data-i'); els[i].className = 'w ' + (r.st[k] === 1 ? 'r1' : r.st[k] === 2 ? 'r2' : k === r.p ? 'rc' : ''); }
+  var els = document.querySelectorAll('#ltext .w'); for (var i = 0; i < els.length; i++) { var k = +els[i].getAttribute('data-i'); els[i].className = 'w ' + wCls(r.st, k, r.p); }
   var c = document.querySelector('#ltext .w.rc'); if (c && c.scrollIntoView) c.scrollIntoView({ block: 'center', behavior: 'smooth' });
   if (r.p >= Math.ceil(R0.T.length * .9)) { /* страница прочитана — следующая, микрофон не выключаем */
     var pg = libPage(kid); libK(kid).s = pg.to; b.pages = (b.pages || 0) + 1; save();
