@@ -44,7 +44,7 @@ function ptMerge(list){ const A = ptAll(), q = S.ptq || {}, seen = {}; let ch = 
     if (i < 0) { A.push(s); ch = true; } else if ((s.v || 0) > (A[i].v || 0)) { A[i] = s; delete q[s.id]; ch = true; } else if ((s.v || 0) < (A[i].v || 0)) q[s.id] = 1; });
   for (let i = A.length - 1; i >= 0; i--) if (!seen[A[i].id] && !q[A[i].id]) { A.splice(i, 1); ch = true; } /* удалено родителем или устарело на сервере */
   if (Object.keys(q).length) ptSyncSoon();
-  if (ch) { save(); if (cur.kid && cur.view === 'home') render(); else if (cur.view === 'parent' && cur.parentTab === 'tasks' && !ptTyping()) render(); else if (cur.view === 'ptask' && !cur.ptid) render(); } }
+  if (ch) { save(); if (cur.kid && cur.view === 'home') render(); else if (cur.view === 'parent' && ['tasks', 'ok', 'home'].includes(cur.parentTab) && !ptTyping()) render(); else if (cur.view === 'ptask' && !cur.ptid) render(); } }
 function ptTyping(){ const a = document.activeElement; return a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName); }
 
 /* --- лист «Указания» (Уроки): тип «задание» — текст «Вынести мусор | 10» или JSON { kind, title, text, q, opts, pts }; тип «подтвердить» — название или id --- */
