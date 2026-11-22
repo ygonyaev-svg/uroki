@@ -85,7 +85,8 @@ function famRoute_(d){
    Лист «Снимки»: семья | ребёнок (id) | t (мс) | обновлено | день (JSON: план уроков, баллы сегодня) | частей | части снимка по 45000 знаков.
    Снимок — прогресс ребёнка с его устройства; родитель видит его на своём телефоне. Хранится самый новый (по t).
    Вечерняя сводка: famEvening по расписанию 20:30 и 21:30 (Лиссабон), повтор только тем, кому письмо ещё не ушло. Журнал — лист «Сводки».
-   Установить расписание один раз: запустить famSumSetup в редакторе. */
+   Установить расписание один раз: запустить famSumSetup в редакторе (заодно спросит разрешение на отправку писем).
+   Опубликовано 22.11.2026: версия развертывания 15 (вместе с заданиями от родителей). */
 var FAM_TZ = 'Europe/Lisbon', FAM_PART = 45000;
 function famSnapSh(){ var ss = SpreadsheetApp.openById(FAM_SID), sh = ss.getSheetByName('Снимки'); if (!sh) { sh = ss.insertSheet('Снимки'); sh.appendRow(['Семья', 'Ребёнок', 't', 'Обновлено', 'День', 'Частей', 'Снимок']); } return sh; }
 function famSumCol(sh){ if (!sh.getRange(1, 13).getValue()) sh.getRange(1, 13).setValue('Сводка'); }
@@ -184,4 +185,5 @@ function famSumSetup(){
   ScriptApp.newTrigger('famEvening').timeBased().atHour(20).nearMinute(30).everyDays(1).inTimezone(FAM_TZ).create();
   ScriptApp.newTrigger('famEvening').timeBased().atHour(21).nearMinute(30).everyDays(1).inTimezone(FAM_TZ).create();
   famSumCol(famRows().sh); famSnapSh(); famSumLog();
+  Logger.log('Писем можно отправить сегодня: ' + MailApp.getRemainingDailyQuota());
 }
