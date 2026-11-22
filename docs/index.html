@@ -1112,7 +1112,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v26272783 */
+<script>/* v4867dcc1 */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -8542,7 +8542,7 @@ function applyCfg(rows){ let fresh = false;
     const kid = /ан/i.test(row.kid) ? 'anya' : /яр/i.test(row.kid) ? 'yarik' : null; if (!kid || !row.id) continue;
     const K = S.kids[kid]; if (K.applied.includes(row.id)) continue;
     const type = String(row.type || '').toLowerCase();
-    if (type.startsWith('тем')) { const s = subjByName(kid, row.subj); const f = s && findUnit(kid, s, row.value); if (f) K.pos[f.key] = f.i; }
+    if (type.startsWith('тем')) { const s = subjByName(kid, row.subj); const f = s && findUnit(kid, s, row.value); if (f) { K.pos[f.key] = f.i; const Dt = K.days[U.today()], Lt = Dt && Dt.les && Dt.les[s]; if (Lt && Lt.phase !== 'done') delete Dt.les[s]; /* начатый сегодня урок по старой теме начнётся заново с новой */ } }
     else if (type.startsWith('дз')) K.hwText.push({ id: row.id, text: String(row.value), done: false });
     else if (type.startsWith('сооб')) K.msgs.push({ id: row.id, text: String(row.value), seen: false });
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
@@ -9023,9 +9023,9 @@ function finishLesson(){
   if (subj !== 'read' && !ITEMS(subj)) {
     const key = subj + L.tr; L.passed = ratio >= .8;
     /* Каждая тема — два урока: изучение и закрепление. Дальше идём, когда тема сдана дважды (≥80%). */
-    if (L.passed) { K.passN = K.passN || {}; const pn = (K.passN[L.uid] || 0) + (ratio === 1 && (L.fb || {}).diff === 'легко' ? 2 : 1); /* всё верно и «легко» — тема закрыта сразу, без закрепления */ K.passN[L.uid] = pn; if (pn >= 2) { K.pos[key] = (K.pos[key] || 0) + 1; L.topicDone = true; } else L.consolidate = true; }
+    if (L.passed) { K.passN = K.passN || {}; const pn = (K.passN[L.uid] || 0) + (ratio === 1 ? 2 : 1); /* всё верно с первого раза — тема закрыта сразу, без закрепления */ K.passN[L.uid] = pn; if (pn >= 2) { K.pos[key] = (K.pos[key] || 0) + 1; L.topicDone = true; } else L.consolidate = true; }
     const f = L.fb || {}; const lv = K.lvl[subj] || 0;
-    if (f.diff === 'легко' && ratio === 1) K.lvl[subj] = Math.min(lv + 1, 5); else if (f.diff === 'трудно' && ratio < .75) K.lvl[subj] = Math.max(lv - 1, -1);
+    if (ratio === 1 && f.diff !== 'трудно') K.lvl[subj] = Math.min(lv + 1, 5); else if (f.diff === 'трудно' && ratio < .75) K.lvl[subj] = Math.max(lv - 1, -1);
   }
   if (subj === 'hw') K.hwText.forEach(h => { if ((L.txt || []).includes(h.id)) h.done = true; });
   L.secs = Math.min(1500, Math.round((Date.now() - (L.t0 || Date.now())) / 1000)); D.secs = (D.secs || 0) + L.secs; restTick(kid, L.secs);
