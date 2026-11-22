@@ -100,7 +100,7 @@ function applyCfg(rows){ let fresh = false;
     const kid = /ан/i.test(row.kid) ? 'anya' : /яр/i.test(row.kid) ? 'yarik' : null; if (!kid || !row.id) continue;
     const K = S.kids[kid]; if (K.applied.includes(row.id)) continue;
     const type = String(row.type || '').toLowerCase();
-    if (type.startsWith('тем')) { const s = subjByName(kid, row.subj); const f = s && findUnit(kid, s, row.value); if (f) K.pos[f.key] = f.i; }
+    if (type.startsWith('тем')) { const s = subjByName(kid, row.subj); const f = s && findUnit(kid, s, row.value); if (f) { K.pos[f.key] = f.i; const Dt = K.days[U.today()], Lt = Dt && Dt.les && Dt.les[s]; if (Lt && Lt.phase !== 'done') delete Dt.les[s]; /* начатый сегодня урок по старой теме начнётся заново с новой */ } }
     else if (type.startsWith('дз')) K.hwText.push({ id: row.id, text: String(row.value), done: false });
     else if (type.startsWith('сооб')) K.msgs.push({ id: row.id, text: String(row.value), seen: false });
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
@@ -581,9 +581,9 @@ function finishLesson(){
   if (subj !== 'read' && !ITEMS(subj)) {
     const key = subj + L.tr; L.passed = ratio >= .8;
     /* Каждая тема — два урока: изучение и закрепление. Дальше идём, когда тема сдана дважды (≥80%). */
-    if (L.passed) { K.passN = K.passN || {}; const pn = (K.passN[L.uid] || 0) + (ratio === 1 && (L.fb || {}).diff === 'легко' ? 2 : 1); /* всё верно и «легко» — тема закрыта сразу, без закрепления */ K.passN[L.uid] = pn; if (pn >= 2) { K.pos[key] = (K.pos[key] || 0) + 1; L.topicDone = true; } else L.consolidate = true; }
+    if (L.passed) { K.passN = K.passN || {}; const pn = (K.passN[L.uid] || 0) + (ratio === 1 ? 2 : 1); /* всё верно с первого раза — тема закрыта сразу, без закрепления */ K.passN[L.uid] = pn; if (pn >= 2) { K.pos[key] = (K.pos[key] || 0) + 1; L.topicDone = true; } else L.consolidate = true; }
     const f = L.fb || {}; const lv = K.lvl[subj] || 0;
-    if (f.diff === 'легко' && ratio === 1) K.lvl[subj] = Math.min(lv + 1, 5); else if (f.diff === 'трудно' && ratio < .75) K.lvl[subj] = Math.max(lv - 1, -1);
+    if (ratio === 1 && f.diff !== 'трудно') K.lvl[subj] = Math.min(lv + 1, 5); else if (f.diff === 'трудно' && ratio < .75) K.lvl[subj] = Math.max(lv - 1, -1);
   }
   if (subj === 'hw') K.hwText.forEach(h => { if ((L.txt || []).includes(h.id)) h.done = true; });
   L.secs = Math.min(1500, Math.round((Date.now() - (L.t0 || Date.now())) / 1000)); D.secs = (D.secs || 0) + L.secs; restTick(kid, L.secs);
