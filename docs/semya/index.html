@@ -964,7 +964,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v53df8a30 */
+<script>/* v69a0b27a */
 var FAM = 1;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -6575,7 +6575,8 @@ function lookO(kid){ var K = S.kids[kid], id = lookId(kid); if (!K.lks) K.lks = 
 function lookTheme(kid){ var id = lookId(kid), base, key = 'p:' + kid;
   if (id === 'foot') base = { banner: ['ball', 'boot', 'goal', 'whistle', 'trophy', 'medal', 'flag', 'ball'].map(lic), pics: THEME.yarik.pics, win: THEME.yarik.win, hello: THEME.yarik.hello, world: THEME.yarik.world }; else if (id === 'magic') base = typeof HP_BASE !== 'undefined' ? HP_BASE : THEME.anya;
   else { var L = LOOK_THEME[id]; base = { banner: L.banner.map(lic), pics: L.pics.map(lic), win: L.win, hello: L.hello, world: L.world }; }
-  var t = { banner: base.banner, pics: base.pics, win: base.win.slice(), hello: base.hello, world: base.world };
+  var df = THEME[kid === 'anya' ? 'anya' : 'yarik'] || THEME.anya; /* чего нет в теме — берём из базовой (без pics падали задания уроков) */
+  var t = { banner: base.banner || df.banner, pics: base.pics || df.pics, win: (base.win || df.win).slice(), hello: base.hello || df.hello, world: base.world || df.world };
   if (id === 'magic') { t.hello = lookG(kid, 'Добро пожаловать в Школу волшебства, юный волшебник!', base.hello);
     var hs = typeof hpHouse === 'function' && HOUSES[hpHouse(kid)]; if (hs) { t.hello = typeof hpG === 'function' ? hpG(kid, hs.hello) : hs.hello; t.win = hs.win.map(function(s){ return typeof hpG === 'function' ? hpG(kid, s) : s; }); } }
   var B = LOOK_B[id], o = lookO(kid); if (B && o && B.done(o)) { var p = B.apply(kid, o); if (p.hello) t.hello = p.hello; if (p.win) t.win = p.win.concat(t.win.slice(0, 2)); }

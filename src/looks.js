@@ -75,7 +75,8 @@ function lookO(kid){ var K = S.kids[kid], id = lookId(kid); if (!K.lks) K.lks = 
 function lookTheme(kid){ var id = lookId(kid), base, key = 'p:' + kid;
   if (id === 'foot') base = { banner: ['ball', 'boot', 'goal', 'whistle', 'trophy', 'medal', 'flag', 'ball'].map(lic), pics: THEME.yarik.pics, win: THEME.yarik.win, hello: THEME.yarik.hello, world: THEME.yarik.world }; else if (id === 'magic') base = typeof HP_BASE !== 'undefined' ? HP_BASE : THEME.anya;
   else { var L = LOOK_THEME[id]; base = { banner: L.banner.map(lic), pics: L.pics.map(lic), win: L.win, hello: L.hello, world: L.world }; }
-  var t = { banner: base.banner, pics: base.pics, win: base.win.slice(), hello: base.hello, world: base.world };
+  var df = THEME[kid === 'anya' ? 'anya' : 'yarik'] || THEME.anya; /* чего нет в теме — берём из базовой (без pics падали задания уроков) */
+  var t = { banner: base.banner || df.banner, pics: base.pics || df.pics, win: (base.win || df.win).slice(), hello: base.hello || df.hello, world: base.world || df.world };
   if (id === 'magic') { t.hello = lookG(kid, 'Добро пожаловать в Школу волшебства, юный волшебник!', base.hello);
     var hs = typeof hpHouse === 'function' && HOUSES[hpHouse(kid)]; if (hs) { t.hello = typeof hpG === 'function' ? hpG(kid, hs.hello) : hs.hello; t.win = hs.win.map(function(s){ return typeof hpG === 'function' ? hpG(kid, s) : s; }); } }
   var B = LOOK_B[id], o = lookO(kid); if (B && o && B.done(o)) { var p = B.apply(kid, o); if (p.hello) t.hello = p.hello; if (p.win) t.win = p.win.concat(t.win.slice(0, 2)); }

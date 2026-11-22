@@ -17,7 +17,7 @@ var HOUSES = {
     hello: '🦡 Пуффендуй приветствует тебя: трудом всего добьёшься!',
     win: ['🦡 +10 очков Пуффендую!', '🦡 Труд и верность!', '💛 Так держать!', '🪄 Заклинание сработало!', '✨ Настоящая пуффендуйка!'] }
 };
-var HP_BASE = { hello: THEME.anya.hello, win: THEME.anya.win.slice(), banner: THEME.anya.banner.slice() };
+var HP_BASE = { hello: THEME.anya.hello, win: THEME.anya.win.slice(), banner: THEME.anya.banner.slice(), pics: THEME.anya.pics, world: THEME.anya.world };
 function hpOn(kid){ return !FAM && kid === 'anya' && !!S.kids[kid]; }
 function hpK(kid){ var K = S.kids[kid]; if (!K.hp) K.hp = { house: '', tr: '', seen: {}, re: [], day: null }; return K.hp; }
 /* Шляпа доступна любому ребёнку с темой «Волшебная школа» (см. looks.js) */
