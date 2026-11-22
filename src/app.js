@@ -311,7 +311,8 @@ const READ_LV = { yarik: [[0,'Новичок','🌱'],[20,'Ученик','📖']
 function readLvList(kid){ return READ_LV[T(kid) === 'anya' ? 'anya' : 'yarik']; }
 function readLv(kid, wpm){ const A = readLvList(kid); let i = 0; A.forEach((x, k) => { if (wpm >= x[0]) i = k; }); return { i, cur: A[i], next: A[i + 1] }; }
 function readOkRec(kid, x){ return (x.acc == null || x.acc >= (KIDS[kid].accMin || .9) - .05) && x.wpm <= KIDS[kid].norm * 3; }
-function readBestOf(kid){ const K = S.kids[kid]; if (K.readBest == null) K.readBest = Math.max(0, ...K.reading.filter(x => x.lang === 'ru' && readOkRec(kid, x)).map(x => x.wpm)); return K.readBest; }
+/* Рекорд — только по чтению, которое айпад слышал (есть точность). Темп «по времени» мог быть нажатием «Я дочитал» раньше времени (22.11: у Ярика вышло 78 сл/мин). */
+function readBestOf(kid){ const K = S.kids[kid]; if (K.readBest == null || K.readBestV !== 2) { K.readBest = Math.max(0, ...K.reading.filter(x => x.lang === 'ru' && x.acc != null && readOkRec(kid, x)).map(x => x.wpm)); K.readBestV = 2; } return K.readBest; }
 function badgesRow(kid){ const lv = readLv(kid, readBestOf(kid)).i; if (!lv) return ''; return `<div class="badges">${readLvList(kid).slice(1, lv + 1).map(x => `<span title="${x[1]}">${x[2]}</span>`).join('')}</div>`; }
 function vocabRow(kid){ const V = S.kids[kid].vocab || []; if (!V.length) return ''; return `<p class="hint">Новых слов в копилке слов: <b>${V.length}</b> — последние: ${V.slice(-4).map(v => U.esc(v.w)).join(', ')}.</p>`; }
 function sparkSvg(kid, vals, norm){ const W = 300, H = 90, P = 8, mx = Math.max(norm * 1.15, ...vals) || 1, lo = Math.floor(Math.min(norm, ...vals) * .7), n = vals.length;
@@ -908,10 +909,10 @@ function stopRead(){
     if (useSR) RD.T.forEach((w, k) => { if (RD.st[k] === 1) { const orig = textWords[k].replace(/[^\p{L}-]/gu, ''); if (K.hard[orig]) { K.hard[orig].ok++; if (K.hard[orig].ok >= 2) delete K.hard[orig]; } } });
     const lim = wordsLimit(kid); K.readWords = Math.round(res.good ? lim * 1.15 : res.repeat ? Math.max(30, lim * .9) : lim);
     { const pr = K.reading.filter(x => x.lang === 'ru').slice(-1)[0], b0 = readBestOf(kid), lv0 = readLv(kid, b0).i; res.prev = pr ? pr.wpm : null; res.pace = 1;
-      if (readOkRec(kid, res) && wpm > b0) { K.readBest = wpm; res.rec = b0 > 0; }
+      if (useSR && readOkRec(kid, res) && wpm > b0) { K.readBest = wpm; res.rec = b0 > 0; } /* без распознавания темп — только по времени (ребёнок мог нажать «Я дочитал» раньше): рекорды и уровни не засчитываем */
       const lv1 = readLv(kid, K.readBest).i; if (lv1 > lv0 && b0 > 0) { res.lvup = lv1; (K.badges = K.badges || []).push({ t: 'read', lv: lv1, d: cur.ds, wpm }); piggyAdd(K, 10); ev(kid, 'новый уровень чтения', { subj: 'Чтение', unit: readLvList(kid)[lv1][1], wpm }); } }
     K.words += reached; K.reading.push({ d: cur.ds, title: readText(kid).title, wpm, acc, lang: 'ru', errs: errs.slice(0, 10) });
-    ev(kid, 'чтение вслух', { subj: 'Чтение', unit: readText(kid).title, wpm, acc: acc == null ? '' : Math.round(acc * 100) + '%', words: reached, secs: res.secs, errs: errs.join(', ') });
+    ev(kid, 'чтение вслух', { subj: 'Чтение', unit: readText(kid).title, wpm, acc: acc == null ? '' : Math.round(acc * 100) + '%', words: reached, secs: res.secs, errs: useSR ? errs.join(', ') : 'темп по времени: айпад не слушал чтение' + (RD.denied ? ' (микрофон не разрешён)' : SR ? '' : ' (нет распознавания речи)') + `; ${reached} слов за ${res.secs} с` });
   } else { const L = dayRec(kid, cur.ds).les[cur.subj]; L.fres = res; L.fphase = 'qs'; S.kids[kid].reading.push({ d: cur.ds, title: L.ftitle, wpm, acc, lang: L.tr === '_alt' ? 'en' : 'pt' }); ev(kid, 'чтение вслух', { subj: L.tr === '_alt' ? 'English' : 'Português', unit: L.ftitle, wpm, acc: acc == null ? '' : Math.round(acc * 100) + '%', errs: errs.join(', ') }); }
   save(); render();
 }
