@@ -1,0 +1,27 @@
+/* Задания от родителей */
+.ptbtn{ display:flex; align-items:center; gap:14px; width:100%; margin:14px 0 4px; padding:14px 16px; border-radius:20px; border:2px dashed rgba(20,33,61,.18); background:rgba(241,245,249,.92); color:#64748B; text-align:left; font:inherit; cursor:default; }
+.ptbtn .ptico{ flex:0 0 auto; width:54px; height:54px; border-radius:16px; background:#E2E8F0; display:flex; align-items:center; justify-content:center; filter:grayscale(1); opacity:.6; }
+.ptbtn .ptico .ic.big{ width:36px; height:36px; }
+.ptbtn .pttt{ display:flex; flex-direction:column; gap:2px; flex:1; }
+.ptbtn .pttt b{ font-family:var(--fh); font-size:19px; color:#475569; }
+.ptbtn .pttt span{ font-size:15px; }
+.ptbtn.on{ cursor:pointer; border:0; background:linear-gradient(135deg,#FFF7E6,#FFE7B8); color:#5B3A00; box-shadow:0 0 0 3px #F59E0B,0 10px 26px rgba(15,23,42,.18); animation:ptpulse 2.4s ease-in-out infinite; }
+.ptbtn.on .ptico{ background:#fff; filter:none; opacity:1; }
+.ptbtn.on .pttt b{ color:#3D2600; }
+.ptbtn:not(.on):not([disabled]){ cursor:pointer; }
+.ptbtn .ptn{ flex:0 0 auto; min-width:34px; height:34px; padding:0 8px; border-radius:17px; background:#E11D48; color:#fff; font-weight:800; font-size:18px; display:flex; align-items:center; justify-content:center; }
+@keyframes ptpulse{ 0%,100%{ box-shadow:0 0 0 3px #F59E0B,0 10px 26px rgba(15,23,42,.18); } 50%{ box-shadow:0 0 0 6px rgba(245,158,11,.55),0 10px 26px rgba(15,23,42,.18); } }
+@media (prefers-reduced-motion:reduce){ .ptbtn.on{ animation:none; } }
+.ptk .pttext{ font-size:21px; line-height:1.6; }
+.ptk .q{ font-size:22px; font-weight:600; line-height:1.5; }
+.ptk .bad{ color:var(--red,#c0392b); font-weight:600; }
+.pttile.wait .ut{ color:#B45309; }
+.ptrow{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--line,#e2e8f0); }
+.ptrow:first-of-type{ border-top:0; }
+.ptbtns{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
+.ptwait{ border:2px solid #F59E0B; }
+.ptform textarea{ display:block; width:100%; box-sizing:border-box; margin-top:4px; padding:10px 12px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); font:inherit; font-size:17px; color:var(--ink); }
+.ptform .chip .ic{ width:20px; height:20px; vertical-align:-4px; }
+.ptchips .chip{ font-size:15px; }
+.ptmsg{ margin-top:12px; }
+.ptform .fkql{ margin:12px 0 6px; font-weight:700; font-size:16px; }

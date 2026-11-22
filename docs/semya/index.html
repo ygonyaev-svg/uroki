@@ -822,6 +822,34 @@ body.anya .reading .text,body.anya .peek .text,body.anya .ptext p{ font-family:"
 .micbar .hint.micerr{ color:#B42318; font-weight:600; }
 .tipin h3 .ic{ margin-right:6px; }
 
+/* Задания от родителей */
+.ptbtn{ display:flex; align-items:center; gap:14px; width:100%; margin:14px 0 4px; padding:14px 16px; border-radius:20px; border:2px dashed rgba(20,33,61,.18); background:rgba(241,245,249,.92); color:#64748B; text-align:left; font:inherit; cursor:default; }
+.ptbtn .ptico{ flex:0 0 auto; width:54px; height:54px; border-radius:16px; background:#E2E8F0; display:flex; align-items:center; justify-content:center; filter:grayscale(1); opacity:.6; }
+.ptbtn .ptico .ic.big{ width:36px; height:36px; }
+.ptbtn .pttt{ display:flex; flex-direction:column; gap:2px; flex:1; }
+.ptbtn .pttt b{ font-family:var(--fh); font-size:19px; color:#475569; }
+.ptbtn .pttt span{ font-size:15px; }
+.ptbtn.on{ cursor:pointer; border:0; background:linear-gradient(135deg,#FFF7E6,#FFE7B8); color:#5B3A00; box-shadow:0 0 0 3px #F59E0B,0 10px 26px rgba(15,23,42,.18); animation:ptpulse 2.4s ease-in-out infinite; }
+.ptbtn.on .ptico{ background:#fff; filter:none; opacity:1; }
+.ptbtn.on .pttt b{ color:#3D2600; }
+.ptbtn:not(.on):not([disabled]){ cursor:pointer; }
+.ptbtn .ptn{ flex:0 0 auto; min-width:34px; height:34px; padding:0 8px; border-radius:17px; background:#E11D48; color:#fff; font-weight:800; font-size:18px; display:flex; align-items:center; justify-content:center; }
+@keyframes ptpulse{ 0%,100%{ box-shadow:0 0 0 3px #F59E0B,0 10px 26px rgba(15,23,42,.18); } 50%{ box-shadow:0 0 0 6px rgba(245,158,11,.55),0 10px 26px rgba(15,23,42,.18); } }
+@media (prefers-reduced-motion:reduce){ .ptbtn.on{ animation:none; } }
+.ptk .pttext{ font-size:21px; line-height:1.6; }
+.ptk .q{ font-size:22px; font-weight:600; line-height:1.5; }
+.ptk .bad{ color:var(--red,#c0392b); font-weight:600; }
+.pttile.wait .ut{ color:#B45309; }
+.ptrow{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--line,#e2e8f0); }
+.ptrow:first-of-type{ border-top:0; }
+.ptbtns{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
+.ptwait{ border:2px solid #F59E0B; }
+.ptform textarea{ display:block; width:100%; box-sizing:border-box; margin-top:4px; padding:10px 12px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); font:inherit; font-size:17px; color:var(--ink); }
+.ptform .chip .ic{ width:20px; height:20px; vertical-align:-4px; }
+.ptchips .chip{ font-size:15px; }
+.ptmsg{ margin-top:12px; }
+.ptform .fkql{ margin:12px 0 6px; font-weight:700; font-size:16px; }
+
 /* ===== Словоход: фирменный стиль «Древо слова» (только семейная сборка) =====
    Зелень #2D4A32, охра #C28A2C, лён #F5EFE0, кора #6B4A2E, чернила #2A2A1E, линия #E6DCC3.
    Экраны детей сохраняют выбранное оформление (футбол/волшебство); здесь — вход, регистрация, родительские экраны. */
@@ -876,7 +904,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v18f4791e */
+<script>/* v03da855f */
 var FAM = 1;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -8795,6 +8823,153 @@ document.addEventListener('click', e => {
   else if (a === 'again' && Y) { const r0 = (Y.d.round || 0) + 1; Y.d = { ds: cur.ds, i: 0, res: [], t0: 0, done: false, pts: null, round: r0 }; cur.syc = null; save(); render(); window.scrollTo(0, 0); }
 });
 
+/* ===== Задания от родителей (22.11, идея Юрия) =====
+   Родитель в «Для родителей» → «Задания» создаёт задание ребёнку и назначает баллы:
+   - дело по дому («вынести мусор»): ребёнок отмечает «Сделал», баллы — после подтверждения родителем;
+   - задачка/головоломка с вариантами ответа: ответ кнопками, баллы сразу (с 1-й попытки — все, со 2-й — половина);
+   - кусок книги: ребёнок читает сам (не быстрее разумного темпа), затем вопрос с вариантами или подтверждение родителем.
+   На главной ребёнка всегда есть кнопка «Задание от родителей»: неактивна, если заданий нет.
+   Баллы идут в копилку сверх дневного лимита: их размер решает родитель.
+   Уроки (Глеб и Катя): задания живут на айпаде; ещё их можно прислать строкой листа «Указания» (тип «задание», подтверждение — тип «подтвердить»).
+   Словоход: задания хранятся на сервере (лист «Задания», команда fam:'pt'), родитель ставит и подтверждает со своего телефона. */
+const PT_KINDS = { chore: ['Дело по дому', 'broom'], quiz: ['Задачка', 'puzzle'], read: ['Чтение', 'book'] };
+const PT_PTS = [5, 10, 15, 20, 30, 50];
+const PT_CHORES = ['Вынести мусор', 'Убрать в своей комнате', 'Разобрать посуду', 'Застелить кровать', 'Помочь приготовить ужин', 'Полить цветы', 'Сложить свои вещи', 'Покормить питомца'];
+let PT_SENDING = false, PT_T = null;
+function ptAll(){ if (!S.pt) S.pt = []; return S.pt; }
+function ptGet(id){ return ptAll().find(t => t.id === id); }
+function ptOf(kid, st){ return ptAll().filter(t => t.kid === kid && (!st || st.includes(t.st))); }
+function ptTouch(t){ t.v = (t.v || 0) + 1; t.u = Date.now(); if (FAM) { if (!S.ptq) S.ptq = {}; S.ptq[t.id] = 1; } save(); ptSyncSoon(); }
+function ptPrune(){ const A = ptAll(), keep = A.filter(t => t.st !== 'del' || (S.ptq || {})[t.id]); const old = keep.filter(t => t.st === 'ok' || t.st === 'miss'); if (old.length > 40) { const drop = new Set(old.sort((a, b) => (a.u || 0) - (b.u || 0)).slice(0, old.length - 40).map(t => t.id)); S.pt = keep.filter(t => !drop.has(t.id)); } else S.pt = keep; }
+function ptWords(s){ return String(s || '').split(/\s+/).filter(Boolean).length; }
+/* Минимальное время чтения: темп в полтора раза выше нормы ребёнка, не меньше 20 секунд */
+function ptMinSecs(kid, t){ const n = (KIDS[kid] && KIDS[kid].norm) || 60; return Math.max(20, Math.round(ptWords(t.text) / (n * 1.5) * 60)); }
+function ptOpts(t){ const r = U.rng(t.id); return r.shuffle((t.opts || []).filter(Boolean).slice()); }
+function ptEv(kid, t, text, pts){ try { ev(kid, 'задание родителей', { unit: t.title || PT_KINDS[t.kind][0], text, price: pts == null ? t.pts : pts }); } catch (e) {} }
+
+/* --- баллы: начисляются на устройстве ребёнка, когда он входит (один раз на задание) --- */
+function ptPay(kid){ const K = S.kids[kid]; if (!K) return; K.ptPaid = K.ptPaid || []; let got = 0, names = [];
+  ptOf(kid, ['ok']).forEach(t => { if (t.paid || K.ptPaid.includes(t.id)) return; const p = Math.max(0, Math.round(t.got == null ? t.pts : t.got)); K.ptPaid.push(t.id); if (K.ptPaid.length > 300) K.ptPaid = K.ptPaid.slice(-300);
+    if (p) { K.piggy = (K.piggy || 0) + p; if (!K.piggyWeek) K.piggyWeek = weekStart(U.today()); got += p; names.push('«' + (t.title || PT_KINDS[t.kind][0]) + '»'); }
+    t.paid = 1; ptTouch(t); ptEv(kid, t, 'баллы начислены', p); });
+  if (got) { K.ptMsg = (names.length === 1 ? 'Задание ' + names[0] + ' засчитано' : 'Задания ' + names.join(', ') + ' засчитаны') + ': +' + agree(got + ' баллов') + ' в копилку.'; save(); } }
+
+/* --- синхронизация (только Словоход) --- */
+function ptSyncSoon(){ if (!FAM) return; clearTimeout(PT_T); PT_T = setTimeout(ptSync, 1500); }
+function ptSync(){
+  if (!FAM || PT_SENDING || TEST || !S.fam || !S.fam.fid || !navigator.onLine) return Promise.resolve();
+  const q = S.ptq || {}, items = ptAll().filter(t => q[t.id]).slice(0, 50);
+  PT_SENDING = true;
+  return famApi({ fam: 'pt', fid: S.fam.fid, token: S.fam.token, items }).then(j => { PT_SENDING = false; if (!j || !j.ok || !Array.isArray(j.pt)) return;
+    items.forEach(t => { const s = j.pt.find(x => x.id === t.id); if (!s || (s.v || 0) >= (t.v || 0) || t.st === 'del') delete q[t.id]; });
+    ptMerge(j.pt); }).catch(() => { PT_SENDING = false; });
+}
+function ptMerge(list){ const A = ptAll(), q = S.ptq || {}, seen = {}; let ch = false;
+  list.forEach(s => { if (!s || !s.id) return; seen[s.id] = 1; const i = A.findIndex(t => t.id === s.id);
+    if (i < 0) { A.push(s); ch = true; } else if ((s.v || 0) > (A[i].v || 0)) { A[i] = s; delete q[s.id]; ch = true; } else if ((s.v || 0) < (A[i].v || 0)) q[s.id] = 1; });
+  for (let i = A.length - 1; i >= 0; i--) if (!seen[A[i].id] && !q[A[i].id]) { A.splice(i, 1); ch = true; } /* удалено родителем или устарело на сервере */
+  if (Object.keys(q).length) ptSyncSoon();
+  if (ch) { save(); if (cur.kid && cur.view === 'home') render(); else if (cur.view === 'parent' && cur.parentTab === 'tasks' && !ptTyping()) render(); else if (cur.view === 'ptask' && !cur.ptid) render(); } }
+function ptTyping(){ const a = document.activeElement; return a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName); }
+
+/* --- лист «Указания» (Уроки): тип «задание» — текст «Вынести мусор | 10» или JSON { kind, title, text, q, opts, pts }; тип «подтвердить» — название или id --- */
+function ptFromRow(kid, row, type){
+  if (type.startsWith('подтв')) { const v = String(row.value || '').toLowerCase().trim(); const t = ptOf(kid, ['wait', 'new']).find(x => x.id === row.value || (v && (x.title || '').toLowerCase().includes(v))); if (t) { t.st = 'ok'; ptTouch(t); } return true; }
+  let d = null; try { d = JSON.parse(String(row.value)); } catch (e) {}
+  if (!d || typeof d !== 'object') { const m = String(row.value || '').split('|'); d = { kind: 'chore', title: m[0].trim(), pts: parseInt(m[1]) || 10 }; }
+  const t = ptNew(kid, d); t.id = 'u' + row.id; if (ptGet(t.id)) return true; ptAll().push(t); save(); return true; }
+function ptNew(kid, d){ const kind = PT_KINDS[d.kind] ? d.kind : 'chore';
+  return { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), kid, kind, title: String(d.title || '').trim().slice(0, 120), text: String(d.text || '').trim().slice(0, 6000), q: String(d.q || '').trim().slice(0, 400),
+    opts: (d.opts || []).map(x => String(x).trim()).filter(Boolean).slice(0, 4), pts: Math.max(1, Math.min(200, Math.round(+d.pts || 10))), st: 'new', v: 1, t: new Date().toISOString(), u: Date.now() }; }
+
+/* ===== Ребёнок ===== */
+function ptHomeBtn(kid){ const n = ptOf(kid, ['new']).length, w = ptOf(kid, ['wait']).length, K = S.kids[kid];
+  const msg = K.ptMsg ? `<div class="note ptmsg">${icon('check')} ${U.esc(K.ptMsg)} <button class="link" data-act="ptmsgseen">Понятно</button></div>` : '';
+  return msg + `<button class="ptbtn ${n ? 'on' : ''}" data-act="ptlist" ${n || w ? '' : 'disabled aria-disabled="true"'}><span class="ptico">${icon('mail', 'big')}</span><span class="pttt"><b>Задание от родителей</b><span>${n ? `${n} ${U.pl(n, 'новое задание', 'новых задания', 'новых заданий')}` : w ? 'Ждёт проверки родителей' : 'Пока заданий нет'}${n && w ? ` · ждёт проверки: ${w}` : ''}</span></span>${n ? `<span class="ptn">${n}</span>` : ''}</button>`; }
+function ptHead(back){ return `<header class="bar"><button class="link" data-act="${back}">← Назад</button><span class="coins">${coinsHtml(S.kids[cur.kid].coins)}</span></header>`; }
+function vPTask(){ const kid = cur.kid; if (!kid) return vLogin(); const t = cur.ptid && ptGet(cur.ptid);
+  if (!t || t.kid !== kid || t.st === 'del') { cur.ptid = null; return vPTList(kid); }
+  return `<main class="wrap ${LK(kid)} ptk">${ptHead('ptlist')}<section class="lesson"><p class="eyebrow">${icon(PT_KINDS[t.kind][1])} Задание от родителей · ${PT_KINDS[t.kind][0]} · ${agree(t.pts + ' баллов')}</p>${ptBody(kid, t)}</section></main>`; }
+function vPTList(kid){ const L = ptOf(kid, ['new', 'wait']).sort((a, b) => (a.st === 'new' ? 0 : 1) - (b.st === 'new' ? 0 : 1)), D = ptOf(kid, ['ok', 'miss']).sort((a, b) => (b.u || 0) - (a.u || 0)).slice(0, 5);
+  const row = t => `<button class="tile pttile ${t.st === 'new' ? 'go' : t.st === 'wait' ? 'wait' : 'done'}" data-act="ptopen" data-id="${t.id}"><span class="ico">${icon(PT_KINDS[t.kind][1], 'big')}</span><span class="tt"><span class="sn">${U.esc(t.title || PT_KINDS[t.kind][0])}</span><span class="ut">${PT_KINDS[t.kind][0]} · ${t.st === 'ok' ? '+' + (t.got == null ? t.pts : t.got) + ' получено' : t.st === 'miss' ? 'без баллов' : agree(t.pts + ' баллов')}${t.st === 'wait' ? ' · ждёт проверки' : ''}</span></span></button>`;
+  return `<main class="wrap ${LK(kid)} ptk">${ptHead('home')}<section class="hello"><h1>Задания от родителей</h1><p>Сделай задание и получи баллы в копилку. Дела по дому засчитывают родители, когда проверят.</p></section>
+  ${L.length ? `<section class="tiles">${L.map(row).join('')}</section>` : '<div class="card"><p>Сейчас заданий нет. Когда родители дадут новое, кнопка на главной станет яркой.</p></div>'}
+  ${D.length ? `<h2 class="alwh">Уже сделано</h2><section class="tiles">${D.map(row).join('')}</section>` : ''}</main>`; }
+function ptBody(kid, t){ const P = cur.ptp || (cur.ptp = {}), say0 = `<button class="btn ghost small" data-act="ptsay">${icon('sound')} Не могу прочитать</button>`;
+  const head = `<h1>${U.esc(t.title || PT_KINDS[t.kind][0])}</h1>${t.note && t.st === 'new' ? `<div class="note">Родители просят доделать: ${U.esc(t.note)}</div>` : ''}`;
+  if (t.st === 'ok' || t.st === 'miss') return head + `<div class="card win"><h2>${t.st === 'ok' ? 'Задание выполнено' : 'Задание закончено'}</h2><p>${t.st === 'ok' ? `Получено: <b>${t.got == null ? t.pts : t.got}</b> в копилку.` : 'В этот раз без баллов. В следующий раз получится!'}${t.kind === 'quiz' || (t.kind === 'read' && t.q) ? ` Правильный ответ: <b>${U.esc(t.opts[0])}</b>.` : ''}</p></div><button class="btn big" data-act="ptlist">К заданиям</button>`;
+  if (t.st === 'wait') return head + (t.text && t.kind === 'chore' ? `<article class="card"><p>${U.esc(t.text).replace(/\n/g, '<br>')}</p></article>` : '') + `<div class="card"><h2>${icon('hourglass')} Ждём проверки</h2><p>Родители посмотрят и засчитают задание. Баллы сразу придут в копилку.</p></div><button class="btn big" data-act="ptlist">К заданиям</button>`;
+  if (t.kind === 'chore') return head + (t.text ? `<article class="card"><p class="pttext">${U.esc(t.text).replace(/\n/g, '<br>')}</p></article>` : '') + `<div class="row">${say0}</div><button class="btn big" data-act="ptdone">Сделал${GIRL(kid) ? 'а' : ''}</button><p class="hint">Отметь, когда всё сделаешь по-настоящему. Баллы придут, когда родители проверят.</p>`;
+  if (t.kind === 'read' && !(P[t.id] && P[t.id].read)) { const st = (P[t.id] = P[t.id] || {}); if (!st.t0) st.t0 = Date.now(); const left = Math.max(0, ptMinSecs(kid, t) - Math.round((Date.now() - st.t0) / 1000));
+    if (left > 0) { clearTimeout(window.PT_RT); window.PT_RT = setTimeout(() => { if (cur.view === 'ptask' && cur.ptid === t.id) softRender(); }, Math.min(left, 15) * 1000 + 300); }
+    return head + `<article class="card reading"><div class="text">${U.esc(t.text).replace(/\n/g, '<br>')}</div></article><button class="btn big" data-act="ptread" ${left > 0 ? 'disabled' : ''}>${left > 0 ? `Читай внимательно… ещё ${left > 60 ? Math.ceil(left / 60) + ' мин' : left + ' с'}` : `Я прочитал${GIRL(kid) ? 'а' : ''}`}</button>`; }
+  if (t.kind === 'read' && !t.q) return head + `<div class="card"><p>Расскажи родителям, о чём ты прочитал${GIRL(kid) ? 'а' : ''}. Когда расскажешь, нажми кнопку — родители засчитают задание.</p></div><button class="btn big" data-act="ptdone">Рассказал${GIRL(kid) ? 'а' : ''}, отправить</button>`;
+  /* вопрос с вариантами: задачка или вопрос к тексту */
+  const st = (P[t.id] = P[t.id] || {}), wr = st.wrong || [], opts = ptOpts(t);
+  return head + (t.kind === 'quiz' && t.text ? `<article class="card"><p class="pttext">${U.esc(t.text).replace(/\n/g, '<br>')}</p></article>` : '') + `<article class="card"><p class="q">${U.esc(t.q)}</p>${wr.length ? '<p class="bad">Неверно. Подумай ещё раз — получишь половину баллов.</p>' : ''}<div class="opts">${opts.map(o => `<button class="opt ${wr.includes(o) ? 'wrong' : ''}" data-act="ptans" data-v="${U.esc(o)}" ${wr.includes(o) ? 'disabled' : ''}>${U.esc(o)}</button>`).join('')}</div></article><div class="row">${t.kind === 'quiz' ? say0 : ''}</div>`; }
+
+/* ===== Родитель: вкладка «Задания» ===== */
+function ptForm(){ if (!cur.ptf) cur.ptf = { kind: 'chore', title: '', text: '', q: '', a: '', w1: '', w2: '', w3: '', pts: 10 }; return cur.ptf; }
+function ptFormRead(){ const F = ptForm(), g = id => { const el = document.getElementById(id); return el ? el.value : null; };
+  ['title', 'text', 'q', 'a', 'w1', 'w2', 'w3'].forEach(k => { const v = g('ptf_' + k); if (v != null) F[k] = v; }); const p = g('ptf_pts'); if (p != null && p !== '') F.pts = Math.max(1, Math.min(200, parseInt(p) || F.pts)); }
+/* Экран родителя собирается из частей: ptWaitCard (ждут проверки), ptFormCard (новое задание), ptListCard (активные и сделанные) — их можно вставлять и по отдельности */
+function vPTParent(){ const pk = cur.parentKid;
+  const kidSw = `<div class="row">${kidIds().map(k => `<button class="chip ${pk === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}${ptOf(k, ['wait']).length ? ' •' : ''}</button>`).join('')}</div>`;
+  return kidSw + ptWaitCard(pk) + ptFormCard(pk) + ptListCard(pk); }
+function ptLine(t, btns){ return `<div class="ptrow"><div><b>${U.esc(t.title || PT_KINDS[t.kind][0])}</b><br><span class="hint">${PT_KINDS[t.kind][0]} · ${agree(t.pts + ' баллов')}${t.st === 'ok' ? ' · засчитано +' + (t.got == null ? t.pts : t.got) : t.st === 'miss' ? ' · ответ неверный, без баллов' : ''}</span></div><div class="ptbtns">${btns}</div></div>`; }
+function ptWaitCard(pk){ const W = ptOf(pk, ['wait']), name = KIDS[pk].name, line = ptLine;
+  return W.length ? `<div class="card ptwait"><h2>Ждут проверки: ${W.length}</h2><p class="hint">${U.esc(name)} ${GIRL(pk) ? 'отметила, что сделала' : 'отметил, что сделал'}. Проверьте и засчитайте — баллы придут в копилку.</p>${W.map(t => line(t, `<button class="btn small" data-act="ptok" data-id="${t.id}">Засчитать</button><button class="btn small ghost" data-act="ptback" data-id="${t.id}">Вернуть</button>`)).join('')}</div>` : ''; }
+function ptListCard(pk){ const line = ptLine, N = ptOf(pk, ['new']), D = ptOf(pk, ['ok', 'miss']).sort((a, b) => (b.u || 0) - (a.u || 0)).slice(0, 8);
+  const act = `<div class="card"><h2>Активные задания</h2>${N.length ? N.map(t => line(t, `${t.kind === 'chore' ? `<button class="btn small ghost" data-act="ptok" data-id="${t.id}">Засчитать</button>` : ''}<button class="link" data-act="ptdel" data-id="${t.id}">Убрать</button>`)).join('') : `<p class="hint">Сейчас у ребёнка нет заданий — кнопка «Задание от родителей» у него неактивна.</p>`}</div>`;
+  const done = D.length ? `<div class="card"><h2>Сделано недавно</h2>${D.map(t => line(t, '')).join('')}</div>` : '';
+  const fam = FAM ? `<p class="hint">Задания хранятся на сервере: можно давать их со своего телефона — у ребёнка они появятся, когда его устройство подключится к интернету (обычно за несколько минут).</p>` : '';
+  return act + done + fam; }
+function ptFormCard(pk){ const F = ptForm(), name = KIDS[pk].name;
+  const k = F.kind, inp = (id, label, ph, max) => `<label>${label}<input id="ptf_${id}" value="${U.esc(F[id] || '')}" maxlength="${max || 120}" autocomplete="off" placeholder="${ph || ''}"></label>`;
+  const ta = (id, label, ph, rows, max) => `<label>${label}<textarea id="ptf_${id}" rows="${rows}" maxlength="${max}" placeholder="${ph}">${U.esc(F[id] || '')}</textarea></label>`;
+  const opts = `<p class="fkql">Варианты ответа${k === 'read' ? ' (если задали вопрос)' : ''} — ребёнок выбирает кнопкой, печатать ничего не нужно</p>${inp('a', 'Правильный ответ', '', 120)}${inp('w1', 'Неверный вариант', '', 120)}${inp('w2', 'Ещё неверный (можно пусто)', '', 120)}${inp('w3', 'Ещё неверный (можно пусто)', '', 120)}`;
+  const fields = k === 'chore' ? `<div class="row ptchips">${PT_CHORES.map(c => `<button type="button" class="chip ${F.title === c ? 'on' : ''}" data-act="ptchore" data-t="${U.esc(c)}">${c}</button>`).join('')}</div>${inp('title', 'Что сделать', 'Например: вынести мусор')}${ta('text', 'Подробности (можно пусто)', 'Например: и поставить новый пакет', 2, 600)}`
+    : k === 'quiz' ? `${inp('title', 'Название (можно пусто)', 'Например: Задачка про яблоки')}${ta('q', 'Вопрос или условие задачи', 'У Маши 5 яблок, она отдала 2. Сколько осталось?', 3, 400)}${opts}`
+    : `${inp('title', 'Название', 'Например: «Каштанка», глава 1')}${ta('text', 'Текст для чтения — вставьте отрывок из книги', 'Скопируйте сюда кусочек книги', 8, 6000)}${inp('q', 'Вопрос по тексту (можно пусто — тогда ребёнок перескажет вам, а вы засчитаете)', 'Например: Как звали собаку?', 400)}${opts}`;
+  const form = `<form class="card form ptform" data-form="ptnew"><h2>Новое задание · ${U.esc(name)}</h2><div class="row">${Object.keys(PT_KINDS).map(x => `<button type="button" class="chip ${k === x ? 'on' : ''}" data-act="ptkind" data-k="${x}">${icon(PT_KINDS[x][1])} ${PT_KINDS[x][0]}</button>`).join('')}</div>${fields}
+    <p class="fkql">Сколько баллов</p><div class="row">${PT_PTS.map(p => `<button type="button" class="chip ${+F.pts === p ? 'on' : ''}" data-act="ptpts" data-p="${p}">${p}</button>`).join('')}</div>
+    <label>Или своё число<input id="ptf_pts" inputmode="numeric" maxlength="3" autocomplete="off" value="${PT_PTS.includes(+F.pts) ? '' : F.pts}"></label>
+    <p class="hint">1 балл = 1 минута игры. Баллы за ваши задания идут в копилку сверх дневного лимита — сколько давать, решаете вы.${k === 'quiz' ? ' За ответ с первой попытки — все баллы, со второй — половина.' : ''}${k === 'chore' ? ' Баллы придут, когда вы нажмёте «Засчитать».' : ''}</p>
+    <button class="btn big">Дать задание</button></form>`;
+  return form; }
+function ptSubmit(){ ptFormRead(); const F = ptForm(), pk = cur.parentKid, k = F.kind;
+  const opts = [F.a, F.w1, F.w2, F.w3].map(x => String(x || '').trim()).filter(Boolean);
+  if (k === 'chore' && !F.title.trim()) return alertMsg('Напишите, что нужно сделать');
+  if (k === 'quiz' && !F.q.trim()) return alertMsg('Напишите вопрос или условие');
+  if (k === 'read' && ptWords(F.text) < 5) return alertMsg('Вставьте текст для чтения');
+  if ((k === 'quiz' || (k === 'read' && F.q.trim())) && (!String(F.a).trim() || opts.length < 2)) return alertMsg('Нужны правильный ответ и хотя бы один неверный');
+  if (new Set(opts.map(x => x.toLowerCase())).size < opts.length) return alertMsg('Варианты ответа не должны повторяться');
+  const t = ptNew(pk, { kind: k, title: F.title || (k === 'quiz' ? 'Задачка' : ''), text: F.text, q: k === 'chore' ? '' : F.q, opts: k === 'chore' || (k === 'read' && !F.q.trim()) ? [] : opts, pts: F.pts });
+  t.by = 'p'; ptAll().push(t); ptTouch(t); ptEv(pk, t, 'новое задание');
+  cur.ptf = { kind: k, title: '', text: '', q: '', a: '', w1: '', w2: '', w3: '', pts: F.pts }; alertMsg('Задание отправлено: ' + KIDS[pk].name); render(); }
+
+function ptAct(act, b){ const kid = cur.kid;
+  switch (act) {
+    case 'ptlist': cur.ptid = null; cur.ptp = {}; go('ptask'); return true;
+    case 'ptopen': cur.ptid = b.dataset.id; go('ptask'); return true;
+    case 'ptmsgseen': if (kid) { delete S.kids[kid].ptMsg; save(); render(); } return true;
+    case 'ptsay': { const t = ptGet(cur.ptid); if (t) { say(strip([t.title, t.kind === 'chore' ? t.text : '', t.q].filter(Boolean).join('. ')), 'ru-RU'); try { ev(kid, 'озвучка', { subj: 'Задание от родителей', unit: t.title, text: 'задание' }); } catch (e) {} } return true; }
+    case 'ptdone': { const t = ptGet(cur.ptid); if (!t || t.st !== 'new') return true; t.st = 'wait'; t.note = ''; ptTouch(t); ptEv(kid, t, t.kind === 'read' ? 'прочитал(а), ждёт подтверждения' : 'сделал(а), ждёт подтверждения'); render(); return true; }
+    case 'ptread': { const t = ptGet(cur.ptid), P = cur.ptp || (cur.ptp = {}); if (!t) return true; const st = P[t.id] = P[t.id] || {}; st.read = true; ptEv(kid, t, 'прочитал(а) текст за ' + Math.round((Date.now() - (st.t0 || Date.now())) / 1000) + ' с', 0); render(); window.scrollTo(0, 0); return true; }
+    case 'ptans': { const t = ptGet(cur.ptid), P = cur.ptp || (cur.ptp = {}); if (!t || t.st !== 'new') return true; const st = P[t.id] = P[t.id] || {}; st.wrong = st.wrong || []; const v = b.dataset.v, ok = v === t.opts[0];
+      if (ok) { t.st = 'ok'; t.got = st.wrong.length ? Math.ceil(t.pts / 2) : t.pts; t.res = st.wrong.length ? 'со 2-й попытки' : 'верно'; ptTouch(t); ptEv(kid, t, 'ответ: ' + t.res, t.got); ptPay(kid); try { say(st.wrong.length ? 'Верно!' : 'Верно! Молодец!', 'ru-RU'); } catch (e) {} }
+      else { st.wrong.push(v); if (st.wrong.length >= 2 || st.wrong.length >= t.opts.length - 1) { t.st = 'miss'; t.got = 0; t.res = 'ошибка'; ptTouch(t); ptEv(kid, t, 'ответ неверный: ' + v, 0); } }
+      render(); return true; }
+    /* родитель */
+    case 'ptkind': ptFormRead(); ptForm().kind = b.dataset.k; render(); return true;
+    case 'ptchore': { ptFormRead(); const F = ptForm(); F.title = b.dataset.t; const y = window.scrollY; render(); window.scrollTo(0, y); return true; }
+    case 'ptpts': { ptFormRead(); ptForm().pts = +b.dataset.p; const el = document.getElementById('ptf_pts'); if (el) el.value = ''; const y = window.scrollY; render(); window.scrollTo(0, y); return true; }
+    case 'ptok': { const t = ptGet(b.dataset.id); if (!t) return true; t.st = 'ok'; t.got = t.pts; t.note = ''; ptTouch(t); ptEv(t.kid, t, 'родитель засчитал', t.pts); alertMsg('Засчитано: +' + t.pts + '. Баллы придут ребёнку в копилку'); render(); return true; }
+    case 'ptback': { const t = ptGet(b.dataset.id); if (!t) return true; const n = window.prompt('Что доделать? (можно оставить пустым)', '') ; if (n === null) return true; t.st = 'new'; t.note = String(n).trim().slice(0, 300) || 'Задание сделано не до конца.'; ptTouch(t); ptEv(t.kid, t, 'родитель вернул: ' + t.note, 0); render(); return true; }
+    case 'ptdel': { const t = ptGet(b.dataset.id); if (!t || !window.confirm('Убрать задание «' + (t.title || PT_KINDS[t.kind][0]) + '»?')) return true; t.st = 'del'; ptTouch(t); ptEv(t.kid, t, 'родитель убрал задание', 0); ptPrune(); render(); return true; }
+  }
+  return false; }
+
 /* ===== Настройка детей ===== */
 CUR_Y.lang = { name:'Языки', src:'Português: 2.º–3.º ano (gramática, ortografia) и English', units: PT_NAT, old: PT_Y, alt: EN_UNITS, altName:'English' };
 CUR_A.logic.alt = A_FIN; CUR_A.logic.altName = 'Финансы'; CUR_Y.world.alt = Y_FIN; CUR_Y.world.altName = 'Деньги'; CUR_Y.world.altSrc = 'Финансовая грамотность (по стандартам Jump$tart, K-5)';
@@ -8882,7 +9057,7 @@ async function flush(){
 }
 async function pull(){
   if (TEST) return;
-  if (FAM) return famStatus();
+  if (FAM) { ptSync(); return famStatus(); }
   if (!S.cfg.sync || !navigator.onLine) return;
   try { const r = await fetch(S.cfg.sync + (S.cfg.sync.includes('?') ? '&' : '?') + 'action=cfg'); const j = await r.json(); applyCfg(j.rows || []); } catch (e) {}
 }
@@ -8903,6 +9078,7 @@ function applyCfg(rows){ let fresh = false;
     else if (type.startsWith('монет')) K.coins += Number(row.value) || 0;
     else if (type.startsWith('чтен')) { const n = Number(row.value); if (n > 0) K.readWords = n; }
     else if (type.startsWith('книг')) bkApply(kid, row);
+    else if (type.startsWith('задан') || type.startsWith('подтв')) ptFromRow(kid, row, type);
     else if (type.startsWith('врем')) { const t = U.today(), m = Math.round((Number(row.value) || 10) / 10) * 10; if (!K.xt || K.xt.d !== t) K.xt = { d: t, m: 0 }; K.xt.m = Math.max(0, Math.min(180, K.xt.m + m)); if (m > 0 && K.restForced && K.restUntil > Date.now()) { K.restUntil = 0; K.restForced = false; K.sess = Math.max(0, SESS_SECS + extraSecs(K) - m * 60); K.blkAt = Date.now(); } }
     else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; }
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
@@ -9002,9 +9178,10 @@ function GIRL(kid){ const k = KIDS[kid]; return k && k.sex ? k.sex === 'f' : T(k
 function sexify(h, kid){ if (!kid || !KIDS[kid] || !KIDS[kid].sex) return h; const f = KIDS[kid].sex === 'f'; return h.replace(/([А-Яа-яЁё]+)\(а\)/g, (m, w) => f ? w + 'а' : w); }
 function render(){
   if (S.parentPin) for (const k of kidIds()) { burnCheck(k); piggyCheck(k); }
+  if (cur.kid && S.kids[cur.kid] && cur.view !== 'parent') ptPay(cur.kid);
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
   if (typeof hpApply === 'function') hpApply();
-  let v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : cur.view === 'lib' ? vLib() : vLogin();
+  let v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : cur.view === 'lib' ? vLib() : cur.view === 'ptask' ? vPTask() : vLogin();
   if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} try { libStop(); } catch (e) {} v = vSleep(); }
   else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} try { libStop(); } catch (e) {} v = vRestScreen(cur.kid); }
   else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active) && !(LR && LR.active)) v = vAsk(cur.kid);
@@ -9090,6 +9267,7 @@ function vHome(){
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">Выйти</button><button class="link voice" data-act="voice" title="Кто читает задания">🔊 ${K.voice === 'm' ? 'Мужской голос' : 'Женский голос'}</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <div class="banner" aria-hidden="true">${THEME[TH(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[TH(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${rusNote(kid)}${dripCard(kid)}${restCard(kid)}${hwCard(kid)}${capLeft(K) ? '' : '<div class="note">✅ Баллы на сегодня собраны (' + DAY_CAP + ' из ' + DAY_CAP + '). Можно заниматься дальше для ума — новые баллы завтра.</div>'}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog tipc" data-tip="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
+  ${ptHomeBtn(kid)}
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${typeof sylTile === 'function' ? sylTile(kid, D) : ''}${tiles}${poemTile(kid, D)}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
   ${libCard(kid)}
@@ -9773,9 +9951,10 @@ function vPrizes(){
 
 /* ----- Родителям ----- */
 function vParent(){
-  const tabs = [['report', 'Отчёт'], ['portrait', 'Портрет'], ['shop', 'Призы'], ['set', 'Настройки']];
+  const tabs = [['report', 'Отчёт'], ['tasks', 'Задания' + (kidIds().some(k => ptOf(k, ['wait']).length) ? ' •' : '')], ['portrait', 'Портрет'], ['shop', 'Призы'], ['set', 'Настройки']];
   let body = '';
   if (cur.parentTab === 'report') body = vReport(cur.parentKid);
+  else if (cur.parentTab === 'tasks') body = KIDS[cur.parentKid] ? vPTParent() : '';
   else if (cur.parentTab === 'portrait') body = `<div class="row">${kidIds().map(k => `<button class="chip ${cur.parentKid === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}</button>`).join('')}</div>` + (cur.parentKid && KIDS[cur.parentKid] ? vPortrait(cur.parentKid) : '');
   else if (cur.parentTab === 'shop') { const pk = cur.parentKid, sh = S.kids[pk].shop || [], wait = sh.filter(x => x.price == null).length;
     body = `<div class="row">${kidIds().map(k => `<button class="chip ${pk === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}${(S.kids[k].shop || []).some(x => x.price == null) ? ' •' : ''}</button>`).join('')}</div>
@@ -9802,7 +9981,7 @@ function vReport(kid){
   <div class="card"><h2>Чтение вслух</h2>${rd ? `<div class="tscroll"><table><thead><tr><th>Дата</th><th>Текст</th><th>Язык</th><th>сл/мин</th><th>Точность</th><th>Ошибки</th></tr></thead><tbody>${rd}</tbody></table></div>` : '<p>Ещё не читал(а).</p>'}<p class="hint">Норма к концу года: ${d.norm} ${U.pl(d.norm, 'слово', 'слова', 'слов')} в минуту. Сейчас читает вслух по ${wordsLimit(kid)} ${U.pl(wordsLimit(kid), 'слову', 'слова', 'слов')} за урок.</p></div>
   <div class="card"><h2>Последние ошибки</h2>${errs ? `<ul>${errs}</ul>` : '<p>Ошибок нет.</p>'}</div>
   <div class="card"><h2>Отзывы после уроков</h2>${fbs ? `<ul>${fbs}</ul>` : '<p>Пока нет.</p>'}</div>
-  <div class="card"><h2>Быстрые действия</h2><form class="form" data-form="hw"><label>Задание ребёнку (появится в «Домашнем задании»)<input id="hwtext" autocomplete="off"></label><button class="btn small">Добавить</button></form>
+  <div class="card"><h2>Быстрые действия</h2><p><button class="btn small" data-act="ptab" data-t="tasks">Дать задание ребёнку</button> <span class="hint">дело по дому, задачку или отрывок книги — во вкладке «Задания»</span></p>
   <form class="form" data-form="coins"><label>Баллы (+ или −)<input id="coinadd" inputmode="numeric" autocomplete="off"></label><button class="btn small">Начислить</button></form></div>`;
 }
 function devInfo(){ const ua = navigator.userAgent; const m = ua.match(/OS (\d+)[_.](\d+)/) || ua.match(/Version\/(\d+)\.(\d+)/); const ios = m ? m[1] + '.' + m[2] : '?'; const pwa = (window.navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches)) ? 'с главного экрана' : 'в браузере';
@@ -9896,7 +10075,7 @@ document.addEventListener('click', e => {
     case 'shop': go('shop'); break;
     case 'buy': { const it = (S.kids[kid].shop || []).find(x => x.id === b.dataset.id); if (!it || it.price == null) break; const k0 = kid; askPin('parent', () => { const K = S.kids[k0]; if (K.coins >= it.price) { K.coins -= it.price; K.purchases.push({ d: cur.ds, name: it.name, price: it.price }); ev(k0, 'награда', { unit: it.name, coins: K.coins, price: it.price }); save(); } cur.kid = k0; go('shop'); }, `Подтвердите: «${it.name}» за ${it.price} монет`); break; }
     case 'resetall': if (window.confirm('Стереть весь прогресс, монеты и коды на этом айпаде?')) { if (kidIds().length) ev(kidIds()[0], 'сброс устройства', {}); flush().finally(() => { try { localStorage.removeItem(KEY); } catch (x) {} location.reload(); }); } break;
-    case 'ptab': go('parent', { parentTab: b.dataset.t }); break;
+    case 'ptab': go('parent', { parentTab: b.dataset.t }); if (b.dataset.t === 'tasks') ptSync(); break;
     case 'pkid': go('parent', { parentKid: b.dataset.k }); break;
     case 'delshop': S.kids[cur.parentKid].shop.splice(+b.dataset.i, 1); save(); render(); break;
     case 'saveshop': { const K = S.kids[cur.parentKid]; K.shop.forEach((it, i) => { const v = parseInt(document.getElementById('sp' + i).value); if (v > 0) { if (it.price !== v) ev(cur.parentKid, 'цена приза', { unit: it.name, price: v }); it.price = v; } }); save(); alertMsg('Цены сохранены'); render(); break; }
@@ -9910,7 +10089,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (libAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (libAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; if (ptAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t, ms){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), ms || 2200); }
@@ -9918,6 +10097,7 @@ document.addEventListener('submit', e => {
   const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const k = f.dataset.form;
   const val = id => (document.getElementById(id) || {}).value || '';
   if (FAM && famForm(k, f, val)) return;
+  if (k === 'ptnew') return ptSubmit();
   if (k === 'setup') { const p = val('pp'), y = val('py'), a = val('pa'); if (![p, y, a].every(x => /^\d{4}$/.test(x))) return alertMsg('Нужно по четыре цифры'); if (new Set([p, y, a]).size < 3) return alertMsg('Коды папы, Глеба и Кати должны быть разными'); S.parentPin = hashPin(p); S.kids.yarik.pin = hashPin(y); S.kids.anya.pin = hashPin(a); save(); go('login'); }
   { const F = ALWAYS.filter(x => k.indexOf(x.id) === 0)[0]; if (F && F.form) return F.form(k, f); }
   if (k === 'num') answer(val('numin'));
