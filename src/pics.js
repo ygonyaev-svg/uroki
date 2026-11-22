@@ -272,11 +272,12 @@ function picSeg(parts, whole){ const P = String(parts).split('^'), W = 280, x0 =
 function picCmp(a, b, la, lb){ a = +a; b = +b; const k = 240 / Math.max(a, b); let g = `<rect x="70" y="10" width="${a * k}" height="16" rx="3" fill="#3b82f6"/><rect x="70" y="40" width="${b * k}" height="16" rx="3" fill="#16a34a"/>` + PX.t(62, 23, la, 13, null, 'end') + PX.t(62, 53, lb, 13, null, 'end');
   if (a !== b) { const lo = Math.min(a, b) * k + 70, hi = Math.max(a, b) * k + 70, y = a > b ? 40 : 10; g += `<rect x="${lo}" y="${y}" width="${hi - lo}" height="16" rx="3" fill="none" stroke="#f43f5e" stroke-dasharray="4 3" stroke-width="2"/>` + PX.t((lo + hi) / 2, y + 30, '?', 15, '#f43f5e'); }
   return PX.svg(330, 86, g, 'cmp'); }
-/* Звуковая схема слова, как в букваре: клеточка на каждый звук, гласные — красные, согласные — синие; open — подписать буквы */
+/* Звуковая схема слова, как в букваре: клеточка на каждый звук, гласные — красные, твёрдые согласные — синие, мягкие — зелёные; open — подписать буквы */
 function picSnd(word, open){ const w = String(word).toLowerCase(), V = 'аоуыэяёюие', s = 34; let g = '', x = 6;
-  for (const ch of w) { if (ch === '-') { x += 10; continue; } if ('ьъ'.includes(ch)) continue; const v = V.includes(ch);
-    g += `<rect x="${x}" y="6" width="${s - 4}" height="${s - 4}" rx="4" fill="${v ? '#fecaca' : '#bfdbfe'}" stroke="${v ? '#dc2626' : '#2563eb'}" stroke-width="2"/>`;
-    if (open) g += PX.t(x + (s - 4) / 2, 6 + (s - 4) / 2 + 7, ch, 20, v ? '#b91c1c' : '#1d4ed8'); x += s; }
+  const cs = [...w]; cs.forEach((ch, i) => { if (ch === '-') { x += 10; return; } if ('ьъ'.includes(ch)) return; const v = V.includes(ch), nx = cs[i + 1] || '', soft = !v && ((nx && 'яёюиеь'.includes(nx)) || 'чщй'.includes(ch)) && !'жшц'.includes(ch);
+    const f = v ? '#fecaca' : soft ? '#bbf7d0' : '#bfdbfe', st = v ? '#dc2626' : soft ? '#16a34a' : '#2563eb';
+    g += `<rect x="${x}" y="6" width="${s - 4}" height="${s - 4}" rx="4" fill="${f}" stroke="${st}" stroke-width="2"/>`;
+    if (open) g += PX.t(x + (s - 4) / 2, 6 + (s - 4) / 2 + 7, ch, 20, st); x += s; });
   return PX.svg(x + 4, s + 8, g, 'snd'); }
 /* Весы с предметами: l, r — через «+»: «арбуз», «x» (неизвестное), «2 кг» (гиря) */
 function picScale2(l, r){ const item = (t, cx) => { t = t.trim();
@@ -288,6 +289,37 @@ function picScale2(l, r){ const item = (t, cx) => { t = t.trim();
   <line x1="75" y1="34" x2="40" y2="90" stroke="#94a3b8"/><line x1="75" y1="34" x2="110" y2="90" stroke="#94a3b8"/><line x1="245" y1="34" x2="210" y2="90" stroke="#94a3b8"/><line x1="245" y1="34" x2="280" y2="90" stroke="#94a3b8"/>`
   + side(l, 75) + side(r, 245) + `<path d="M15,90 h120 a60,16 0 0,1 -120,0" fill="#cbd5e1"/><path d="M185,90 h120 a60,16 0 0,1 -120,0" fill="#cbd5e1"/>`;
   return PX.svg(320, 178, g, 'scale'); }
+/* Разбор слова по составу, значки как в учебнике: spec «п:под,к:снеж,с:ник,о:» (п — приставка, к — корень, с — суффикс, о — окончание, пустое — нулевое) */
+function picMorph(spec){ const cw = 17, parts = String(spec).split(',').map(x => { const i = x.indexOf(':'); return [x.slice(0, i), x.slice(i + 1)]; }); let x = 10, g = '';
+  for (const [r, t] of parts) { const w = Math.max(t.length * cw, r === 'о' ? 18 : 0), x0 = x;
+    if (r === 'о') g += `<rect x="${x0 + 1}" y="34" width="${w}" height="30" fill="none" stroke="#dc2626" stroke-width="2"/>`;
+    if (r === 'п') g += `<path d="M${x0 + 2},26 h${w - 4} v10" fill="none" stroke="#2563eb" stroke-width="2.5"/>`;
+    if (r === 'к') g += `<path d="M${x0 + 2},28 Q${x0 + w / 2},4 ${x0 + w - 2},28" fill="none" stroke="#16a34a" stroke-width="2.5"/>`;
+    if (r === 'с') g += `<path d="M${x0 + 3},28 L${x0 + w / 2},10 L${x0 + w - 3},28" fill="none" stroke="#9333ea" stroke-width="2.5"/>`;
+    [...t].forEach((ch, i) => { g += PX.t(x0 + i * cw + cw / 2 + (r === 'о' ? 1 : 0), 57, ch, 24, '#0f172a'); }); x += w + (r === 'о' ? 4 : 0); }
+  return PX.svg(x + 10, 72, g, 'morph'); }
+/* Предложение с подчёркиванием членов, как в тетради: «Мальчик_1 читает_2 книгу_3» — 1 подлежащее (одна черта), 2 сказуемое (две), 3 дополнение (пунктир), 4 определение (волна), 5 обстоятельство (точка-тире), 0 — без черты */
+function picSent(spec){ const ws = String(spec).split(' ').map(w => { const m = w.match(/^(.*)_(\d)$/); return m ? [m[1], +m[2]] : [w, 0]; }); let x = 10, g = ''; const cw = 15;
+  for (const [w, k] of ws) { const L = w.length * cw, y = 44;
+    g += `<text x="${x + L / 2}" y="34" font-size="21" fill="#0f172a" text-anchor="middle" textLength="${L - 2}" lengthAdjust="spacingAndGlyphs" font-family="system-ui,-apple-system,sans-serif" font-weight="600">${w}</text>`;
+    if (k === 1) g += `<line x1="${x}" x2="${x + L}" y1="${y}" y2="${y}" stroke="#2563eb" stroke-width="2.5"/>`;
+    if (k === 2) g += `<line x1="${x}" x2="${x + L}" y1="${y}" y2="${y}" stroke="#dc2626" stroke-width="2.5"/><line x1="${x}" x2="${x + L}" y1="${y + 5}" y2="${y + 5}" stroke="#dc2626" stroke-width="2.5"/>`;
+    if (k === 3) g += `<line x1="${x}" x2="${x + L}" y1="${y}" y2="${y}" stroke="#16a34a" stroke-width="2.5" stroke-dasharray="7 5"/>`;
+    if (k === 4) { let d = `M${x},${y}`; for (let i = 0; i < L / 8; i++) d += ` q2,${i % 2 ? 5 : -5} 4,0 q2,${i % 2 ? -5 : 5} 4,0`; g += `<path d="${d}" fill="none" stroke="#9333ea" stroke-width="2"/>`; }
+    if (k === 5) g += `<line x1="${x}" x2="${x + L}" y1="${y}" y2="${y}" stroke="#ea580c" stroke-width="2.5" stroke-dasharray="10 4 2 4"/>`;
+    x += L + 16; }
+  return PX.svg(x, 58, g, 'sent'); }
+/* Логическая таблица: строки^…, столбцы^…, клетки по строкам «-+-^+--» (пробел — пусто) */
+function picGrid(rows, cols, cells){ const R = String(rows).split('^'), C = String(cols).split('^'), V = String(cells || '').split('^'), lw = 70, cw = 64, h = 32; let g = '';
+  C.forEach((c, j) => { g += PX.t(lw + j * cw + cw / 2, 22, c, 14, '#334155'); });
+  R.forEach((r, i) => { const y = 30 + i * h; g += PX.t(lw - 8, y + 21, r, 14, '#334155', 'end');
+    C.forEach((c, j) => { const v = (V[i] || '')[j] || ' '; g += `<rect x="${lw + j * cw}" y="${y}" width="${cw}" height="${h}" fill="${v === '+' ? '#dcfce7' : '#fff'}" stroke="#94a3b8"/>` + (v.trim() ? PX.t(lw + j * cw + cw / 2, y + 23, v === '-' ? '−' : v, 20, v === '+' ? '#15803d' : '#dc2626') : ''); }); });
+  return PX.svg(lw + C.length * cw + 10, 36 + R.length * h, g, 'grid'); }
+/* Цепочка чисел или фигур со стрелками: «2^5^8^11^?», над стрелками — подпись шага */
+function picChain(items, step){ const I = String(items).split('^'), w = 54; let g = '';
+  I.forEach((t, i) => { const x = 10 + i * (w + 26); g += `<rect x="${x}" y="22" width="${w}" height="40" rx="10" fill="${t === '?' ? '#fee2e2' : '#e0f2fe'}" stroke="${t === '?' ? '#f43f5e' : '#0284c7'}" stroke-width="2"/>` + PX.t(x + w / 2, 49, t, 18, t === '?' ? '#e11d48' : '#0f172a');
+    if (i < I.length - 1) g += `<path d="M${x + w + 3},42 h18 m-6,-5 l6,5 l-6,5" fill="none" stroke="#64748b" stroke-width="2"/>` + (step ? PX.t(x + w + 13, 16, step, 12, '#16a34a') : ''); });
+  return PX.svg(10 + I.length * (w + 26), 70, g, 'chain'); }
 function thPic(spec){ const h = String(spec).includes(';') ? `<div class="pair">${String(spec).split(';').map(thPic1).join('')}</div>` : thPic1(spec);
   return h.replace(/>([^<]+)</g, (m, t) => '>' + t.replace(/(\d)\.(\d)/g, '$1,$2') + '<'); } /* в подписях десятичная запятая */
 function thPic1(spec){ const [n, ...a] = String(spec).split('|'); try {
@@ -296,6 +328,10 @@ function thPic1(spec){ const [n, ...a] = String(spec).split('|'); try {
     case 'w': { const ps = wordPics(a[0], 3); return ps.length ? `<div class="wpics">${ps.map(e => `<span>${e}</span>`).join('')}</div>` : ''; }
     case 'groups': return picGroups(a[0], a[1], a[2], a[3], a[4]);
     case 'right': return picRight();
+    case 'grid': return picGrid(a[0], a[1], a[2]);
+    case 'chain': return picChain(a[0], a[1]);
+    case 'morph': return picMorph(a[0]);
+    case 'sent': return picSent(a[0]);
     case 'circle': return picCircle();
     case 'notes': return picNotebooks(a[0], a[1]);
     case 'scale': return picScale(a[0], a[1]);
