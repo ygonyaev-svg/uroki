@@ -1108,7 +1108,7 @@ document.addEventListener('click', e => {
     default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (libAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
-function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }
+function alertMsg(t, ms){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), ms || 2200); }
 document.addEventListener('submit', e => {
   const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const k = f.dataset.form;
   const val = id => (document.getElementById(id) || {}).value || '';

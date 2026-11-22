@@ -46,7 +46,7 @@ var FAM_Q = [
   ['mo', 'Что больше всего мотивирует', ['Награда из копилки', 'Похвала', 'Рекорды и серии дней', 'Сюжет и новое']]];
 /* Изучаемые языки: код → [название, код озвучки] и уровни владения */
 var FAM_LANGS = { pt: ['Португальский', 'pt-PT'], en: ['Английский', 'en-GB'], fr: ['Французский', 'fr-FR'], de: ['Немецкий', 'de-DE'], es: ['Испанский', 'es-ES'] };
-var FAM_LLV = ['Не знает', 'Немного говорит', 'Общается в школе', 'Говорит свободно'];
+var FAM_LLV = ['Изучать с нуля', 'Изучать: немного говорит', 'Изучать: общается в школе', 'Изучать: говорит свободно'];
 /* Курс по языку и уровню. Начальные уровни — объяснения по-русски; «общается в школе» и «свободно» — упор на грамматику и письмо */
 function famLangCourse(code, lv, age){
   if (code === 'pt') return lv >= 2 ? PT_NAT : lv === 1 && age >= 8 ? PT_A : PT_Y;
@@ -158,14 +158,14 @@ function vFamKids(){
     '<label>Любимые герои мультиков или книг<input id="fkh' + i + '" value="' + U.esc(c.hero || '') + '" maxlength="80" autocomplete="off" placeholder="Например: Гарри Поттер, Человек-паук, Колобок"></label>' +
     '<label>Как читает по-русски<select id="fkr' + i + '"><option value="">— выберите —</option>' + FAM_RD.map(function(t, k){ return '<option value="' + k + '"' + (String(c.rd) === String(k) ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></label>' +
     '<p class="fkql">Ещё несколько вопросов — чтобы задания с первого дня были по силам</p>' + FAM_Q.map(function(x){ var v = (c.q || {})[x[0]]; return '<label>' + x[1] + '<select id="fkq' + x[0] + i + '"><option value="">— выберите —</option>' + x[2].map(function(t, k){ return '<option value="' + k + '"' + (v !== '' && v != null && String(v) === String(k) ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></label>'; }).join('') +
-    '<p class="fkql">Какие языки изучать, кроме русского (до двух) и как ребёнок на них говорит</p>' + Object.keys(FAM_LANGS).map(function(k){ var v = (c.lg || {})[k]; return '<label>' + FAM_LANGS[k][0] + '<select id="fkl' + k + i + '"><option value="">— не изучать —</option>' + FAM_LLV.map(function(t, j){ return '<option value="' + j + '"' + (v != null && v !== '' && +v === j ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></label>'; }).join('') +
+    '<p class="fkql">Иностранные языки — по желанию</p><p class="hint">Русский ребёнок учит всегда. Можно добавить один или два иностранных языка и отметить, как ребёнок говорит на нём сейчас. Если иностранный язык не нужен, оставьте везде «Не изучать».</p>' + Object.keys(FAM_LANGS).map(function(k){ var v = (c.lg || {})[k]; return '<label>' + FAM_LANGS[k][0] + '<select id="fkl' + k + i + '"><option value="">Не изучать</option>' + FAM_LLV.map(function(t, j){ return '<option value="' + j + '"' + (v != null && v !== '' && +v === j ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></label>'; }).join('') +
     '<label>Любимые книги<input id="fkb' + i + '" value="' + U.esc(c.books || '') + '" maxlength="200" autocomplete="off" placeholder="На любом языке, можно несколько"></label>' +
     '<label>Что уже прочитал(а) из русских книг<input id="fkd' + i + '" value="' + U.esc(c.done || '') + '" maxlength="300" autocomplete="off" placeholder="Например: Денискины рассказы, Каштанка"></label>' +
     '<p class="fkql">Любимый цвет</p><div class="row fkcols">' + FAM_COLORS.map(function(x){ return '<button type="button" class="fkcol' + (c.color === x[0] ? ' on' : '') + '" data-act="fkcol" data-i="' + i + '" data-k="' + x[0] + '" style="background:' + x[1] + '" aria-label="' + x[0] + '"></button>'; }).join('') + '</div>' +
-    '<label>Код ребёнка, 4 цифры' + (c.has ? ' (оставьте пустым, чтобы не менять)' : '') + '<input id="fkp' + i + '" inputmode="numeric" maxlength="4" autocomplete="off" value="' + U.esc(c.pinNew || '') + '"></label></fieldset>'; }).join('');
+    '<label>Код ребёнка, 4 цифры — ребёнок вводит его, когда входит в свой профиль' + (c.has ? ' (оставьте пустым, чтобы не менять)' : '') + '<input id="fkp' + i + '" inputmode="numeric" maxlength="4" autocomplete="off" value="' + U.esc(c.pinNew || '') + '"></label></fieldset>'; }).join('');
   return famWrap(famBrand(false) + '<header class="hero"><p class="eyebrow">' + U.esc((S.fam && S.fam.email) || '') + '</p><h1>' + (first ? 'Добавьте детей' : 'Дети') + '</h1><p>Программа подбирается по возрасту ребёнка — от подготовки к школе до седьмого класса. Дальше сложность меняется по его ответам.</p></header>' +
     '<form data-form="fkids">' + rows + (L.length < 5 ? '<p class="center"><button type="button" class="btn ghost" data-act="fkadd">+ Ещё ребёнок</button></p>' : '') +
-    '<div class="card form"><label>Код родителя, 4 цифры' + (first ? '' : ' (оставьте пустым, чтобы не менять)') + '<input id="fkpp" inputmode="numeric" maxlength="4" autocomplete="off"></label><p class="hint">Код родителя открывает отчёты и подтверждает призы. Коды детей — чтобы брат или сестра не заходили друг за друга.</p>' +
+    '<div class="card form"><label>Код родителя, 4 цифры' + (first ? '' : ' (оставьте пустым, чтобы не менять)') + '<input id="fkpp" inputmode="numeric" maxlength="4" autocomplete="off"></label><p class="hint">Код родителя нужен, чтобы открыть отчёты и подтвердить призы. У каждого ребёнка свой код: так брат или сестра не смогут заниматься под чужим именем. Все коды должны быть разными.</p>' +
     '<button class="btn big">Сохранить</button>' + (first ? '' : ' <button type="button" class="link" data-act="fkback">Отмена</button>') + '</div></form>');
 }
 function famLoginExtra(){ return '<p class="fammotto center">' + FAM_MOTTO + '</p>'; }
@@ -196,6 +196,7 @@ function famAuthDone(j){
   S.fam = { fid: j.fid, token: j.token, email: j.email, name: j.name || '', kids: j.kids || [], ppin: j.ppin || null, off: !!j.off };
   famInit(); save(); cur.fk = null; go('login');
 }
+function famBad(id, msg, id2){ alertMsg(msg, 5000); var e = document.getElementById(id2 || id); if (e) { e.scrollIntoView({ block: 'center' }); e.focus(); } return true; }
 function famForm(k, f, val){
   if (k === 'freg' || k === 'flogin') {
     var em = val('femail').trim().toLowerCase(), pw = val('fpass'), nm = k === 'freg' ? val('fname').trim() : '';
@@ -209,18 +210,18 @@ function famForm(k, f, val){
   if (k === 'fkids') {
     fkRead(); var L = cur.fk, pp = val('fkpp'), first = !S.parentPin, i, c, pins = [];
     for (i = 0; i < L.length; i++) { c = L[i];
-      if (!c.name) { alertMsg('Напишите имя ребёнка ' + (i + 1)); return true; }
-      if (Object.keys(c.lg || {}).filter(function(k){ return c.lg[k] !== ''; }).length > 2) { alertMsg('Выберите не больше двух языков для ребёнка: ' + c.name); return true; }
-      if (c.pinNew && !/^\d{4}$/.test(c.pinNew)) { alertMsg('Код ребёнка — четыре цифры'); return true; }
-      if (!c.has && !c.pinNew) { alertMsg('Придумайте код для ребёнка: ' + c.name); return true; } }
-    if ((first || pp) && !/^\d{4}$/.test(pp)) { alertMsg('Код родителя — четыре цифры'); return true; }
+      if (!c.name) return famBad('fkn' + i, 'Напишите имя ребёнка ' + (i + 1));
+      var lgOn = Object.keys(c.lg || {}).filter(function(k){ return FAM_LANGS[k] && c.lg[k] !== ''; }); if (lgOn.length > 2) { return famBad(null, c.name + ': можно изучать не больше двух иностранных языков, а выбрано ' + lgOn.length + ' (' + lgOn.map(function(k){ return FAM_LANGS[k][0].toLowerCase(); }).join(', ') + '). У лишних выберите «Не изучать».', 'fkl' + lgOn[2] + i); }
+      if (c.pinNew && !/^\d{4}$/.test(c.pinNew)) return famBad('fkp' + i, 'Код ребёнка ' + c.name + ' — ровно четыре цифры');
+      if (!c.has && !c.pinNew) return famBad('fkp' + i, 'Придумайте код из четырёх цифр для ребёнка: ' + c.name); }
+    if ((first || pp) && !/^\d{4}$/.test(pp)) return famBad('fkpp', 'Код родителя — ровно четыре цифры');
     var old = {}; (S.fam.kids || []).forEach(function(x){ old[x.id] = x; });
     var kids = L.map(function(c, j){ var id = c.id || ('k' + Date.now().toString(36) + j); var o = old[id] || {};
       var x = { id: id, name: c.name.slice(0, 20), age: c.age, ints: c.ints || [], hero: (c.hero || '').slice(0, 80), books: (c.books || '').slice(0, 200), done: (c.done || '').slice(0, 300), rd: c.rd === '' || c.rd == null ? null : +c.rd, color: c.color || '', pin: c.pinNew ? hashPin(c.pinNew) : o.pin };
       FAM_QK.forEach(function(k){ var v = (c.q || {})[k]; x[k] = v === '' || v == null ? null : +v; }); x.lg = {}; Object.keys(c.lg || {}).forEach(function(k){ if (FAM_LANGS[k] && c.lg[k] !== '') x.lg[k] = +c.lg[k]; }); return x; });
     var ppin = pp ? hashPin(pp) : S.fam.ppin;
     kids.forEach(function(x){ pins.push(x.pin); }); pins.push(ppin);
-    if (pins.filter(function(x, j){ return pins.indexOf(x) !== j; }).length) { alertMsg('Коды должны быть разными у всех'); return true; }
+    if (pins.filter(function(x, j){ return pins.indexOf(x) !== j; }).length) return famBad(null, 'Коды не должны совпадать: у каждого ребёнка и у родителя свой код');
     var gone = (S.fam.kids || []).filter(function(x){ return !kids.some(function(y){ return y.id === x.id; }); });
     gone.forEach(function(x){ delete S.kids[x.id]; });
     S.fam.kids = kids; S.fam.ppin = ppin; S.parentPin = ppin; famInit(); save();
