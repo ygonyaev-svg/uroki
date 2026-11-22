@@ -1,7 +1,7 @@
 /* Тестовый режим для родителя: копия данных в «песочнице» — все уроки открыты, перерывов нет,
    баллы и прогресс детей не меняются, события в таблицу не идут. Кнопка «📝 Замечание» отправляет заметку Юры в таблицу. */
 let TEST = false;
-function testCard(){ return `<div class="card testc"><h2>🧪 Тестовый режим</h2><p class="hint">Пройдите любые задания за ребёнка: всё открыто, без перерывов. Баллы и прогресс детей не меняются, в таблицу ничего не пишется. Замечания по ходу — кнопкой «📝 Замечание».</p><div class="row">${kidIds().map(k => `<button class="btn small" data-act="testgo" data-k="${k}">За ${KIDS[k].name === 'Аня' ? 'Аню' : KIDS[k].name === 'Ярик' ? 'Ярика' : KIDS[k].name}</button>`).join(' ')}</div></div>`; }
+function testCard(){ return `<div class="card testc"><h2>🧪 Тестовый режим</h2><p class="hint">Пройдите любые задания за ребёнка: всё открыто, без перерывов. Баллы и прогресс детей не меняются, ${FAM ? 'в отчёт ничего не попадает' : 'в таблицу ничего не пишется'}. Замечания по ходу — кнопкой «📝 Замечание».</p><div class="row">${kidIds().map(k => `<button class="btn small" data-act="testgo" data-k="${k}">За ${U.acc(KIDS[k].name)}</button>`).join(' ')}</div></div>`; }
 function testEnter(k){ const real = S; S = JSON.parse(JSON.stringify(real)); S.queue = []; S.test = true; TEST = true;
   Object.keys(S.kids).forEach(x => { S.kids[x].restUntil = 0; S.kids[x].blk = 0; S.kids[x].prizesSet = true; });
   cur.kid = k; go('home'); }

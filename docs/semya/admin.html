@@ -37,7 +37,7 @@ function draw(j){
   h += invBlock(j.invs || []) + '<h1 style="margin-top:20px">Семьи</h1>';
   if (!F.length) h += '<div class="card">Пока никто не зарегистрировался.</div>';
   F.slice().reverse().forEach(function(f){
-    var kids = (f.kids || []).map(function(k){ return esc(k.name) + ', ' + esc(k.age) + ((k.ints && k.ints.length) || k.hero || k.rd != null || qs(k) ? ' <span class="mut">(' + esc((k.ints || []).join(', ') + (k.hero ? '; герои: ' + k.hero : '') + (k.books ? '; любит: ' + k.books : '') + (k.done ? '; прочитал(а): ' + k.done : '') + (k.rd != null ? '; чтение ' + k.rd + ' из 3' : '') + qs(k)) + ')</span>' : ''); }).join('; ') || 'детей ещё нет';
+    var kids = (f.kids || []).map(function(k){ return esc(k.name) + ', ' + (k.sex === 'f' ? 'девочка, ' : k.sex === 'm' ? 'мальчик, ' : '') + esc(k.age) + ((k.ints && k.ints.length) || k.hero || k.rd != null || qs(k) ? ' <span class="mut">(' + esc((k.ints || []).join(', ') + (k.hero ? '; герои: ' + k.hero : '') + (k.books ? '; любит: ' + k.books : '') + (k.done ? '; прочитал(а): ' + k.done : '') + (k.rd != null ? '; чтение ' + k.rd + ' из 3' : '') + qs(k)) + ')</span>' : ''); }).join('; ') || 'детей ещё нет';
     h += '<div class="card"><div class="top"><div><b>' + esc(f.name || 'без имени') + '</b><br><span class="mut">' + esc(f.email) + '</span></div><span class="st ' + (f.off ? 'off">отключена' : 'on">активна') + '</span></div>' +
       '<p>Дети: ' + kids + '</p><p class="mut">Регистрация: ' + dt(f.created) + ' · был(а): ' + dt(f.last) + ' · событий: ' + esc(f.events) + '</p>' +
       '<button class="' + (f.off ? '' : 'red') + '" onclick="setSt(\'' + esc(f.fid) + '\',' + (f.off ? 'true' : 'false') + ')">' + (f.off ? 'Включить' : 'Отключить') + '</button></div>';

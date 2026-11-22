@@ -78,7 +78,7 @@ function lineSyl(line){ const out = []; line.split(/\s+/).filter(Boolean).forEac
 function meterHit(m, i){ return m === 'хорей' ? i % 2 === 0 : m === 'ямб' ? i % 2 === 1 : m === 'амфибрахий' ? i % 3 === 1 : m === 'дактиль' ? i % 3 === 0 : m === 'анапест' ? i % 3 === 2 : false; }
 function rhymes(a, b){ a = pvN(a); b = pvN(b); if (!a || !b || a === b) return false; const tail = w => { let k = w.length - 1; while (k >= 0 && !PV.includes(w[k])) k--; return w.slice(Math.max(0, k - 1)); }; return a.slice(-2) === b.slice(-2) || tail(a) === tail(b); }
 function poemPairs(p){ const L = poemLines(p), r = p.r || '', out = []; for (let i = 0; i < L.length; i++) { const c = r[i]; if (!c || c === 'x') continue; for (let j = i + 1; j < L.length; j++) if (r[j] === c) { out.push([i, j]); break; } } return out; }
-function poemTasks(kid, p, seed){ const R = U.rng(seed), L = poemLines(p), pairs = R.shuffle(poemPairs(p)), girl = T(kid) === 'anya', out = [];
+function poemTasks(kid, p, seed){ const R = U.rng(seed), L = poemLines(p), pairs = R.shuffle(poemPairs(p)), girl = GIRL(kid), out = [];
   const others = R.shuffle(POEMS.filter(q => q.id !== p.id).map(q => poemLines(q).map(lastWord)).flat().filter(Boolean));
   const distract = (w, n) => { const res = []; for (const o of others) { if (res.length >= n) break; if (pvN(o) === pvN(w) || rhymes(o, w) || res.some(x => pvN(x) === pvN(o))) continue; res.push(o.toLowerCase()); } return res; };
   if (pairs[0]) { const [i, j] = pairs[0], w = lastWord(L[i]), a = lastWord(L[j]).toLowerCase(); out.push({ k: 'rhyme', q: `Найди рифму к слову «${w.toLowerCase()}»`, line: L[i], a, opts: R.shuffle([a, ...distract(a, 2)]) }); }
@@ -113,7 +113,7 @@ function poemOpen(kid){ const D = dayRec(kid, cur.ds); if (!D.poem) { if (restAs
     const p = poemCur(kid), st = poemState(kid); st.n = (st.n || 0) + 1; D.poem = { id: p.id, phase: 'read', i: 0, ans: [], t0: Date.now(), hide: 0, seed: U.h(kid + cur.ds + p.id + st.n) }; save(); }
   go('poem'); }
 function poemSteps(kid){ return T(kid) === 'anya' ? [['read', 'Читаю'], ['tasks', 'Рифма и ритм'], ['stress', 'Ударение'], ['compose', 'Мои строки'], ['learn', 'Наизусть'], ['done', 'Итог']] : [['read', 'Читаю'], ['tasks', 'Рифма и слоги'], ['stress', 'Ударение'], ['learn', 'Наизусть'], ['done', 'Итог']]; }
-function vPoem(){ const kid = cur.kid, D = dayRec(kid, cur.ds), P = D.poem; if (!P) return vHome(); const p = POEMS.find(x => x.id === P.id) || poemCur(kid), L = poemLines(p), girl = T(kid) === 'anya';
+function vPoem(){ const kid = cur.kid, D = dayRec(kid, cur.ds), P = D.poem; if (!P) return vHome(); const p = POEMS.find(x => x.id === P.id) || poemCur(kid), L = poemLines(p), girl = GIRL(kid);
   const steps = poemSteps(kid), ix = steps.findIndex(s => s[0] === P.phase);
   const head = `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← К урокам</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header><section class="lesson poem"><p class="eyebrow">🎵 Стихи</p><h1>${p.e} ${U.esc(p.t)}</h1><p class="author">${U.esc(p.a)}</p><ol class="steps">${steps.map((s, i) => `<li class="${i < ix ? 'ok' : ''} ${i === ix ? 'now' : ''}">${s[1]}</li>`).join('')}</ol>`;
   const end = '</section></main>';
@@ -152,7 +152,7 @@ function vPoem(){ const kid = cur.kid, D = dayRec(kid, cur.ds), P = D.poem; if (
      <button class="btn big" data-act="pfinish">${P.recRes >= .85 ? 'Закончить' : 'Закончить (выучу потом)'}</button>` + end; }
   /* done */
   const st = poemState(kid);
-  return head + `<article class="card win"><h2>Готово!</h2><p>Задания: <b>${P.score || 0} из ${P.total || 0}</b> с первого раза.</p><p>${P.coins ? `+${P.coins} баллов в копилку 🐷` : 'В этот раз без баллов — нужно больше верных ответов.'}</p>${P.learnedNow ? `<p>🏅 Стих выучен наизусть! +10 баллов.</p>` : st.learned.includes(p.id) ? '' : '<p class="hint">Наизусть ещё не выучено — завтра продолжим этот же стих.</p>'}<p class="hint">Знаю наизусть: ${st.learned.length ? st.learned.map(id => { const q = POEMS.find(x => x.id === id); return q ? '«' + U.esc(q.t) + '»' : ''; }).join(', ') : 'пока ничего'}.</p></article>
+  return head + `<article class="card win"><h2>Готово!</h2><p>Задания: <b>${P.score || 0} из ${P.total || 0}</b> с первого раза.</p><p>${P.coins ? `+${P.coins} ${U.pl(P.coins, 'балл', 'балла', 'баллов')} в копилку 🐷` : 'В этот раз без баллов — нужно больше верных ответов.'}</p>${P.learnedNow ? `<p>🏅 Стих выучен наизусть! +10 баллов.</p>` : st.learned.includes(p.id) ? '' : '<p class="hint">Наизусть ещё не выучено — завтра продолжим этот же стих.</p>'}<p class="hint">Знаю наизусть: ${st.learned.length ? st.learned.map(id => { const q = POEMS.find(x => x.id === id); return q ? '«' + U.esc(q.t) + '»' : ''; }).join(', ') : 'пока ничего'}.</p></article>
    <button class="btn big" data-act="home">К урокам</button>` + end; }
 /* Проверка наизусть: по строкам, слова сравниваются «по звучанию» — распознавание речи часто путает окончания и похожие слова. */
 function recPh(w){ w = pvN(w).replace(/-/g, ''); return w.replace(/[ьъ]/g, '').replace(/[ёо]/g, 'а').replace(/[еэяиы]/g, 'и').replace(/ю/g, 'у').replace(/тс|дс|тьс/g, 'ц').replace(/(.)\1/g, '$1').replace(/[бвгдзж]$/, c => 'пфктсш'['бвгдзж'.indexOf(c)]); }
@@ -182,7 +182,7 @@ function poemFinish(kid){ const D = dayRec(kid, cur.ds), P = D.poem, K = S.kids[
   ev(kid, 'стихи', { subj: 'Стихи', unit: p.a + ' «' + p.t + '»', score: `${first}/${T0.length}`, grade: P.grade, secs: P.secs, text: `+${pts} баллов` + (P.comp ? '; своя строчка: ' + P.comp : '') });
   save(); render(); window.scrollTo(0, 0); }
 function poemAct(act, b){ if (cur.view !== 'poem' && act !== 'openpoem') return false; const kid = cur.kid; if (act === 'openpoem') { poemOpen(kid); return true; }
-  const D = dayRec(kid, cur.ds), P = D.poem; if (!P) return false; const p = POEMS.find(x => x.id === P.id), girl = T(kid) === 'anya';
+  const D = dayRec(kid, cur.ds), P = D.poem; if (!P) return false; const p = POEMS.find(x => x.id === P.id), girl = GIRL(kid);
   switch (act) {
     case 'psay': say(p.text.replace(/\n/g, '. '), 'ru-RU'); break;
     case 'psayl': say(poemLines(p).slice(0, poemLearnN(kid, p)).join('. '), 'ru-RU'); break;
