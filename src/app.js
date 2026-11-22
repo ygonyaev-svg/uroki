@@ -148,14 +148,38 @@ function sim(a, b){ if (a === b) return true; if (Math.abs(a.length - b.length) 
   if (!/[а-я]/.test(b)) return false; const x = simPh(a), y = simPh(b); if (x === y) return true;
   const sh = Math.min(x.length, y.length), lg = Math.max(x.length, y.length); if (sh >= 3 && lg - sh <= 2 && (x.startsWith(y) || y.startsWith(x))) return true;
   return lg >= 4 && lev(x, y) <= (lg >= 7 ? 2 : 1); }
-function align(T, spoken){ const st = new Array(T.length).fill(0); let p = 0, extra = 0;
-  const hit = (i, j) => { if (!T[j]) return 0; const s = spoken[i]; if (sim(s, T[j])) return 1; if (i + 1 < spoken.length && T[j].length > s.length) { const s2 = s + spoken[i + 1]; if (sim(s2, T[j])) return 2; if (i + 2 < spoken.length && sim(s2 + spoken[i + 2], T[j])) return 3; } return 0; };
-  for (let i = 0; i < spoken.length; i++) { if (!spoken[i]) continue; let f = -1, n = 0;
-    for (let j = p; j < Math.min(T.length, p + 5); j++) { n = hit(i, j); if (n) { f = j; break; } }
-    /* не застреваем: если слово не узнано, ищем дальше, но только когда и следующее сказанное слово совпадает со следующим в тексте */
-    if (f < 0) for (let j = p + 5; j < Math.min(T.length, p + 25); j++) { n = hit(i, j); if (n && i + n < spoken.length && j + 1 < T.length && hit(i + n, j + 1)) { f = j; break; } n = 0; }
-    if (f < 0) { extra++; continue; } for (let k = p; k < f; k++) st[k] = T[k].length <= 2 ? 1 : 2; st[f] = 1; p = f + 1; i += n - 1; }
-  return { st, p, extra }; }
+/* Сверка прочитанного с текстом (22.11, см. «Голос — итог 22.11»): выравниваем весь отрывок целиком, а не «жадно».
+   Правило: ошибку засчитываем, только когда уверены. st: 1 — верно, 3 — похоже (подсказка, без штрафа), 2 — ошибка, 0 — ещё не читал или не услышали. */
+const NUMW = /^(од|дв|тр|чет|пят|шест|сем|восем|девят|десят|сорок|девяност|сот|ст[оа]|тысяч|нол|нул)/;
+const ALC = new Map(); /* кэш сравнений слов между пересчётами — живая подсветка пересчитывается много раз */
+function alignSc(s, t){ if (s === t) return 2; if (/^\d+$/.test(s)) return NUMW.test(t) ? 2 : -1; if (simPh(s) === simPh(t)) return 2; return sim(s, t) ? 1 : -1; }
+function align(T, spoken){ const m = T.length, n = spoken.length, st = new Array(m).fill(0);
+  if (!m || !n) return { st, p: 0, extra: n };
+  const W = 40, NEG = -1e9, sc = (s, t) => { const k = s + '|' + t; let v = ALC.get(k); if (v === undefined) { if (ALC.size > 60000) ALC.clear(); v = alignSc(s, t); ALC.set(k, v); } return v; };
+  const D = [], P = []; for (let i = 0; i <= m; i++) { D.push(new Float32Array(n + 1).fill(NEG)); P.push(new Uint8Array(n + 1)); }
+  D[0][0] = 0; for (let j = 1; j <= n; j++) { D[0][j] = -0.5 * j; P[0][j] = 2; } for (let i = 1; i <= m && i <= W; i++) { D[i][0] = -i; P[i][0] = 1; }
+  for (let i = 1; i <= m; i++) { const lo = Math.max(1, i - W), hi = Math.min(n, i + W); const Ti = T[i - 1];
+    for (let j = lo; j <= hi; j++) { let best = NEG, bp = 0, v;
+      if (D[i - 1][j - 1] > NEG) { v = D[i - 1][j - 1] + sc(spoken[j - 1], Ti); if (v > best) { best = v; bp = 0; } }
+      if (D[i - 1][j] > NEG) { v = D[i - 1][j] - 1; if (v > best) { best = v; bp = 1; } }
+      if (D[i][j - 1] > NEG) { v = D[i][j - 1] - 0.5; if (v > best) { best = v; bp = 2; } }
+      if (j >= 2 && D[i - 1][j - 2] > NEG && Ti.length > spoken[j - 1].length) { const x = sc(spoken[j - 2] + spoken[j - 1], Ti); if (x > 0) { v = D[i - 1][j - 2] + x; if (v > best) { best = v; bp = 3; } } } /* «проказница» + «мартышка» */
+      if (i >= 2 && D[i - 2][j - 1] > NEG) { const x = sc(spoken[j - 1], T[i - 2] + Ti); if (x > 0) { v = D[i - 2][j - 1] + x + 0.5; if (v > best) { best = v; bp = 4; } } } /* «стара я» = «старая» */
+      D[i][j] = best; P[i][j] = bp; } }
+  /* конец чтения — там, где выравнивание лучше всего (дальше ребёнок ещё не читал) */
+  let bi = 0, bv = D[0][n]; for (let i = 1; i <= m; i++) if (D[i][n] > bv + 1e-6) { bv = D[i][n]; bi = i; }
+  let i = bi, j = n, extra = 0; const del = new Array(m).fill(false);
+  while (i > 0 || j > 0) { const p = i > 0 && j > 0 ? P[i][j] : i > 0 ? 1 : 2;
+    if (p === 0) { const x = sc(spoken[j - 1], T[i - 1]); st[i - 1] = x === 2 ? 1 : x === 1 ? 3 : 2; i--; j--; }
+    else if (p === 3) { st[i - 1] = 1; i--; j -= 2; } else if (p === 4) { st[i - 1] = st[i - 2] = 1; i -= 2; j--; }
+    else if (p === 1) { del[i - 1] = true; i--; } else { extra++; j--; } }
+  const digits = spoken.some(w => /^\d+$/.test(w));
+  /* не услышали слово — это не ошибка ребёнка (диктовка теряет слова). Ошибка — только пропуск целой фразы (4+ слов подряд) */
+  for (let k = 0; k < bi; k++) if (del[k]) { let e = k; while (e < bi && del[e]) e++; const run = e - k;
+    for (let q = k; q < e; q++) st[q] = T[q].length <= 2 || (digits && NUMW.test(T[q])) ? 1 : run >= 4 ? 2 : 0; k = e - 1; }
+  return { st, p: bi, extra }; }
+/* класс слова при чтении вслух */
+function wCls(st, k, p){ return st ? (st[k] === 1 ? 'r1' : st[k] === 2 ? 'r2' : st[k] === 3 ? 'r3' : k === p ? 'rc' : '') : ''; }
 
 /* Часы работы (правило Юры 21.11): детская часть — с 8:00 до 21:00 по Лиссабону. «Для родителей» и тестовый режим — всегда. */
 const OPEN_H = 8, CLOSE_H = 21;
@@ -712,7 +736,7 @@ function aloudPart(text, limit){ const words = text.split(/\s+/); if (words.leng
   for (const ln of lines) { const w = ln.split(/\s+/).filter(Boolean).length; if (cnt < n) { out.push(ln); cnt += w; } else rest.push(ln); }
   return { aloud: out.join('\n'), rest: rest.join('\n') }; }
 function wordsLimit(kid){ const K = S.kids[kid]; if (KIDS[kid].rplan) { const b = rpBand(kid); return Math.max(b.lo, Math.min(b.hi, K.readWords || b.lo)); } return K.readWords || KIDS[kid].startWords; }
-function tokensHtml(text, st, p){ let i = 0; return text.split('\n').map(line => '<p>' + line.split(/\s+/).filter(Boolean).map(w => { const k = i++; const c = st ? (st[k] === 1 ? 'r1' : st[k] === 2 ? 'r2' : k === p ? 'rc' : '') : ''; return `<span class="w ${c}" data-i="${k}">${U.esc(w)}</span>`; }).join(' ') + '</p>').join(''); }
+function tokensHtml(text, st, p){ let i = 0; return text.split('\n').map(line => '<p>' + line.split(/\s+/).filter(Boolean).map(w => { const k = i++; const c = wCls(st, k, p); return `<span class="w ${c}" data-i="${k}">${U.esc(w)}</span>`; }).join(' ') + '</p>').join(''); }
 function vRead(kid, L){
   const t = readText(kid), K = S.kids[kid];
   if (!L.gl && L.phase === 'warm') { L.gl = glossFor(kid, t.text, 4); save(); }
@@ -850,7 +874,7 @@ function readBar(startAct, startLbl){ const live = RD && RD.active, paused = RD 
 function updRead(){
   const spoken = (RD.base + ' ' + RD.cur).split(/\s+/).map(normW).filter(Boolean);
   const r = align(RD.T, spoken); RD.st = r.st; RD.p = r.p; RD.extra = r.extra;
-  document.querySelectorAll('#rtext .w, .ftext .w').forEach(el => { const k = +el.dataset.i; el.className = 'w ' + (r.st[k] === 1 ? 'r1' : r.st[k] === 2 ? 'r2' : k === r.p ? 'rc' : ''); });
+  document.querySelectorAll('#rtext .w, .ftext .w').forEach(el => { const k = +el.dataset.i; el.className = 'w ' + wCls(r.st, k, r.p); });
   const cur_ = document.querySelector('.w.rc'); if (cur_ && cur_.scrollIntoView) cur_.scrollIntoView({ block: 'center', behavior: 'smooth' });
   const stat = document.getElementById('rstat'); if (stat) stat.textContent = `Прочитано ${r.p} из ${RD.T.length}`;
   if (r.p >= RD.T.length) setTimeout(stopRead, 600);

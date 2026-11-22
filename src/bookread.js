@@ -74,7 +74,7 @@ function brUpd(){
   var stat = document.getElementById('brstat');
   if (!BR.T) { if (stat) stat.textContent = 'Слышу тебя: ' + spoken.length + ' ' + U.pl(spoken.length, 'слово', 'слова', 'слов'); return; }
   var r = align(BR.T, spoken); BR.st = r.st; BR.p = r.p;
-  var els = document.querySelectorAll('#bktext .w'); for (var i = 0; i < els.length; i++) { var k = +els[i].getAttribute('data-i'); els[i].className = 'w ' + (r.st[k] === 1 ? 'r1' : r.st[k] === 2 ? 'r2' : k === r.p ? 'rc' : ''); }
+  var els = document.querySelectorAll('#bktext .w'); for (var i = 0; i < els.length; i++) { var k = +els[i].getAttribute('data-i'); els[i].className = 'w ' + wCls(r.st, k, r.p); }
   var c = document.querySelector('#bktext .w.rc'); if (c && c.scrollIntoView) try { c.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { c.scrollIntoView(); }
   if (stat) stat.textContent = 'Прочитано ' + r.p + ' из ' + BR.T.length;
 }
