@@ -115,8 +115,16 @@ function famApi(o){
 var FAM_BUSY = false;
 /* Регистрация только по личному одноразовому приглашению: ссылка …/semya/#i=КОД */
 var FAM_INV = (function(){ var c = ''; try { var m = (location.hash + '&' + location.search).match(/[#?&]i=([A-Za-z0-9]{6,20})/); if (m) { c = m[1]; localStorage.setItem('slovohod.inv', c); history.replaceState(null, '', location.pathname); } c = c || localStorage.getItem('slovohod.inv') || ''; } catch (e) {} return c; })();
+/* Анкета детей на сервер. Не дошла (нет связи, ошибка) — помечаем и повторяем при каждом открытии, иначе на другом устройстве детей не будет */
+function famKidsPush(loud){
+  if (!S.fam || !S.fam.fid || !S.fam.kidsDirty) return Promise.resolve();
+  return famApi({ fam: 'kids', fid: S.fam.fid, token: S.fam.token, kids: S.fam.kids || [], ppin: S.fam.ppin })
+    .then(function(j){ if (j && j.ok) { delete S.fam.kidsDirty; save(); } else if (loud) alertMsg('Анкета сохранена на этом устройстве, но не отправилась на сервер. Повторим сами при следующем открытии', 6000); })
+    .catch(function(){ if (loud) alertMsg('Нет связи: анкета сохранена на этом устройстве и отправится, когда появится интернет', 6000); });
+}
 function famStatus(){
   if (!S.fam || !S.fam.fid || !navigator.onLine) return;
+  famKidsPush(false);
   return famApi({ fam: 'st', fid: S.fam.fid, token: S.fam.token }).then(function(j){
     if (!j) return; var off = !!j.off || j.err === 'auth'; if (off !== !!S.fam.off) { S.fam.off = off; save(); render(); } }).catch(function(){});
 }
@@ -228,7 +236,7 @@ function famForm(k, f, val){
     var gone = (S.fam.kids || []).filter(function(x){ return !kids.some(function(y){ return y.id === x.id; }); });
     gone.forEach(function(x){ delete S.kids[x.id]; });
     S.fam.kids = kids; S.fam.ppin = ppin; S.parentPin = ppin; famInit(); save();
-    famApi({ fam: 'kids', fid: S.fam.fid, token: S.fam.token, kids: kids, ppin: ppin }).catch(function(){});
+    S.fam.kidsDirty = 1; save(); famKidsPush(true);
     cur.fk = null; alertMsg('Сохранено'); go('login');
     return true;
   }
