@@ -19,7 +19,7 @@ function spotTask(kid, t, seed){ const R = U.rng(seed), S0 = spotSent(t.text), n
   return null; }
 function vSpot(kid, L, head){ const t = readText(kid), q = spotTask(kid, t, (L.seed || 1) + 77), a = L.spot || {};
   if (!q) { L.phase = L.gl && L.gl.length ? 'words' : 'survey'; save(); return null; }
-  const fin = a.fin, girl = T(kid) === 'anya';
+  const fin = a.fin, girl = GIRL(kid);
   const sent = (s, si) => s.split(' ').map((w, wi) => { const bad = si === q.k && wi === q.wi, tried = (a.wrong || []).some(x => x[0] === si && x[1] === wi);
     const cls = fin && bad ? (a.ok ? 'right' : 'miss') : tried ? 'wrong' : ''; return `<button class="spw ${cls}" data-act="spw" data-s="${si}" data-w="${wi}" ${fin || tried ? 'disabled' : ''}>${U.esc(w)}</button>`; }).join(' ');
   return head + `<article class="card task spot"><h2>🔎 Найди ошибку</h2><p class="hint">Это кусочек из главы, которую ты ${girl ? 'прочитала' : 'прочитал'}. Но в одном предложении я поменял одно слово — и получилось не так, как в книге. Найди его и нажми.</p>

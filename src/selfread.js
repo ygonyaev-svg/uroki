@@ -1,11 +1,24 @@
 /* ===== Ярик читает сам (решение Юры 22.11) =====
    1) Задание сначала читает вслух сам: айпад слушает и подсвечивает слова. Запнулся — озвучиваем только трудное слово.
-   2) «Не понимаю»: 3 раза за урок бесплатно, дальше минус 1 балл за каждый. Верно без подсказки — баллы вдвое больше, чем с подсказкой.
+   2) «Не понимаю» стоит дорого: 3 балла, каждое следующее в уроке на балл дороже. Верно без подсказки — баллы вдвое больше, чем с подсказкой.
    3) Слоги: ежедневный блок ~10 минут по методике букваря — звуки, слияния, слова (футбол, животные).
    4) Загадки, головоломки, задачи, шахматы и программирование открываются, только когда ребёнок прочитал слово.
    Включается флагом self у ребёнка (KIDS_TPL), только в «Уроках» (не в «Словоходе»). */
-function srOn(kid){ try { return !FAM && !!kid && !!KIDS[kid] && !!KIDS[kid].self && !(S.kids[kid] && S.kids[kid].selfOff); } catch (e) { return false; } }
-const SR_FREE = 3;
+/* Уровень режима по чтению (22.11 — для всех детей, и в «Словоходе»):
+   3 — не читает или по слогам: всё (читает задание сам, платное «Не понимаю», «Слоги», ключ-слово к играм);
+   2 — читает медленно: то же, «Слоги» с 3-го уровня;
+   1 — читает уверенно: только платное «Не понимаю» и двойные баллы без подсказки;
+   0 — выключено. Уровень берётся из анкеты (rdLv: 0 не читает … 3 читает много) и повышается сам по рекорду скорости чтения.
+   Малыши до 6 лет (озвучка бесплатно): «Слоги» и ключ к играм, без чтения задания и без штрафа за «Не понимаю». */
+function srLvl(kid){ try { if (!kid || !KIDS[kid] || (S.kids[kid] && S.kids[kid].selfOff)) return 0; const rd = KIDS[kid].rdLv; if (rd == null) return 0;
+  let l = rd <= 0 ? 3 : rd === 1 ? 2 : 1; const best = readBestOf(kid), norm = KIDS[kid].norm || 60;
+  if (l >= 2 && best >= norm * .9) l = 1; else if (l === 3 && best >= norm * .5) l = 2; return l; } catch (e) { return 0; } }
+function srOn(kid){ return srLvl(kid) >= 2 && !voiceFree(kid); }
+function srDunOn(kid){ return srLvl(kid) >= 1 && !voiceFree(kid); }
+function sylOn(kid){ return srLvl(kid) >= 2; }
+/* «Не понимаю» стоит дорого (Юра 22.11): бесплатных нет, первое — 3 балла, каждое следующее в уроке на 1 дороже. */
+const srPrice = n => 3 + n; /* n — сколько уже нажато в этом уроке */
+const srCost = dn => { let s = 0; for (let i = 0; i < dn; i++) s += srPrice(i); return s; };
 
 /* ---------- 1. Задание читает сам ---------- */
 let SRT = null;
@@ -51,17 +64,17 @@ function srOk(manual){ const me = SRT; if (!me || me.ok) return; const kid = cur
   save(); render(); }
 
 /* ---------- 2. «Не понимаю» стоит баллов ---------- */
-function srDl(kid, L){ if (!srOn(kid)) return '🤔 Не понимаю'; const left = SR_FREE - (L.dn || 0); return left > 0 ? `🤔 Не понимаю <span class="dnc">(бесплатно ещё ${left})</span>` : '🤔 Не понимаю <span class="dnc">(минус 1 балл)</span>'; }
-function srDunno(kid, L, task){ L.dn = (L.dn || 0) + 1; if (task && srOn(kid)) { const a = L.ans[L.i] || (L.ans[L.i] = { tries: 0, wrong: [] }); a.help = 1; a.rd = 1; srStop(); } }
-function srPts(kid, subj, L, T, pts){ if (!srOn(kid) || subj === 'read') return pts;
+function srDl(kid, L){ if (!srDunOn(kid)) return '🤔 Не понимаю'; const p = srPrice(L.dn || 0); return `🤔 Не понимаю <span class="dnc">(минус ${p} ${U.pl(p, 'балл', 'балла', 'баллов')})</span>`; }
+function srDunno(kid, L, task){ if (srDunOn(kid)) { const p = srPrice(L.dn || 0); try { alertMsg('Подсказка: минус ' + p + ' ' + U.pl(p, 'балл', 'балла', 'баллов') + '. Следующая — ' + (p + 1) + '.'); } catch (e) {} } L.dn = (L.dn || 0) + 1; if (task && srDunOn(kid)) { const a = L.ans[L.i] || (L.ans[L.i] = { tries: 0, wrong: [] }); a.help = 1; a.rd = 1; srStop(); } }
+function srPts(kid, subj, L, T, pts){ if (!srDunOn(kid) || subj === 'read') return pts;
   const ok = L.ans.filter(a => a && a.ok && a.tries === 1), self = ok.filter(a => !a.help).length, helped = ok.length - self;
   L.selfN = self; L.helpN2 = helped;
   if (ok.length && helped) pts = Math.round(pts * (self * 2 + helped) / (ok.length * 2));
-  const pen = Math.max(0, (L.dn || 0) - SR_FREE); if (pen) { L.dnCut = Math.min(pen, pts); pts = Math.max(0, pts - pen); }
-  try { ev(kid, 'читал задания сам', { subj: subjName(kid, subj, cur.ds), text: `прочитал вслух ${L.srN || 0} из ${T.length}, подсказано слов ${L.srH || 0}, «Не понимаю» ${L.dn || 0}, сам без подсказки верно ${self}, с подсказкой ${helped}` }); } catch (e) {}
+  const pen = srCost(L.dn || 0); if (pen) { const fromL = Math.min(pen, pts), K = S.kids[kid], fromP = Math.min(pen - fromL, Math.max(0, K.piggy || 0)), fromC = Math.min(pen - fromL - fromP, Math.max(0, K.coins || 0)); pts -= fromL; if (fromP) K.piggy -= fromP; if (fromC) K.coins -= fromC; L.dnCut = fromL + fromP + fromC; }
+  try { ev(kid, 'читал задания сам', { subj: subjName(kid, subj, cur.ds), text: `прочитано вслух ${L.srN || 0} из ${T.length}, подсказано слов ${L.srH || 0}, «Не понимаю» ${L.dn || 0}, сам без подсказки верно ${self}, с подсказкой ${helped}` }); } catch (e) {}
   return pts; }
-function srResult(kid, L){ if (!srOn(kid) || L.selfN == null) return ''; let h = `<p class="hint">Сам, без подсказки, верно: <b>${L.selfN}</b>${L.helpN2 ? ` · с подсказкой: ${L.helpN2} (за них баллы вдвое меньше)` : ' — баллы полные!'}</p>`;
-  if (L.dnCut) h += `<p class="hint">«Не понимаю» нажато ${L.dn} раз: бесплатно только ${SR_FREE}, поэтому минус ${L.dnCut} ${U.pl(L.dnCut, 'балл', 'балла', 'баллов')}.</p>`; return h; }
+function srResult(kid, L){ if (!srDunOn(kid) || L.selfN == null) return ''; let h = `<p class="hint">Сам, без подсказки, верно: <b>${L.selfN}</b>${L.helpN2 ? ` · с подсказкой: ${L.helpN2} (за них баллы вдвое меньше)` : ' — баллы полные!'}</p>`;
+  if (L.dn) h += `<p class="hint">«Не понимаю» нажато ${L.dn} ${U.pl(L.dn, 'раз', 'раза', 'раз')}: минус ${L.dnCut || 0} ${U.pl(L.dnCut || 0, 'балл', 'балла', 'баллов')}${(L.dnCut || 0) < srCost(L.dn) ? ' (больше списать было не из чего)' : ''}.</p>`; return h; }
 
 /* ---------- Слова с картинками (свои иконки) ---------- */
 const SYL_W = [
@@ -82,7 +95,7 @@ const UPW = w => w.toUpperCase();
 const SYL_N = 20;
 const SYL_HOW = { vow: 'Найди гласную букву. Гласные звуки можно петь: а-а-а, о-о-о.', first: 'Какой первый звук в этом слове? Назови картинку вслух и найди букву.', merge: 'Послушай слог и найди, как он пишется.', pic: 'Прочитай слово и найди картинку.', cnt: 'Сколько слогов в слове? Сколько гласных — столько и слогов.', build: 'Собери слово из слогов. Нажимай по порядку.', say: 'Прочитай слово вслух по слогам.' };
 const SYL_MIX = { 1: ['vow', 'first', 'first', 'merge', 'merge', 'pic'], 2: ['first', 'merge', 'pic', 'pic', 'cnt', 'say'], 3: ['pic', 'pic', 'cnt', 'build', 'build', 'say'], 4: ['pic', 'pic', 'cnt', 'build', 'build', 'say', 'say'] };
-function sylK(kid){ const K = S.kids[kid]; if (!K.syl) K.syl = { lv: 1, hist: [] }; const Y = K.syl; if (!Y.d || Y.d.ds !== cur.ds) Y.d = { ds: cur.ds, i: 0, res: [], t0: 0, done: false, pts: null, round: 0 }; return Y; }
+function sylK(kid){ const K = S.kids[kid]; if (!K.syl) K.syl = { lv: srLvl(kid) === 2 ? 3 : 1, hist: [] }; const Y = K.syl; if (!Y.d || Y.d.ds !== cur.ds) Y.d = { ds: cur.ds, i: 0, res: [], t0: 0, done: false, pts: null, round: 0 }; return Y; }
 function sylCard(kid, Y){ const d = Y.d, r = U.rng(U.h(kid + d.ds + 'syl' + d.round + ':' + d.i)); let lv = Y.lv; if (lv > 1 && r() < .3) lv = r.int(1, lv - 1); /* немного повторения прошлых уровней */
   let types = SYL_MIX[lv].slice(); if (!SR) types = types.filter(x => x !== 'say'); const type = r.pick(types);
   if (type === 'vow') { const v = r.pick(SYL_V1.split('')), cs = r.shuffle(SYL_C1.split('')).slice(0, 3); return { type, opts: r.shuffle([v].concat(cs)).map(UPW), a: UPW(v) }; }
@@ -93,7 +106,7 @@ function sylCard(kid, Y){ const d = Y.d, r = U.rng(U.h(kid + d.ds + 'syl' + d.ro
   if (type === 'cnt') { const mx = lv >= 4 ? 4 : 3, o = []; for (let k = 1; k <= mx; k++) o.push(String(k)); return { type, x, opts: o, a: String(x.n) }; }
   if (type === 'build') { if (x.n < 2) { const y = r.pick(SYL_W.filter(z => z.n >= 2 && z.n <= 3)); return { type, x: y, opts: r.shuffle(y.s.slice()), a: y.w }; } return { type, x, opts: r.shuffle(x.s.slice()), a: x.w }; }
   return { type: 'say', x, a: x.w }; }
-function sylTile(kid, D){ if (!srOn(kid) || cur.ds !== U.today()) return ''; const Y = sylK(kid), d = Y.d, st = d.done ? 'done' : d.i ? 'go' : 'new';
+function sylTile(kid, D){ if (!sylOn(kid) || cur.ds !== U.today()) return ''; const Y = sylK(kid), d = Y.d, st = d.done ? 'done' : d.i ? 'go' : 'new';
   return `<button class="tile syl ${st}" data-act="always" data-id="slogi"><span class="ico">🔤</span><span class="tt"><span class="sn">Слоги — 10 минут</span><span class="ut">${d.done ? `Сделано${d.pts ? ': +' + d.pts + ' ' + U.pl(d.pts, 'балл', 'балла', 'баллов') : ''}. Можно ещё — для тренировки` : d.i ? `Карточка ${d.i + 1} из ${SYL_N}` : 'Каждый день: звуки, слоги, слова. До +5 баллов'}</span></span></button>`; }
 function sylView(kid){ const Y = sylK(kid), d = Y.d;
   const head = `<section class="hello"><p class="eyebrow">Каждый день</p><h1>🔤 Слоги</h1><p class="hint">Уровень ${Y.lv} из 4: ${['', 'звуки и слоги', 'короткие слова', 'слова из двух слогов', 'длинные слова'][Y.lv]}.</p></section>`;
@@ -138,7 +151,7 @@ function sylMic(){ const c = cur.syc; if (!c || !SR) return; try { SYM && SYM.st
 /* ---------- 4. Игры открываются прочитанным словом ---------- */
 const RL_GATE = { zag: 'Загадки', pz: 'Головоломки', zad: 'Задачи на смекалку', chess: 'Шахматы', code: 'Программирование' };
 function rlReset(id){ cur.rlOk = cur.rlOk || {}; delete cur.rlOk[id]; cur.rlW = null; }
-function rlGate(kid, F){ if (!srOn(kid) || !F || !RL_GATE[F.id] || (cur.rlOk && cur.rlOk[F.id])) return '';
+function rlGate(kid, F){ if (!sylOn(kid) || !F || !RL_GATE[F.id] || (cur.rlOk && cur.rlOk[F.id])) return '';
   const Y = sylK(kid), lv = Math.max(2, Y.lv);
   if (!cur.rlW || cur.rlW.id !== F.id) { const r = U.rng(Date.now() % 100000), x = r.pick(sylPool(Math.min(4, lv))); cur.rlW = { id: F.id, x, opts: sylPics(r, x), wrong: [] }; }
   const g = cur.rlW;
