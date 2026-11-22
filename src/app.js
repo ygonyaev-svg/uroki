@@ -709,9 +709,12 @@ function lessonQuality(kid, subj, L, ratio){
   const w = parts.reduce((a, x) => a + x[1], 0); return parts.reduce((a, x) => a + x[0] * x[1], 0) / w;
 }
 /* Пропуск дня: баллы сгорают. Пропущен 1 день — половина, 2 и больше — все. */
-/* Обычное время каждый день: 60 мин игр + 30 мин YouTube, не сгорает. Сгорают только заработанные баллы. */
+/* Обычное время каждый день (по умолчанию 60 мин игр + 30 мин YouTube, родитель меняет на экране «Время»), не сгорает. Сгорают только заработанные баллы. */
 const BASE_GAME = 60, BASE_YT = 30;
-function baseTime(kid){ const c = 0; return { game: Math.max(0, BASE_GAME - 15 * c), yt: Math.max(0, BASE_YT - 10 * c), cut: c }; }
+/* Что разрешено каждый день: родитель сам вписывает, на что и сколько минут (экран «Время», 22.11). По умолчанию игры 60 + YouTube 30 */
+function baseList(kid){ const K = S.kids[kid]; return K && Array.isArray(K.allow) ? K.allow : [{ id: 'g', name: 'Игры', m: BASE_GAME }, { id: 'y', name: 'YouTube', m: BASE_YT }]; }
+function baseIcon(name){ const n = String(name).toLowerCase(); return /игр|комп|приставк|роблокс|майнкрафт/.test(n) ? 'game' : /youtube|ютуб|мульт|фильм|кино|сериал|тв|телевиз|видео/.test(n) ? 'video' : /телефон|планшет|айпад/.test(n) ? 'phone' : /прогул|улиц|двор|парк/.test(n) ? 'tree' : /друз|гост/.test(n) ? 'people' : /музык|песн/.test(n) ? 'music' : /мяч|футбол/.test(n) ? 'ball' : 'clock'; }
+function baseTime(kid){ const L = baseList(kid); return { game: (L[0] || {}).m || 0, yt: (L[1] || {}).m || 0, cut: 0, list: L }; }
 function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) { K.lastDone = t; K.burnDate = t; return; } if (K.burnDate === t) return; K.burnDate = t;
   let missed = 0, d = K.lastDone; while (U.addDays(d, 1) < t) { d = U.addDays(d, 1); missed++; }
   const before = K.burnBase == null ? missed : missed - K.burnBase; K.burnBase = missed;
@@ -724,7 +727,7 @@ function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) 
 function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0) return '';
   const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'} (${K.coins}).</div>`; }
 function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
-  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span class="tipc" data-tip="base">🎮 Игры <b>${bt.game} мин</b></span><span class="tipc" data-tip="base">▶️ YouTube <b>${bt.yt} мин</b></span><span class="tipc" data-tip="coins">⭐ Баллы <b>${K.coins}</b>&nbsp;(+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
+  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2">${bt.list.filter(x => x.m > 0).map(x => `<span class="tipc" data-tip="base">${icon(baseIcon(x.name))} ${U.esc(x.name)} <b>${x.m} мин</b></span>`).join('')}<span class="tipc" data-tip="coins">⭐ Баллы <b>${K.coins}</b>&nbsp;(+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
 /* ----- Копилка: заработанное за неделю копится и в воскресенье переходит на счёт с прибавкой +10%. Забрать раньше можно, но без прибавки. ----- */
 const PIGGY_RATE = .10;
 function weekStart(ds){ const n = U.dayNum(ds), wd = (n + 3) % 7; /* 0 = понедельник */ return U.addDays(ds, -wd); }

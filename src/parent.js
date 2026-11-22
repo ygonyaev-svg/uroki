@@ -46,7 +46,7 @@ function vParent(){
     <div class="pp-grid">${ppTile('sum', 'note', 'Сводка сейчас', U.esc(KIDS[k].name) + ': что сделано за день', '', true)}
     ${ppTile('tasks', 'pen', 'Дать задание', n ? 'активных: ' + n : 'дело, задачка, чтение')}
     ${ppTile('ok', 'check', 'Проверить', w ? 'ждут вас: ' + w : 'задания и цены призов', w)}
-    ${ppTile('time', 'clock', 'Время', restLeft(k) ? 'отдых до ' + hhmm(K.restUntil) : 'занятий ' + Math.round((K.sess || 0) / 60) + ' из ' + (60 + x) + ' мин')}
+    ${ppTile('time', 'clock', 'Время', restLeft(k) ? 'отдых до ' + hhmm(K.restUntil) : (baseList(k).filter(x => x.m > 0).map(x => x.name.toLowerCase() + ' ' + x.m).join(', ') || 'настроить') + (baseList(k).some(x => x.m > 0) ? ' мин' : ''))}
     ${ppTile('coins', 'coin', 'Баллы +/−', 'на счету ' + K.coins + (K.piggy ? ', в копилке ' + K.piggy : ''))}
     ${ppTile('report', 'chart', 'Учёба', 'предметы, чтение, ошибки')}
     ${ppTile('portrait', 'brain', 'Развитие', 'сильные стороны')}</div>
@@ -94,13 +94,23 @@ function ppOk(k){ const K = S.kids[k], sh = K.shop || [], wait = sh.filter(x => 
 function ppDays(p){ const d = Math.max(1, Math.round(p / 60)); return p <= 60 ? '≈ день уроков' : '≈ ' + agree(d + ' дней') + ' уроков'; }
 /* ----- Время ----- */
 function ppTime(k){ const K = S.kids[k], bt = baseTime(k), x = extraSecs(K) / 60, used = Math.round((K.sess || 0) / 60), r = restLeft(k);
-  return `<div class="card"><h2>${U.esc(KIDS[k].name)}: ${r ? 'отдыхает до ' + hhmm(K.restUntil) : 'можно заниматься'}</h2>
+  return ppAllow(k) + `<div class="card"><h2>${U.esc(KIDS[k].name)}: ${r ? 'отдыхает до ' + hhmm(K.restUntil) : 'можно заниматься'}</h2>
     <p>Занятий в этой сессии: <b>${used} из ${60 + x} мин</b>${x ? ` (+${x} от вас)` : ''}.</p>
     <div class="pp-big2"><button class="btn" data-act="xtadd" data-k="${k}" data-m="10">+10 минут</button><button class="btn" data-act="xtadd" data-k="${k}" data-m="30">+30 минут</button></div>
     ${x ? `<p><button class="btn ghost small" data-act="xtadd" data-k="${k}" data-m="-10">Убрать 10 минут</button></p>` : ''}
     ${r ? `<p><button class="btn ghost" data-act="norest" data-k="${k}">Снять перерыв</button></p>` : ''}
     <p class="hint">Добавленное время — только на сегодня. Каждые ~20 минут ребёнка спрашивают «Не устал?»; после часа занятий — перерыв 2 часа.</p></div>
-    <div class="card"><h2>Экранное время на сегодня</h2><p>Игры ${bt.game} мин · YouTube ${bt.yt} мин · плюс баллы: 1 балл = 1 минута.</p><p class="hint">На счету ${K.coins}${K.piggy ? `, в копилке ${K.piggy} (в воскресенье +10%)` : ''}.</p></div>`; }
+`; }
+/* Что разрешено каждый день: свой список родителя, ребёнок видит его на главном экране */
+const PP_MIN = [15, 30, 45, 60, 90, 120], PP_IDEAS = ['Игры', 'YouTube', 'Мультики', 'Телефон', 'Компьютер', 'Прогулка с друзьями', 'Настольные игры'];
+function ppAllow(k){ const L = baseList(k), F = cur.ppAl || {};
+  return `<div class="card"><h2>Что разрешено каждый день</h2><p class="hint">Ваш список: на что и сколько минут. ${U.esc(KIDS[k].name)} видит его на своём главном экране. Это время есть всегда и не сгорает; заработанные баллы добавляют минуты сверху (1 балл = 1 минута). Нажмите — сохранится сразу.</p>
+    ${L.length ? L.map((x, i) => `<div class="pp-prize"><div class="pp-pn"><b>${icon(baseIcon(x.name))} ${U.esc(x.name)}: ${x.m} мин</b></div><div class="pp-pc">${PP_MIN.map(m => `<button class="chip ${x.m === m ? 'on' : ''}" data-act="ppalm" data-i="${i}" data-m="${m}">${m}</button>`).join('')}</div><button class="link pp-del" data-act="ppaldel" data-i="${i}">Убрать</button></div>`).join('') : '<p>Список пуст: свободного времени без баллов нет.</p>'}
+    <form class="form pp-add" data-form="ppal"><p class="fkql">Добавить своё</p><div class="row">${PP_IDEAS.filter(n => !L.some(x => x.name === n)).map(n => `<button type="button" class="chip" data-act="ppalidea" data-n="${n}">${n}</button>`).join('')}</div>
+    <label>Название<input id="ppaln" maxlength="40" autocomplete="off" placeholder="Например: планшет, прогулка, мультики" value="${U.esc(F.n || '')}"></label>
+    <p class="fkql">Сколько минут в день</p><div class="pp-pc">${PP_MIN.map(m => `<button type="button" class="chip ${(F.m || 30) === m ? 'on' : ''}" data-act="ppalnm" data-m="${m}">${m}</button>`).join('')}</div>
+    <button class="btn">Добавить</button></form></div>`; }
+function ppAllowSave(k, L, msg){ const K = S.kids[k]; K.allow = L; ev(k, 'обычное время', { text: L.map(x => x.name + ' ' + x.m + ' мин').join(', ') || 'пусто' }); save(); if (msg) alertMsg(msg); if (FAM) setTimeout(() => famSnapTouch(k), 0); render(); }
 /* ----- Баллы +/− с причиной ----- */
 function ppCoins(k){ const K = S.kids[k], why = cur.ppWhy || '', name = KIDS[k].name;
   const hist = S.log.filter(e => e.kid === name && e.type === 'баллы от Юры').slice(-5).reverse();
@@ -116,13 +126,19 @@ function ppCoinAdd(k, n){ const K = S.kids[k]; if (!n) return; if (K.coins + n <
 function ppSetPrice(k, i, v){ const it = (S.kids[k].shop || [])[i]; if (!it || !(v > 0)) return; if (it.price !== v) ev(k, 'цена приза', { unit: it.name, price: v }); it.price = v; cur.ppOwn = null; save(); alertMsg('Цена ' + v + ' сохранена'); if (FAM) setTimeout(() => famSnapTouch(k), 0); render(); }
 function ppAct(act, b){ const k = cur.parentKid;
   switch (act) {
+    case 'ppalm': { const L = baseList(k).map(x => Object.assign({}, x)), i = +b.dataset.i; if (!L[i]) return true; L[i].m = +b.dataset.m; ppAllowSave(k, L, L[i].name + ': ' + L[i].m + ' мин в день'); return true; }
+    case 'ppaldel': { const L = baseList(k).slice(), x = L.splice(+b.dataset.i, 1)[0]; if (x) ppAllowSave(k, L, 'Убрано: ' + x.name); return true; }
+    case 'ppalidea': { const e = document.getElementById('ppaln'); cur.ppAl = Object.assign({}, cur.ppAl, { n: b.dataset.n }); if (e) e.value = b.dataset.n; return true; }
+    case 'ppalnm': { const e = document.getElementById('ppaln'); cur.ppAl = Object.assign({}, cur.ppAl, { m: +b.dataset.m, n: e ? e.value : '' }); const y = window.scrollY; render(); window.scrollTo(0, y); return true; }
     case 'ppwhy': cur.ppWhy = cur.ppWhy === b.dataset.w ? '' : b.dataset.w; render(); return true;
     case 'ppcoins': ppCoinAdd(k, +b.dataset.n); return true;
     case 'ppprice': ppSetPrice(k, +b.dataset.i, +b.dataset.p); return true;
     case 'ppown': cur.ppOwn = cur.ppOwn === +b.dataset.i ? null : +b.dataset.i; render(); setTimeout(() => { const e = document.getElementById('ppownv'); if (e) e.focus(); }, 50); return true;
   }
   return false; }
-function ppForm(k0, val){ if (k0 !== 'ppown') return false; ppSetPrice(cur.parentKid, cur.ppOwn, parseInt(val('ppownv'))); return true; }
+function ppForm(k0, val){
+  if (k0 === 'ppal') { const n = val('ppaln').trim(), k = cur.parentKid; if (!n) { alertMsg('Напишите, на что время: например, мультики'); return true; } const L = baseList(k).slice(); L.push({ id: 'a' + Date.now(), name: n.slice(0, 40), m: (cur.ppAl || {}).m || 30 }); cur.ppAl = null; ppAllowSave(k, L, 'Добавлено: ' + n); return true; }
+  if (k0 !== 'ppown') return false; ppSetPrice(cur.parentKid, cur.ppOwn, parseInt(val('ppownv'))); return true; }
 
 /* ----- Учёба подробно: карточки вместо таблиц ----- */
 function vReport(kid){
