@@ -31,7 +31,7 @@ function ppKidCard(k, on){ const T0 = ppToday(k), w = ppWait(k), K = S.kids[k];
 function ppTile(act, ic, title, sub, badge, wide){ return `<button class="pp-tile${wide ? ' wide' : ''}" data-act="ptab" data-t="${act}">${icon(ic)}<span class="pp-tt">${title}</span><span class="pp-ts">${sub}</span>${badge ? `<span class="pp-badge">${badge}</span>` : ''}</button>`; }
 function ppHead(title, back){ const k = cur.parentKid, many = kidIds().length > 1;
   return `<header class="bar"><button class="link" data-act="${back ? 'ptab' : 'logout'}" data-t="home">${back ? '← Назад' : '← Выйти'}</button><span>${title}</span>${back ? '' : `<button class="pp-gear" data-act="ptab" data-t="set" aria-label="Настройки">${icon('gear')}</button>`}</header>` +
-    (back && many && k ? `<div class="row pp-sw">${kidIds().map(x => `<button class="chip ${x === k ? 'on' : ''}" data-act="pkid" data-k="${x}">${U.esc(KIDS[x].name)}${ppWait(x) ? ' •' : ''}</button>`).join('')}</div>` : ''); }
+    (back && many && k && cur.parentTab !== 'set' && !(FAM && cur.parentTab === 'sum') ? `<div class="row pp-sw">${kidIds().map(x => `<button class="chip ${x === k ? 'on' : ''}" data-act="pkid" data-k="${x}">${U.esc(KIDS[x].name)}${ppWait(x) ? ' •' : ''}</button>`).join('')}</div>` : ''); }
 function vParent(){
   if (FAM) famParentPull();
   let tab = PP_OLD[cur.parentTab] || cur.parentTab || 'home'; cur.parentTab = tab;
