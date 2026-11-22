@@ -981,6 +981,7 @@ function vPrizes(){
 function vParent(){
   const tabs = [['report', 'Отчёт'], ['tasks', 'Задания' + (kidIds().some(k => ptOf(k, ['wait']).length) ? ' •' : '')], ['portrait', 'Портрет'], ['shop', 'Призы'], ['set', 'Настройки']];
   let body = '';
+  if (FAM) famParentPull();
   if (cur.parentTab === 'report') body = vReport(cur.parentKid);
   else if (cur.parentTab === 'tasks') body = KIDS[cur.parentKid] ? vPTParent() : '';
   else if (cur.parentTab === 'portrait') body = `<div class="row">${kidIds().map(k => `<button class="chip ${cur.parentKid === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}</button>`).join('')}</div>` + (cur.parentKid && KIDS[cur.parentKid] ? vPortrait(cur.parentKid) : '');
@@ -991,7 +992,7 @@ function vParent(){
     ${sh.length ? '<button class="btn small" data-act="saveshop">Сохранить цены</button>' : ''}</div>`; }
   else body = vSettings();
   return `<main class="wrap"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span>Родителям</span></header>
-  <nav class="tabs">${tabs.map(([k, t]) => `<button class="tab ${cur.parentTab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${t}</button>`).join('')}</nav>${cur.parentTab === 'report' || cur.parentTab === 'set' ? testCard() : ''}${body}</main>`;
+  <nav class="tabs">${tabs.map(([k, t]) => `<button class="tab ${cur.parentTab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${t}</button>`).join('')}</nav>${FAM && cur.parentTab === 'report' ? famSumCard() : ''}${cur.parentTab === 'report' || cur.parentTab === 'set' ? testCard() : ''}${body}</main>`;
 }
 function vReport(kid){
   const K = S.kids[kid], d = KIDS[kid];
@@ -1025,6 +1026,7 @@ function vSettings(){
 /* ===== События ===== */
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act;
+  if (FAM && !cur.kid && ['xtadd', 'saveshop', 'delshop'].includes(act)) { const tk = act === 'xtadd' ? b.dataset.k : cur.parentKid; setTimeout(() => famSnapTouch(tk), 0); }
   const kid = cur.kid; const D = kid && dayRec(kid, cur.ds); const L = D && cur.subj && D.les[cur.subj];
   switch (act) {
     case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; snapCheck(cur.kid); ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;
@@ -1125,6 +1127,7 @@ document.addEventListener('submit', e => {
   const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const k = f.dataset.form;
   const val = id => (document.getElementById(id) || {}).value || '';
   if (FAM && famForm(k, f, val)) return;
+  if (FAM && !cur.kid && (k === 'hw' || k === 'coins')) { const tk = cur.parentKid; setTimeout(() => famSnapTouch(tk), 0); }
   if (k === 'ptnew') return ptSubmit();
   if (k === 'setup') { const p = val('pp'), y = val('py'), a = val('pa'); if (![p, y, a].every(x => /^\d{4}$/.test(x))) return alertMsg('Нужно по четыре цифры'); if (new Set([p, y, a]).size < 3) return alertMsg('Коды Юры, Ярика и Ани должны быть разными'); S.parentPin = hashPin(p); S.kids.yarik.pin = hashPin(y); S.kids.anya.pin = hashPin(a); save(); go('login'); }
   { const F = ALWAYS.filter(x => k.indexOf(x.id) === 0)[0]; if (F && F.form) return F.form(k, f); }

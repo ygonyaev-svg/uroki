@@ -181,6 +181,7 @@ function vFamKids(){
 function famLoginExtra(){ return '<p class="fammotto center">' + FAM_MOTTO + '</p>'; }
 function famSettings(){
   return '<div class="card"><h2>Семья</h2><p class="hint">' + U.esc(S.fam.email || '') + '</p><div class="row"><button class="btn small" data-act="fkedit">Дети и коды</button> <button class="btn small stop" data-act="fkout">Выйти из аккаунта</button></div></div>' +
+    '<div class="card"><h2>Вечерняя сводка на почту</h2><p class="hint">Каждый день около 20:30 (Лиссабон) на ' + U.esc(S.fam.email || '') + ' приходит письмо: что дети сделали и чего не сделали за день. Сводку на эту минуту можно получить во вкладке «Отчёт», кнопка «Сводка сейчас».</p><p>' + (S.fam.sumOff ? 'Сейчас отключена.' : 'Сейчас включена.') + '</p><div class="row"><button class="btn small' + (S.fam.sumOff ? '' : ' ghost') + '" data-act="' + (S.fam.sumOff ? 'fsumon' : 'fsumoff') + '">' + (S.fam.sumOff ? 'Включить' : 'Отключить') + '</button></div></div>' +
     '<form class="card form" data-form="ffb"><h2>Отзыв о тестовой версии</h2><label>Что понравилось, что мешает, чего не хватает<textarea id="ffbt" rows="4" maxlength="2000" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;font:inherit;padding:10px;border-radius:12px;border:1px solid #cbd5e1"></textarea></label><button class="btn small">Отправить</button></form>';
 }
 function famAct(act, b){
@@ -194,6 +195,10 @@ function famAct(act, b){
     case 'fkedit': cur.fk = null; go('fkids'); return true;
     case 'fkback': cur.fk = null; go('parent', { parentTab: 'set' }); return true;
     case 'fkrecheck': famStatus(); return true;
+    case 'fsum': famSumGet(false); return true;
+    case 'fsummail': famSumGet(true); return true;
+    case 'fsumon': famSumSet(true); return true;
+    case 'fsumoff': famSumSet(false); return true;
     case 'fkout': if (window.confirm('Выйти из аккаунта на этом устройстве? Прогресс детей на этом устройстве сотрётся.')) { flush().finally(function(){ try { localStorage.removeItem(KEY); } catch (x) {} location.reload(); }); } return true;
   }
   return false;
@@ -203,7 +208,7 @@ function famAuthDone(j){
   if (j && j.inv === 'bad') { FAM_INV = ''; try { localStorage.removeItem('slovohod.inv'); } catch (e) {} }
   if (j && j.ok && FAM_INV) { FAM_INV = ''; try { localStorage.removeItem('slovohod.inv'); } catch (e) {} }
   if (!j || !j.ok) { render(); return alertMsg(j && j.msg ? j.msg : 'Не получилось. Проверьте интернет и попробуйте ещё раз'); }
-  S.fam = { fid: j.fid, token: j.token, email: j.email, name: j.name || '', kids: j.kids || [], ppin: j.ppin || null, off: !!j.off };
+  S.fam = { fid: j.fid, token: j.token, email: j.email, name: j.name || '', kids: j.kids || [], ppin: j.ppin || null, off: !!j.off, sumOff: !!j.sumOff };
   famInit(); save(); cur.fk = null; go('login');
 }
 function famBad(id, msg, id2){ alertMsg(msg, 5000); var e = document.getElementById(id2 || id); if (e) { e.scrollIntoView({ block: 'center' }); e.focus(); } return true; }
@@ -245,3 +250,57 @@ function famForm(k, f, val){
     return true; }
   return false;
 }
+/* ===== Синхронизация прогресса и сводка для родителей (22.11.2026) =====
+   Прогресс ребёнка (снимок S.kids[id] + его журнал) уходит на сервер с устройства, где он занимается, — через 15 с после изменений и при сворачивании.
+   Родитель на своём телефоне открывает «Для родителей» — снимки подтягиваются, отчёты показывают то же, что на планшете ребёнка.
+   Правило: побеждает более новый снимок (K.modT). Устройство, ещё ни разу не сверившееся, свой непустой прогресс не отдаёт чужому — сначала отправляет его. */
+var FSNAP = { ok: {}, pushed: {}, pulled: {}, chk: {}, timer: null, busy: false, at: 0 };
+function famSnapOn(){ return !TEST && S.fam && S.fam.fid && !S.fam.off; }
+function famSnapMark(kid){ var K = S.kids[kid]; if (!K || !famSnapOn() || FSNAP.busy) return;
+  if (!FSNAP.ok[kid]) { if (snapWork(K) && K.modT) K.dirtyT = Date.now(); return; }
+  K.modT = Date.now(); clearTimeout(FSNAP.timer); FSNAP.timer = setTimeout(famSnapPush, 15000); }
+/* Явное действие родителя (цена приза, баллы, задание, время) на устройстве, где снимок уже загружен, — отправляем сразу */
+function famSnapTouch(kid){ if (!famSnapOn() || !S.kids[kid] || !(FSNAP.ok[kid] || FSNAP.pulled[kid])) return; FSNAP.ok[kid] = true; S.kids[kid].modT = Date.now(); famSnapPush(); }
+/* План и итог дня — для сводки на сервере */
+function famDayInfo(kid){ var K = S.kids[kid]; if (!K || !KIDS[kid]) return null; var t = U.today(), keep = cur.ds, plan = [];
+  try { cur.ds = t; var D = K.days[t] || { les: {} }; plan = todaySubjects(kid).map(function(s){ var L = D.les[s] || {}; return { n: String(subjName(kid, s, t)).replace(/^[^A-Za-zА-Яа-яЁё]+/, ''), st: L.phase === 'done' ? 'done' : L.phase ? 'go' : '', g: L.grade || '', sc: L.total ? L.score + '/' + L.total : '' }; }); } catch (e) {}
+  cur.ds = keep; var D2 = K.days[t] || {}; return { d: t, plan: plan, pts: D2.pts || 0, coins: K.coins || 0, secs: D2.secs || 0 }; }
+function famKidLog(kid){ var nm = KIDS[kid] && KIDS[kid].name; return S.log.filter(function(e){ return e.kid === nm; }).slice(-300); }
+function famSnapPush(){ if (!famSnapOn() || !navigator.onLine) return Promise.resolve(); clearTimeout(FSNAP.timer);
+  return Promise.all(Object.keys(FSNAP.ok).map(function(kid){ var K = S.kids[kid]; if (!K || !K.modT || FSNAP.pushed[kid] === K.modT) return null; var t = K.modT;
+    return famApi({ fam: 'snap', fid: S.fam.fid, token: S.fam.token, kid: kid, t: t, state: JSON.stringify({ K: K, log: famKidLog(kid) }), day: famDayInfo(kid) })
+      .then(function(j){ if (j && j.ok) FSNAP.pushed[kid] = t; }).catch(function(){}); })); }
+function famLogMerge(log){ if (!log || !log.length) return; var have = {}; S.log.forEach(function(e){ have[e.t + '|' + e.kid + '|' + e.type + '|' + (e.q || '')] = 1; });
+  log.forEach(function(e){ var k = e.t + '|' + e.kid + '|' + e.type + '|' + (e.q || ''); if (!have[k]) { S.log.push(e); have[k] = 1; } });
+  S.log.sort(function(a, b){ return a.t < b.t ? -1 : a.t > b.t ? 1 : 0; }); if (S.log.length > 1500) S.log = S.log.slice(-1500); }
+/* Подтянуть снимки. asKid — ребёнок вошёл на этом устройстве: после сверки устройство начинает отправлять свой прогресс */
+function famSnapPull(ids, asKid){ if (!famSnapOn() || !navigator.onLine) return Promise.resolve(false);
+  var have = {}; ids.forEach(function(k){ var K = S.kids[k]; if (K && K.modT) have[k] = Math.max(K.modT || 0, K.dirtyT || 0); });
+  return famApi({ fam: 'snapget', fid: S.fam.fid, token: S.fam.token, kids: ids, have: have }).then(function(j){ if (!j || !j.ok) return false; var ch = false;
+    (j.snaps || []).forEach(function(x){ var K = S.kids[x.kid]; if (!K || !x.state) return; var loc = Math.max(K.modT || 0, K.dirtyT || 0);
+      if (!K.modT && snapWork(K) && asKid) return; /* первый раз на этом устройстве, и здесь уже есть свои занятия — свой прогресс не затираем */
+      if (x.t <= loc) return; var R; try { R = JSON.parse(x.state); } catch (e) { return; } if (!R || !R.K || !R.K.days) return;
+      FSNAP.busy = true; if (K.pin && !R.K.pin) R.K.pin = K.pin; S.kids[x.kid] = R.K; S.kids[x.kid].modT = x.t; FSNAP.pushed[x.kid] = x.t; famLogMerge(R.log); if (typeof posFix === 'function') try { posFix(x.kid); } catch (e) {} FSNAP.busy = false; ch = true; });
+    ids.forEach(function(k){ FSNAP.pulled[k] = Date.now(); });
+    if (asKid) ids.forEach(function(k){ var K = S.kids[k]; if (!K) return; FSNAP.ok[k] = true; if (!K.modT || (K.dirtyT && K.dirtyT > K.modT)) K.modT = Date.now(); delete K.dirtyT; });
+    S.fam.snapAt = Date.now(); save(); if (asKid) famSnapPush(); return ch; }).catch(function(){ return false; }); }
+/* Вход ребёнка: первая сверка сразу, дальше — раз в 3 минуты (вдруг родитель поменял цены призов или добавил время) */
+function famSnapCheck(kid){ if (!kid || !famSnapOn()) return; var last = FSNAP.chk[kid] || 0; if (FSNAP.ok[kid] && Date.now() - last < 180000) return; FSNAP.chk[kid] = Date.now();
+  return famSnapPull([kid], true).then(function(ch){ if (ch && cur.kid === kid) { var K = S.kids[kid]; if (cur.view === 'prizes' && K.prizesSet) go('home'); else if (cur.view !== 'lesson') render(); } }); }
+/* Родитель открыл раздел — подтягиваем прогресс всех детей (не чаще раза в 20 секунд) */
+function famParentPull(force){ if (!famSnapOn() || (!force && Date.now() - FSNAP.at < 20000)) return; FSNAP.at = Date.now();
+  famSnapPull(kidIds(), false).then(function(ch){ if (cur.view === 'parent') { if (ch || force) render(); } }); }
+/* Карточка «Сводка за сегодня» вверху отчёта */
+var FSUM = { busy: false, res: null, err: '' };
+function famSumCard(){ if (!S.fam || !S.fam.fid) return '';
+  var r = FSUM.res, body = r ? '<p class="hint">' + U.esc(r.dayH) + ', на ' + U.esc(r.at) + '</p>' + r.kids.map(function(k){ return '<h3>' + U.esc(k.name) + '</h3>' + k.lines.map(function(l){ return '<p class="fsumln">' + U.esc(l) + '</p>'; }).join(''); }).join('') +
+    '<div class="row"><button class="btn small ghost" data-act="fsummail"' + (FSUM.busy ? ' disabled' : '') + '>Прислать на почту</button></div>' : (FSUM.err ? '<p>' + U.esc(FSUM.err) + '</p>' : '<p class="hint">Что ребёнок сделал и чего не сделал на эту минуту: уроки, баллы, ошибки, чтение, «Не понимаю». Каждый вечер около 20:30 такая же сводка приходит на ' + U.esc(S.fam.email || 'почту') + (S.fam.sumOff ? ' (сейчас отключено в «Настройках»)' : '') + '.</p>');
+  var sync = S.fam.snapAt ? '<p class="hint">Прогресс детей обновлён в ' + new Date(S.fam.snapAt).toTimeString().slice(0, 5) + '.</p>' : '';
+  return '<div class="card fsum"><h2>Сводка за сегодня</h2>' + body + '<div class="row"><button class="btn small" data-act="fsum"' + (FSUM.busy ? ' disabled' : '') + '>' + (FSUM.busy ? 'Собираем…' : r ? 'Обновить' : 'Сводка сейчас') + '</button></div>' + sync + '</div>'; }
+function famSumGet(mail){ if (FSUM.busy) return; FSUM.busy = true; FSUM.err = ''; render();
+  var pre = []; try { pre.push(Promise.resolve(flush()).catch(function(){})); } catch (e) {} pre.push(famSnapPush());
+  Promise.all(pre).then(function(){ return famApi({ fam: 'sum', fid: S.fam.fid, token: S.fam.token, mail: mail ? 1 : 0 }); }).then(function(j){ FSUM.busy = false;
+    if (!j || !j.ok) { FSUM.err = j && j.off ? 'Доступ приостановлен.' : 'Не получилось собрать сводку. Проверьте интернет и попробуйте ещё раз.'; render(); return; }
+    FSUM.res = j; render(); if (mail) alertMsg(j.mailed ? 'Сводка отправлена на ' + (S.fam.email || 'почту') : 'Письмо не ушло: ' + (j.mailErr || 'ошибка почты') + '. Сводка — на экране', 6000);
+  }).catch(function(){ FSUM.busy = false; FSUM.err = 'Нет связи с сервером. Попробуйте ещё раз.'; render(); }); }
+function famSumSet(on){ famApi({ fam: 'sumset', fid: S.fam.fid, token: S.fam.token, on: on ? 1 : 0 }).then(function(j){ if (j && j.ok) { S.fam.sumOff = !on; save(); render(); alertMsg(on ? 'Вечерняя сводка включена' : 'Вечерняя сводка отключена'); } else alertMsg('Не получилось. Попробуйте ещё раз'); }).catch(function(){ alertMsg('Нет связи. Попробуйте позже'); }); }
