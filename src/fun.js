@@ -5,9 +5,9 @@ var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
 var FUN_CAP = { zag: 5, pz: 6, zad: 6 };
 function funK(kid){ var K = S.kids[kid]; if (!K.fun) K.fun = { z: {}, p: {}, q: {}, day: '', got: {} }; var F = K.fun; if (F.day !== U.today()) { F.day = U.today(); F.got = {}; } return F; }
 /* Общая функция для всех «всегда доступных» разделов (и шахмат): начисляет не больше дневного лимита, возвращает реально начисленное */
-function funPts(kid, key, pts, cap){ if (!kid || !pts) return 0; var F = funK(kid), got = F.got[key] || 0; var add = Math.max(0, Math.min(pts, (cap || FUN_CAP[key] || 5) - got)); if (add) { add = piggyAdd(S.kids[kid], add); F.got[key] = got + add; } save(); return add; }
-function funLeft(kid, key){ var F = funK(kid); return Math.max(0, (FUN_CAP[key] || 5) - (F.got[key] || 0)); }
-function funCapNote(kid, key){ var l = Math.min(funLeft(kid, key), capLeft(S.kids[kid])); return l ? 'Сегодня можно заработать ещё <b>' + l + '</b> ' + U.pl(l, 'балл', 'балла', 'баллов') + '.' : 'Баллы на сегодня собраны — дальше играем просто для ума 🙂'; }
+function funPts(kid, key, pts, cap){ if (!kid || !pts) return 0; if (key !== 'hp') return 0; /* игры — без баллов, заработок только чтением (22.11) */ var F = funK(kid), got = F.got[key] || 0; var add = Math.max(0, Math.min(pts, (cap || FUN_CAP[key] || 5) - got)); if (add) { add = piggyAdd(S.kids[kid], add); F.got[key] = got + add; } save(); return add; }
+function funLeft(kid, key){ if (key !== 'hp') return 0; var F = funK(kid); return Math.max(0, (FUN_CAP[key] || 5) - (F.got[key] || 0)); }
+function funCapNote(kid, key){ if (key !== 'hp') return LIB_NOTE; var l = Math.min(funLeft(kid, key), capLeft(S.kids[kid])); return l ? 'Сегодня можно заработать ещё <b>' + l + '</b> ' + U.pl(l, 'балл', 'балла', 'баллов') + '.' : 'Баллы на сегодня собраны — дальше играем просто для ума 🙂'; }
 function funTab(act, cur0, list){ return '<div class="fntabs">' + list.map(function(t){ return '<button class="chip ' + (String(cur0) === String(t[0]) ? 'on' : '') + '" data-act="' + act + '" data-l="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>'; }
 function funLvl(kid){ return T(kid) === 'anya' ? 2 : 1; }
 function funOrder(kid, list, salt){ var r = U.rng(kid + salt); return r.shuffle(list.map(function(x, i){ return i; })); }
@@ -26,7 +26,7 @@ ALWAYS.push({ id: 'zag', order: 10,
   view: function(kid){ var F = funK(kid), lv = cur.zgL || funLvl(kid), L = zgList(kid, lv), z = cur.fz && ZG.filter(function(x){ return x.id === cur.fz.id; })[0];
     if (!z) z = L.filter(function(x){ return !(x.id in F.z); })[0];
     var solved = L.filter(function(x){ return F.z[x.id]; }).length, seen = L.filter(function(x){ return x.id in F.z; }).length;
-    var h = '<section class="hello"><p class="eyebrow">Всегда доступно</p><h1>🦉 Загадки</h1><p class="hint">Народные загадки. Подумай как следует: засчитывается только первый ответ. Лёгкая — 1 балл, трудная — 2. ' + funCapNote(kid, 'zag') + '</p>' +
+    var h = '<section class="hello"><p class="eyebrow">Всегда доступно</p><h1>🦉 Загадки</h1><p class="hint">Народные загадки. Подумай как следует: засчитывается только первый ответ. ' + funCapNote(kid, 'zag') + '</p>' +
       funTab('zgtab', lv, [[1, '🙂 Лёгкие · 7–9 лет'], [2, '🧠 Трудные · 10–12 лет']]) + '<p>Отгадано: <b>' + solved + '</b> из ' + L.length + (seen > solved ? ' · не угадано: ' + (seen - solved) : '') + '</p></section>';
     if (!z) return h + '<div class="card win"><h2>Все загадки этого уровня пройдены!</h2><p>Попробуй другой уровень. Скоро добавим новые.</p></div>';
     var r = cur.fz && cur.fz.id === z.id ? cur.fz : null, opts = U.rng(z.id + kid).shuffle([z.a].concat(z.w));

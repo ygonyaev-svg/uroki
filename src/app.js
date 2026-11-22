@@ -61,7 +61,7 @@ function voiceEv(kid, L, what){ if (!L) return; const k = what + ':' + (L.phase 
    Потолок за день: 3% капитала, но не меньше 10 баллов. Капает в копилку (в воскресенье +10% сверху). */
 const DRIP_RATE = .004, DRIP_MIN = .2, DRIP_CAP = .03, DRIP_CAP_MIN = 10;
 function dripRec(K){ const d = U.today(); if (!K.drip || K.drip.d !== d) K.drip = { d, got: 0, frac: 0, streak: (K.drip && K.drip.streak) || 0, sess: (K.drip && K.drip.sess) || 0, cap: Math.max(DRIP_CAP_MIN, Math.round(((K.coins || 0) + (K.piggy || 0)) * DRIP_CAP)) }; return K.drip; }
-function dripOn(kid, type, d){ const K = S.kids[kid]; if (!K) return;
+function dripOn(kid, type, d){ const K = S.kids[kid]; if (!K) return; if (/^(загадка|головоломка|задача на смекалку|шахматы|программирование)$/.test(type)) return; /* после уроков баллы — только чтением (правило Юры 22.11) */
   const chessOk = type === 'шахматы' && /с первой попытки/.test(d.text || '') && !/не с первой/.test(d.text || ''), chessBad = type === 'шахматы' && /не с первой/.test(d.text || '');
   const ok = d.ok === 'верно' || chessOk, bad = d.ok === 'ошибка' || d.ok === 'со 2-й попытки' || chessBad; if (!ok && !bad) return;
   const R = dripRec(K); if (bad) { R.streak = 0; return; }
@@ -167,7 +167,7 @@ setInterval(() => { if (cur.kid && !TEST && cur.view !== 'parent' && ((sleepNow(
 /* ===== Состояние экрана ===== */
 const cur = { kid:null, view:'login', subj:null, ds:U.today(), K(){ return KIDS[this.kid]; }, pinFor:null, onPin:null, parentTab:'report', parentKid:'yarik', msg:'' };
 const app = () => document.getElementById('app');
-function go(view, extra){ try { sayStop(); } catch (e) {} try { micStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
+function go(view, extra){ try { sayStop(); } catch (e) {} try { micStop(); } catch (e) {} try { if (view !== 'lib') libStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
   if (view === 'lesson' && cur.kid && cur.subj) { const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L && L.scrollY && L.scrollY.ph === (L.phase || '') + (L.fphase || '')) { const y = L.scrollY.y; setTimeout(() => window.scrollTo(0, y), 60); } } }
 /* Запоминаем, докуда ребёнок долистал текст, чтобы вернуться на то же место */
 function rememberScroll(){ if (cur.view !== 'lesson' || !cur.kid || !cur.subj) return; const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L) { L.scrollY = { ph: (L.phase || '') + (L.fphase || ''), y: window.scrollY || 0 }; save(); } }
@@ -178,11 +178,11 @@ function render(){
   if (S.parentPin) for (const k of kidIds()) { burnCheck(k); piggyCheck(k); }
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
   if (typeof hpApply === 'function') hpApply();
-  let v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : vLogin();
-  if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vSleep(); }
-  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vRestScreen(cur.kid); }
-  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active)) v = vAsk(cur.kid);
-  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
+  let v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : cur.view === 'lib' ? vLib() : vLogin();
+  if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} try { libStop(); } catch (e) {} v = vSleep(); }
+  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} try { libStop(); } catch (e) {} v = vRestScreen(cur.kid); }
+  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active) && !(LR && LR.active)) v = vAsk(cur.kid);
+  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix', 'lib'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
   if (typeof lookVars === 'function') lookVars(document.body.className ? cur.kid : null);
   if (FAM) famBody();
   app().innerHTML = (TEST ? testBar() : '') + v; afterRender();
@@ -266,6 +266,7 @@ function vHome(){
    <div class="prog tipc" data-tip="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}${poemTile(kid, D)}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
+  ${libCard(kid)}
   ${alwaysTiles(kid)}
   <p class="center"><button class="link" data-act="chpin">🔑 Поменять пароль</button></p>
   ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
@@ -1080,7 +1081,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (libAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }

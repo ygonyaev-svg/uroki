@@ -426,6 +426,13 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .hwc, .hwc p, .hwc b{ color:#2a2622; } .hwc .hint{ color:#5a524a !important; } .hwc{ border:2px solid var(--acc); }
 .restscr h1, .restscr p, .restscr h3, .restscr li{ color:#2a2622; } .restscr .hint{ color:#5a524a !important; } .tmr{ text-align:left; margin:8px 0 12px; padding-left:20px; } .tmr li{ margin:6px 0; }
 .xtrow{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:8px 0; }
+/* Читальня */
+.libc h2 .ic{ width:28px; height:28px; vertical-align:-6px; margin-right:6px; }
+.libc.off{ opacity:.75; } .libc.on{ border:2px solid var(--acc); }
+.libblk{ display:flex; flex-direction:column; gap:12px; margin:16px 0; }
+.libbar{ display:flex; align-items:center; gap:12px; margin:8px 0 14px; } .libbar .prog{ flex:1; margin:0; } .libbar span{ white-space:nowrap; font-weight:600; }
+.lib .reading .text{ font-size:22px; line-height:1.7; }
+@media (max-width:480px){ .libbar{ flex-direction:column; align-items:stretch; } .lib .reading .text{ font-size:20px; } }
 
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
@@ -847,7 +854,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* vb12db7cc */
+<script>/* v6876d140 */
 var FAM = 1;
 const CH_IMG_LIST = ["bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac7", "bac8", "bac9", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bgt1", "bgt2", "bgt3", "bka3", "bkm1", "bkm2", "bkz1", "blg1", "blg2", "bmi1", "bmi2", "bmi3", "bnp7", "bsh1", "bsh3", "bsh4", "bvv1", "bvv2", "bvv3", "bzy1"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -6175,9 +6182,9 @@ var ALWAYS = window.ALWAYS || (window.ALWAYS = []);
 var FUN_CAP = { zag: 5, pz: 6, zad: 6 };
 function funK(kid){ var K = S.kids[kid]; if (!K.fun) K.fun = { z: {}, p: {}, q: {}, day: '', got: {} }; var F = K.fun; if (F.day !== U.today()) { F.day = U.today(); F.got = {}; } return F; }
 /* Общая функция для всех «всегда доступных» разделов (и шахмат): начисляет не больше дневного лимита, возвращает реально начисленное */
-function funPts(kid, key, pts, cap){ if (!kid || !pts) return 0; var F = funK(kid), got = F.got[key] || 0; var add = Math.max(0, Math.min(pts, (cap || FUN_CAP[key] || 5) - got)); if (add) { add = piggyAdd(S.kids[kid], add); F.got[key] = got + add; } save(); return add; }
-function funLeft(kid, key){ var F = funK(kid); return Math.max(0, (FUN_CAP[key] || 5) - (F.got[key] || 0)); }
-function funCapNote(kid, key){ var l = Math.min(funLeft(kid, key), capLeft(S.kids[kid])); return l ? 'Сегодня можно заработать ещё <b>' + l + '</b> ' + U.pl(l, 'балл', 'балла', 'баллов') + '.' : 'Баллы на сегодня собраны — дальше играем просто для ума 🙂'; }
+function funPts(kid, key, pts, cap){ if (!kid || !pts) return 0; if (key !== 'hp') return 0; /* игры — без баллов, заработок только чтением (22.11) */ var F = funK(kid), got = F.got[key] || 0; var add = Math.max(0, Math.min(pts, (cap || FUN_CAP[key] || 5) - got)); if (add) { add = piggyAdd(S.kids[kid], add); F.got[key] = got + add; } save(); return add; }
+function funLeft(kid, key){ if (key !== 'hp') return 0; var F = funK(kid); return Math.max(0, (FUN_CAP[key] || 5) - (F.got[key] || 0)); }
+function funCapNote(kid, key){ if (key !== 'hp') return LIB_NOTE; var l = Math.min(funLeft(kid, key), capLeft(S.kids[kid])); return l ? 'Сегодня можно заработать ещё <b>' + l + '</b> ' + U.pl(l, 'балл', 'балла', 'баллов') + '.' : 'Баллы на сегодня собраны — дальше играем просто для ума 🙂'; }
 function funTab(act, cur0, list){ return '<div class="fntabs">' + list.map(function(t){ return '<button class="chip ' + (String(cur0) === String(t[0]) ? 'on' : '') + '" data-act="' + act + '" data-l="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>'; }
 function funLvl(kid){ return T(kid) === 'anya' ? 2 : 1; }
 function funOrder(kid, list, salt){ var r = U.rng(kid + salt); return r.shuffle(list.map(function(x, i){ return i; })); }
@@ -6196,7 +6203,7 @@ ALWAYS.push({ id: 'zag', order: 10,
   view: function(kid){ var F = funK(kid), lv = cur.zgL || funLvl(kid), L = zgList(kid, lv), z = cur.fz && ZG.filter(function(x){ return x.id === cur.fz.id; })[0];
     if (!z) z = L.filter(function(x){ return !(x.id in F.z); })[0];
     var solved = L.filter(function(x){ return F.z[x.id]; }).length, seen = L.filter(function(x){ return x.id in F.z; }).length;
-    var h = '<section class="hello"><p class="eyebrow">Всегда доступно</p><h1>🦉 Загадки</h1><p class="hint">Народные загадки. Подумай как следует: засчитывается только первый ответ. Лёгкая — 1 балл, трудная — 2. ' + funCapNote(kid, 'zag') + '</p>' +
+    var h = '<section class="hello"><p class="eyebrow">Всегда доступно</p><h1>🦉 Загадки</h1><p class="hint">Народные загадки. Подумай как следует: засчитывается только первый ответ. ' + funCapNote(kid, 'zag') + '</p>' +
       funTab('zgtab', lv, [[1, '🙂 Лёгкие · 7–9 лет'], [2, '🧠 Трудные · 10–12 лет']]) + '<p>Отгадано: <b>' + solved + '</b> из ' + L.length + (seen > solved ? ' · не угадано: ' + (seen - solved) : '') + '</p></section>';
     if (!z) return h + '<div class="card win"><h2>Все загадки этого уровня пройдены!</h2><p>Попробуй другой уровень. Скоро добавим новые.</p></div>';
     var r = cur.fz && cur.fz.id === z.id ? cur.fz : null, opts = U.rng(z.id + kid).shuffle([z.a].concat(z.w));
@@ -6928,7 +6935,7 @@ function chView(kid){
   return h + '</main>';
 }
 function chMenu(kid){
-  var C = chK(kid), h = '<section class="hello"><h1>♞ Шахматы</h1><p>Здесь можно заниматься всегда, даже в перерыв. ' + (chDayLeft(kid) ? 'За задачи, решённые с первой попытки без подсказки, — по 1 баллу в копилку (до ' + CHESS_DAY_MAX + ' в день, сегодня осталось ' + chDayLeft(kid) + ').' : 'Баллы за задачи на сегодня уже получены, но решать можно сколько хочешь.') + '</p></section>';
+  var C = chK(kid), h = '<section class="hello"><h1>♞ Шахматы</h1><p>Здесь можно заниматься всегда, даже в перерыв. ' + (LIB_NOTE + ' ') + (false ? 'За задачи, решённые с первой попытки без подсказки, — по 1 баллу в копилку (до ' + CHESS_DAY_MAX + ' в день, сегодня осталось ' + chDayLeft(kid) + ').' : '') + '</p></section>';
   var mine = T(kid) === 'yarik', i, L, n, tot, done;
   var cdone = 0; for (i = 0; i < CH_COURSE.length; i++) if (C.course[CH_COURSE[i].id]) cdone++;
   var courseTile = '<button class="tile chtile" data-act="chcourse"><span class="ico">♙</span><span class="tt"><span class="sn">Учимся играть' + (mine ? ' <em>начни здесь</em>' : '') + '</span><span class="ut">Как ходят фигуры, шах, мат, рокировка. Уроков пройдено: ' + cdone + ' из ' + CH_COURSE.length + '</span></span></button>';
@@ -7003,7 +7010,7 @@ function chPzSolved(kid, lv, pre){
   var C = chK(kid), key = lv + ':' + CHS.i, was = !!C.solved[key], pts = 0;
   if (!was) { C.solved[key] = 1; C.n = (C.n || 0) + 1; if (CHS.first) pts = chPts(kid, 1); }
   C.pos[lv] = CHS.i + 1;
-  CHS.ok = true; CHS.msg = pre + (CHS.first ? 'Отлично, с первой попытки!' : 'Решено!') + (pts ? ' +1 балл в копилку.' : was ? '' : CHS.first && !chDayLeft(kid) ? ' (баллы за шахматы на сегодня уже получены)' : '');
+  CHS.ok = true; CHS.msg = pre + (CHS.first ? 'Отлично, с первой попытки!' : 'Решено!') + (pts ? ' +1 балл в копилку.' : was ? '' : '');
   if (!was) ev(kid, 'шахматы', { subj:'Шахматы', unit: CH_LEVELS.filter(function(x){ return x.id === lv; })[0].t, text:'задача ' + (CHS.i + 1) + (CHS.first ? ' с первой попытки' : ' не с первой попытки'), coins: S.kids[kid].coins, price: pts || 0 });
   save(); render();
 }
@@ -7342,7 +7349,7 @@ function vCode(){ const kid = cur.kid, C = cgK(kid); cgPayPending(kid);
         return `<button class="cglv ${s ? 'won' : op ? 'open' : 'lock'}${z.l.hard ? ' hard' : ''}" data-act="cglv" data-id="${z.l.id}" ${op ? '' : 'aria-disabled="true"'}><b>${z.l.id}</b><i>${s ? '★★★'.slice(0, s) + '<s>' + '★★★'.slice(s) + '</s>' : op ? '▶' : '🔒'}</i></button>`; }).join('')}</div></section>`; }).join('');
   return `<main class="wrap ${LK(kid)} cg"><header class="bar"><button class="link" data-act="home">← На главную</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header>
     <section class="hello cghero"><img class="cgtoby" src="img/code-toby.webp" alt="" onerror="this.remove()"><div><p class="eyebrow">Игра</p><h1>Тоби-программист</h1><p>Щенок Тоби понимает только программы. Собери из блоков программу, и Тоби выполнит её шаг за шагом.</p>
-    <p class="hint">За новый уровень — столько баллов, сколько звёзд. Сегодня: <b>${day} из ${CODE_DAY_MAX}</b>.${C.pend ? ` Ждут в копилку: <b>${C.pend}</b> — придут, когда сделаешь уроки дня.` : ''}</p></div></section>${chs}</main>`; }
+    <p class="hint">${LIB_NOTE}${C.pend ? ` Ждут в копилку: <b>${C.pend}</b> — придут, когда сделаешь уроки дня.` : ''}</p></div></section>${chs}</main>`; }
 
 /* --- экран уровня --- */
 let CG = null, CG_VIEW = 'map'; /* { id, prog, sel:{k,i}, run, vi, step, res, hint } */
@@ -7424,7 +7431,7 @@ function cgRun(){ const kid = cur.kid, lv = CG_LV[cgIdx(CG.id)], grids = cgGrids
     if (!ok) { rec.t = (rec.t || 0) + 1; const tip = lv.max && lv.b.indexOf('P') >= 0 && cgCount(CG.prog) >= lv.max - 1 && !JSON.stringify(CG.prog).match(/"P"/) ? ' Блоков не хватает? Замени одинаковые стрелки одним блоком Повтори 🔁.' : ''; CG.res = { ok: false, msg: (grids.length > 1 ? `Улица ${R.indexOf(bad) + 1}: ` : '') + bad.msg + tip, vr: vr }; CG.vi = R.indexOf(bad); save(); render(); if (CG.sayok || CG.hint || voiceFree(cur.kid)) say(bad.msg + tip); return; }
     const n = cgCount(CG.prog), stars = cgStars(lv, n, CG.used); const prev = rec.s || 0; if (!prev && !rec.first) rec.first = (rec.t || 0) + 1;
     rec.w = (rec.w || 0) + 1; rec.prog = JSON.parse(JSON.stringify(CG.prog));
-    let pts = 0, pend = false; if (stars > prev && !CG.used) { const room = Math.max(0, CODE_DAY_MAX - cgToday(kid)); pts = Math.min(stars - prev, room); }
+    let pts = 0, pend = false; if (stars > prev && !CG.used) { const room = 0; /* без баллов: заработок только чтением (22.11) */ pts = Math.min(stars - prev, room); }
     if (stars > prev) rec.s = stars;
     if (pts) { C.pts[U.today()] = cgToday(kid) + pts; const t = U.today(), D = S.kids[kid].days[t]; if ((D && D.bonus) || dayDone(kid, t)) piggyAdd(S.kids[kid], pts); else { C.pend = (C.pend || 0) + pts; pend = true; } }
     ev(kid, 'программирование', { subj: 'Программирование', unit: `Уровень ${lv.id}`, score: stars + '★', ok: CG.used ? 'по решению' : 'верно', text: `попыток ${rec.t + 1}, блоков ${n}${pts ? `, +${pts} баллов` : ''}` });
@@ -7892,6 +7899,124 @@ function spotAct(act, b){ if (act !== 'spw' && act !== 'spnext') return false; c
   else a.wrong.push([si, wi]);
   save(); render(); return true; }
 
+/* ===== Читальня: дополнительный заработок — только чтением (правило папы, 22.11) =====
+   Когда уроки дня сделаны, заработать ещё можно только здесь: блок усидчивого чтения 15, 20 или 30 минут подряд.
+   Баллы — только за целый блок. Время засчитывается только за настоящее чтение:
+   — вслух (начинающий читатель, если айпад слушает): минута идёт, пока распознавание видит, что ребёнок продвигается по тексту
+     (пауза дольше LIB_GAP секунд не считается); страница засчитана, когда прочитано 90% слов;
+   — про себя: на страницу есть минимальное время (не пролистать) и максимум (не «пересидеть»), а каждые две страницы —
+     «Найди ошибку» по только что прочитанному. Не нашёл — эти страницы не засчитаны.
+   Загадки, головоломки, задачи, шахматы и программирование теперь без баллов (играем для ума). Викторина ГП и «Мои книги» — это чтение, они остаются.
+   Баллы Читальни идут в копилку сверх дневного потолка DAY_CAP, но не больше LIB_DAY_MIN минут чтения в день. */
+var LIB_BLOCKS = [[15, 10], [20, 15], [30, 25]], LIB_DAY_MIN = 45, LIB_GAP = 30;
+var LIB_NOTE = 'Здесь играем для ума, без баллов. Заработать ещё можно только чтением — в Читальне.';
+var LR = null; /* живое распознавание страницы */
+function libK(kid){ var K = S.kids[kid], t = U.today(); if (!K.lib) K.lib = { i: null, s: 0 }; if (K.lib.d !== t) { K.lib.d = t; K.lib.min = 0; K.lib.pts = 0; K.lib.blk = null; K.lib.msg = ''; } return K.lib; }
+function libOpen(kid){ if (TEST) return true; var t = U.today(), D = S.kids[kid].days[t]; return !!(D && D.bonus) || dayDone(kid, t); }
+function libAloud(kid){ var K = S.kids[kid]; return !!SR && (K.readBest || KIDS[kid].norm || 100) < 80; }
+function libList(kid){ return (KIDS[kid].read || []).filter(function(t){ return t && t.text; }); }
+function libSents(text){ return (String(text).replace(/\s+/g, ' ').match(/[^.!?…]+[.!?…]+[»"]?|[^.!?…]+$/g) || []).map(function(s){ return s.trim(); }).filter(Boolean); }
+function libPageW(kid){ return libAloud(kid) ? (T(kid) === 'yarik' ? 30 : 60) : 130; }
+function libCurText(kid){ var B = libK(kid), list = libList(kid); if (!list.length) return null;
+  if (B.i == null) { var days = Object.keys(S.kids[kid].days || {}).sort().reverse(), tid = null, k = -1; for (var d = 0; d < days.length && !tid; d++) { var Dd = S.kids[kid].days[days[d]]; tid = Dd && Dd.les && Dd.les.read && Dd.les.read.tid; } for (var j = 0; j < list.length; j++) if (list[j].id === tid) k = j; B.i = k + 1; B.s = 0; }
+  var t = list[B.i % list.length], S0 = libSents(t.text); if (B.s >= S0.length) { B.i++; B.s = 0; t = list[B.i % list.length]; S0 = libSents(t.text); } return { t: t, S: S0 }; }
+function libPage(kid){ var c = libCurText(kid); if (!c) return null; var B = libK(kid), n = libPageW(kid), out = [], w = 0, k = B.s;
+  while (k < c.S.length && (w < n || !out.length)) { var x = c.S[k].split(' ').length; if (out.length && w + x > n * 1.35) break; out.push(c.S[k]); w += x; k++; }
+  return { t: c.t, sents: out, from: B.s, to: k, words: w, text: out.join(' '), last: k >= c.S.length }; }
+function libWords(s){ return s.split(/\s+/).filter(Boolean); }
+function libStop(){ if (!LR) return; LR.active = false; try { LR.rec && LR.rec.stop(); } catch (e) {} LR = null; }
+
+/* --- карточка на главной --- */
+function libCard(kid){ if (!kid) return ''; var B = libK(kid), left = LIB_DAY_MIN - (B.min || 0);
+  if (!libOpen(kid)) return '<section class="card libc off"><h2>' + icon('books') + ' Читальня</h2><p>Откроется, когда сделаешь все уроки дня. Там можно заработать ещё — но только чтением: 15, 20 или 30 минут подряд.</p></section>';
+  if (left < LIB_BLOCKS[0][0] && !B.blk) return '<section class="card libc"><h2>' + icon('books') + ' Читальня</h2><p>На сегодня в Читальне всё: ты читал' + (T(kid) === 'anya' ? 'а' : '') + ' ' + (B.min || 0) + ' минут и заработал' + (T(kid) === 'anya' ? 'а' : '') + ' <b>+' + (B.pts || 0) + '</b>. Завтра можно снова.</p></section>';
+  return '<section class="card libc on"><h2>' + icon('books') + ' Читальня — заработать ещё</h2><p>' + (B.blk ? 'Блок чтения начат: ' + Math.floor((B.blk.sec || 0) / 60) + ' из ' + B.blk.m + ' минут.' : 'Хочешь ещё баллов? Почитай 15, 20 или 30 минут подряд. Баллы — только за целый блок.') + (B.pts ? ' Сегодня уже +' + B.pts + '.' : '') + '</p><button class="btn big" data-act="libgo">' + (B.blk ? 'Продолжить чтение' : 'Открыть Читальню') + '</button></section>'; }
+
+/* --- экран --- */
+function vLib(){ var kid = cur.kid, K = S.kids[kid], B = libK(kid);
+  var head = '<main class="wrap ' + LK(kid) + '"><header class="bar"><button class="link" data-act="libhome">← К урокам</button><span class="coins">' + coinsHtml(K.coins) + '</span></header><section class="lesson lib"><p class="eyebrow">Читальня</p>';
+  if (!libOpen(kid)) return head + '<h1>Сначала уроки</h1><p>Читальня откроется, когда сделаешь все уроки дня.</p></section></main>';
+  var b = B.blk;
+  if (!b) { var left = LIB_DAY_MIN - (B.min || 0);
+    return head + '<h1>Заработай чтением</h1>' + (B.msg ? '<div class="fb ok"><b>' + U.esc(B.msg) + '</b></div>' : '') +
+      '<p>Выбери, сколько будешь читать. Время идёт, только когда ты по-настоящему читаешь' + (libAloud(kid) ? ' вслух — я слушаю.' : ': не пролистать, а после каждых двух страниц — «Найди ошибку».') + ' Баллы — только за целый блок.</p>' +
+      '<div class="libblk">' + LIB_BLOCKS.map(function(x){ var ok = x[0] <= left; return '<button class="btn big ' + (ok ? '' : 'ghost') + '" data-act="libstart" data-m="' + x[0] + '" ' + (ok ? '' : 'disabled') + '>' + x[0] + ' минут — +' + x[1] + '</button>'; }).join('') + '</div>' +
+      '<p class="hint">Сегодня прочитано в Читальне: ' + (B.min || 0) + ' из ' + LIB_DAY_MIN + ' минут' + (B.pts ? ', заработано +' + B.pts : '') + '.</p></section></main>'; }
+  var pg = libPage(kid); if (!pg) return head + '<p>Нет текстов.</p></section></main>';
+  var done = Math.min(b.m * 60, b.sec || 0), pct = Math.round(done / (b.m * 60) * 100);
+  var bar = '<div class="libbar"><div class="prog"><i style="width:' + pct + '%"></i></div><span>' + Math.floor(done / 60) + ' мин из ' + b.m + ' · +' + b.pts + ' в конце</span></div>';
+  var title = '<h1>' + U.esc(pg.t.title || '') + '</h1>' + (pg.t.author ? '<p class="author">' + U.esc(pg.t.author) + '</p>' : '');
+  if (b.chk) return head + title + bar + libChkView(kid, b) + '</section></main>';
+  if (b.aloud) { var live = LR && LR.active;
+    return head + title + bar + '<article class="card reading"><div class="text" id="ltext"><p>' + libWords(pg.text).map(function(w, i){ var st = LR && LR.st ? LR.st[i] : 0; return '<span class="w ' + (st === 1 ? 'r1' : st === 2 ? 'r2' : LR && i === LR.p ? 'rc' : '') + '" data-i="' + i + '">' + U.esc(w) + '</span>'; }).join(' ') + '</p></div></article>' +
+      '<div class="readbar">' + (live ? '<button class="btn ghost" data-act="libpause">' + icon('pause') + ' Пауза</button><span id="lstat" class="rstat">Слушаю… читай вслух</span>' : '<button class="btn big mic" data-act="libmic">' + icon('mic') + ' ' + (b.pages ? 'Читать дальше вслух' : 'Читать вслух') + '</button>') + '</div>' +
+      '<p class="hint">Страница засчитается, когда прочитаешь её вслух. Если молчать — время не идёт.</p></section></main>'; }
+  if (!b.t0) { b.t0 = Date.now(); save(); }
+  return head + title + bar + '<article class="card reading"><div class="text">' + pg.sents.map(function(s){ return U.esc(s); }).join(' ') + '</div></article>' +
+    '<div class="readbar"><button class="btn big" data-act="libnext">Прочитал' + (T(kid) === 'anya' ? 'а' : '') + ' страницу</button></div><p class="hint">Читай внимательно: после каждых двух страниц — «Найди ошибку» по прочитанному.</p></section></main>'; }
+
+/* --- «Найди ошибку» по двум страницам --- */
+function libChkView(kid, b){ var q = b.chk, girl = T(kid) === 'anya';
+  var sent = function(s, si){ return s.split(' ').map(function(w, wi){ var bad = si === q.k && wi === q.wi, tried = (q.wrong || []).some(function(x){ return x[0] === si && x[1] === wi; });
+    var cls = q.fin && bad ? (q.ok ? 'right' : 'miss') : tried ? 'wrong' : ''; return '<button class="spw ' + cls + '" data-act="libspw" data-s="' + si + '" data-w="' + wi + '" ' + (q.fin || tried ? 'disabled' : '') + '>' + U.esc(w) + '</button>'; }).join(' '); };
+  return '<article class="card task spot"><h2>' + icon('search') + ' Найди ошибку</h2><p class="hint">Это из страниц, которые ты сейчас ' + (girl ? 'прочитала' : 'прочитал') + '. В одном предложении я поменял одно слово. Найди его. Две попытки.</p><div class="spt">' + q.sents.map(function(s, si){ return '<p>' + sent(s, si) + '</p>'; }).join('') + '</div>' +
+    (q.fin ? (q.ok ? '<div class="fb ok"><b>Верно!</b> В тексте было «' + U.esc(q.was.toLowerCase()) + '». Страницы засчитаны.</div>' : '<div class="fb bad"><b>Ошибка была здесь:</b> в тексте «' + U.esc(q.was.toLowerCase()) + '». Эти две страницы не засчитаны — читай внимательнее.</div>') : (q.wrong && q.wrong.length ? '<div class="fb try">Это слово верное. Попробуй ещё раз.</div>' : '')) + '</article>' +
+    (q.fin ? '<button class="btn big" data-act="libchkok">Дальше</button>' : ''); }
+
+/* --- распознавание вслух --- */
+function libMic(kid){ var pg = libPage(kid); if (!pg || !SR) return; libStop();
+  var T0 = libWords(pg.text).map(normW), R0 = LR = { active: true, T: T0, st: new Array(T0.length).fill(0), p: 0, base: '', cur: '', from: 0, last: Date.now(), kid: kid };
+  var rec = new SR(); rec.lang = 'ru-RU'; rec.continuous = true; rec.interimResults = true; R0.rec = rec;
+  rec.onresult = function(e){ if (LR !== R0) return; var s = ''; for (var i = R0.from; i < e.results.length; i++) s += ' ' + e.results[i][0].transcript; R0.cur = s; R0.n = e.results.length; libUpd(R0); };
+  rec.onerror = function(e){ if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { R0.denied = true; libStop(); var b = libK(kid).blk; if (b) { b.aloud = false; save(); } render(); } };
+  rec.onend = function(){ R0.base += ' ' + R0.cur; R0.cur = ''; R0.from = 0; if (LR === R0 && R0.active) setTimeout(function(){ try { rec.start(); } catch (x) {} }, 120); };
+  try { rec.start(); } catch (x) {}
+  render(); }
+function libUpd(R0){ var kid = R0.kid, b = libK(kid).blk; if (!b) return;
+  var spoken = (R0.base + ' ' + R0.cur).split(/\s+/).map(normW).filter(Boolean), r = align(R0.T, spoken), now = Date.now();
+  if (r.p > R0.p) { b.sec = (b.sec || 0) + Math.min((now - R0.last) / 1000, LIB_GAP); b.words = (b.words || 0) + (r.p - R0.p); R0.last = now; }
+  else if (now - R0.last > LIB_GAP * 1000) R0.last = now - LIB_GAP * 1000;
+  R0.st = r.st; R0.p = r.p;
+  var els = document.querySelectorAll('#ltext .w'); for (var i = 0; i < els.length; i++) { var k = +els[i].getAttribute('data-i'); els[i].className = 'w ' + (r.st[k] === 1 ? 'r1' : r.st[k] === 2 ? 'r2' : k === r.p ? 'rc' : ''); }
+  var c = document.querySelector('#ltext .w.rc'); if (c && c.scrollIntoView) c.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  if (r.p >= Math.ceil(R0.T.length * .9)) { /* страница прочитана — следующая, микрофон не выключаем */
+    var pg = libPage(kid); libK(kid).s = pg.to; b.pages = (b.pages || 0) + 1; save();
+    if (libFinish(kid)) return;
+    var np = libPage(kid); R0.T = libWords(np.text).map(normW); R0.st = new Array(R0.T.length).fill(0); R0.p = 0; R0.base = ''; R0.cur = ''; R0.from = R0.n || 0; render(); return; }
+  if (libFinish(kid)) return;
+  var bar = document.querySelector('.libbar span'), pr = document.querySelector('.libbar i'); if (bar) bar.textContent = Math.floor(Math.min(b.sec, b.m * 60) / 60) + ' мин из ' + b.m + ' · +' + b.pts + ' в конце'; if (pr) pr.style.width = Math.round(Math.min(1, b.sec / (b.m * 60)) * 100) + '%';
+  if (Math.random() < .1) save(); }
+
+/* --- конец блока --- */
+function libFinish(kid){ var K = S.kids[kid], B = libK(kid), b = B.blk; if (!b || (b.sec || 0) < b.m * 60) return false;
+  libStop(); var pts = b.pts; K.piggy = (K.piggy || 0) + pts; if (!K.piggyWeek) K.piggyWeek = weekStart(U.today());
+  B.min = (B.min || 0) + b.m; B.pts = (B.pts || 0) + pts; var pg = libPage(kid), wpm = b.words && b.aloud ? Math.round(b.words / (b.sec / 60)) : '';
+  K.texts = K.texts || 0;
+  ev(kid, 'читальня', { subj: 'Чтение', unit: (pg && pg.t.title) || '', score: b.m + ' мин', wpm: wpm, text: (b.aloud ? 'вслух' : 'про себя') + ', страниц ' + (b.pages || 0) + (b.miss ? ', не засчитано ' + b.miss : '') + ', +' + pts + ' баллов', coins: K.coins });
+  B.msg = 'Блок ' + b.m + ' минут прочитан! +' + pts + ' в копилку.'; B.blk = null; save(); render(); window.scrollTo(0, 0); return true; }
+
+function libAct(act, b){
+  if (act === 'libgo') { go('lib'); window.scrollTo(0, 0); return true; }
+  if (cur.view !== 'lib' && act.indexOf('lib') !== 0) return false;
+  var kid = cur.kid; if (!kid) return false; var B = libK(kid), blk = B.blk;
+  switch (act) {
+    case 'libhome': libStop(); if (blk) { blk.t0 = 0; save(); } go('home'); return true;
+    case 'libstart': { var m = +b.getAttribute('data-m'), x = LIB_BLOCKS.filter(function(y){ return y[0] === m; })[0]; if (!x || !libOpen(kid) || (B.min || 0) + m > LIB_DAY_MIN) return true;
+      B.msg = ''; B.blk = { m: m, pts: x[1], sec: 0, words: 0, pages: 0, aloud: libAloud(kid), pend: 0, pn: 0, miss: 0 }; ev(kid, 'читальня начата', { subj: 'Чтение', score: m + ' мин' }); save(); render(); window.scrollTo(0, 0); if (B.blk.aloud) libMic(kid); return true; }
+    case 'libmic': libMic(kid); return true;
+    case 'libpause': libStop(); save(); render(); return true;
+    case 'libnext': { if (!blk || blk.chk) return true; var pg = libPage(kid), el = (Date.now() - (blk.t0 || Date.now())) / 1000, norm = KIDS[kid].norm || 100;
+      var minS = pg.words / (norm * 2) * 60, maxS = pg.words / (norm * .5) * 60;
+      if (el < minS) { alertMsg('Слишком быстро. Прочитай страницу внимательно, ещё примерно ' + Math.max(5, Math.ceil(minS - el)) + ' сек.'); return true; }
+      blk.pend = (blk.pend || 0) + Math.min(el, maxS); blk.pn = (blk.pn || 0) + 1; blk.ptext = (blk.ptext || '') + ' ' + pg.text; B.s = pg.to; blk.pages = (blk.pages || 0) + 1; blk.t0 = 0;
+      if (blk.pn >= 2) { var q = spotTask(kid, { text: blk.ptext }, Date.now() % 100000); if (q) { q.wrong = []; blk.chk = q; } else { blk.sec += blk.pend; blk.pend = 0; blk.pn = 0; blk.ptext = ''; } }
+      save(); if (!blk.chk && libFinish(kid)) return true; render(); window.scrollTo(0, 0); return true; }
+    case 'libspw': { var q2 = blk && blk.chk; if (!q2 || q2.fin) return true; var si = +b.getAttribute('data-s'), wi = +b.getAttribute('data-w'), ok = si === q2.k && wi === q2.wi; q2.tries = (q2.tries || 0) + 1;
+      if (ok || q2.tries >= 2) { q2.fin = true; q2.ok = ok; } else q2.wrong.push([si, wi]); save(); render(); return true; }
+    case 'libchkok': { if (!blk || !blk.chk) return true; if (blk.chk.ok) blk.sec += blk.pend; else blk.miss = (blk.miss || 0) + blk.pn; blk.pend = 0; blk.pn = 0; blk.ptext = ''; blk.chk = null; save(); if (libFinish(kid)) return true; render(); window.scrollTo(0, 0); return true; }
+  }
+  return false; }
+
 /* ===== Домашнее задание = работа над ошибками прошлого урока =====
    Правило папы (21.11): ошибки урока — это ДЗ по предмету. Его нужно сделать до следующего урока по этому предмету,
    иначе за следующий урок баллов будет 70%. Делать можно в любое время, даже в перерыв.
@@ -7936,7 +8061,7 @@ function hwAct(act, b){ if (act === 'hwgo') { go('hwfix', { hw: { s: b.dataset.s
 /* Подсказки по касанию: дети нажимают на непонятное (баллы, копилку, проценты…) — всплывает объяснение, можно послушать. */
 const TIPS = {
   coins: ['⭐ Баллы на счёте', 'Это твои баллы. 1 балл = 1 минута игры или мультиков сверх обычного времени. Их можно потратить на призы, которые ты выбрал{а}.'],
-  piggy: ['🐷 Копилка', 'Сюда падают баллы за уроки, загадки, стихи и задачи. В воскресенье всё из копилки переходит на счёт, и сверху добавляется ещё десять процентов — подарок за то, что ты копил{а} и не тратил{а}. Забрать раньше можно, но тогда без прибавки.'],
+  piggy: ['🐷 Копилка', 'Сюда падают баллы за уроки, стихи и чтение в Читальне. В воскресенье всё из копилки переходит на счёт, и сверху добавляется ещё десять процентов — подарок за то, что ты копил{а} и не тратил{а}. Забрать раньше можно, но тогда без прибавки.'],
   percent: ['% Процент', 'Процент — это одна сотая часть. Десять процентов от ста баллов — это десять баллов. Десять процентов от пятидесяти — пять. Чем больше накопил{а}, тем больше прибавка.'],
   drip: ['📈 Капитал растёт', 'Капитал — это всё, что у тебя есть: счёт и копилка вместе. За каждый верный ответ с первого раза капитал чуть-чуть растёт. Пять верных подряд — растёт в полтора раза быстрее, десять подряд — в два раза. Ошибка начинает серию заново.'],
   rest: ['☕ Перерыв', 'Голове нужен отдых. Каждые двадцать минут я спрошу, не устал{а} ли ты: можно продолжить или выбрать отдых. После часа занятий подряд — большой перерыв на два часа. Пройденные уроки и работа над ошибками открыты всегда.'],
@@ -8514,7 +8639,7 @@ function voiceEv(kid, L, what){ if (!L) return; const k = what + ':' + (L.phase 
    Потолок за день: 3% капитала, но не меньше 10 баллов. Капает в копилку (в воскресенье +10% сверху). */
 const DRIP_RATE = .004, DRIP_MIN = .2, DRIP_CAP = .03, DRIP_CAP_MIN = 10;
 function dripRec(K){ const d = U.today(); if (!K.drip || K.drip.d !== d) K.drip = { d, got: 0, frac: 0, streak: (K.drip && K.drip.streak) || 0, sess: (K.drip && K.drip.sess) || 0, cap: Math.max(DRIP_CAP_MIN, Math.round(((K.coins || 0) + (K.piggy || 0)) * DRIP_CAP)) }; return K.drip; }
-function dripOn(kid, type, d){ const K = S.kids[kid]; if (!K) return;
+function dripOn(kid, type, d){ const K = S.kids[kid]; if (!K) return; if (/^(загадка|головоломка|задача на смекалку|шахматы|программирование)$/.test(type)) return; /* после уроков баллы — только чтением (правило папы 22.11) */
   const chessOk = type === 'шахматы' && /с первой попытки/.test(d.text || '') && !/не с первой/.test(d.text || ''), chessBad = type === 'шахматы' && /не с первой/.test(d.text || '');
   const ok = d.ok === 'верно' || chessOk, bad = d.ok === 'ошибка' || d.ok === 'со 2-й попытки' || chessBad; if (!ok && !bad) return;
   const R = dripRec(K); if (bad) { R.streak = 0; return; }
@@ -8620,7 +8745,7 @@ setInterval(() => { if (cur.kid && !TEST && cur.view !== 'parent' && ((sleepNow(
 /* ===== Состояние экрана ===== */
 const cur = { kid:null, view:'login', subj:null, ds:U.today(), K(){ return KIDS[this.kid]; }, pinFor:null, onPin:null, parentTab:'report', parentKid:'yarik', msg:'' };
 const app = () => document.getElementById('app');
-function go(view, extra){ try { sayStop(); } catch (e) {} try { micStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
+function go(view, extra){ try { sayStop(); } catch (e) {} try { micStop(); } catch (e) {} try { if (view !== 'lib') libStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
   if (view === 'lesson' && cur.kid && cur.subj) { const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L && L.scrollY && L.scrollY.ph === (L.phase || '') + (L.fphase || '')) { const y = L.scrollY.y; setTimeout(() => window.scrollTo(0, y), 60); } } }
 /* Запоминаем, докуда ребёнок долистал текст, чтобы вернуться на то же место */
 function rememberScroll(){ if (cur.view !== 'lesson' || !cur.kid || !cur.subj) return; const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L) { L.scrollY = { ph: (L.phase || '') + (L.fphase || ''), y: window.scrollY || 0 }; save(); } }
@@ -8631,11 +8756,11 @@ function render(){
   if (S.parentPin) for (const k of kidIds()) { burnCheck(k); piggyCheck(k); }
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
   if (typeof hpApply === 'function') hpApply();
-  let v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : vLogin();
-  if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vSleep(); }
-  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vRestScreen(cur.kid); }
-  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active)) v = vAsk(cur.kid);
-  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
+  let v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : cur.view === 'lib' ? vLib() : vLogin();
+  if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} try { libStop(); } catch (e) {} v = vSleep(); }
+  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} try { libStop(); } catch (e) {} v = vRestScreen(cur.kid); }
+  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active) && !(LR && LR.active)) v = vAsk(cur.kid);
+  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix', 'lib'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
   if (typeof lookVars === 'function') lookVars(document.body.className ? cur.kid : null);
   if (FAM) famBody();
   app().innerHTML = (TEST ? testBar() : '') + v; afterRender();
@@ -8719,6 +8844,7 @@ function vHome(){
    <div class="prog tipc" data-tip="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}${poemTile(kid, D)}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
+  ${libCard(kid)}
   ${alwaysTiles(kid)}
   <p class="center"><button class="link" data-act="chpin">🔑 Поменять пароль</button></p>
   ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
@@ -9533,7 +9659,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (libAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }
