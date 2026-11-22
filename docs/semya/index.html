@@ -873,10 +873,14 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 .fkcols{ display:flex; flex-wrap:wrap; gap:10px; }
 .fkcol{ width:38px; height:38px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1px #E6DCC3; cursor:pointer; padding:0; }
 .fkcol.on{ box-shadow:0 0 0 3px #2D4A32; }
+/* Сводка за сегодня (отчёт родителя) */
+.fsum h3{margin:14px 0 4px;color:var(--fam-green,#2D4A32)}
+.fsum .fsumln{margin:0 0 6px;line-height:1.45}
+.fsum .row{margin-top:10px}
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v18f4791e */
+<script>/* v2cb9923f */
 var FAM = 1;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -8165,11 +8169,11 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-hear
    Пока сверка не прошла, свой снимок не отправляем, чтобы пустое устройство не затёрло настоящий прогресс. */
 const SNAP_OK = {}, SNAP_PUSHED = {}; let SNAP_T = null, SNAP_BUSY = false;
 function snapWork(K){ return Object.keys(K.days || {}).some(d => Object.keys((K.days[d] || {}).les || {}).length); }
-function snapMark(){ if (TEST || FAM || !cur.kid || SNAP_BUSY) return; const K = S.kids[cur.kid]; if (!K) return; if (!SNAP_OK[cur.kid]) { if (snapWork(K) && K.modT) K.dirtyT = Date.now(); return; } K.modT = Date.now(); clearTimeout(SNAP_T); SNAP_T = setTimeout(snapPush, 45000); }
-function snapPush(){ if (TEST || FAM || !S.cfg.sync || !navigator.onLine) return; clearTimeout(SNAP_T);
+function snapMark(){ if (TEST || !cur.kid || SNAP_BUSY) return; if (FAM) return famSnapMark(cur.kid); const K = S.kids[cur.kid]; if (!K) return; if (!SNAP_OK[cur.kid]) { if (snapWork(K) && K.modT) K.dirtyT = Date.now(); return; } K.modT = Date.now(); clearTimeout(SNAP_T); SNAP_T = setTimeout(snapPush, 45000); }
+function snapPush(){ if (FAM) return famSnapPush(); if (TEST || !S.cfg.sync || !navigator.onLine) return; clearTimeout(SNAP_T);
   Object.keys(SNAP_OK).forEach(kid => { const K = S.kids[kid]; if (!K || !K.modT || SNAP_PUSHED[kid] === K.modT) return; const t = K.modT;
     try { fetch(S.cfg.sync, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ snap: 1, kid, t, state: JSON.stringify(K) }) }).then(() => { SNAP_PUSHED[kid] = t; }).catch(() => {}); } catch (e) {} }); }
-async function snapCheck(kid){ if (TEST || FAM || !kid || SNAP_OK[kid] || !S.cfg.sync || !navigator.onLine) return;
+async function snapCheck(kid){ if (FAM) return famSnapCheck(kid); if (TEST || !kid || SNAP_OK[kid] || !S.cfg.sync || !navigator.onLine) return;
   try { const r = await fetch(S.cfg.sync + (S.cfg.sync.includes('?') ? '&' : '?') + 'action=snap&kid=' + encodeURIComponent(kid)); const j = await r.json(); if (!j || !j.ok) return;
     const K = S.kids[kid]; if (j.t && j.state && j.t > Math.max(K.modT || 0, K.dirtyT || 0)) { const R = JSON.parse(j.state); if (R && typeof R === 'object' && R.days) { SNAP_BUSY = true; S.kids[kid] = R; if (typeof posFix === 'function') posFix(kid); save(); SNAP_BUSY = false; SNAP_PUSHED[kid] = R.modT; if (cur.kid === kid) { alertMsg('Прогресс загружен ✓'); if (cur.view === 'prizes' && R.prizesSet) go('home'); else render(); } } }
     SNAP_OK[kid] = true; if (!S.kids[kid].modT) { S.kids[kid].modT = Date.now(); } snapPush();
@@ -8555,6 +8559,7 @@ function vFamKids(){
 function famLoginExtra(){ return '<p class="fammotto center">' + FAM_MOTTO + '</p>'; }
 function famSettings(){
   return '<div class="card"><h2>Семья</h2><p class="hint">' + U.esc(S.fam.email || '') + '</p><div class="row"><button class="btn small" data-act="fkedit">Дети и коды</button> <button class="btn small stop" data-act="fkout">Выйти из аккаунта</button></div></div>' +
+    '<div class="card"><h2>Вечерняя сводка на почту</h2><p class="hint">Каждый день около 20:30 (Лиссабон) на ' + U.esc(S.fam.email || '') + ' приходит письмо: что дети сделали и чего не сделали за день. Сводку на эту минуту можно получить во вкладке «Отчёт», кнопка «Сводка сейчас».</p><p>' + (S.fam.sumOff ? 'Сейчас отключена.' : 'Сейчас включена.') + '</p><div class="row"><button class="btn small' + (S.fam.sumOff ? '' : ' ghost') + '" data-act="' + (S.fam.sumOff ? 'fsumon' : 'fsumoff') + '">' + (S.fam.sumOff ? 'Включить' : 'Отключить') + '</button></div></div>' +
     '<form class="card form" data-form="ffb"><h2>Отзыв о тестовой версии</h2><label>Что понравилось, что мешает, чего не хватает<textarea id="ffbt" rows="4" maxlength="2000" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;font:inherit;padding:10px;border-radius:12px;border:1px solid #cbd5e1"></textarea></label><button class="btn small">Отправить</button></form>';
 }
 function famAct(act, b){
@@ -8568,6 +8573,10 @@ function famAct(act, b){
     case 'fkedit': cur.fk = null; go('fkids'); return true;
     case 'fkback': cur.fk = null; go('parent', { parentTab: 'set' }); return true;
     case 'fkrecheck': famStatus(); return true;
+    case 'fsum': famSumGet(false); return true;
+    case 'fsummail': famSumGet(true); return true;
+    case 'fsumon': famSumSet(true); return true;
+    case 'fsumoff': famSumSet(false); return true;
     case 'fkout': if (window.confirm('Выйти из аккаунта на этом устройстве? Прогресс детей на этом устройстве сотрётся.')) { flush().finally(function(){ try { localStorage.removeItem(KEY); } catch (x) {} location.reload(); }); } return true;
   }
   return false;
@@ -8577,7 +8586,7 @@ function famAuthDone(j){
   if (j && j.inv === 'bad') { FAM_INV = ''; try { localStorage.removeItem('slovohod.inv'); } catch (e) {} }
   if (j && j.ok && FAM_INV) { FAM_INV = ''; try { localStorage.removeItem('slovohod.inv'); } catch (e) {} }
   if (!j || !j.ok) { render(); return alertMsg(j && j.msg ? j.msg : 'Не получилось. Проверьте интернет и попробуйте ещё раз'); }
-  S.fam = { fid: j.fid, token: j.token, email: j.email, name: j.name || '', kids: j.kids || [], ppin: j.ppin || null, off: !!j.off };
+  S.fam = { fid: j.fid, token: j.token, email: j.email, name: j.name || '', kids: j.kids || [], ppin: j.ppin || null, off: !!j.off, sumOff: !!j.sumOff };
   famInit(); save(); cur.fk = null; go('login');
 }
 function famBad(id, msg, id2){ alertMsg(msg, 5000); var e = document.getElementById(id2 || id); if (e) { e.scrollIntoView({ block: 'center' }); e.focus(); } return true; }
@@ -8619,6 +8628,60 @@ function famForm(k, f, val){
     return true; }
   return false;
 }
+/* ===== Синхронизация прогресса и сводка для родителей (22.11.2026) =====
+   Прогресс ребёнка (снимок S.kids[id] + его журнал) уходит на сервер с устройства, где он занимается, — через 15 с после изменений и при сворачивании.
+   Родитель на своём телефоне открывает «Для родителей» — снимки подтягиваются, отчёты показывают то же, что на планшете ребёнка.
+   Правило: побеждает более новый снимок (K.modT). Устройство, ещё ни разу не сверившееся, свой непустой прогресс не отдаёт чужому — сначала отправляет его. */
+var FSNAP = { ok: {}, pushed: {}, pulled: {}, chk: {}, timer: null, busy: false, at: 0 };
+function famSnapOn(){ return !TEST && S.fam && S.fam.fid && !S.fam.off; }
+function famSnapMark(kid){ var K = S.kids[kid]; if (!K || !famSnapOn() || FSNAP.busy) return;
+  if (!FSNAP.ok[kid]) { if (snapWork(K) && K.modT) K.dirtyT = Date.now(); return; }
+  K.modT = Date.now(); clearTimeout(FSNAP.timer); FSNAP.timer = setTimeout(famSnapPush, 15000); }
+/* Явное действие родителя (цена приза, баллы, задание, время) на устройстве, где снимок уже загружен, — отправляем сразу */
+function famSnapTouch(kid){ if (!famSnapOn() || !S.kids[kid] || !(FSNAP.ok[kid] || FSNAP.pulled[kid])) return; FSNAP.ok[kid] = true; S.kids[kid].modT = Date.now(); famSnapPush(); }
+/* План и итог дня — для сводки на сервере */
+function famDayInfo(kid){ var K = S.kids[kid]; if (!K || !KIDS[kid]) return null; var t = U.today(), keep = cur.ds, plan = [];
+  try { cur.ds = t; var D = K.days[t] || { les: {} }; plan = todaySubjects(kid).map(function(s){ var L = D.les[s] || {}; return { n: String(subjName(kid, s, t)).replace(/^[^A-Za-zА-Яа-яЁё]+/, ''), st: L.phase === 'done' ? 'done' : L.phase ? 'go' : '', g: L.grade || '', sc: L.total ? L.score + '/' + L.total : '' }; }); } catch (e) {}
+  cur.ds = keep; var D2 = K.days[t] || {}; return { d: t, plan: plan, pts: D2.pts || 0, coins: K.coins || 0, secs: D2.secs || 0 }; }
+function famKidLog(kid){ var nm = KIDS[kid] && KIDS[kid].name; return S.log.filter(function(e){ return e.kid === nm; }).slice(-300); }
+function famSnapPush(){ if (!famSnapOn() || !navigator.onLine) return Promise.resolve(); clearTimeout(FSNAP.timer);
+  return Promise.all(Object.keys(FSNAP.ok).map(function(kid){ var K = S.kids[kid]; if (!K || !K.modT || FSNAP.pushed[kid] === K.modT) return null; var t = K.modT;
+    return famApi({ fam: 'snap', fid: S.fam.fid, token: S.fam.token, kid: kid, t: t, state: JSON.stringify({ K: K, log: famKidLog(kid) }), day: famDayInfo(kid) })
+      .then(function(j){ if (j && j.ok) FSNAP.pushed[kid] = t; }).catch(function(){}); })); }
+function famLogMerge(log){ if (!log || !log.length) return; var have = {}; S.log.forEach(function(e){ have[e.t + '|' + e.kid + '|' + e.type + '|' + (e.q || '')] = 1; });
+  log.forEach(function(e){ var k = e.t + '|' + e.kid + '|' + e.type + '|' + (e.q || ''); if (!have[k]) { S.log.push(e); have[k] = 1; } });
+  S.log.sort(function(a, b){ return a.t < b.t ? -1 : a.t > b.t ? 1 : 0; }); if (S.log.length > 1500) S.log = S.log.slice(-1500); }
+/* Подтянуть снимки. asKid — ребёнок вошёл на этом устройстве: после сверки устройство начинает отправлять свой прогресс */
+function famSnapPull(ids, asKid){ if (!famSnapOn() || !navigator.onLine) return Promise.resolve(false);
+  var have = {}; ids.forEach(function(k){ var K = S.kids[k]; if (K && K.modT) have[k] = Math.max(K.modT || 0, K.dirtyT || 0); });
+  return famApi({ fam: 'snapget', fid: S.fam.fid, token: S.fam.token, kids: ids, have: have }).then(function(j){ if (!j || !j.ok) return false; var ch = false;
+    (j.snaps || []).forEach(function(x){ var K = S.kids[x.kid]; if (!K || !x.state) return; var loc = Math.max(K.modT || 0, K.dirtyT || 0);
+      if (!K.modT && snapWork(K) && asKid) return; /* первый раз на этом устройстве, и здесь уже есть свои занятия — свой прогресс не затираем */
+      if (x.t <= loc) return; var R; try { R = JSON.parse(x.state); } catch (e) { return; } if (!R || !R.K || !R.K.days) return;
+      FSNAP.busy = true; if (K.pin && !R.K.pin) R.K.pin = K.pin; S.kids[x.kid] = R.K; S.kids[x.kid].modT = x.t; FSNAP.pushed[x.kid] = x.t; famLogMerge(R.log); if (typeof posFix === 'function') try { posFix(x.kid); } catch (e) {} FSNAP.busy = false; ch = true; });
+    ids.forEach(function(k){ FSNAP.pulled[k] = Date.now(); });
+    if (asKid) ids.forEach(function(k){ var K = S.kids[k]; if (!K) return; FSNAP.ok[k] = true; if (!K.modT || (K.dirtyT && K.dirtyT > K.modT)) K.modT = Date.now(); delete K.dirtyT; });
+    S.fam.snapAt = Date.now(); save(); if (asKid) famSnapPush(); return ch; }).catch(function(){ return false; }); }
+/* Вход ребёнка: первая сверка сразу, дальше — раз в 3 минуты (вдруг родитель поменял цены призов или добавил время) */
+function famSnapCheck(kid){ if (!kid || !famSnapOn()) return; var last = FSNAP.chk[kid] || 0; if (FSNAP.ok[kid] && Date.now() - last < 180000) return; FSNAP.chk[kid] = Date.now();
+  return famSnapPull([kid], true).then(function(ch){ if (ch && cur.kid === kid) { var K = S.kids[kid]; if (cur.view === 'prizes' && K.prizesSet) go('home'); else if (cur.view !== 'lesson') render(); } }); }
+/* Родитель открыл раздел — подтягиваем прогресс всех детей (не чаще раза в 20 секунд) */
+function famParentPull(force){ if (!famSnapOn() || (!force && Date.now() - FSNAP.at < 20000)) return; FSNAP.at = Date.now();
+  famSnapPull(kidIds(), false).then(function(ch){ if (cur.view === 'parent') { if (ch || force) render(); } }); }
+/* Карточка «Сводка за сегодня» вверху отчёта */
+var FSUM = { busy: false, res: null, err: '' };
+function famSumCard(){ if (!S.fam || !S.fam.fid) return '';
+  var r = FSUM.res, body = r ? '<p class="hint">' + U.esc(r.dayH) + ', на ' + U.esc(r.at) + '</p>' + r.kids.map(function(k){ return '<h3>' + U.esc(k.name) + '</h3>' + k.lines.map(function(l){ return '<p class="fsumln">' + U.esc(l) + '</p>'; }).join(''); }).join('') +
+    '<div class="row"><button class="btn small ghost" data-act="fsummail"' + (FSUM.busy ? ' disabled' : '') + '>Прислать на почту</button></div>' : (FSUM.err ? '<p>' + U.esc(FSUM.err) + '</p>' : '<p class="hint">Что ребёнок сделал и чего не сделал на эту минуту: уроки, баллы, ошибки, чтение, «Не понимаю». Каждый вечер около 20:30 такая же сводка приходит на ' + U.esc(S.fam.email || 'почту') + (S.fam.sumOff ? ' (сейчас отключено в «Настройках»)' : '') + '.</p>');
+  var sync = S.fam.snapAt ? '<p class="hint">Прогресс детей обновлён в ' + new Date(S.fam.snapAt).toTimeString().slice(0, 5) + '.</p>' : '';
+  return '<div class="card fsum"><h2>Сводка за сегодня</h2>' + body + '<div class="row"><button class="btn small" data-act="fsum"' + (FSUM.busy ? ' disabled' : '') + '>' + (FSUM.busy ? 'Собираем…' : r ? 'Обновить' : 'Сводка сейчас') + '</button></div>' + sync + '</div>'; }
+function famSumGet(mail){ if (FSUM.busy) return; FSUM.busy = true; FSUM.err = ''; render();
+  var pre = []; try { pre.push(Promise.resolve(flush()).catch(function(){})); } catch (e) {} pre.push(famSnapPush());
+  Promise.all(pre).then(function(){ return famApi({ fam: 'sum', fid: S.fam.fid, token: S.fam.token, mail: mail ? 1 : 0 }); }).then(function(j){ FSUM.busy = false;
+    if (!j || !j.ok) { FSUM.err = j && j.off ? 'Доступ приостановлен.' : 'Не получилось собрать сводку. Проверьте интернет и попробуйте ещё раз.'; render(); return; }
+    FSUM.res = j; render(); if (mail) alertMsg(j.mailed ? 'Сводка отправлена на ' + (S.fam.email || 'почту') : 'Письмо не ушло: ' + (j.mailErr || 'ошибка почты') + '. Сводка — на экране', 6000);
+  }).catch(function(){ FSUM.busy = false; FSUM.err = 'Нет связи с сервером. Попробуйте ещё раз.'; render(); }); }
+function famSumSet(on){ famApi({ fam: 'sumset', fid: S.fam.fid, token: S.fam.token, on: on ? 1 : 0 }).then(function(j){ if (j && j.ok) { S.fam.sumOff = !on; save(); render(); alertMsg(on ? 'Вечерняя сводка включена' : 'Вечерняя сводка отключена'); } else alertMsg('Не получилось. Попробуйте ещё раз'); }).catch(function(){ alertMsg('Нет связи. Попробуйте позже'); }); }
 
 /* ===== Глеб читает сам (решение папы 22.11) =====
    1) Задание сначала читает вслух сам: айпад слушает и подсвечивает слова. Запнулся — озвучиваем только трудное слово.
@@ -9775,6 +9838,7 @@ function vPrizes(){
 function vParent(){
   const tabs = [['report', 'Отчёт'], ['portrait', 'Портрет'], ['shop', 'Призы'], ['set', 'Настройки']];
   let body = '';
+  if (FAM) famParentPull();
   if (cur.parentTab === 'report') body = vReport(cur.parentKid);
   else if (cur.parentTab === 'portrait') body = `<div class="row">${kidIds().map(k => `<button class="chip ${cur.parentKid === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}</button>`).join('')}</div>` + (cur.parentKid && KIDS[cur.parentKid] ? vPortrait(cur.parentKid) : '');
   else if (cur.parentTab === 'shop') { const pk = cur.parentKid, sh = S.kids[pk].shop || [], wait = sh.filter(x => x.price == null).length;
@@ -9784,7 +9848,7 @@ function vParent(){
     ${sh.length ? '<button class="btn small" data-act="saveshop">Сохранить цены</button>' : ''}</div>`; }
   else body = vSettings();
   return `<main class="wrap"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span>Родителям</span></header>
-  <nav class="tabs">${tabs.map(([k, t]) => `<button class="tab ${cur.parentTab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${t}</button>`).join('')}</nav>${cur.parentTab === 'report' || cur.parentTab === 'set' ? testCard() : ''}${body}</main>`;
+  <nav class="tabs">${tabs.map(([k, t]) => `<button class="tab ${cur.parentTab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${t}</button>`).join('')}</nav>${FAM && cur.parentTab === 'report' ? famSumCard() : ''}${cur.parentTab === 'report' || cur.parentTab === 'set' ? testCard() : ''}${body}</main>`;
 }
 function vReport(kid){
   const K = S.kids[kid], d = KIDS[kid];
@@ -9818,6 +9882,7 @@ function vSettings(){
 /* ===== События ===== */
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act;
+  if (FAM && !cur.kid && ['xtadd', 'saveshop', 'delshop'].includes(act)) { const tk = act === 'xtadd' ? b.dataset.k : cur.parentKid; setTimeout(() => famSnapTouch(tk), 0); }
   const kid = cur.kid; const D = kid && dayRec(kid, cur.ds); const L = D && cur.subj && D.les[cur.subj];
   switch (act) {
     case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; snapCheck(cur.kid); ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;
@@ -9918,6 +9983,7 @@ document.addEventListener('submit', e => {
   const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const k = f.dataset.form;
   const val = id => (document.getElementById(id) || {}).value || '';
   if (FAM && famForm(k, f, val)) return;
+  if (FAM && !cur.kid && (k === 'hw' || k === 'coins')) { const tk = cur.parentKid; setTimeout(() => famSnapTouch(tk), 0); }
   if (k === 'setup') { const p = val('pp'), y = val('py'), a = val('pa'); if (![p, y, a].every(x => /^\d{4}$/.test(x))) return alertMsg('Нужно по четыре цифры'); if (new Set([p, y, a]).size < 3) return alertMsg('Коды папы, Глеба и Кати должны быть разными'); S.parentPin = hashPin(p); S.kids.yarik.pin = hashPin(y); S.kids.anya.pin = hashPin(a); save(); go('login'); }
   { const F = ALWAYS.filter(x => k.indexOf(x.id) === 0)[0]; if (F && F.form) return F.form(k, f); }
   if (k === 'num') answer(val('numin'));

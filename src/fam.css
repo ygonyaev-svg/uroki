@@ -49,3 +49,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 .fkcols{ display:flex; flex-wrap:wrap; gap:10px; }
 .fkcol{ width:38px; height:38px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1px #E6DCC3; cursor:pointer; padding:0; }
 .fkcol.on{ box-shadow:0 0 0 3px #2D4A32; }
+/* Сводка за сегодня (отчёт родителя) */
+.fsum h3{margin:14px 0 4px;color:var(--fam-green,#2D4A32)}
+.fsum .fsumln{margin:0 0 6px;line-height:1.45}
+.fsum .row{margin-top:10px}

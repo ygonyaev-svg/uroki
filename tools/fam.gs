@@ -12,7 +12,7 @@ function famInvSh(){ var ss = SpreadsheetApp.openById(FAM_SID), sh = ss.getSheet
 function famLg(o){ var r = {}; ['pt', 'en', 'fr', 'de', 'es'].forEach(function(k){ if (o && o[k] != null && o[k] !== '') r[k] = famN(o[k]); }); return r; }
 function famKids(s){ try { return JSON.parse(s || '[]'); } catch (e) { return []; } }
 function famAuth(d){ var R = famRows(), i = famFind(R.v, 0, d.fid); if (i < 0 || String(R.v[i][9]) !== String(d.token)) return null; return { R: R, i: i, row: R.v[i] }; }
-function famResp(row){ return { ok: true, fid: String(row[0]), token: String(row[9]), email: String(row[2]), name: String(row[3]), kids: famKids(row[6]), ppin: row[7] === '' ? null : String(row[7]), off: row[8] === 'отключена' }; }
+function famResp(row){ return { ok: true, fid: String(row[0]), token: String(row[9]), email: String(row[2]), name: String(row[3]), kids: famKids(row[6]), ppin: row[7] === '' ? null : String(row[7]), off: row[8] === 'отключена', sumOff: row[12] === 'нет' }; }
 function famRoute(d){
   var lock = LockService.getScriptLock(); lock.waitLock(20000);
   try { return famRoute_(d); } catch (e) { return { ok: false, msg: 'Ошибка сервера: ' + e.message }; } finally { lock.releaseLock(); }
@@ -58,6 +58,115 @@ function famRoute_(d){
     if (rows.length) { var es = famSh('События'); es.getRange(es.getLastRow() + 1, 1, rows.length, 6).setValues(rows); a.R.sh.getRange(a.i + 1, 12).setValue((+a.row[11] || 0) + rows.length); }
     a.R.sh.getRange(a.i + 1, 11).setValue(now); return { ok: true };
   }
+  if (d.fam === 'snap') return famSnapSave(a, d, now);
+  if (d.fam === 'snapget') return famSnapGet(a, d);
+  if (d.fam === 'sum') { var su = famSum(a.row, now); if (d.mail) { var sr = famSumMail(a.row, su, 'по кнопке'); su.mailed = sr.ok; if (!sr.ok) su.mailErr = sr.msg; } return su; }
+  if (d.fam === 'sumset') { famSumCol(a.R.sh); a.R.sh.getRange(a.i + 1, 13).setValue(d.on ? '' : 'нет'); return { ok: true, on: !!d.on }; }
   if (d.fam === 'fb') { famSh('Отзывы').appendRow([now, a.row[0], a.row[2], String(d.text || '').slice(0, 2000)]); return { ok: true }; }
   return { ok: false, msg: 'Неизвестная команда' };
+}
+
+/* ===== Сводка для родителей и синхронизация прогресса (22.11.2026) =====
+   Лист «Снимки»: семья | ребёнок (id) | t (мс) | обновлено | день (JSON: план уроков, баллы сегодня) | частей | части снимка по 45000 знаков.
+   Снимок — прогресс ребёнка с его устройства; родитель видит его на своём телефоне. Хранится самый новый (по t).
+   Вечерняя сводка: famEvening по расписанию 20:30 и 21:30 (Лиссабон), повтор только тем, кому письмо ещё не ушло. Журнал — лист «Сводки».
+   Установить расписание один раз: запустить famSumSetup в редакторе. */
+var FAM_TZ = 'Europe/Lisbon', FAM_PART = 45000;
+function famSnapSh(){ var ss = SpreadsheetApp.openById(FAM_SID), sh = ss.getSheetByName('Снимки'); if (!sh) { sh = ss.insertSheet('Снимки'); sh.appendRow(['Семья', 'Ребёнок', 't', 'Обновлено', 'День', 'Частей', 'Снимок']); } return sh; }
+function famSumCol(sh){ if (!sh.getRange(1, 13).getValue()) sh.getRange(1, 13).setValue('Сводка'); }
+function famSnapRows(fid){ var sh = famSnapSh(), n = sh.getLastRow(); if (n < 2) return { sh: sh, rows: [] };
+  var v = sh.getRange(2, 1, n - 1, 6).getValues(), out = []; for (var i = 0; i < v.length; i++) if (String(v[i][0]) === fid) out.push({ r: i + 2, kid: String(v[i][1]), t: +v[i][2] || 0, day: v[i][4], n: +v[i][5] || 0 }); return { sh: sh, rows: out }; }
+function famSnapSave(a, d, now){
+  var fid = String(a.row[0]), kid = String(d.kid || '').slice(0, 30), t = +d.t || 0, st = String(d.state || '');
+  if (!kid || !t || !st || st.length > 3000000) return { ok: false, msg: 'Пустой снимок' };
+  var S = famSnapRows(fid), x = S.rows.filter(function(r){ return r.kid === kid; })[0];
+  var day = d.day ? JSON.stringify(d.day).slice(0, 20000) : '';
+  if (x && x.t >= t) { if (day) S.sh.getRange(x.r, 5).setValue(day); return { ok: true, old: true, t: x.t }; }
+  var parts = []; for (var p = 0; p < st.length; p += FAM_PART) parts.push(st.slice(p, p + FAM_PART));
+  var row = [fid, kid, t, now, day, parts.length].concat(parts), r = x ? x.r : S.sh.getLastRow() + 1;
+  if (x && x.n > parts.length) S.sh.getRange(r, 7 + parts.length, 1, x.n - parts.length).clearContent();
+  S.sh.getRange(r, 1, 1, row.length).setValues([row]);
+  return { ok: true, t: t };
+}
+function famSnapGet(a, d){
+  var fid = String(a.row[0]), want = d.kids && d.kids.length ? d.kids.map(String) : null, have = d.have || {}, S = famSnapRows(fid), out = [];
+  S.rows.forEach(function(x){ if (want && want.indexOf(x.kid) < 0) return; if (have[x.kid] && +have[x.kid] >= x.t) { out.push({ kid: x.kid, t: x.t }); return; }
+    var st = x.n ? S.sh.getRange(x.r, 7, 1, x.n).getValues()[0].join('') : ''; out.push({ kid: x.kid, t: x.t, state: st }); });
+  return { ok: true, snaps: out };
+}
+function famDayStr(dt){ return Utilities.formatDate(dt, FAM_TZ, 'yyyy-MM-dd'); }
+/* События семьи за день (с конца листа, последние 30000 строк) */
+function famEvDay(fid, day){
+  var sh = famSh('События'), n = sh.getLastRow(); if (n < 2) return [];
+  var from = Math.max(2, n - 30000 + 1), v = sh.getRange(from, 1, n - from + 1, 6).getValues(), out = [];
+  for (var i = 0; i < v.length; i++) { if (String(v[i][1]) !== fid) continue; var t = v[i][0] instanceof Date ? v[i][0] : new Date(v[i][0]); if (isNaN(t) || famDayStr(t) !== day) continue;
+    var x = {}; try { x = JSON.parse(v[i][5] || '{}'); } catch (e) {} x.t = t; x.kid = String(v[i][3]); x.type = String(v[i][4]); out.push(x); }
+  return out;
+}
+var FAM_MON = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+function famDayHuman(day){ var p = day.split('-'); return +p[2] + ' ' + FAM_MON[+p[1] - 1]; }
+function famPl(n, a, b, c){ n = Math.abs(n) % 100; var m = n % 10; return n > 10 && n < 20 ? c : m === 1 ? a : m >= 2 && m <= 4 ? b : c; }
+function famClean(s, n){ s = String(s == null ? '' : s).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/[☀-➿\uD83C-􏰀-\uDFFF️‍]/g, '').replace(/\s+/g, ' ').trim(); return n && s.length > n ? s.slice(0, n - 1) + '…' : s; }
+function famUniq(a){ var o = []; a.forEach(function(x){ if (x && o.indexOf(x) < 0) o.push(x); }); return o; }
+/* Сводка за сегодня по всем детям семьи: { ok, day, at, kids: [{ name, lines: [] }], text } */
+function famSum(row, now){
+  var fid = String(row[0]), day = famDayStr(now), kids = famKids(row[6]), E = famEvDay(fid, day), SN = famSnapRows(fid).rows;
+  var res = { ok: true, day: day, dayH: famDayHuman(day), at: Utilities.formatDate(now, FAM_TZ, 'HH:mm'), kids: [] };
+  kids.forEach(function(k){
+    var f = k.sex === 'f', V = function(m, w){ return f ? w : m; }, e = E.filter(function(x){ return x.kid === k.name; }), L = [];
+    var sn = SN.filter(function(x){ return x.kid === String(k.id); })[0], di = null; try { di = sn && sn.day ? JSON.parse(sn.day) : null; } catch (x) {}
+    var today = di && di.d === day ? di : null, plan = (di && di.plan) || [];
+    var fin = e.filter(function(x){ return x.type === 'урок завершён'; });
+    if (!e.length && !(today && today.plan.some(function(p){ return p.st; }))) {
+      L.push('Сегодня не ' + V('занимался', 'занималась') + '.' + (plan.length ? ' Уроков в плане на день: ' + plan.length + '.' : ''));
+      if (di && di.coins != null) L.push('Баллов на счету: ' + di.coins + '.');
+      res.kids.push({ name: k.name, lines: L }); return; }
+    if (today && plan.length) {
+      var dn = plan.filter(function(p){ return p.st === 'done'; }), go = plan.filter(function(p){ return p.st === 'go'; }), no = plan.filter(function(p){ return !p.st; });
+      L.push('Уроки: сделано ' + dn.length + ' из ' + plan.length + (dn.length ? ' (' + dn.map(function(p){ return famClean(p.n) + (p.g ? ', оценка ' + p.g : ''); }).join('; ') + ')' : '') + '.');
+      if (go.length) L.push('Начаты, но не закончены: ' + go.map(function(p){ return famClean(p.n); }).join(', ') + '.');
+      L.push(no.length ? 'Не сделано: ' + no.map(function(p){ return famClean(p.n); }).join(', ') + '.' : (go.length ? '' : 'Все уроки дня сделаны.'));
+    } else if (fin.length) L.push('Уроков сделано: ' + fin.length + ' (' + fin.map(function(x){ return famClean(x.subj) + (x.grade ? ', оценка ' + x.grade : ''); }).join('; ') + ').');
+    else L.push('Уроки сегодня ещё не ' + V('закончил', 'закончила') + '.');
+    if (today) L.push('Баллы: +' + (today.pts || 0) + ' за сегодня, всего на счету ' + (today.coins || 0) + '.' + (today.secs ? ' В уроках ' + Math.max(1, Math.round(today.secs / 60)) + ' мин.' : ''));
+    var ans = e.filter(function(x){ return x.type === 'ответ' || x.type === 'загадка' || x.type === 'задача на смекалку' || x.type === 'головоломка'; }), bad = ans.filter(function(x){ return x.ok === 'ошибка'; });
+    if (ans.length) { L.push('Ответов: ' + ans.length + ', ошибок: ' + bad.length + '.');
+      bad.slice(-4).forEach(function(x){ L.push('— ' + famClean(x.subj, 30) + ': ' + famClean(x.q, 90) + (x.ans ? ' — ' + V('ответил', 'ответила') + ' «' + famClean(x.ans, 40) + '»' : '') + (x.right ? ', верно «' + famClean(x.right, 40) + '»' : '') + '.'); }); }
+    var rd = e.filter(function(x){ return x.type === 'чтение вслух'; }), heard = rd.filter(function(x){ return x.wpm && x.acc !== '' && x.acc != null && !/^темп по времени/.test(String(x.errs || '')); });
+    if (rd.length) L.push('Чтение вслух: ' + famUniq(rd.map(function(x){ return '«' + famClean(x.unit, 60) + '»'; })).join(', ') + '.' + (heard.length ? ' Темп ' + heard.map(function(x){ return x.wpm; }).join(', ') + ' ' + famPl(+heard[heard.length - 1].wpm, 'слово', 'слова', 'слов') + ' в минуту, точность ' + heard[heard.length - 1].acc + '.' : ''));
+    var sil = e.filter(function(x){ return x.type === 'чтение про себя'; }); if (sil.length) L.push('Чтение про себя: ' + sil.length + ' ' + famPl(sil.length, 'текст', 'текста', 'текстов') + '.');
+    var nu = e.filter(function(x){ return x.type === 'не понимаю'; }); L.push(nu.length ? '«Не понимаю»: ' + nu.length + ' ' + famPl(nu.length, 'раз', 'раза', 'раз') + ' (' + famUniq(nu.map(function(x){ return famClean(x.subj); })).join(', ') + ').' : '«Не понимаю» не ' + V('нажимал', 'нажимала') + '.');
+    var ex = { 'шахматы': 'шахматы', 'загадка': 'загадки', 'головоломка': 'головоломки', 'задача на смекалку': 'задачи на смекалку', 'программирование': 'программирование' }, xs = famUniq(e.filter(function(x){ return ex[x.type]; }).map(function(x){ return ex[x.type]; }));
+    if (xs.length) L.push('Ещё ' + V('занимался', 'занималась') + ': ' + xs.join(', ') + '.');
+    res.kids.push({ name: k.name, lines: L.filter(Boolean) });
+  });
+  res.text = 'Сводка за ' + res.dayH + ', на ' + res.at + '\n\n' + res.kids.map(function(k){ return k.name + '\n' + k.lines.join('\n'); }).join('\n\n');
+  return res;
+}
+function famSumLog(){ var ss = SpreadsheetApp.openById(FAM_SID), sh = ss.getSheetByName('Сводки'); if (!sh) { sh = ss.insertSheet('Сводки'); sh.appendRow(['Время', 'День', 'Семья', 'Email', 'Как', 'Итог']); } return sh; }
+function famSumMail(row, su, how){
+  var em = String(row[2] || ''); if (!em) return { ok: false, msg: 'Нет email' };
+  var names = su.kids.map(function(k){ return k.name; }).join(' и '), esc = function(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); };
+  var foot = 'Подробнее — в разделе «Для родителей»: https://slovohod.com\nВечерние письма можно отключить там же, в «Настройках».';
+  var html = '<div style="font-family:Georgia,serif;color:#1f2a22;max-width:560px"><p style="color:#2D4A32;font-size:20px;margin:0 0 4px"><b>Словоход</b></p><p style="color:#6b7280;margin:0 0 16px">Сводка за ' + su.dayH + ', на ' + su.at + '</p>' +
+    su.kids.map(function(k){ return '<h3 style="color:#2D4A32;margin:16px 0 6px">' + esc(k.name) + '</h3>' + k.lines.map(function(l){ return '<p style="margin:0 0 6px;line-height:1.45">' + esc(l) + '</p>'; }).join(''); }).join('') +
+    '<p style="color:#6b7280;font-size:13px;margin-top:20px;border-top:1px solid #e5e7eb;padding-top:10px">Подробнее — в разделе «Для родителей»: <a href="https://slovohod.com" style="color:#C28A2C">slovohod.com</a>. Вечерние письма можно отключить там же, в «Настройках».</p></div>';
+  try { MailApp.sendEmail({ to: em, subject: 'Словоход: ' + names + ' — сводка за ' + su.dayH, body: su.text + '\n\n' + foot, htmlBody: html, name: 'Словоход' });
+    famSumLog().appendRow([new Date(), su.day, String(row[0]), em, how, 'отправлено']); return { ok: true }; }
+  catch (e) { famSumLog().appendRow([new Date(), su.day, String(row[0]), em, how, 'ошибка: ' + e.message]); return { ok: false, msg: e.message }; }
+}
+/* Вечерняя рассылка: всем активным семьям с детьми, кроме отключивших; повторный запуск шлёт только тем, кому сегодня ещё не ушло */
+function famEvening(){
+  var lock = LockService.getScriptLock(); lock.waitLock(30000);
+  try { var now = new Date(), day = famDayStr(now), R = famRows(), lg = famSumLog().getDataRange().getValues(), sent = {};
+    lg.forEach(function(r){ if (String(r[1]) === day && r[4] === 'вечер' && r[5] === 'отправлено') sent[String(r[2])] = 1; });
+    for (var i = 1; i < R.v.length; i++) { var row = R.v[i]; if (!row[0] || !row[2] || row[8] === 'отключена' || row[12] === 'нет' || sent[String(row[0])] || !famKids(row[6]).length) continue;
+      try { famSumMail(row, famSum(row, now), 'вечер'); } catch (e) { famSumLog().appendRow([new Date(), day, String(row[0]), row[2], 'вечер', 'ошибка: ' + e.message]); } }
+  } finally { lock.releaseLock(); }
+}
+function famSumSetup(){
+  ScriptApp.getProjectTriggers().forEach(function(t){ if (t.getHandlerFunction() === 'famEvening') ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('famEvening').timeBased().atHour(20).nearMinute(30).everyDays(1).inTimezone(FAM_TZ).create();
+  ScriptApp.newTrigger('famEvening').timeBased().atHour(21).nearMinute(30).everyDays(1).inTimezone(FAM_TZ).create();
+  famSumCol(famRows().sh); famSnapSh(); famSumLog();
 }

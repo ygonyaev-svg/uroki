@@ -1028,7 +1028,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v9dd3ee5f */
+<script>/* v32317460 */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -7680,11 +7680,11 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-hear
    Пока сверка не прошла, свой снимок не отправляем, чтобы пустое устройство не затёрло настоящий прогресс. */
 const SNAP_OK = {}, SNAP_PUSHED = {}; let SNAP_T = null, SNAP_BUSY = false;
 function snapWork(K){ return Object.keys(K.days || {}).some(d => Object.keys((K.days[d] || {}).les || {}).length); }
-function snapMark(){ if (TEST || FAM || !cur.kid || SNAP_BUSY) return; const K = S.kids[cur.kid]; if (!K) return; if (!SNAP_OK[cur.kid]) { if (snapWork(K) && K.modT) K.dirtyT = Date.now(); return; } K.modT = Date.now(); clearTimeout(SNAP_T); SNAP_T = setTimeout(snapPush, 45000); }
-function snapPush(){ if (TEST || FAM || !S.cfg.sync || !navigator.onLine) return; clearTimeout(SNAP_T);
+function snapMark(){ if (TEST || !cur.kid || SNAP_BUSY) return; if (FAM) return famSnapMark(cur.kid); const K = S.kids[cur.kid]; if (!K) return; if (!SNAP_OK[cur.kid]) { if (snapWork(K) && K.modT) K.dirtyT = Date.now(); return; } K.modT = Date.now(); clearTimeout(SNAP_T); SNAP_T = setTimeout(snapPush, 45000); }
+function snapPush(){ if (FAM) return famSnapPush(); if (TEST || !S.cfg.sync || !navigator.onLine) return; clearTimeout(SNAP_T);
   Object.keys(SNAP_OK).forEach(kid => { const K = S.kids[kid]; if (!K || !K.modT || SNAP_PUSHED[kid] === K.modT) return; const t = K.modT;
     try { fetch(S.cfg.sync, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ snap: 1, kid, t, state: JSON.stringify(K) }) }).then(() => { SNAP_PUSHED[kid] = t; }).catch(() => {}); } catch (e) {} }); }
-async function snapCheck(kid){ if (TEST || FAM || !kid || SNAP_OK[kid] || !S.cfg.sync || !navigator.onLine) return;
+async function snapCheck(kid){ if (FAM) return famSnapCheck(kid); if (TEST || !kid || SNAP_OK[kid] || !S.cfg.sync || !navigator.onLine) return;
   try { const r = await fetch(S.cfg.sync + (S.cfg.sync.includes('?') ? '&' : '?') + 'action=snap&kid=' + encodeURIComponent(kid)); const j = await r.json(); if (!j || !j.ok) return;
     const K = S.kids[kid]; if (j.t && j.state && j.t > Math.max(K.modT || 0, K.dirtyT || 0)) { const R = JSON.parse(j.state); if (R && typeof R === 'object' && R.days) { SNAP_BUSY = true; S.kids[kid] = R; if (typeof posFix === 'function') posFix(kid); save(); SNAP_BUSY = false; SNAP_PUSHED[kid] = R.modT; if (cur.kid === kid) { alertMsg('Прогресс загружен ✓'); if (cur.view === 'prizes' && R.prizesSet) go('home'); else render(); } } }
     SNAP_OK[kid] = true; if (!S.kids[kid].modT) { S.kids[kid].modT = Date.now(); } snapPush();
@@ -9042,6 +9042,7 @@ function vPrizes(){
 function vParent(){
   const tabs = [['report', 'Отчёт'], ['portrait', 'Портрет'], ['shop', 'Призы'], ['set', 'Настройки']];
   let body = '';
+  if (FAM) famParentPull();
   if (cur.parentTab === 'report') body = vReport(cur.parentKid);
   else if (cur.parentTab === 'portrait') body = `<div class="row">${kidIds().map(k => `<button class="chip ${cur.parentKid === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}</button>`).join('')}</div>` + (cur.parentKid && KIDS[cur.parentKid] ? vPortrait(cur.parentKid) : '');
   else if (cur.parentTab === 'shop') { const pk = cur.parentKid, sh = S.kids[pk].shop || [], wait = sh.filter(x => x.price == null).length;
@@ -9051,7 +9052,7 @@ function vParent(){
     ${sh.length ? '<button class="btn small" data-act="saveshop">Сохранить цены</button>' : ''}</div>`; }
   else body = vSettings();
   return `<main class="wrap"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span>Родителям</span></header>
-  <nav class="tabs">${tabs.map(([k, t]) => `<button class="tab ${cur.parentTab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${t}</button>`).join('')}</nav>${cur.parentTab === 'report' || cur.parentTab === 'set' ? testCard() : ''}${body}</main>`;
+  <nav class="tabs">${tabs.map(([k, t]) => `<button class="tab ${cur.parentTab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${t}</button>`).join('')}</nav>${FAM && cur.parentTab === 'report' ? famSumCard() : ''}${cur.parentTab === 'report' || cur.parentTab === 'set' ? testCard() : ''}${body}</main>`;
 }
 function vReport(kid){
   const K = S.kids[kid], d = KIDS[kid];
@@ -9085,6 +9086,7 @@ function vSettings(){
 /* ===== События ===== */
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act;
+  if (FAM && !cur.kid && ['xtadd', 'saveshop', 'delshop'].includes(act)) { const tk = act === 'xtadd' ? b.dataset.k : cur.parentKid; setTimeout(() => famSnapTouch(tk), 0); }
   const kid = cur.kid; const D = kid && dayRec(kid, cur.ds); const L = D && cur.subj && D.les[cur.subj];
   switch (act) {
     case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; snapCheck(cur.kid); ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;
@@ -9185,6 +9187,7 @@ document.addEventListener('submit', e => {
   const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const k = f.dataset.form;
   const val = id => (document.getElementById(id) || {}).value || '';
   if (FAM && famForm(k, f, val)) return;
+  if (FAM && !cur.kid && (k === 'hw' || k === 'coins')) { const tk = cur.parentKid; setTimeout(() => famSnapTouch(tk), 0); }
   if (k === 'setup') { const p = val('pp'), y = val('py'), a = val('pa'); if (![p, y, a].every(x => /^\d{4}$/.test(x))) return alertMsg('Нужно по четыре цифры'); if (new Set([p, y, a]).size < 3) return alertMsg('Коды Юры, Ярика и Ани должны быть разными'); S.parentPin = hashPin(p); S.kids.yarik.pin = hashPin(y); S.kids.anya.pin = hashPin(a); save(); go('login'); }
   { const F = ALWAYS.filter(x => k.indexOf(x.id) === 0)[0]; if (F && F.form) return F.form(k, f); }
   if (k === 'num') answer(val('numin'));
