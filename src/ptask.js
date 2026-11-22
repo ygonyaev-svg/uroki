@@ -87,13 +87,19 @@ function ptBody(kid, t){ const P = cur.ptp || (cur.ptp = {}), say0 = `<button cl
 function ptForm(){ if (!cur.ptf) cur.ptf = { kind: 'chore', title: '', text: '', q: '', a: '', w1: '', w2: '', w3: '', pts: 10 }; return cur.ptf; }
 function ptFormRead(){ const F = ptForm(), g = id => { const el = document.getElementById(id); return el ? el.value : null; };
   ['title', 'text', 'q', 'a', 'w1', 'w2', 'w3'].forEach(k => { const v = g('ptf_' + k); if (v != null) F[k] = v; }); const p = g('ptf_pts'); if (p != null && p !== '') F.pts = Math.max(1, Math.min(200, parseInt(p) || F.pts)); }
-function vPTParent(){ const pk = cur.parentKid, F = ptForm(), name = KIDS[pk].name;
+/* Экран родителя собирается из частей: ptWaitCard (ждут проверки), ptFormCard (новое задание), ptListCard (активные и сделанные) — их можно вставлять и по отдельности */
+function vPTParent(){ const pk = cur.parentKid;
   const kidSw = `<div class="row">${kidIds().map(k => `<button class="chip ${pk === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}${ptOf(k, ['wait']).length ? ' •' : ''}</button>`).join('')}</div>`;
-  const W = ptOf(pk, ['wait']), N = ptOf(pk, ['new']), D = ptOf(pk, ['ok', 'miss']).sort((a, b) => (b.u || 0) - (a.u || 0)).slice(0, 8);
-  const line = (t, btns) => `<div class="ptrow"><div><b>${U.esc(t.title || PT_KINDS[t.kind][0])}</b><br><span class="hint">${PT_KINDS[t.kind][0]} · ${agree(t.pts + ' баллов')}${t.st === 'ok' ? ' · засчитано +' + (t.got == null ? t.pts : t.got) : t.st === 'miss' ? ' · ответ неверный, без баллов' : ''}</span></div><div class="ptbtns">${btns}</div></div>`;
-  const wait = W.length ? `<div class="card ptwait"><h2>Ждут проверки: ${W.length}</h2><p class="hint">${U.esc(name)} ${GIRL(pk) ? 'отметила, что сделала' : 'отметил, что сделал'}. Проверьте и засчитайте — баллы придут в копилку.</p>${W.map(t => line(t, `<button class="btn small" data-act="ptok" data-id="${t.id}">Засчитать</button><button class="btn small ghost" data-act="ptback" data-id="${t.id}">Вернуть</button>`)).join('')}</div>` : '';
+  return kidSw + ptWaitCard(pk) + ptFormCard(pk) + ptListCard(pk); }
+function ptLine(t, btns){ return `<div class="ptrow"><div><b>${U.esc(t.title || PT_KINDS[t.kind][0])}</b><br><span class="hint">${PT_KINDS[t.kind][0]} · ${agree(t.pts + ' баллов')}${t.st === 'ok' ? ' · засчитано +' + (t.got == null ? t.pts : t.got) : t.st === 'miss' ? ' · ответ неверный, без баллов' : ''}</span></div><div class="ptbtns">${btns}</div></div>`; }
+function ptWaitCard(pk){ const W = ptOf(pk, ['wait']), name = KIDS[pk].name, line = ptLine;
+  return W.length ? `<div class="card ptwait"><h2>Ждут проверки: ${W.length}</h2><p class="hint">${U.esc(name)} ${GIRL(pk) ? 'отметила, что сделала' : 'отметил, что сделал'}. Проверьте и засчитайте — баллы придут в копилку.</p>${W.map(t => line(t, `<button class="btn small" data-act="ptok" data-id="${t.id}">Засчитать</button><button class="btn small ghost" data-act="ptback" data-id="${t.id}">Вернуть</button>`)).join('')}</div>` : ''; }
+function ptListCard(pk){ const line = ptLine, N = ptOf(pk, ['new']), D = ptOf(pk, ['ok', 'miss']).sort((a, b) => (b.u || 0) - (a.u || 0)).slice(0, 8);
   const act = `<div class="card"><h2>Активные задания</h2>${N.length ? N.map(t => line(t, `${t.kind === 'chore' ? `<button class="btn small ghost" data-act="ptok" data-id="${t.id}">Засчитать</button>` : ''}<button class="link" data-act="ptdel" data-id="${t.id}">Убрать</button>`)).join('') : `<p class="hint">Сейчас у ребёнка нет заданий — кнопка «Задание от родителей» у него неактивна.</p>`}</div>`;
   const done = D.length ? `<div class="card"><h2>Сделано недавно</h2>${D.map(t => line(t, '')).join('')}</div>` : '';
+  const fam = FAM ? `<p class="hint">Задания хранятся на сервере: можно давать их со своего телефона — у ребёнка они появятся, когда его устройство подключится к интернету (обычно за несколько минут).</p>` : '';
+  return act + done + fam; }
+function ptFormCard(pk){ const F = ptForm(), name = KIDS[pk].name;
   const k = F.kind, inp = (id, label, ph, max) => `<label>${label}<input id="ptf_${id}" value="${U.esc(F[id] || '')}" maxlength="${max || 120}" autocomplete="off" placeholder="${ph || ''}"></label>`;
   const ta = (id, label, ph, rows, max) => `<label>${label}<textarea id="ptf_${id}" rows="${rows}" maxlength="${max}" placeholder="${ph}">${U.esc(F[id] || '')}</textarea></label>`;
   const opts = `<p class="fkql">Варианты ответа${k === 'read' ? ' (если задали вопрос)' : ''} — ребёнок выбирает кнопкой, печатать ничего не нужно</p>${inp('a', 'Правильный ответ', '', 120)}${inp('w1', 'Неверный вариант', '', 120)}${inp('w2', 'Ещё неверный (можно пусто)', '', 120)}${inp('w3', 'Ещё неверный (можно пусто)', '', 120)}`;
@@ -105,8 +111,7 @@ function vPTParent(){ const pk = cur.parentKid, F = ptForm(), name = KIDS[pk].na
     <label>Или своё число<input id="ptf_pts" inputmode="numeric" maxlength="3" autocomplete="off" value="${PT_PTS.includes(+F.pts) ? '' : F.pts}"></label>
     <p class="hint">1 балл = 1 минута игры. Баллы за ваши задания идут в копилку сверх дневного лимита — сколько давать, решаете вы.${k === 'quiz' ? ' За ответ с первой попытки — все баллы, со второй — половина.' : ''}${k === 'chore' ? ' Баллы придут, когда вы нажмёте «Засчитать».' : ''}</p>
     <button class="btn big">Дать задание</button></form>`;
-  const fam = FAM ? `<p class="hint">Задания хранятся на сервере: можно давать их со своего телефона — у ребёнка они появятся, когда его устройство подключится к интернету (обычно за несколько минут).</p>` : '';
-  return kidSw + wait + form + act + done + fam; }
+  return form; }
 function ptSubmit(){ ptFormRead(); const F = ptForm(), pk = cur.parentKid, k = F.kind;
   const opts = [F.a, F.w1, F.w2, F.w3].map(x => String(x || '').trim()).filter(Boolean);
   if (k === 'chore' && !F.title.trim()) return alertMsg('Напишите, что нужно сделать');
