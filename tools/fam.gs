@@ -13,6 +13,20 @@ function famLg(o){ var r = {}; ['pt', 'en', 'fr', 'de', 'es'].forEach(function(k
 function famKids(s){ try { return JSON.parse(s || '[]'); } catch (e) { return []; } }
 function famAuth(d){ var R = famRows(), i = famFind(R.v, 0, d.fid); if (i < 0 || String(R.v[i][9]) !== String(d.token)) return null; return { R: R, i: i, row: R.v[i] }; }
 function famResp(row){ return { ok: true, fid: String(row[0]), token: String(row[9]), email: String(row[2]), name: String(row[3]), kids: famKids(row[6]), ppin: row[7] === '' ? null : String(row[7]), off: row[8] === 'отключена', sumOff: row[12] === 'нет' }; }
+/* ===== Задания от родителей (Словоход): лист «Задания» — id, fid, kid, json, статус, версия, обновлено.
+   Родитель с телефона создаёт и подтверждает, устройство ребёнка забирает и отмечает «Сделал». Побеждает запись с большей версией v. */
+function famPtSh(){ var ss = SpreadsheetApp.openById(FAM_SID), sh = ss.getSheetByName('Задания'); if (!sh) { sh = ss.insertSheet('Задания'); sh.appendRow(['id', 'fid', 'Ребёнок', 'Задание (json)', 'Статус', 'Версия', 'Обновлено']); } return sh; }
+function famPtClean(t){ var o = { id: String(t.id || '').slice(0, 40), kid: String(t.kid || '').slice(0, 30), kind: ['chore', 'quiz', 'read'].indexOf(t.kind) >= 0 ? t.kind : 'chore', title: String(t.title || '').slice(0, 120), text: String(t.text || '').slice(0, 6000), q: String(t.q || '').slice(0, 400),
+    opts: (t.opts || []).slice(0, 4).map(function(x){ return String(x).slice(0, 120); }), pts: Math.max(0, Math.min(200, Math.round(+t.pts || 0))), st: String(t.st || 'new').slice(0, 10), v: Math.max(0, Math.round(+t.v || 0)), res: String(t.res || '').slice(0, 200), note: String(t.note || '').slice(0, 300), t: t.t || '', by: String(t.by || '').slice(0, 10) };
+  return o; }
+function famPtList(fid){ var v = famPtSh().getDataRange().getValues(), out = [], old = Date.now() - 30 * 86400000;
+  for (var i = 1; i < v.length; i++) if (String(v[i][1]) === String(fid)) { var t; try { t = JSON.parse(v[i][3]); } catch (e) { continue; } if (t.st === 'del' || ((t.st === 'ok' || t.st === 'miss') && new Date(v[i][6]).getTime() < old)) continue; out.push(t); }
+  return out.slice(-100); }
+function famPt(a, d){ var sh = famPtSh(), v = sh.getDataRange().getValues(), now = new Date(), fid = String(a.row[0]);
+  (d.items || []).slice(0, 50).forEach(function(x){ var t = famPtClean(x); if (!t.id) return; var r = -1; for (var i = 1; i < v.length; i++) if (String(v[i][0]) === t.id && String(v[i][1]) === fid) { r = i; break; }
+    if (r < 0) { var row = [t.id, fid, t.kid, JSON.stringify(t), t.st, t.v, now]; sh.appendRow(row); v.push(row); }
+    else if (t.v > (+v[r][5] || 0)) { sh.getRange(r + 1, 3, 1, 5).setValues([[t.kid, JSON.stringify(t), t.st, t.v, now]]); v[r][3] = JSON.stringify(t); v[r][5] = t.v; v[r][6] = now; } });
+  return famPtList(fid); }
 function famRoute(d){
   var lock = LockService.getScriptLock(); lock.waitLock(20000);
   try { return famRoute_(d); } catch (e) { return { ok: false, msg: 'Ошибка сервера: ' + e.message }; } finally { lock.releaseLock(); }
@@ -47,7 +61,7 @@ function famRoute_(d){
   }
   a = famAuth(d); if (!a) return { ok: false, err: 'auth' };
   var off = a.row[8] === 'отключена';
-  if (d.fam === 'st') { a.R.sh.getRange(a.i + 1, 11).setValue(now); return { ok: true, off: off }; }
+  if (d.fam === 'st') { a.R.sh.getRange(a.i + 1, 11).setValue(now); var st = { ok: true, off: off }; if (d.pt) try { st.pt = famPtList(a.row[0]); } catch (e) {} return st; }
   if (off) return { ok: false, off: true };
   if (d.fam === 'kids') {
     var kids = (d.kids || []).slice(0, 5).map(function(k){ return { id: String(k.id).slice(0, 30), name: String(k.name).slice(0, 20), age: +k.age, sex: k.sex === 'f' || k.sex === 'm' ? k.sex : '', look: String(k.look || '').slice(0, 10), ints: (k.ints || []).slice(0, 15).map(String), hero: String(k.hero || '').slice(0, 80), books: String(k.books || '').slice(0, 200), done: String(k.done || '').slice(0, 300), rd: k.rd == null ? null : +k.rd, color: String(k.color || '').slice(0, 10), pin: k.pin ? String(k.pin) : null, rt: famN(k.rt), vw: famN(k.vw), wr: famN(k.wr), mt: famN(k.mt), at: famN(k.at), er: famN(k.er), dk: famN(k.dk), mo: famN(k.mo), lg: famLg(k.lg) }; });
@@ -62,6 +76,7 @@ function famRoute_(d){
   if (d.fam === 'snapget') return famSnapGet(a, d);
   if (d.fam === 'sum') { var su = famSum(a.row, now); if (d.mail) { var sr = famSumMail(a.row, su, 'по кнопке'); su.mailed = sr.ok; if (!sr.ok) su.mailErr = sr.msg; } return su; }
   if (d.fam === 'sumset') { famSumCol(a.R.sh); a.R.sh.getRange(a.i + 1, 13).setValue(d.on ? '' : 'нет'); return { ok: true, on: !!d.on }; }
+  if (d.fam === 'pt') return { ok: true, pt: famPt(a, d) };
   if (d.fam === 'fb') { famSh('Отзывы').appendRow([now, a.row[0], a.row[2], String(d.text || '').slice(0, 2000)]); return { ok: true }; }
   return { ok: false, msg: 'Неизвестная команда' };
 }
