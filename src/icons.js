@@ -144,17 +144,21 @@ function icon(name, cls){ var p = ICONS[name]; if (!p) return ''; return '<svg c
 function icoBuildRe(){ var ks = Object.keys(EMO_ICON).concat(Object.keys(ICO_ONLY)).sort(function(a, b){ return b.length - a.length; });
   return new RegExp('(' + ks.map(function(k){ return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')️?', 'g'); }
 var EMO_RE = icoBuildRe();
+/* Эмодзи без нашей иконки не показываем вовсе (★ ✓ ✕ шахматы и масти — обычные знаки, оставляем) */
+var EMO_LEFT = /\u200D|\uFE0F|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF]|[\u2600-\u27BF\u2B1B\u2B1C\u2B50\u2B55\u231A\u231B\u23E9-\u23FA]/g;
+var EMO_KEEP = '★☆✓✔✕✖✗✘☐☑☒♠♣♥♦♤♧♡♢♔♕♖♗♘♙♚♛♜♝♞♟☰';
+function emoStrip(s){ return String(s).replace(EMO_LEFT, function(c){ return EMO_KEEP.indexOf(c) >= 0 ? c : ''; }); }
 function icoSkip(el){ for (var n = el; n && n.nodeType === 1; n = n.parentNode) { var c = n.className; if (typeof c !== 'string') c = n.getAttribute && n.getAttribute('class') || '';
     var t = n.tagName; if (t === 'TEXTAREA' || t === 'INPUT' || t === 'SCRIPT' || t === 'STYLE' || t === 'OPTION' || t === 'svg' || t === 'SVG' || t === 'TITLE') return true;
     if (/(^| )(noico|ic|chboard|pc)( |$)/.test(c)) return true; if (n.id === 'app' || n.tagName === 'BODY') break; } return false; }
 function icoize(root){ if (!root || !document.createTreeWalker) return; var w = document.createTreeWalker(root, 4, null, false), list = [], n;
-  while ((n = w.nextNode())) { EMO_RE.lastIndex = 0; if (EMO_RE.test(n.nodeValue)) list.push(n); }
+  while ((n = w.nextNode())) { EMO_RE.lastIndex = 0; EMO_LEFT.lastIndex = 0; if (EMO_RE.test(n.nodeValue) || EMO_LEFT.test(n.nodeValue)) list.push(n); }
   for (var i = 0; i < list.length; i++) { n = list[i]; var par = n.parentNode; if (!par || icoSkip(par)) continue;
     var inIco = false; for (var q = par; q && q.nodeType === 1 && q.id !== 'app'; q = q.parentNode) if (q.classList && q.classList.contains('ico')) { inIco = true; break; }
     EMO_RE.lastIndex = 0; var s = n.nodeValue, html = '', last = 0, m, any = false;
     while ((m = EMO_RE.exec(s))) { var k = m[1], nm = EMO_ICON[k] || (inIco ? ICO_ONLY[k] : null); if (!nm) continue; any = true;
-      html += U.esc(s.slice(last, m.index)) + icon(nm, inIco ? 'big' : ''); last = m.index + m[0].length; }
-    if (!any) continue; html += U.esc(s.slice(last));
+      html += U.esc(emoStrip(s.slice(last, m.index))) + icon(nm, inIco ? 'big' : ''); last = m.index + m[0].length; }
+    if (!any) { var cl = emoStrip(s); if (cl !== s) n.nodeValue = cl; continue; } html += U.esc(emoStrip(s.slice(last)));
     var span = document.createElement('span'); span.className = 'icw'; span.innerHTML = html;
     var frag = document.createDocumentFragment(); while (span.firstChild) frag.appendChild(span.firstChild); par.replaceChild(frag, n); }
 }
@@ -165,7 +169,7 @@ function icoSvgText(root){ if (!root || !root.getElementsByTagName) return; var 
   for (i = 0; i < arr.length; i++) { var t = arr[i], s = t.textContent, names = [], m, rest;
     if (!s || t.getAttribute('data-ico')) continue; EMO_RE.lastIndex = 0;
     while ((m = EMO_RE.exec(s))) { var nm = EMO_ICON[m[1]]; if (!nm) { names = null; break; } names.push(nm); }
-    if (!names || !names.length) continue; EMO_RE.lastIndex = 0; rest = s.replace(EMO_RE, '').replace(/[\s‍️]/g, ''); if (rest) continue;
+    if (!names || !names.length) { var cl = emoStrip(s); if (cl !== s) t.textContent = cl; continue; } EMO_RE.lastIndex = 0; rest = emoStrip(s.replace(EMO_RE, '')).replace(/\s/g, ''); if (rest) { var cl2 = emoStrip(s); if (cl2 !== s) t.textContent = cl2; continue; }
     var fs = parseFloat(t.getAttribute('font-size')) || parseFloat((t.style && t.style.fontSize) || '') || 16, x = parseFloat(t.getAttribute('x')) || 0, y = parseFloat(t.getAttribute('y')) || 0;
     var w = fs * 1.1, tot = w * names.length, an = t.getAttribute('text-anchor') || '';
     var x0 = an === 'middle' ? x - tot / 2 : an === 'end' ? x - tot : x, y0 = y - fs * .92;
