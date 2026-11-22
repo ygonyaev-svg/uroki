@@ -847,7 +847,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* vc882cd36 */
+<script>/* vb12db7cc */
 var FAM = 1;
 const CH_IMG_LIST = ["bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac7", "bac8", "bac9", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bgt1", "bgt2", "bgt3", "bka3", "bkm1", "bkm2", "bkz1", "blg1", "blg2", "bmi1", "bmi2", "bmi3", "bnp7", "bsh1", "bsh3", "bsh4", "bvv1", "bvv2", "bvv3", "bzy1"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -8507,6 +8507,8 @@ const hashPin = p => String(U.h('uroki:' + p));
 /* ===== Синхронизация с Google Таблицей родителя ===== */
 function strip(h){ return String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); }
 function ev(kid, type, data){ const e = Object.assign({ t: new Date().toISOString(), kid: KIDS[kid].name, type }, data); if (!TEST) S.queue.push(e); S.log.push(e); if (S.log.length > 1500) S.log = S.log.slice(-1500); try { dripOn(kid, type, data || {}); } catch (x) {} if (typeof pfOn === 'function') pfOn(kid, e); save(); flushSoon(); }
+/* озвучка в уроке: одна запись на шаг (для динамики самостоятельного чтения) */
+function voiceEv(kid, L, what){ if (!L) return; const k = what + ':' + (L.phase || '') + ':' + (L.i || 0); L._vo = L._vo || {}; if (L._vo[k]) return; L._vo[k] = 1; ev(kid, 'озвучка', { subj: subjName(kid, cur.subj, cur.ds), unit: (unitById(kid, cur.subj, L.uid) || {}).t || '', text: what }); }
 /* «Капающий процент»: каждый верный ответ с первой попытки — где угодно в приложении — немного увеличивает накопленный капитал (счёт + копилка).
    +0,4% капитала за ответ (не меньше 0,2 балла); серия 5 верных подряд — ×1,5, серия 10 — ×2; ошибка обнуляет серию и ничего не даёт.
    Потолок за день: 3% капитала, но не меньше 10 баллов. Капает в копилку (в воскресенье +10% сверху). */
@@ -9473,12 +9475,12 @@ document.addEventListener('click', e => {
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
     case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); if (L.phase === 'theory' && L.helpN === 1) say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
     case 'dunnotask': { L.showTh = L.i; L.helpN = (L.helpN || 0) + 1; const t = lessonTasks(L, kid, cur.subj)[L.i], u = (t.uid && t.sj ? unitById(kid, t.sj, t.uid) : unitById(kid, cur.subj, L.uid)) || { t: '' }; ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, q: strip(t.q) }); save(); render(); if (!t.sp) say(strip(String(t.q)).replace(/_+/g, ' пропуск '), 'ru-RU'); break; }
-    case 'sayqtext': { const t = lessonTasks(L, kid, cur.subj)[L.i]; if (t) say(strip(String(t.q)).replace(/_+/g, ' пропуск '), 'ru-RU'); break; }
+    case 'sayqtext': { voiceEv(kid, L, 'задание'); const t = lessonTasks(L, kid, cur.subj)[L.i]; if (t) say(strip(String(t.q)).replace(/_+/g, ' пропуск '), 'ru-RU'); break; }
     case 'sayex': say(b.dataset.t, 'ru-RU'); break;
-    case 'saytheory': { const u = unitById(kid, cur.subj, L.uid); say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
+    case 'saytheory': { voiceEv(kid, L, 'объяснение'); const u = unitById(kid, cur.subj, L.uid); say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
     case 'topractice': L.phase = 'practice'; save(); render(); break;
     case 'choose': answer(b.dataset.v); break;
-    case 'sayq': { const T = lessonTasks(L, kid, cur.subj); const t = T[L.i]; say(t.sp, LCODE(kid, L.tr)); break; }
+    case 'sayq': { voiceEv(kid, L, 'задание (язык)'); const T = lessonTasks(L, kid, cur.subj); const t = T[L.i]; say(t.sp, LCODE(kid, L.tr)); break; }
     case 'next': nextTask(); break;
     case 'fb': { L.fb = L.fb || {}; L.fb[b.dataset.k] = isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v; const tx = document.getElementById('fbtext'); if (tx) L.fb.text = tx.value; save(); render(); break; }
     case 'sendfb': { const tx = document.getElementById('fbtext'); if (tx) L.fb.text = tx.value.trim(); finishLesson(); break; }
@@ -9511,7 +9513,7 @@ document.addEventListener('click', e => {
     case 'wdone': { const K = S.kids[kid]; K.vocab = K.vocab || []; (L.gl || []).forEach((g, k) => { if (!K.vocab.some(v => v.w === g.w)) K.vocab.push({ w: g.w, d: g.d, e: g.e, ok: !!(L.wans && L.wans[k] && L.wans[k].ok), ds: cur.ds }); }); L.phase = 'survey'; save(); render(); window.scrollTo(0, 0); break; }
     case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = 'spot'; L.wi = 0; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) { K.pos.read = (K.pos.read || 0) + 1; if (KIDS[kid].rplan) rpDone(kid, readText(kid)); } } save(); render(); break; }
     case 'startfread': if (!(RD && RD.paused)) RD = null; startRead(LCODE(cur.kid, L.tr)); break;
-    case 'sayfull': say(curForeign(L).text, LCODE(cur.kid, L.tr)); break;
+    case 'sayfull': voiceEv(kid, L, 'текст (язык)'); say(curForeign(L).text, LCODE(cur.kid, L.tr)); break;
     case 'fq': foreignAnswer(b.dataset.v); break;
     case 'fnext': { if (L.fi + 1 < L.fq) L.fi++; else { L.phase = 'survey'; const key = L.tr === '_alt' ? 'enRead' : 'ptRead'; S.kids[kid].pos[key] = (S.kids[kid].pos[key] || 0) + 1; } save(); render(); break; }
     case 'shop': go('shop'); break;
