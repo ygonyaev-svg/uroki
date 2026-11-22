@@ -1112,7 +1112,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v4867dcc1 */
+<script>/* v71e3156e */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -7696,7 +7696,7 @@ const TIPS = {
   percent: ['% Процент', 'Процент — это одна сотая часть. Десять процентов от ста баллов — это десять баллов. Десять процентов от пятидесяти — пять. Чем больше накопил{а}, тем больше прибавка.'],
   drip: ['📈 Капитал растёт', 'Капитал — это всё, что у тебя есть: счёт и копилка вместе. За каждый верный ответ с первого раза капитал чуть-чуть растёт. Пять верных подряд — растёт в полтора раза быстрее, десять подряд — в два раза. Ошибка начинает серию заново.'],
   rest: ['☕ Перерыв', 'Голове нужен отдых. Каждые двадцать минут я спрошу, не устал{а} ли ты: можно продолжить или выбрать отдых. После часа занятий подряд — большой перерыв на два часа. Пройденные уроки и работа над ошибками открыты всегда.'],
-  base: ['🎮 Обычное время', 'Каждый день у тебя есть шестьдесят минут игр и тридцать минут YouTube — это время есть всегда. Баллы добавляют минуты сверху.'],
+  base: ['🎮 Обычное время', 'Каждый день у тебя есть: {list}. Это время есть всегда. Баллы добавляют минуты сверху.'],
   wpm: ['📖 Скорость чтения', 'Это сколько слов ты читаешь вслух за одну минуту. Чем больше читаешь, тем быстрее и легче получается.'],
   norm: ['📏 Норма', 'Норма — сколько слов в минуту обычно читают дети твоего класса к концу учебного года.'],
   level: ['🏅 Уровень чтения', 'Уровень растёт, когда ты ставишь новый рекорд скорости и читаешь без ошибок. За каждый новый уровень — значок и десять баллов в копилку.'],
@@ -7704,7 +7704,7 @@ const TIPS = {
   prog: ['📊 Полоска', 'Полоска показывает, сколько уроков на сегодня уже сделано.'],
   mark: ['📝 Оценка', 'Оценка за урок, как в школе: пять — отлично, четыре — хорошо, три — нужно повторить. Считается только первый ответ.']
 };
-function tipText(key){ const t = TIPS[key]; if (!t) return null; const girl = cur.kid && (typeof GIRL === 'function' ? GIRL(cur.kid) : cur.kid === 'anya'); return [t[0], t[1].replace(/\{а\}/g, girl ? 'а' : '')]; }
+function tipText(key){ const t = TIPS[key]; if (!t) return null; const girl = cur.kid && (typeof GIRL === 'function' ? GIRL(cur.kid) : cur.kid === 'anya'); let tx = t[1].replace(/\{а\}/g, girl ? 'а' : ''); if (cur.kid && typeof baseList === 'function') tx = tx.replace('{list}', baseList(cur.kid).filter(x => x.m > 0).map(x => x.name + ' ' + x.m + ' ' + U.pl(x.m, 'минута', 'минуты', 'минут')).join(', ') || 'свободного времени пока нет'); else tx = tx.replace('{list}', 'игры 60 минут, YouTube 30 минут'); return [t[0], tx]; }
 function tipShow(key){ const t = tipText(key); if (!t) return; tipHide(); const d = document.createElement('div'); d.className = 'tipbox'; d.id = 'tipbox'; d.setAttribute('role', 'dialog');
   d.innerHTML = `<div class="tipin"><h3>${U.esc(t[0])}</h3><p>${U.esc(t[1])}</p><div class="tiprow"><button class="btn small" data-tipsay="${key}">🔊 Послушать</button><button class="btn ghost small" data-tipclose="1">Понятно</button></div></div>`;
   document.body.appendChild(d); }
@@ -7969,7 +7969,7 @@ function vParent(){
     <div class="pp-grid">${ppTile('sum', 'note', 'Сводка сейчас', U.esc(KIDS[k].name) + ': что сделано за день', '', true)}
     ${ppTile('tasks', 'pen', 'Дать задание', n ? 'активных: ' + n : 'дело, задачка, чтение')}
     ${ppTile('ok', 'check', 'Проверить', w ? 'ждут вас: ' + w : 'задания и цены призов', w)}
-    ${ppTile('time', 'clock', 'Время', restLeft(k) ? 'отдых до ' + hhmm(K.restUntil) : 'занятий ' + Math.round((K.sess || 0) / 60) + ' из ' + (60 + x) + ' мин')}
+    ${ppTile('time', 'clock', 'Время', restLeft(k) ? 'отдых до ' + hhmm(K.restUntil) : (baseList(k).filter(x => x.m > 0).map(x => x.name.toLowerCase() + ' ' + x.m).join(', ') || 'настроить') + (baseList(k).some(x => x.m > 0) ? ' мин' : ''))}
     ${ppTile('coins', 'coin', 'Баллы +/−', 'на счету ' + K.coins + (K.piggy ? ', в копилке ' + K.piggy : ''))}
     ${ppTile('report', 'chart', 'Учёба', 'предметы, чтение, ошибки')}
     ${ppTile('portrait', 'brain', 'Развитие', 'сильные стороны')}</div>
@@ -8017,13 +8017,23 @@ function ppOk(k){ const K = S.kids[k], sh = K.shop || [], wait = sh.filter(x => 
 function ppDays(p){ const d = Math.max(1, Math.round(p / 60)); return p <= 60 ? '≈ день уроков' : '≈ ' + agree(d + ' дней') + ' уроков'; }
 /* ----- Время ----- */
 function ppTime(k){ const K = S.kids[k], bt = baseTime(k), x = extraSecs(K) / 60, used = Math.round((K.sess || 0) / 60), r = restLeft(k);
-  return `<div class="card"><h2>${U.esc(KIDS[k].name)}: ${r ? 'отдыхает до ' + hhmm(K.restUntil) : 'можно заниматься'}</h2>
+  return ppAllow(k) + `<div class="card"><h2>${U.esc(KIDS[k].name)}: ${r ? 'отдыхает до ' + hhmm(K.restUntil) : 'можно заниматься'}</h2>
     <p>Занятий в этой сессии: <b>${used} из ${60 + x} мин</b>${x ? ` (+${x} от вас)` : ''}.</p>
     <div class="pp-big2"><button class="btn" data-act="xtadd" data-k="${k}" data-m="10">+10 минут</button><button class="btn" data-act="xtadd" data-k="${k}" data-m="30">+30 минут</button></div>
     ${x ? `<p><button class="btn ghost small" data-act="xtadd" data-k="${k}" data-m="-10">Убрать 10 минут</button></p>` : ''}
     ${r ? `<p><button class="btn ghost" data-act="norest" data-k="${k}">Снять перерыв</button></p>` : ''}
     <p class="hint">Добавленное время — только на сегодня. Каждые ~20 минут ребёнка спрашивают «Не устал?»; после часа занятий — перерыв 2 часа.</p></div>
-    <div class="card"><h2>Экранное время на сегодня</h2><p>Игры ${bt.game} мин · YouTube ${bt.yt} мин · плюс баллы: 1 балл = 1 минута.</p><p class="hint">На счету ${K.coins}${K.piggy ? `, в копилке ${K.piggy} (в воскресенье +10%)` : ''}.</p></div>`; }
+`; }
+/* Что разрешено каждый день: свой список родителя, ребёнок видит его на главном экране */
+const PP_MIN = [15, 30, 45, 60, 90, 120], PP_IDEAS = ['Игры', 'YouTube', 'Мультики', 'Телефон', 'Компьютер', 'Прогулка с друзьями', 'Настольные игры'];
+function ppAllow(k){ const L = baseList(k), F = cur.ppAl || {};
+  return `<div class="card"><h2>Что разрешено каждый день</h2><p class="hint">Ваш список: на что и сколько минут. ${U.esc(KIDS[k].name)} видит его на своём главном экране. Это время есть всегда и не сгорает; заработанные баллы добавляют минуты сверху (1 балл = 1 минута). Нажмите — сохранится сразу.</p>
+    ${L.length ? L.map((x, i) => `<div class="pp-prize"><div class="pp-pn"><b>${icon(baseIcon(x.name))} ${U.esc(x.name)}: ${x.m} мин</b></div><div class="pp-pc">${PP_MIN.map(m => `<button class="chip ${x.m === m ? 'on' : ''}" data-act="ppalm" data-i="${i}" data-m="${m}">${m}</button>`).join('')}</div><button class="link pp-del" data-act="ppaldel" data-i="${i}">Убрать</button></div>`).join('') : '<p>Список пуст: свободного времени без баллов нет.</p>'}
+    <form class="form pp-add" data-form="ppal"><p class="fkql">Добавить своё</p><div class="row">${PP_IDEAS.filter(n => !L.some(x => x.name === n)).map(n => `<button type="button" class="chip" data-act="ppalidea" data-n="${n}">${n}</button>`).join('')}</div>
+    <label>Название<input id="ppaln" maxlength="40" autocomplete="off" placeholder="Например: планшет, прогулка, мультики" value="${U.esc(F.n || '')}"></label>
+    <p class="fkql">Сколько минут в день</p><div class="pp-pc">${PP_MIN.map(m => `<button type="button" class="chip ${(F.m || 30) === m ? 'on' : ''}" data-act="ppalnm" data-m="${m}">${m}</button>`).join('')}</div>
+    <button class="btn">Добавить</button></form></div>`; }
+function ppAllowSave(k, L, msg){ const K = S.kids[k]; K.allow = L; ev(k, 'обычное время', { text: L.map(x => x.name + ' ' + x.m + ' мин').join(', ') || 'пусто' }); save(); if (msg) alertMsg(msg); if (FAM) setTimeout(() => famSnapTouch(k), 0); render(); }
 /* ----- Баллы +/− с причиной ----- */
 function ppCoins(k){ const K = S.kids[k], why = cur.ppWhy || '', name = KIDS[k].name;
   const hist = S.log.filter(e => e.kid === name && e.type === 'баллы от Юры').slice(-5).reverse();
@@ -8039,13 +8049,19 @@ function ppCoinAdd(k, n){ const K = S.kids[k]; if (!n) return; if (K.coins + n <
 function ppSetPrice(k, i, v){ const it = (S.kids[k].shop || [])[i]; if (!it || !(v > 0)) return; if (it.price !== v) ev(k, 'цена приза', { unit: it.name, price: v }); it.price = v; cur.ppOwn = null; save(); alertMsg('Цена ' + v + ' сохранена'); if (FAM) setTimeout(() => famSnapTouch(k), 0); render(); }
 function ppAct(act, b){ const k = cur.parentKid;
   switch (act) {
+    case 'ppalm': { const L = baseList(k).map(x => Object.assign({}, x)), i = +b.dataset.i; if (!L[i]) return true; L[i].m = +b.dataset.m; ppAllowSave(k, L, L[i].name + ': ' + L[i].m + ' мин в день'); return true; }
+    case 'ppaldel': { const L = baseList(k).slice(), x = L.splice(+b.dataset.i, 1)[0]; if (x) ppAllowSave(k, L, 'Убрано: ' + x.name); return true; }
+    case 'ppalidea': { const e = document.getElementById('ppaln'); cur.ppAl = Object.assign({}, cur.ppAl, { n: b.dataset.n }); if (e) e.value = b.dataset.n; return true; }
+    case 'ppalnm': { const e = document.getElementById('ppaln'); cur.ppAl = Object.assign({}, cur.ppAl, { m: +b.dataset.m, n: e ? e.value : '' }); const y = window.scrollY; render(); window.scrollTo(0, y); return true; }
     case 'ppwhy': cur.ppWhy = cur.ppWhy === b.dataset.w ? '' : b.dataset.w; render(); return true;
     case 'ppcoins': ppCoinAdd(k, +b.dataset.n); return true;
     case 'ppprice': ppSetPrice(k, +b.dataset.i, +b.dataset.p); return true;
     case 'ppown': cur.ppOwn = cur.ppOwn === +b.dataset.i ? null : +b.dataset.i; render(); setTimeout(() => { const e = document.getElementById('ppownv'); if (e) e.focus(); }, 50); return true;
   }
   return false; }
-function ppForm(k0, val){ if (k0 !== 'ppown') return false; ppSetPrice(cur.parentKid, cur.ppOwn, parseInt(val('ppownv'))); return true; }
+function ppForm(k0, val){
+  if (k0 === 'ppal') { const n = val('ppaln').trim(), k = cur.parentKid; if (!n) { alertMsg('Напишите, на что время: например, мультики'); return true; } const L = baseList(k).slice(); L.push({ id: 'a' + Date.now(), name: n.slice(0, 40), m: (cur.ppAl || {}).m || 30 }); cur.ppAl = null; ppAllowSave(k, L, 'Добавлено: ' + n); return true; }
+  if (k0 !== 'ppown') return false; ppSetPrice(cur.parentKid, cur.ppOwn, parseInt(val('ppownv'))); return true; }
 
 /* ----- Учёба подробно: карточки вместо таблиц ----- */
 function vReport(kid){
@@ -9151,9 +9167,12 @@ function lessonQuality(kid, subj, L, ratio){
   const w = parts.reduce((a, x) => a + x[1], 0); return parts.reduce((a, x) => a + x[0] * x[1], 0) / w;
 }
 /* Пропуск дня: баллы сгорают. Пропущен 1 день — половина, 2 и больше — все. */
-/* Обычное время каждый день: 60 мин игр + 30 мин YouTube, не сгорает. Сгорают только заработанные баллы. */
+/* Обычное время каждый день (по умолчанию 60 мин игр + 30 мин YouTube, родитель меняет на экране «Время»), не сгорает. Сгорают только заработанные баллы. */
 const BASE_GAME = 60, BASE_YT = 30;
-function baseTime(kid){ const c = 0; return { game: Math.max(0, BASE_GAME - 15 * c), yt: Math.max(0, BASE_YT - 10 * c), cut: c }; }
+/* Что разрешено каждый день: родитель сам вписывает, на что и сколько минут (экран «Время», 22.11). По умолчанию игры 60 + YouTube 30 */
+function baseList(kid){ const K = S.kids[kid]; return K && Array.isArray(K.allow) ? K.allow : [{ id: 'g', name: 'Игры', m: BASE_GAME }, { id: 'y', name: 'YouTube', m: BASE_YT }]; }
+function baseIcon(name){ const n = String(name).toLowerCase(); return /игр|комп|приставк|роблокс|майнкрафт/.test(n) ? 'game' : /youtube|ютуб|мульт|фильм|кино|сериал|тв|телевиз|видео/.test(n) ? 'video' : /телефон|планшет|айпад/.test(n) ? 'phone' : /прогул|улиц|двор|парк/.test(n) ? 'tree' : /друз|гост/.test(n) ? 'people' : /музык|песн/.test(n) ? 'music' : /мяч|футбол/.test(n) ? 'ball' : 'clock'; }
+function baseTime(kid){ const L = baseList(kid); return { game: (L[0] || {}).m || 0, yt: (L[1] || {}).m || 0, cut: 0, list: L }; }
 function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) { K.lastDone = t; K.burnDate = t; return; } if (K.burnDate === t) return; K.burnDate = t;
   let missed = 0, d = K.lastDone; while (U.addDays(d, 1) < t) { d = U.addDays(d, 1); missed++; }
   const before = K.burnBase == null ? missed : missed - K.burnBase; K.burnBase = missed;
@@ -9166,7 +9185,7 @@ function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) 
 function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0) return '';
   const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'} (${K.coins}).</div>`; }
 function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
-  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span class="tipc" data-tip="base">🎮 Игры <b>${bt.game} мин</b></span><span class="tipc" data-tip="base">▶️ YouTube <b>${bt.yt} мин</b></span><span class="tipc" data-tip="coins">⭐ Баллы <b>${K.coins}</b>&nbsp;(+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
+  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2">${bt.list.filter(x => x.m > 0).map(x => `<span class="tipc" data-tip="base">${icon(baseIcon(x.name))} ${U.esc(x.name)} <b>${x.m} мин</b></span>`).join('')}<span class="tipc" data-tip="coins">⭐ Баллы <b>${K.coins}</b>&nbsp;(+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
 /* ----- Копилка: заработанное за неделю копится и в воскресенье переходит на счёт с прибавкой +10%. Забрать раньше можно, но без прибавки. ----- */
 const PIGGY_RATE = .10;
 function weekStart(ds){ const n = U.dayNum(ds), wd = (n + 3) % 7; /* 0 = понедельник */ return U.addDays(ds, -wd); }
