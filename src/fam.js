@@ -100,7 +100,7 @@ function famInit(){
       a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur, { lang: lang }); a.lc = lc; }
     else { a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur); delete a.cur.lang; a.order = KIDS_TPL[a.tpl].order.filter(function(sj){ return sj !== 'lang'; }); } /* «Не изучать» везде — иностранного языка в плане нет */
     a.read = famReadList(rd >= 3 && c.age >= 9 ? READ_A : rd === 0 && c.age <= 10 ? READ_Y : KIDS_TPL[a.tpl].read, c.done);
-    KIDS[c.id] = Object.assign({}, KIDS_TPL[a.tpl], a, { name: c.name, age: +c.age, grade: c.age + ' ' + U.pl(+c.age, 'год', 'года', 'лет'), sex: c.sex || '', look: c.look || famLookOf(c) });
+    KIDS[c.id] = Object.assign({}, KIDS_TPL[a.tpl], a, { name: c.name, rdLv: rd, age: +c.age, grade: c.age + ' ' + U.pl(+c.age, 'год', 'года', 'лет'), sex: c.sex || '', look: c.look || famLookOf(c) });
     var th = famThemeOf(c); if (th) THEME['k:' + c.id] = th; else delete THEME['k:' + c.id];
     if (!S.kids[c.id]) S.kids[c.id] = newKid(); if (c.pin) S.kids[c.id].pin = c.pin;
     var K = S.kids[c.id], ms = mk ? mt + '|' + mk : ''; if (ms && K.mathSet !== ms) { K.pos.math = mp; K.mathSet = ms; }

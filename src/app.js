@@ -8,8 +8,8 @@ function contLast(list){ if (!list) return; const a = list.filter(u => !u.cont),
 for (const C0 of [CUR_Y, CUR_A]) for (const c of Object.values(C0)) { contLast(c.units); contLast(c.alt); }
 const CONT_MARK = u => u && u.cont ? 'Продолжение · ' : '';
 const KIDS_TPL = {
-  yarik: { name:'Ярик', grade:'2 класс', cur: CUR_Y, read: READ_Y, n: 10, w: { read: .24, rus: .13, lang: .13, math: .30, world: .10, logic: .10, hw: .05 }, norm: 55, startWords: 60, rplan: !FAM, self: !FAM, order:['read','math','rus','world','logic','lang'] },
-  anya:  { name:'Аня',  grade:'5 класс', cur: CUR_A, read: READ_A, n: 14, w: { read: .22, rus: .16, lang: .12, math: .26, hist: .12, logic: .12, hw: .05 }, norm: 110, startWords: 150, order:['read','math','rus','hist','logic','lang'] }
+  yarik: { name:'Ярик', grade:'2 класс', cur: CUR_Y, read: READ_Y, n: 10, w: { read: .24, rus: .13, lang: .13, math: .30, world: .10, logic: .10, hw: .05 }, norm: 55, startWords: 60, rplan: !FAM, rdLv: 0, order:['read','math','rus','world','logic','lang'] },
+  anya:  { name:'Аня',  grade:'5 класс', cur: CUR_A, read: READ_A, n: 14, w: { read: .22, rus: .16, lang: .12, math: .26, hist: .12, logic: .12, hw: .05 }, norm: 110, startWords: 150, rdLv: 3, order:['read','math','rus','hist','logic','lang'] }
 };
 const KIDS = FAM ? {} : KIDS_TPL;
 /* Шаблон программы (yarik — младшие, anya — старшие) и оформление ребёнка; в семейной версии дети заводятся родителями */
