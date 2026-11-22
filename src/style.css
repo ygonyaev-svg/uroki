@@ -96,6 +96,20 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 .steps li.ok::before{ content:"✓ "; }
 .theory .th{ font-size:19px; }
 .theory .th b,.theory .th strong{ color:var(--acc); }
+/* Объяснение по схеме учебника (UCH): задача → названия → правило → образец */
+.th .tz,.th .tn,.th .tr,.th .tx,.th .tm{ margin:0 0 12px; padding:12px 14px; border-radius:14px; line-height:1.5; }
+.th .tz{ background:#f8fafc; border:1px solid var(--line); }
+.th .tn{ background:#eff6ff; }
+.th .tr{ background:#fef9c3; border-left:5px solid #eab308; font-weight:600; }
+.th .tx{ background:#f0fdf4; }
+.th .tm{ background:#fdf2f8; }
+.th .tl{ display:block; font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#64748b; margin-bottom:4px; }
+.th .tl + br{ display:none; }
+.th .tc{ display:block; margin-top:6px; color:#15803d; }
+.th .tzr{ display:block; margin-top:6px; }
+.th .tpic{ margin:10px 0 2px; text-align:center; }
+.th .tpic svg{ max-width:100%; height:auto; }
+.peek .th .tr,.peek .th .tx{ margin-bottom:8px; }
 .theory table{ border-collapse:collapse; margin:8px 0; }
 .theory td,.theory th{ border:1px solid var(--line); padding:4px 10px; }
 .vw{ appearance:none; border:1px solid var(--line); background:var(--soft); border-radius:10px; padding:6px 12px; margin:3px; cursor:pointer; }

@@ -26,6 +26,19 @@ const U = {
   gcd(a, b){ while (b) [a, b] = [b, a % b]; return Math.abs(a); }
 };
 
+/* ===== Объяснение темы по схеме советского учебника (Моро, Виленкин, Рамзаева, букварь Горецкого) =====
+   z — житейская задача, с которой учебник начинает тему; pic — рисунок к ней ('имя|арг|…', рисуется при показе: thPic в src/pics.js);
+   zr — как её решили; xp — рисунок к образцу; n — названия (термины); r — правило формулировкой учебника; x — образец; c — проверка.
+   Озвучка читает th как strip(th с <br> → «. »): после метки стоит <br>, скрытый в CSS, чтобы голос делал паузу. */
+function UCH(o){ const L = s => `<span class="tl">${s}</span><br>`; let h = '';
+  if (o.z) h += `<div class="tz">${L(o.zl || 'Задача')}${o.z}${o.pic ? `<i class="tp" data-tp="${o.pic}"></i>` : ''}${o.zr ? `<span class="tzr">${o.zr}</span>` : ''}</div>`;
+  else if (o.pic) h += `<i class="tp" data-tp="${o.pic}"></i>`;
+  if (o.n) h += `<div class="tn">${L('Запомни названия')}${o.n}</div>`;
+  if (o.r) h += `<div class="tr">${L('Правило')}${[].concat(o.r).join('<br>')}</div>`;
+  if (o.x) h += `<div class="tx">${L('Образец')}${o.x}${o.xp ? `<i class="tp" data-tp="${o.xp}"></i>` : ''}${o.c ? `<span class="tc">Проверка: ${o.c}</span>` : ''}</div>`;
+  if (o.m) h += `<div class="tm">${o.m}</div>`;
+  return h.replace(/(\S) ([=+−·:<>≈]) (?=\S)/g, '$1\u00a0$2\u00a0'); }
+
 /* ===== Конструкторы заданий =====
    k:'c' — выбор ответа, k:'n' — число. q — вопрос (html), a — ответ, w — неверные, e — пояснение */
 function C(q, a, w, e){ a = String(a); const ws = []; for (const x of w) { const s = String(x); if (s !== a && !ws.includes(s)) ws.push(s); } return { k: 'c', q, a, w: ws.slice(0, 3), e: e || '' }; }

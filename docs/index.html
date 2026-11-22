@@ -114,6 +114,20 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 .steps li.ok::before{ content:"✓ "; }
 .theory .th{ font-size:19px; }
 .theory .th b,.theory .th strong{ color:var(--acc); }
+/* Объяснение по схеме учебника (UCH): задача → названия → правило → образец */
+.th .tz,.th .tn,.th .tr,.th .tx,.th .tm{ margin:0 0 12px; padding:12px 14px; border-radius:14px; line-height:1.5; }
+.th .tz{ background:#f8fafc; border:1px solid var(--line); }
+.th .tn{ background:#eff6ff; }
+.th .tr{ background:#fef9c3; border-left:5px solid #eab308; font-weight:600; }
+.th .tx{ background:#f0fdf4; }
+.th .tm{ background:#fdf2f8; }
+.th .tl{ display:block; font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#64748b; margin-bottom:4px; }
+.th .tl + br{ display:none; }
+.th .tc{ display:block; margin-top:6px; color:#15803d; }
+.th .tzr{ display:block; margin-top:6px; }
+.th .tpic{ margin:10px 0 2px; text-align:center; }
+.th .tpic svg{ max-width:100%; height:auto; }
+.peek .th .tr,.peek .th .tx{ margin-bottom:8px; }
 .theory table{ border-collapse:collapse; margin:8px 0; }
 .theory td,.theory th{ border:1px solid var(--line); padding:4px 10px; }
 .vw{ appearance:none; border:1px solid var(--line); background:var(--soft); border-radius:10px; padding:6px 12px; margin:3px; cursor:pointer; }
@@ -1112,7 +1126,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v78c6d053 */
+<script>/* vd02d1439 */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -1142,6 +1156,19 @@ const U = {
   roman(n){ const r = [[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let s = ''; for (const [v, c] of r) while (n >= v) { s += c; n -= v; } return s; },
   gcd(a, b){ while (b) [a, b] = [b, a % b]; return Math.abs(a); }
 };
+
+/* ===== Объяснение темы по схеме советского учебника (Моро, Виленкин, Рамзаева, букварь Горецкого) =====
+   z — житейская задача, с которой учебник начинает тему; pic — рисунок к ней ('имя|арг|…', рисуется при показе: thPic в src/pics.js);
+   zr — как её решили; xp — рисунок к образцу; n — названия (термины); r — правило формулировкой учебника; x — образец; c — проверка.
+   Озвучка читает th как strip(th с <br> → «. »): после метки стоит <br>, скрытый в CSS, чтобы голос делал паузу. */
+function UCH(o){ const L = s => `<span class="tl">${s}</span><br>`; let h = '';
+  if (o.z) h += `<div class="tz">${L(o.zl || 'Задача')}${o.z}${o.pic ? `<i class="tp" data-tp="${o.pic}"></i>` : ''}${o.zr ? `<span class="tzr">${o.zr}</span>` : ''}</div>`;
+  else if (o.pic) h += `<i class="tp" data-tp="${o.pic}"></i>`;
+  if (o.n) h += `<div class="tn">${L('Запомни названия')}${o.n}</div>`;
+  if (o.r) h += `<div class="tr">${L('Правило')}${[].concat(o.r).join('<br>')}</div>`;
+  if (o.x) h += `<div class="tx">${L('Образец')}${o.x}${o.xp ? `<i class="tp" data-tp="${o.xp}"></i>` : ''}${o.c ? `<span class="tc">Проверка: ${o.c}</span>` : ''}</div>`;
+  if (o.m) h += `<div class="tm">${o.m}</div>`;
+  return h.replace(/(\S) ([=+−·:<>≈]) (?=\S)/g, '$1\u00a0$2\u00a0'); }
 
 /* ===== Конструкторы заданий =====
    k:'c' — выбор ответа, k:'n' — число. q — вопрос (html), a — ответ, w — неверные, e — пояснение */
@@ -1741,7 +1768,11 @@ const Y_READL = (function(){
   const OW = [['МА-МА','мама'],['РЫ-БА','рыба'],['ЛУ-НА','луна'],['РУ-КА','рука'],['СО-ВА','сова'],['КО-ЗА','коза'],['ЛИ-СА','лиса'],['НО-ГА','нога'],['ЗИ-МА','зима'],['РО-ЗА','роза'],['ГО-РА','гора'],['ВО-ДА','вода']];
 
   const U1 = { id:'rl_1', first:1, t:'Учимся читать: звуки речи',
-    th:`Мы говорим словами. Слова состоят из <b>звуков</b>.<br>Скажи медленно: ${bw('к-о-т')}.<br>Поменяй один звук — получится новое слово: <b>кот — кит</b>.<br>Звуки мы <b>слышим</b> и <b>говорим</b>.`,
+    th:UCH({ zl:'Смотри и слушай', z:'Кто на картинке? Кот. Скажи слово медленно, протяни каждый звук: к-о-т.', pic:'w|кот;snd|кот',
+     zr:'В слове <b>кот</b> три звука: [к], [о], [т]. На схеме каждый звук — клеточка.',
+     n:'<b>Звуки</b> мы слышим и произносим. Слова состоят из звуков. Звук записывают в скобках: [к].',
+     r:'Заменим в слове один звук — получится другое слово.',
+     x:'[к]от — [р]от: первый звук [к] заменили на [р], и вместо кота получился рот.', c:'скажи оба слова вслух и сравни первый звук.' }),
     g: MIX(
       RB([`Скажи ${q('кот')}. Первый звук замени на [р]. Что вышло?|рот|кит;ток;кол|кот — рот: звук [к] стал [р].`,
           `Скажи ${q('дом')}. Первый звук замени на [с]. Что вышло?|сом|дым;ком;сок|дом — сом: звук [д] стал [с].`,
@@ -2172,7 +2203,11 @@ const Y_MATH = [
      B(['Сколько часов в сутках?|24|12;60;100|1 сутки = 24 часа','Сколько минут в половине часа?|30|15;50;60|60 : 2 = 30','Сколько минут в четверти часа?|15|25;30;4|60 : 4 = 15','Сколько секунд в минуте?|60|100;30;24|1 мин = 60 с','Что дольше: 1 час или 70 минут?|70 минут|1 час;одинаково|1 ч = 60 мин, а 70 мин больше','Что дольше: 1 час или 45 минут?|1 час|45 минут;одинаково|1 ч = 60 мин'])
    ) },
  { id:'m2_10', t:'Что такое умножение',
-   th:'Если складываем <b>одинаковые</b> числа, можно записать короче — умножением:<br>3 + 3 + 3 + 3 = 3 · 4 = 12. Первое число — что складываем, второе — сколько раз.<br>От перестановки множителей произведение не меняется: 3 · 4 = 4 · 3.',
+   th:UCH({ z:'Тетрадь стоит 2 цента. Саша купил 4 тетради. Сколько центов заплатил Саша?', pic:'notes|4|2',
+     zr:'2 + 2 + 2 + 2 = 8. Одинаковые слагаемые можно записать короче: 2 · 4 = 8. По 2 взять 4 раза — получится 8. Ответ: 8 центов.',
+     n:'Запись 2 · 4 читают: «два умножить на четыре».<br>Числа, которые умножают, — <b>множители</b>. Результат — <b>произведение</b>.<br>В записи 2 · 4 = 8 числа 2 и 4 — множители, 8 — произведение.',
+     r:['Умножить 2 на 4 — значит взять по 2 четыре раза: 2 + 2 + 2 + 2.', 'От перестановки множителей произведение не изменяется: 2 · 4 = 4 · 2.'],
+     x:'В трёх кругах по 5 треугольников. 5 + 5 + 5 = 15, значит 5 · 3 = 15.', c:'по 5 взяли 3 раза — 15 треугольников.', xp:'groups|3|5|tri' }),
    g: MIX(
      r => { const a=r.int(2,9), n=r.int(3,5); return C(`Замени сложение умножением: ${Array(n).fill(a).join(' + ')}`, `${a} · ${n}`, [`${a} + ${n}`, `${n} · ${n+1}`, `${a+1} · ${n}`], `Число ${a} сложили ${n} ${U.pl(n,'раз','раза','раз')}`); },
      r => { const a=r.int(2,6), n=r.int(2,5); return N(`В ${n} вазах стоит по ${a} ${U.pl(a,'цветку','цветка','цветков')}. Сколько всего цветов?`, a*n, `${a} · ${n} = ${a*n}`); },
@@ -2463,7 +2498,11 @@ const A_MATH = [
      r => { const a=r.int(11,89), c=100-a, b=r.int(101,899); return N(`Вычисли удобным способом: ${a} + ${b} + ${c}`, a+b+c, `(${a} + ${c}) + ${b} = 100 + ${b}`); }
    ) },
  { id:'m5_3', t:'Буквенные выражения и уравнения',
-   th:'В выражение 3a + 5 вместо a подставляем число: при a = 7 получаем 3 · 7 + 5 = 26.<br>Уравнение x + 137 = 500: неизвестное слагаемое x = 500 − 137 = 363.<br>x − 48 = 152: x = 152 + 48 = 200. 250 − x = 175: x = 250 − 175 = 75.',
+   th:UCH({ z:'На левой чаше весов лежат арбуз и гиря 2 кг, на правой — гиря 5 кг. Весы в равновесии. Чему равна масса арбуза?', pic:'scale2|арбуз+2 кг|5 кг',
+     zr:'Обозначим массу арбуза буквой x. Весы в равновесии, значит x + 2 = 5. По смыслу вычитания x = 5 − 2, то есть x = 3. Масса арбуза 3 кг.',
+     n:'<b>Буквенное выражение</b> — выражение, в котором есть буквы: 3a + 5. Если a = 7, его значение 3 · 7 + 5 = 26.<br><b>Уравнение</b> — равенство, содержащее букву, значение которой надо найти.<br><b>Корень уравнения</b> — значение буквы, при котором получается верное числовое равенство. <b>Решить уравнение</b> — найти все его корни.',
+     r:['Чтобы найти неизвестное слагаемое, надо из суммы вычесть известное слагаемое.', 'Чтобы найти неизвестное уменьшаемое, надо сложить вычитаемое и разность.', 'Чтобы найти неизвестное вычитаемое, надо из уменьшаемого вычесть разность.', 'Чтобы найти неизвестный множитель, надо произведение разделить на другой множитель.'],
+     x:'x + 12 = 78. Неизвестно слагаемое, поэтому x = 78 − 12, x = 66.', c:'66 + 12 = 78 — равенство верное, значит 66 — корень уравнения.' }),
    g: MIX(
      r => { const k=r.int(2,9), b=r.int(1,30), a=r.int(2,20); return N(`Найди значение выражения ${k}a + ${b} при a = ${a}.`, k*a+b, `${k} · ${a} + ${b}`); },
      r => { const x=r.int(100,900), a=r.int(100,900); return N(`Реши уравнение: x + ${a} = ${x+a}`, x, `x = ${x+a} − ${a}`); },
@@ -4737,6 +4776,73 @@ const COVER_IMG = { 'Пёстрая лента':'cover-holmes.webp', 'Серая
   'Кавказский пленник':'cover-plennik.webp', 'Дети подземелья':'cover-podzem.webp', 'Белый пудель':'cover-pudel.webp', 'Чёрная курица':'cover-kurica.webp',
   'Городок в табакерке':'cover-tabakerka.webp', 'Мороз Иванович':'cover-moroz.webp', 'Алёнушкины сказки':'cover-alenushka.webp', 'Сказка о рыбаке и рыбке':'cover-rybka.webp',
   'Сказка о мёртвой царевне':'cover-carevna.webp', 'Филипок':'cover-filipok.webp' };
+
+/* ===== Рисунки к объяснению темы (UCH в core.js): <i class="tp" data-tp="имя|арг|…"> ===== */
+/* Группы предметов, как в учебнике Моро: n кружков-групп по k фигур */
+function picGroups(n, k, shape, col){ n = +n; k = +k; const cols = (col || '#ef4444,#3b82f6,#16a34a,#f59e0b,#8b5cf6').split(','), per = k <= 3 ? k : Math.ceil(k / 2), s = 22, gw = per * s + 16, gh = (k <= 3 ? 1 : 2) * s + 16; let g = '';
+  for (let i = 0; i < n; i++) { const x0 = 8 + i * (gw + 10), c = cols[i % cols.length]; g += `<rect x="${x0}" y="6" width="${gw}" height="${gh}" rx="${gh / 2}" fill="none" stroke="#475569" stroke-width="2"/>`;
+    for (let j = 0; j < k; j++) { const cx = x0 + 8 + (j % per) * s + s / 2, cy = 14 + Math.floor(j / per) * s + s / 2;
+      g += shape === 'tri' ? `<polygon points="${cx},${cy - 8} ${cx - 8},${cy + 7} ${cx + 8},${cy + 7}" fill="${c}"/>` : shape === 'sq' ? `<rect x="${cx - 7}" y="${cy - 7}" width="14" height="14" rx="2" fill="${c}"/>` : `<circle cx="${cx}" cy="${cy}" r="8" fill="${c}"/>`; } }
+  return PX.svg(n * (gw + 10) + 6, gh + 12, g, 'groups'); }
+/* Тетради по 2 копейки (Моро, «Умножение») */
+function picNotebooks(n, price){ n = +n; let g = '';
+  for (let i = 0; i < n; i++) { const x = 10 + i * 70; g += `<rect x="${x}" y="8" width="54" height="68" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="2" transform="rotate(-6 ${x + 27} 42)"/><line x1="${x + 10}" x2="${x + 44}" y1="24" y2="21" stroke="#94a3b8"/><line x1="${x + 10}" x2="${x + 44}" y1="34" y2="31" stroke="#94a3b8"/>`
+    + `<circle cx="${x + 30}" cy="86" r="15" fill="#fbbf24" stroke="#b45309" stroke-width="2"/>` + PX.t(x + 30, 92, price, 16, '#78350f'); }
+  return PX.svg(n * 70 + 10, 106, g, 'notes'); }
+/* Отрезок-схема «часть и часть — целое» (рис. 44 у Виленкина, схемы задач у Моро): parts — подписи частей через «,», whole — подпись целого */
+function picSeg(parts, whole){ const P = String(parts).split(','), W = 280, x0 = 12, ws = P.map(p => /^\?|x|y|z|□$/.test(p.trim()) ? 1 : 1.6), tot = ws.reduce((a, b) => a + b, 0); let x = x0, g = '';
+  P.forEach((p, i) => { const w = ws[i] / tot * W, c = /\?|x|y|z|□/.test(p) ? '#f43f5e' : ['#3b82f6', '#16a34a', '#f59e0b'][i % 3];
+    g += `<rect x="${x}" y="30" width="${w - 2}" height="18" rx="3" fill="${c}" opacity=".85"/>` + PX.t(x + w / 2, 22, p.trim(), 15, c); x += w; });
+  g += `<path d="M${x0},56 q0,10 10,10 h${W / 2 - 20} q10,0 10,10 q0,-10 10,-10 h${W / 2 - 20} q10,0 10,-10" fill="none" stroke="#475569" stroke-width="2"/>` + PX.t(x0 + W / 2, 96, whole, 15);
+  return PX.svg(W + 24, 104, g, 'seg'); }
+/* Два отрезка: «на сколько больше» / «во сколько раз больше» */
+function picCmp(a, b, la, lb){ a = +a; b = +b; const k = 240 / Math.max(a, b); let g = `<rect x="70" y="10" width="${a * k}" height="16" rx="3" fill="#3b82f6"/><rect x="70" y="40" width="${b * k}" height="16" rx="3" fill="#16a34a"/>` + PX.t(62, 23, la, 13, null, 'end') + PX.t(62, 53, lb, 13, null, 'end');
+  if (a !== b) { const lo = Math.min(a, b) * k + 70, hi = Math.max(a, b) * k + 70, y = a > b ? 40 : 10; g += `<rect x="${lo}" y="${y}" width="${hi - lo}" height="16" rx="3" fill="none" stroke="#f43f5e" stroke-dasharray="4 3" stroke-width="2"/>` + PX.t((lo + hi) / 2, y + 30, '?', 15, '#f43f5e'); }
+  return PX.svg(330, 86, g, 'cmp'); }
+/* Звуковая схема слова, как в букваре: клеточка на каждый звук, гласные — красные, согласные — синие; open — подписать буквы */
+function picSnd(word, open){ const w = String(word).toLowerCase(), V = 'аоуыэяёюие', s = 34; let g = '', x = 6;
+  for (const ch of w) { if (ch === '-') { x += 10; continue; } if ('ьъ'.includes(ch)) continue; const v = V.includes(ch);
+    g += `<rect x="${x}" y="6" width="${s - 4}" height="${s - 4}" rx="4" fill="${v ? '#fecaca' : '#bfdbfe'}" stroke="${v ? '#dc2626' : '#2563eb'}" stroke-width="2"/>`;
+    if (open) g += PX.t(x + (s - 4) / 2, 6 + (s - 4) / 2 + 7, ch, 20, v ? '#b91c1c' : '#1d4ed8'); x += s; }
+  return PX.svg(x + 4, s + 8, g, 'snd'); }
+/* Весы с предметами: l, r — через «+»: «арбуз», «x» (неизвестное), «2 кг» (гиря) */
+function picScale2(l, r){ const item = (t, cx) => { t = t.trim();
+    if (t === 'арбуз') return `<ellipse cx="${cx}" cy="72" rx="24" ry="17" fill="#16a34a"/><path d="M${cx - 16},62 q16,10 0,22 M${cx},56 q6,16 0,32 M${cx + 16},62 q-16,10 0,22" stroke="#bbf7d0" stroke-width="3" fill="none"/>`;
+    if (/^[a-zx□?]$/.test(t)) return `<rect x="${cx - 18}" y="56" width="36" height="32" rx="6" fill="#f43f5e"/>` + PX.t(cx, 79, t, 20, '#fff');
+    return `<path d="M${cx - 18},88 L${cx - 12},60 L${cx + 12},60 L${cx + 18},88 Z" fill="#475569"/><circle cx="${cx}" cy="56" r="5" fill="none" stroke="#475569" stroke-width="3"/>` + PX.t(cx, 81, t.replace(/\s/g, '&#160;'), 12, '#fff'); };
+  const side = (s, x0) => { const it = String(s).split('+'), w = 46; return it.map((t, i) => item(t, x0 - (it.length - 1) * w / 2 + i * w)).join(''); };
+  const g = `<polygon points="160,150 145,172 175,172" fill="#64748b"/><rect x="156" y="30" width="8" height="122" fill="#64748b"/><rect x="30" y="26" width="260" height="8" rx="4" fill="#475569"/>
+  <line x1="75" y1="34" x2="40" y2="90" stroke="#94a3b8"/><line x1="75" y1="34" x2="110" y2="90" stroke="#94a3b8"/><line x1="245" y1="34" x2="210" y2="90" stroke="#94a3b8"/><line x1="245" y1="34" x2="280" y2="90" stroke="#94a3b8"/>`
+  + side(l, 75) + side(r, 245) + `<path d="M15,90 h120 a60,16 0 0,1 -120,0" fill="#cbd5e1"/><path d="M185,90 h120 a60,16 0 0,1 -120,0" fill="#cbd5e1"/>`;
+  return PX.svg(320, 178, g, 'scale'); }
+function thPic(spec){ if (String(spec).includes(';')) return `<div class="pair">${String(spec).split(';').map(thPic1).join('')}</div>`; return thPic1(spec); }
+function thPic1(spec){ const [n, ...a] = String(spec).split('|'); try {
+  switch (n) {
+    case 'snd': return picSnd(a[0], a[1]);
+    case 'w': { const ps = wordPics(a[0], 3); return ps.length ? `<div class="wpics">${ps.map(e => `<span>${e}</span>`).join('')}</div>` : ''; }
+    case 'groups': return picGroups(a[0], a[1], a[2], a[3]);
+    case 'notes': return picNotebooks(a[0], a[1]);
+    case 'scale': return picScale(a[0], a[1]);
+    case 'scale2': return picScale2(a[0], a[1]);
+    case 'seg': return picSeg(a[0], a[1]);
+    case 'cmp': return picCmp(a[0], a[1], a[2], a[3]);
+    case 'tens': return picTens(a.filter(x => /^\d+$/.test(x)).map(Number), a.find(x => !/^\d+$/.test(x)) || '');
+    case 'pie': return picPie(+a[0], +a[1]);
+    case 'pct': return picPct(+a[0]);
+    case 'rect': return picRect(+a[0], +a[1], a[2], a[3]);
+    case 'box': return picBox(a[0], a[1], a[2], a[3]);
+    case 'ruler': return picRuler(+a[0]);
+    case 'clock': return picClock(+a[0], +a[1]);
+    case 'angle': return picAngle(+a[0], +a[1]);
+    case 'bars': return picBars(a.map(Number));
+    case 'place': return picPlace(a[0]);
+    case 'line': return picLine(PX.num(a[0]), +a[1]);
+    case 'tri': return picTri(a[0], a[1], a[2], a[3]);
+  } } catch (e) {} return ''; }
+/* Показ объяснения: рисуем рисунки; short — в подсказке к заданию только правило и образец */
+function thR(th, short){ let h = String(th || '');
+  if (short && /class="tr"/.test(h)) h = (h.match(/<div class="t[rx]">[\s\S]*?<\/div>/g) || []).join('');
+  return h.replace(/<i class="tp" data-tp="([^"]*)"><\/i>/g, (m, s) => { const p = thPic(s); return p ? `<div class="illus tpic">${p}</div>` : ''; }); }
 
 /* ===== Мои книги: бумажные книги из дома =====
    Ребёнок фотографирует обложку, оборот титульного листа (издательство, год, тираж, ISBN), заднюю обложку со штрихкодом, по желанию оглавление; для незнакомых книг — страницы главы → фото уходят в скрипт таблицы → папка «Уроки — фото книг» на Диске
@@ -8922,11 +9028,11 @@ function vLesson(){
     return `<li class="${past ? 'ok' : ''} ${on ? 'now' : ''} ${can ? 'tap' : ''}">${can ? `<button class="stp" data-act="rview" data-s="${past && s !== cur.rview ? s : ''}">${s}</button>` : s}</li>`; }).join('')}</ol>`;
   const title = `<p class="eyebrow">${subjName(kid, subj, cur.ds)}</p><h1>${U.esc(subj === 'hw' ? 'Повторение ошибок' : subj === 'extra' ? 'Дополнительные задания по сегодняшним урокам' : subj === 'pro' ? 'Уровень PRO: тот же день, но сложнее' : subj === 'train' ? 'Испытание: сложные задачи по новым темам' : u.t)}</h1>`;
   if (cur.rtask != null) body = vRetry(kid, subj, L, cur.rtask);
-  else if (cur.rview === 'Теория' && u) body = `<div class="note">Это повторение — баллы не меняются. <button class="link" data-act="rview" data-s="">Вернуться к уроку →</button></div><article class="card theory">${subjArt(kid, subj)}<div class="th">${u.th}</div><div class="row"><button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button></div></article><button class="btn big" data-act="rview" data-s="">Вернуться к уроку</button>`;
+  else if (cur.rview === 'Теория' && u) body = `<div class="note">Это повторение — баллы не меняются. <button class="link" data-act="rview" data-s="">Вернуться к уроку →</button></div><article class="card theory">${subjArt(kid, subj)}<div class="th">${thR(u.th)}</div><div class="row"><button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button></div></article><button class="btn big" data-act="rview" data-s="">Вернуться к уроку</button>`;
   else if (cur.rview === 'Практика' || cur.rview === 'Задания') body = vPracList(kid, subj, L);
   else if (L.phase === 'theory') {
     const c = KIDS[kid].cur[subj];
-    body = `${!(L.ans && L.ans.length) ? hwNote(kid, subj) : ""}<article class="card theory">${subjArt(kid, subj)}<div class="th">${u.th}</div><div class="row">${L.helpN || voiceFree(kid) ? '<button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button>' : ''}${subj !== 'hw' ? `<button class="btn ghost small" data-act="dunno">${typeof srDl === 'function' ? srDl(kid, L) : '🤔 Не понимаю'}</button>` : ''}</div></article>${L.helpN ? vExample(kid, subj, L, u) : ''}
+    body = `${!(L.ans && L.ans.length) ? hwNote(kid, subj) : ""}<article class="card theory">${subjArt(kid, subj)}<div class="th">${thR(u.th)}</div><div class="row">${L.helpN || voiceFree(kid) ? '<button class="btn ghost small" data-act="saytheory">🔊 Прочитать вслух</button>' : ''}${subj !== 'hw' ? `<button class="btn ghost small" data-act="dunno">${typeof srDl === 'function' ? srDl(kid, L) : '🤔 Не понимаю'}</button>` : ''}</div></article>${L.helpN ? vExample(kid, subj, L, u) : ''}
     <p class="src">По учебнику: ${U.esc(c.src)}</p><button class="btn big" data-act="topractice">Понятно, к заданиям</button>`;
   } else if (L.phase === 'practice') body = vTask(kid, subj, L);
   else if (L.phase === 'fread') body = vForeign(kid, L);
@@ -8949,7 +9055,7 @@ function vTask(kid, subj, L){
   const spk = t.sp ? `<button class="btn ghost small" data-act="sayq">🔊 Послушать</button>` : '';
   const u0 = (subj === 'extra' || subj === 'pro' || subj === 'train') && t.uid ? unitById(kid, t.sj, t.uid) : subj !== 'hw' && unitById(kid, subj, L.uid);
   const gate = typeof srGate === 'function' ? srGate(kid, subj, L, t, a) : ''; if (gate) inp = gate;
-  const help = u0 && !fin ? (L.showTh === L.i ? `${t.sp ? '' : '<button class="btn ghost small" data-act="sayqtext">🔊 Прочитать задание</button>'}<details class="peek" open><summary>Правило</summary><div class="th">${u0.th}</div></details>${vExample(kid, subj, L, u0, t)}` : `<button class="link" data-act="dunnotask">${typeof srDl === 'function' ? srDl(kid, L) : '🤔 Не понимаю'}</button>`) : '';
+  const help = u0 && !fin ? (L.showTh === L.i ? `${t.sp ? '' : '<button class="btn ghost small" data-act="sayqtext">🔊 Прочитать задание</button>'}<details class="peek" open><summary>Правило</summary><div class="th">${thR(u0.th, 1)}</div></details>${vExample(kid, subj, L, u0, t)}` : `<button class="link" data-act="dunnotask">${typeof srDl === 'function' ? srDl(kid, L) : '🤔 Не понимаю'}</button>`) : '';
   const dots = `<div class="dots">${T.map((x, j) => { const aj = L.ans[j]; const st = aj && aj.final ? (aj.ok && aj.tries === 1 ? 'ok' : aj.ok ? 'mid' : 'bad') : j === L.i ? 'now' : ''; return `<span class="dot ${st}">${j + 1}</span>`; }).join('')}</div>`;
   return `<div class="counter">Задание ${L.i + 1} из ${T.length}</div>${dots}${L.i === 0 ? '<p class="hint small">Отвечай внимательно: засчитывается только первый ответ.</p>' : ''}<article class="card task">${(() => { const il = illus(kid, t.sj || subj, t); return il ? '' : `<div class="scenebar">${scene(kid, (L.seed || 7) + L.i)}</div>`; })()}<span class="sticker" aria-hidden="true">${U.rng((L.seed || 7) + L.i * 31).pick(THEME[TH(kid)].pics)}</span>${t.rev ? `<p class="revtag">🔁 Повторение: ${U.esc(t.rev)}</p>` : ''}${gate ? '' : `<div class="q">${t.k === 't' ? t.q : t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>`}${illus(kid, t.sj || subj, t)}${t.sp && !t.spAfter ? spk : ''}${inp}${fb}${t.sp && t.spAfter && fin ? spk : ''}${help}</article>
   ${fin ? `<button class="btn big" data-act="next">${L.i + 1 < T.length ? 'Дальше' : 'Закончить'}</button>` : ''}`;
