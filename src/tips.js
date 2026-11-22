@@ -13,7 +13,7 @@ const TIPS = {
   prog: ['📊 Полоска', 'Полоска показывает, сколько уроков на сегодня уже сделано.'],
   mark: ['📝 Оценка', 'Оценка за урок, как в школе: пять — отлично, четыре — хорошо, три — нужно повторить. Считается только первый ответ.']
 };
-function tipText(key){ const t = TIPS[key]; if (!t) return null; const girl = cur.kid && (typeof T === 'function' ? T(cur.kid) : cur.kid) === 'anya'; return [t[0], t[1].replace(/\{а\}/g, girl ? 'а' : '')]; }
+function tipText(key){ const t = TIPS[key]; if (!t) return null; const girl = cur.kid && (typeof GIRL === 'function' ? GIRL(cur.kid) : cur.kid === 'anya'); return [t[0], t[1].replace(/\{а\}/g, girl ? 'а' : '')]; }
 function tipShow(key){ const t = tipText(key); if (!t) return; tipHide(); const d = document.createElement('div'); d.className = 'tipbox'; d.id = 'tipbox'; d.setAttribute('role', 'dialog');
   d.innerHTML = `<div class="tipin"><h3>${U.esc(t[0])}</h3><p>${U.esc(t[1])}</p><div class="tiprow"><button class="btn small" data-tipsay="${key}">🔊 Послушать</button><button class="btn ghost small" data-tipclose="1">Понятно</button></div></div>`;
   document.body.appendChild(d); }

@@ -28,7 +28,7 @@ function libStop(){ if (!LR) return; LR.active = false; try { LR.rec && LR.rec.s
 /* --- карточка на главной --- */
 function libCard(kid){ if (!kid) return ''; var B = libK(kid), left = LIB_DAY_MIN - (B.min || 0);
   if (!libOpen(kid)) return '<section class="card libc off"><h2>' + icon('books') + ' Читальня</h2><p>Откроется, когда сделаешь все уроки дня. Там можно заработать ещё — но только чтением: 15, 20 или 30 минут подряд.</p></section>';
-  if (left < LIB_BLOCKS[0][0] && !B.blk) return '<section class="card libc"><h2>' + icon('books') + ' Читальня</h2><p>На сегодня в Читальне всё: ты читал' + (T(kid) === 'anya' ? 'а' : '') + ' ' + (B.min || 0) + ' минут и заработал' + (T(kid) === 'anya' ? 'а' : '') + ' <b>+' + (B.pts || 0) + '</b>. Завтра можно снова.</p></section>';
+  if (left < LIB_BLOCKS[0][0] && !B.blk) return '<section class="card libc"><h2>' + icon('books') + ' Читальня</h2><p>На сегодня в Читальне всё: ты читал' + (GIRL(kid) ? 'а' : '') + ' ' + (B.min || 0) + ' минут и заработал' + (GIRL(kid) ? 'а' : '') + ' <b>+' + (B.pts || 0) + '</b>. Завтра можно снова.</p></section>';
   return '<section class="card libc on"><h2>' + icon('books') + ' Читальня — заработать ещё</h2><p>' + (B.blk ? 'Блок чтения начат: ' + Math.floor((B.blk.sec || 0) / 60) + ' из ' + B.blk.m + ' минут.' : 'Хочешь ещё баллов? Почитай 15, 20 или 30 минут подряд. Баллы — только за целый блок.') + (B.pts ? ' Сегодня уже +' + B.pts + '.' : '') + '</p><button class="btn big" data-act="libgo">' + (B.blk ? 'Продолжить чтение' : 'Открыть Читальню') + '</button></section>'; }
 
 /* --- экран --- */
@@ -52,10 +52,10 @@ function vLib(){ var kid = cur.kid, K = S.kids[kid], B = libK(kid);
       '<p class="hint">Страница засчитается, когда прочитаешь её вслух. Если молчать — время не идёт.</p></section></main>'; }
   if (!b.t0) { b.t0 = Date.now(); save(); }
   return head + title + bar + '<article class="card reading"><div class="text">' + pg.sents.map(function(s){ return U.esc(s); }).join(' ') + '</div></article>' +
-    '<div class="readbar"><button class="btn big" data-act="libnext">Прочитал' + (T(kid) === 'anya' ? 'а' : '') + ' страницу</button></div><p class="hint">Читай внимательно: после каждых двух страниц — «Найди ошибку» по прочитанному.</p></section></main>'; }
+    '<div class="readbar"><button class="btn big" data-act="libnext">Прочитал' + (GIRL(kid) ? 'а' : '') + ' страницу</button></div><p class="hint">Читай внимательно: после каждых двух страниц — «Найди ошибку» по прочитанному.</p></section></main>'; }
 
 /* --- «Найди ошибку» по двум страницам --- */
-function libChkView(kid, b){ var q = b.chk, girl = T(kid) === 'anya';
+function libChkView(kid, b){ var q = b.chk, girl = GIRL(kid);
   var sent = function(s, si){ return s.split(' ').map(function(w, wi){ var bad = si === q.k && wi === q.wi, tried = (q.wrong || []).some(function(x){ return x[0] === si && x[1] === wi; });
     var cls = q.fin && bad ? (q.ok ? 'right' : 'miss') : tried ? 'wrong' : ''; return '<button class="spw ' + cls + '" data-act="libspw" data-s="' + si + '" data-w="' + wi + '" ' + (q.fin || tried ? 'disabled' : '') + '>' + U.esc(w) + '</button>'; }).join(' '); };
   return '<article class="card task spot"><h2>' + icon('search') + ' Найди ошибку</h2><p class="hint">Это из страниц, которые ты сейчас ' + (girl ? 'прочитала' : 'прочитал') + '. В одном предложении я поменял одно слово. Найди его. Две попытки.</p><div class="spt">' + q.sents.map(function(s, si){ return '<p>' + sent(s, si) + '</p>'; }).join('') + '</div>' +

@@ -94,7 +94,7 @@ function vPortrait(kid){
   const note = `<p class="hint pfnote">Это наблюдения по результатам ребёнка в приложении, а не психологическая диагностика и не прогноз. Интересы и способности в этом возрасте быстро меняются — портрет обновляется сам по мере занятий.</p>`;
   if (P.tot < MIN_ANS || P.days < MIN_DAYS) {
     const p = Math.min(P.tot / MIN_ANS, P.days / MIN_DAYS);
-    return `<div class="card"><h2>Портрет: копим наблюдения</h2><p>Чтобы выводы были честными, нужно хотя бы ${MIN_ANS} ответов за ${MIN_DAYS} разных дней. Сейчас: ${P.tot} ${pfWord(P.tot, 'ответ', 'ответа', 'ответов')} за ${P.days} ${pfWord(P.days, 'день', 'дня', 'дней')}.</p>${pfBar(p)}<p class="hint">Готово примерно на ${Math.round(p * 100)}%. ${S.pfSheet && S.pfSheet._at ? 'Учтены все занятия из таблицы.' : 'Загружаю занятия из таблицы…'}</p></div>${note}`; }
+    return `<div class="card"><h2>Портрет: копим наблюдения</h2><p>Чтобы выводы были честными, нужно хотя бы ${MIN_ANS} ответов за ${MIN_DAYS} разных дней. Сейчас: ${P.tot} ${pfWord(P.tot, 'ответ', 'ответа', 'ответов')} за ${P.days} ${pfWord(P.days, 'день', 'дня', 'дней')}.</p>${pfBar(p)}<p class="hint">Готово примерно на ${Math.round(p * 100)}%. ${S.pfSheet && S.pfSheet._at ? (FAM ? 'Учтены все занятия.' : 'Учтены все занятия из таблицы.') : 'Загружаю занятия из таблицы…'}</p></div>${note}`; }
   const ready = Object.keys(PF_SC).filter(k => P.sc[k].n >= SC_MIN);
   const rows = Object.keys(PF_SC).map(k => { const x = P.sc[k], s = PF_SC[k];
     if (x.n < SC_MIN) return `<div class="pfrow dim"><b>${s.i} ${s.n}</b><span class="hint">пока мало данных (${x.n} из ${SC_MIN})</span></div>`;

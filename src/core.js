@@ -11,6 +11,10 @@ const U = {
     f.sample = (arr, n) => f.shuffle(arr).slice(0, n);
     return f;
   },
+  /* Убрать эмодзи (для <option>, где наши иконки не подставляются) */
+  noEmo(s){ return String(s == null ? '' : s).replace(/[\u2600-\u27BF\uFE0F\u200D\u2B50\u2B06\u2934\u2935\u3030\u303D\u3297\u3299]|[\uD83C-\uD83E][\uDC00-\uDFFF]/g, '').replace(/\s{2,}/g, ' ').trim(); },
+  /* Имя в винительном падеже: «за Глеба», «за Катю», «за Мишу» */
+  acc(n){ n = String(n || ''); if (/[^А-Яа-яЁё]/.test(n.slice(-1)) || n.length < 2) return n; const l = n.slice(-1), p = n.slice(0, -1); if (l === 'а') return p + 'у'; if (l === 'я') return p + 'ю'; if (l === 'й' || l === 'ь') return p + 'я'; if (/[бвгджзклмнпрстфхцчшщ]/i.test(l)) return n + 'а'; return n; },
   pl(n, one, few, many){ const m10 = n % 10, m100 = n % 100; if (m10 === 1 && m100 !== 11) return one; if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few; return many; },
   dec(x){ return String(Math.round(x * 1000) / 1000).replace('.', ','); },
   big(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); },

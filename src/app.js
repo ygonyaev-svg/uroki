@@ -198,6 +198,9 @@ function rememberScroll(){ if (cur.view !== 'lesson' || !cur.kid || !cur.subj) r
 function coinsHtml(n){ const K = cur.kid && S.kids[cur.kid]; return `<span class="tipc" data-tip="coins"><span class="coin" aria-hidden="true"></span><b>${n}</b></span>${K ? `<span class="tipc pigh" data-tip="piggy">🐷<b>${K.piggy || 0}</b></span>` : ''}`; }
 
 /* ===== Экраны ===== */
+/* Пол ребёнка (анкета Словохода): «прочитал» / «прочитала». Без пола — по шаблону, как у Ярика и Ани */
+function GIRL(kid){ const k = KIDS[kid]; return k && k.sex ? k.sex === 'f' : T(kid) === 'anya'; }
+function sexify(h, kid){ if (!kid || !KIDS[kid] || !KIDS[kid].sex) return h; const f = KIDS[kid].sex === 'f'; return h.replace(/([А-Яа-яЁё]+)\(а\)/g, (m, w) => f ? w + 'а' : w); }
 function render(){
   if (S.parentPin) for (const k of kidIds()) { burnCheck(k); piggyCheck(k); }
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
@@ -209,7 +212,7 @@ function render(){
   document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix', 'lib'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
   if (typeof lookVars === 'function') lookVars(document.body.className ? cur.kid : null);
   if (FAM) famBody();
-  app().innerHTML = (TEST ? testBar() : '') + v; afterRender();
+  app().innerHTML = (TEST ? testBar() : '') + (FAM ? sexify(v, cur.view === 'parent' ? cur.parentKid : cur.kid) : v); afterRender();
 }
 function afterRender(){ const f = app().querySelector('[autofocus]'); if (f) try { f.focus(); } catch (e) {} }
 
@@ -232,8 +235,8 @@ function vLogin(){
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.INSTALL_EV = e; if (cur.view === 'login') render(); });
 window.addEventListener('appinstalled', () => { window.INSTALL_EV = null; if (cur.view === 'login') render(); });
 function vPin(){
-  const who = cur.pinFor === 'parent' ? 'Код родителя' : 'Код: ' + KIDS[cur.pinFor].name;
-  return `<main class="wrap narrow"><header class="hero"><h1>${who}</h1><p>${U.esc(cur.msg || 'Введи четыре цифры')}</p></header>
+  const who = cur.pinFor === 'parent' ? 'Код родителя' : KIDS[cur.pinFor].name + ', введи свой код';
+  return `<main class="wrap narrow"><header class="hero"><h1>${U.esc(who)}</h1><p>${U.esc(cur.msg || (cur.pinFor === 'parent' ? 'Введите четыре цифры' : 'Четыре цифры'))}</p></header>
   <div class="pinbox"><div class="dots" id="dots">${'<i></i>'.repeat(4)}</div>
   <div class="pad">${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(x => x === '' ? '<span></span>' : `<button class="key" data-act="key" data-k="${x}">${x}</button>`).join('')}</div>
   <button class="link" data-act="cancelpin">Назад</button></div></main>`;
@@ -299,7 +302,7 @@ function vHome(){
   <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
 }
 function lastReading(kid){ const K = S.kids[kid], R = K.reading.filter(x => x.lang === 'ru').slice(-5); if (!R.length) return ''; const best = readBestOf(kid), lv = readLv(kid, best);
-  return `<p class="rlv tipc" data-tip="level"><span class="rlvb">${lv.cur[2]} ${lv.cur[1]}</span> рекорд <b>${best}</b> сл/мин${lv.next ? ` · до уровня «${lv.next[1]}» ещё ${lv.next[0] - best}` : ''}</p>${badgesRow(kid)}` + '<div class="speeds">' + R.map(x => `<span title="${U.esc(x.title)}"><b>${x.wpm}</b> сл/мин</span>`).join('') + `</div><p class="hint">Цель к концу года: ${KIDS[kid].norm} слов в минуту.</p>${vocabRow(kid)}`; }
+  return `<p class="rlv tipc" data-tip="level"><span class="rlvb">${lv.cur[2]} ${lv.cur[1]}</span> рекорд <b>${best}</b> сл/мин${lv.next ? ` · до уровня «${lv.next[1]}» ещё ${lv.next[0] - best}` : ''}</p>${badgesRow(kid)}` + '<div class="speeds">' + R.map(x => `<span title="${U.esc(x.title)}"><b>${x.wpm}</b> сл/мин</span>`).join('') + `</div><p class="hint">Цель к концу года: ${KIDS[kid].norm} ${U.pl(KIDS[kid].norm, 'слово', 'слова', 'слов')} в минуту.</p>${vocabRow(kid)}`; }
 /* ----- Темп чтения: уровни, рекорды, значки ----- */
 const READ_LV = { yarik: [[0,'Новичок','🌱'],[20,'Ученик','📖'],[30,'Читатель','📚'],[40,'Знаток слов','🔤'],[55,'Мастер чтения','🏅'],[70,'Чемпион','🏆'],[90,'Легенда','👑']],
   anya: [[0,'Ученица','🌱'],[80,'Читательница','📖'],[100,'Книжный знаток','📚'],[120,'Мастер слова','✒️'],[140,'Магистр чтения','🌟'],[160,'Архимаг книг','🔮']] };
@@ -313,7 +316,7 @@ function sparkSvg(kid, vals, norm){ const W = 300, H = 90, P = 8, mx = Math.max(
   const X = i => n < 2 ? W / 2 : P + i * (W - 2 * P) / (n - 1), Y = v => H - P - (v - lo) / Math.max(1, mx - lo) * (H - 2 * P);
   const pts = vals.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
   return `<svg class="spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="Скорость чтения по разам"><line x1="0" x2="${W}" y1="${Y(norm).toFixed(1)}" y2="${Y(norm).toFixed(1)}" class="sn"/><text x="${W - 4}" y="${(Y(norm) - 4).toFixed(1)}" text-anchor="end" class="st">норма ${norm}</text>${n > 1 ? `<polyline points="${pts}" class="sl"/>` : ''}${vals.map((v, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="${i === n - 1 ? 6 : 3.5}" class="${i === n - 1 ? 'sc now' : 'sc'}"/>`).join('')}</svg>`; }
-function paceCard(kid, r){ const K = S.kids[kid], norm = KIDS[kid].norm, best = readBestOf(kid), lv = readLv(kid, best), girl = T(kid) === 'anya';
+function paceCard(kid, r){ const K = S.kids[kid], norm = KIDS[kid].norm, best = readBestOf(kid), lv = readLv(kid, best), girl = GIRL(kid);
   const vals = K.reading.filter(x => x.lang === 'ru').slice(-10).map(x => x.wpm);
   const d = r.prev != null ? r.wpm - r.prev : null;
   const praise = r.lvup ? `🎉 Новый уровень: <b>${lv.cur[2]} ${lv.cur[1]}</b>! Ты ${girl ? 'заслужила' : 'заслужил'} новый значок и +10 баллов в копилку.`
@@ -327,7 +330,7 @@ function paceCard(kid, r){ const K = S.kids[kid], norm = KIDS[kid].norm, best = 
   return `<article class="card pace"><p class="eyebrow">Твой темп</p><div class="pbig"><span class="tipc" data-tip="wpm"><b>${r.wpm}</b> слов в минуту</span>${r.acc != null ? ` · <span class="tipc" data-tip="acc">точность ${Math.round(r.acc * 100)}%</span>` : ''}</div>
    <p class="ppr">${praise}</p>
    ${r.prev != null ? `<p>В прошлый раз: <b>${r.prev}</b>. Твой рекорд: <b>${best}</b>.</p>` : ''}
-   <p class="tipc" data-tip="norm">Норма к концу года${KIDS[kid].grade ? ' (' + KIDS[kid].grade + ')' : ''} — <b>${norm}</b> слов в минуту.${r.wpm >= norm ? ' Ты уже читаешь как надо — даже быстрее!' : ` Осталось ${norm - r.wpm}.`}</p>
+   <p class="tipc" data-tip="norm">Норма к концу года${KIDS[kid].grade ? ' (' + KIDS[kid].grade + ')' : ''} — <b>${norm}</b> ${U.pl(norm, 'слово', 'слова', 'слов')} в минуту.${r.wpm >= norm ? ' Ты уже читаешь как надо — даже быстрее!' : ` Осталось ${norm - r.wpm}.`}</p>
    ${vals.length > 1 ? sparkSvg(kid, vals, norm) + '<p class="hint center">Твои последние чтения. Пунктир — норма.</p>' : ''}
    <div class="plv tipc" data-tip="level"><span>${lv.cur[2]} ${lv.cur[1]}</span>${lv.next ? `<div class="pbar"><i style="width:${pr}%"></i></div><span>${lv.next[2]} ${lv.next[1]} · ${lv.next[0]}</span>` : '<span>Высший уровень!</span>'}</div>
    ${badgesRow(kid)}
@@ -341,7 +344,7 @@ function wordQs(kid, L){ const gl = (L.gl || []).slice(0, 4), lvl = T(kid) === '
   return gl.map(g => { const ds = [...new Set(r.shuffle(pool.filter(x => x[1] !== g.w && x[2] !== g.d)).map(x => x[2]))].slice(0, 2); return { w: g.w, e: g.e, a: g.d, opts: r.shuffle([g.d, ...ds]) }; }); }
 function vWords(kid, L, head){ const qs = wordQs(kid, L), i = L.wi || 0, A = L.wans || [];
   if (i >= qs.length) { const okn = A.filter(a => a && a.ok).length;
-    return head + `<article class="card gloss"><h2>Какие новые слова ты ${T(kid) === 'anya' ? 'узнала' : 'узнал'}</h2><p>Угадано с первого раза: <b>${okn} из ${qs.length}</b>${okn === qs.length ? ' — отлично!' : ''}</p>${(L.gl || []).map((g, k) => `<div class="gw"><span class="ge">${g.e}</span><div><b>${U.esc(g.w)}</b> — ${U.esc(g.d)}</div>${A[k] ? (A[k].ok ? '✅' : '🔁') : ''}</div>`).join('')}<p class="hint">Попробуй сегодня сказать одно из этих слов в разговоре.</p></article><button class="btn big" data-act="wdone">Дальше</button></section>`; }
+    return head + `<article class="card gloss"><h2>Какие новые слова ты ${GIRL(kid) ? 'узнала' : 'узнал'}</h2><p>Угадано с первого раза: <b>${okn} из ${qs.length}</b>${okn === qs.length ? ' — отлично!' : ''}</p>${(L.gl || []).map((g, k) => `<div class="gw"><span class="ge">${g.e}</span><div><b>${U.esc(g.w)}</b> — ${U.esc(g.d)}</div>${A[k] ? (A[k].ok ? '✅' : '🔁') : ''}</div>`).join('')}<p class="hint">Попробуй сегодня сказать одно из этих слов в разговоре.</p></article><button class="btn big" data-act="wdone">Дальше</button></section>`; }
   const q = qs[i], a = A[i] || {};
   return head + `<div class="counter">Новое слово ${i + 1} из ${qs.length}</div><article class="card task"><div class="q">Что значит «${U.esc(q.w)}»? ${q.e}</div><div class="opts">${q.opts.map(o => `<button class="opt ${a.v != null && o === q.a ? 'right' : a.v === o && !a.ok ? 'wrong' : ''}" data-act="wq" data-v="${U.esc(o)}" ${a.v != null ? 'disabled' : ''}>${U.esc(o)}</button>`).join('')}</div>
    ${a.v != null ? (a.ok ? '<div class="fb ok"><b>Верно!</b></div>' : `<div class="fb bad"><b>«${U.esc(q.w)}» — это ${U.esc(q.a)}</b></div>`) : ''}</article>${a.v != null ? `<button class="btn big" data-act="wnext">Дальше</button>` : ''}</section>`; }
@@ -621,7 +624,7 @@ const DAY_MAX = 60, DAY_BONUS = 10, LESSON_POOL = DAY_MAX - DAY_BONUS, SKIP_PRIC
 function extraTile(kid, D){ if (!D.bonus || cur.ds !== U.today()) return ''; const L = D.les.extra;
   if (!L && !extraTasks(kid, D).length) return '';
   const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new';
-  return `<button class="tile extra ${st}" data-act="openextra"><span class="ico">⭐</span><span class="tt"><span class="sn">Экстра</span><span class="ut">${st === 'done' ? `Сделано: +${L.coins || 0} баллов` : 'Хочешь ещё? Задания по сегодняшним ошибкам: +5 баллов'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : ''}</button>`; }
+  return `<button class="tile extra ${st}" data-act="openextra"><span class="ico">⭐</span><span class="tt"><span class="sn">Экстра</span><span class="ut">${st === 'done' ? `Сделано: +${L.coins || 0} ${U.pl(L.coins || 0, 'балл', 'балла', 'баллов')}` : 'Хочешь ещё? Задания по сегодняшним ошибкам: +5 баллов'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : ''}</button>`; }
 /* Перерывы (правило Юры 21.11): каждые ~20 минут спрашиваем «Не устал?». Готов — занимается дальше; устал — сам выбирает отдых 15/20/30 мин.
    Но за одну сессию не больше часа занятий: после часа — обязательный перерыв 2 часа. Пройденные уроки и работа над ошибками открыты всегда. */
 const REST_MS = 2 * 3600 * 1000, BLOCK_SECS = 20 * 60, SESS_SECS = 60 * 60;
@@ -668,7 +671,7 @@ function trainTasks(kid, D){ const out = [], K = S.kids[kid];
   return U.rng(U.h(kid + cur.ds + 'trainMix')).shuffle(uniq).slice(0, 16); }
 function trainTile(kid, D){ if (!trainReady(kid, D)) return ''; const L = D.les.train; if (!L && !trainTasks(kid, D).length) return '';
   const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new';
-  return `<button class="tile pro ${st}" data-act="opentrain"><span class="ico">🔥</span><span class="tt"><span class="sn">Испытание</span><span class="ut">${st === 'done' ? `Пройдено: +${L.coins || 0} баллов` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Сложные задачи по темам, которые будут дальше. Одна попытка. До +15 баллов'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : ''}</button>`; }
+  return `<button class="tile pro ${st}" data-act="opentrain"><span class="ico">🔥</span><span class="tt"><span class="sn">Испытание</span><span class="ut">${st === 'done' ? `Пройдено: +${L.coins || 0} ${U.pl(L.coins || 0, 'балл', 'балла', 'баллов')}` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Сложные задачи по темам, которые будут дальше. Одна попытка. До +15 баллов'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : ''}</button>`; }
 /* Уровень PRO: после всех уроков и Экстры — тот же день заново, но сложнее. По 3 задания на сегодняшнюю тему и 2 на следующую (на завтра). Одна попытка. */
 function proReady(kid, D){ if (!D.bonus || cur.ds !== U.today()) return false; const E = D.les.extra; return (E && E.phase === 'done') || (!E && !extraTasks(kid, D).length); }
 function proTasks(kid, D){ const out = [];
@@ -679,7 +682,7 @@ function proTasks(kid, D){ const out = [];
   return U.rng(U.h(kid + cur.ds + 'proMix')).shuffle(out).slice(0, 16); }
 function proTile(kid, D){ if (!proReady(kid, D)) return ''; const L = D.les.pro; if (!L && !proTasks(kid, D).length) return '';
   const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new';
-  return `<button class="tile pro ${st}" data-act="openpro"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${st === 'done' ? `Пройден: +${L.coins || 0} баллов` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Пройди этот день ещё раз — задачи на смекалку и тема завтрашнего урока. Одна попытка'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : '<span class="state">до +30</span>'}</button>`; }
+  return `<button class="tile pro ${st}" data-act="openpro"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${st === 'done' ? `Пройден: +${L.coins || 0} ${U.pl(L.coins || 0, 'балл', 'балла', 'баллов')}` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Пройди этот день ещё раз — задачи на смекалку и тема завтрашнего урока. Одна попытка'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : '<span class="state">до +30</span>'}</button>`; }
 /* Экстра: по 3 новых задания на темы, где сегодня были ошибки, и по 1 на закрепление остальных; не больше 10 */
 function extraTasks(kid, D){ const out = [];
   const subs = Object.keys(D.les).filter(s => D.les[s].uid && D.les[s].phase === 'done').map(s => { const L = D.les[s]; const bad = (L.ans || []).filter(a => a && !(a.ok && a.tries === 1)).length; return { s, L, bad }; }).sort((a, b) => b.bad - a.bad);
@@ -713,7 +716,7 @@ function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) 
 function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0) return '';
   const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'} (${K.coins}).</div>`; }
 function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
-  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span class="tipc" data-tip="base">🎮 Игры <b>${bt.game} мин</b></span><span class="tipc" data-tip="base">▶️ YouTube <b>${bt.yt} мин</b></span><span class="tipc" data-tip="coins">⭐ Баллы <b>${K.coins}</b> (+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
+  return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2"><span class="tipc" data-tip="base">🎮 Игры <b>${bt.game} мин</b></span><span class="tipc" data-tip="base">▶️ YouTube <b>${bt.yt} мин</b></span><span class="tipc" data-tip="coins">⭐ Баллы <b>${K.coins}</b>&nbsp;(+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
 /* ----- Копилка: заработанное за неделю копится и в воскресенье переходит на счёт с прибавкой +10%. Забрать раньше можно, но без прибавки. ----- */
 const PIGGY_RATE = .10;
 function weekStart(ds){ const n = U.dayNum(ds), wd = (n + 3) % 7; /* 0 = понедельник */ return U.addDays(ds, -wd); }
@@ -750,7 +753,7 @@ function vRead(kid, L){
     const auto = t.text.split(/\s+/).map(w => w.replace(/[^\p{L}-]/gu, '')).filter(w => w.length >= 9);
     const list = [...new Set(hard.concat(auto))].slice(0, 6);
     return head + cover(t) + glossCard(kid, L) + `<article class="card"><h2>Разминка: прочитай слова по слогам</h2><p class="hint">Нажми на слово, чтобы его послушать.</p><div class="warm">${list.map(w => `<button class="ww" data-act="sayw" data-w="${U.esc(w)}">${U.esc(w)}</button>`).join('')}</div>
-    <p>Сегодня читаешь вслух: <b>${aloud.split(/\s+/).length} слов</b>. Читай спокойно и чётко, как будто рассказываешь кому-то.</p></article>
+    <p>Сегодня читаешь вслух: <b>${((n) => n + ' ' + U.pl(n, 'слово', 'слова', 'слов'))(aloud.split(/\s+/).length)}</b>. Читай спокойно и чётко, как будто рассказываешь кому-то.</p></article>
     <button class="btn big" data-act="toread">Начать чтение</button></section>`;
   }
   if (L.phase === 'read') {
@@ -953,7 +956,7 @@ function prizeIdeas(kid){
   const c = [['g15', '🎮 15 минут игры', 15], ['g30', '🎮 30 минут игры', 30], ['g60', '🎮 Час игры', 60], ['tv', '📺 30 минут мультиков или сериала', 30], ['sw', '🍬 Сладость на выбор', 30], ['late', '🌙 Лечь спать на 30 минут позже', 40],
     ['din', '🍕 Выбрать ужин для всей семьи', 80], ['film', '🎬 Семейный вечер кино — фильм выбираю я', 60], ['cafe', '🍽️ Всей семьёй в кафе или ресторан', 600], ['trip', '🏝️ Семейная поездка — место выбираю я', 1500], ['gift', '🎁 Подарок до 10 €', 400]];
   const y = [['ball', '⚽ Новый мяч или футбольная форма', 800], ['zoo', '🐬 Всей семьёй в океанариум или зоопарк', 700], ['noclean', '🧸 День без уборки игрушек', 50], ['match', '🏟️ Сходить на футбольный матч', 1500]];
-  const a = [['book', '📚 Новая книга на выбор', 150], ['stick', '🦉 Наклейки или значок', 50], ['self', '💅 Что-то для себя до 5 €', 200], ['friend', '👭 Позвать подругу в гости', 120], ['nochore', '🧹 Выходной от домашних дел', 60]];
+  const a = [['book', '📚 Новая книга на выбор', 150], ['stick', '🦉 Наклейки или значок', 50], ['self', '💅 Что-то для себя до 5 €', 200], ['friend', '👭 Позвать друзей в гости', 120], ['nochore', '🧹 Выходной от домашних дел', 60]];
   return c.concat(T(kid) === 'yarik' ? y : a).map(([id, name, price]) => ({ id, name, price }));
 }
 function vPrizes(){
@@ -994,7 +997,7 @@ function vReport(kid){
   return kidSw + timeCard(kid) + `<div class="card"><h2>${d.name}: баллы ${K.coins}, прочитано слов ${K.words}, в повторении ${K.srs.length} заданий</h2>
   <div class="tscroll"><table><thead><tr><th>Предмет</th><th>Темы</th><th>Сейчас</th><th>Точность</th></tr></thead><tbody>${subs}</tbody></table></div></div>
   <div class="card"><h2>Слабые места</h2>${weak ? `<ul>${weak}</ul>` : '<p>Пока мало данных.</p>'}</div>
-  <div class="card"><h2>Чтение вслух</h2>${rd ? `<div class="tscroll"><table><thead><tr><th>Дата</th><th>Текст</th><th>Язык</th><th>сл/мин</th><th>Точность</th><th>Ошибки</th></tr></thead><tbody>${rd}</tbody></table></div>` : '<p>Ещё не читал(а).</p>'}<p class="hint">Норма к концу года: ${d.norm} слов в минуту. Сейчас читает вслух по ${wordsLimit(kid)} слов за урок.</p></div>
+  <div class="card"><h2>Чтение вслух</h2>${rd ? `<div class="tscroll"><table><thead><tr><th>Дата</th><th>Текст</th><th>Язык</th><th>сл/мин</th><th>Точность</th><th>Ошибки</th></tr></thead><tbody>${rd}</tbody></table></div>` : '<p>Ещё не читал(а).</p>'}<p class="hint">Норма к концу года: ${d.norm} ${U.pl(d.norm, 'слово', 'слова', 'слов')} в минуту. Сейчас читает вслух по ${wordsLimit(kid)} ${U.pl(wordsLimit(kid), 'слову', 'слова', 'слов')} за урок.</p></div>
   <div class="card"><h2>Последние ошибки</h2>${errs ? `<ul>${errs}</ul>` : '<p>Ошибок нет.</p>'}</div>
   <div class="card"><h2>Отзывы после уроков</h2>${fbs ? `<ul>${fbs}</ul>` : '<p>Пока нет.</p>'}</div>
   <div class="card"><h2>Быстрые действия</h2><form class="form" data-form="hw"><label>Задание ребёнку (появится в «Домашнем задании»)<input id="hwtext" autocomplete="off"></label><button class="btn small">Добавить</button></form>
@@ -1003,7 +1006,7 @@ function vReport(kid){
 function devInfo(){ const ua = navigator.userAgent; const m = ua.match(/OS (\d+)[_.](\d+)/) || ua.match(/Version\/(\d+)\.(\d+)/); const ios = m ? m[1] + '.' + m[2] : '?'; const pwa = (window.navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches)) ? 'с главного экрана' : 'в браузере';
   return `Версия системы: ${ios}, открыто ${pwa}. Распознавание чтения вслух: ${SR ? '✅ есть' : '❌ нет — нужен iPadOS 14.5 или новее (Настройки → Основные → Обновление ПО); пока скорость чтения считается по таймеру'}. Микрофон: ${navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? 'доступен' : 'недоступен'}.`; }
 function vSettings(){
-  const unitSel = kid => Object.entries(KIDS[kid].cur).filter(([, c]) => c.units).map(([k, c]) => [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []).map(([tr, list, nm]) => `<label>${KIDS[kid].name} · ${nm}<select id="sel_${kid}_${k}${tr}">${list.map((u, i) => `${u.cont && !(list[i - 1] || {}).cont ? '<optgroup label="Продолжение (следующий класс)">' : ''}<option value="${i}" ${(S.kids[kid].pos[k + tr] || 0) === i ? 'selected' : ''}>${i + 1}. ${CONT_MARK(u)}${U.esc(u.t)}</option>${u.cont && i === list.length - 1 ? '</optgroup>' : ''}`).join('')}</select></label>`).join('')).join('');
+  const unitSel = kid => Object.entries(KIDS[kid].cur).filter(([, c]) => c.units).map(([k, c]) => [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []).map(([tr, list, nm]) => `<label>${KIDS[kid].name} · ${nm}<select id="sel_${kid}_${k}${tr}">${list.map((u, i) => `${u.cont && !(list[i - 1] || {}).cont ? '<optgroup label="Продолжение (следующий класс)">' : ''}<option value="${i}" ${(S.kids[kid].pos[k + tr] || 0) === i ? 'selected' : ''}>${i + 1}. ${CONT_MARK(u)}${U.esc(U.noEmo(u.t))}</option>${u.cont && i === list.length - 1 ? '</optgroup>' : ''}`).join('')}</select></label>`).join('')).join('');
   return (typeof lookSettings === 'function' ? lookSettings() : '') + `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => { const K0 = S.kids[k], x = extraSecs(K0) / 60, used = Math.round((K0.sess || 0) / 60); return `<div class="xtrow"><span><b>${KIDS[k].name}</b>: сегодня в сессии ${used} из ${60 + x} мин${x ? ` (+${x} от вас)` : ''}</span> <button class="btn small" data-act="xtadd" data-k="${k}" data-m="10">+10 мин</button> ${x ? `<button class="btn ghost small" data-act="xtadd" data-k="${k}" data-m="-10">−10</button>` : ''}</div>`; }).join('')}<p class="hint">Добавленное время — только на сегодня. Если ребёнок уже на большом перерыве, он сразу снимается.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
   ${FAM ? '' : `<div class="card form" ><h2>Связь с таблицей родителя</h2><label>Адрес скрипта Google<input id="syncurl" value="${U.esc(S.cfg.sync || '')}" autocomplete="off"></label><p class="hint">В очереди на отправку: ${S.queue.length}.</p><div class="row"><button class="btn small" data-act="savesync">Сохранить и отправить</button></div></div>`}
   <div class="card"><h2>Начать заново</h2><p class="hint">Стирает на этом айпаде весь прогресс, монеты, покупки и коды. После теста нажмите — и приложение будет как новое.</p><button class="btn small stop" data-act="resetall">Сбросить всё на этом устройстве</button></div>
