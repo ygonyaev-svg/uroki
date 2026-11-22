@@ -192,7 +192,7 @@ function vSleep(){ const h = lisbonHour(); return `<main class="wrap ${LK(cur.ki
 setInterval(() => { if (cur.kid && !TEST && cur.view !== 'parent' && ((sleepNow() ? 1 : 0) !== (cur.slept || 0))) { cur.slept = sleepNow() ? 1 : 0; render(); } }, 60000);
 
 /* ===== Состояние экрана ===== */
-const cur = { kid:null, view:'login', subj:null, ds:U.today(), K(){ return KIDS[this.kid]; }, pinFor:null, onPin:null, parentTab:'report', parentKid:'yarik', msg:'' };
+const cur = { kid:null, view:'login', subj:null, ds:U.today(), K(){ return KIDS[this.kid]; }, pinFor:null, onPin:null, parentTab:'home', parentKid:'yarik', msg:'' };
 const app = () => document.getElementById('app');
 function go(view, extra){ try { sayStop(); } catch (e) {} try { micStop(); } catch (e) {} try { if (view !== 'lib') libStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
   if (view === 'lesson' && cur.kid && cur.subj) { const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L && L.scrollY && L.scrollY.ph === (L.phase || '') + (L.fphase || '')) { const y = L.scrollY.y; setTimeout(() => window.scrollTo(0, y), 60); } } }
@@ -977,50 +977,18 @@ function vPrizes(){
   <button class="btn big" data-act="prdone" ${sel.length < 3 ? 'disabled' : ''}>Готово (${sel.length})</button></section></main>`;
 }
 
-/* ----- Родителям ----- */
-function vParent(){
-  const tabs = [['report', 'Отчёт'], ['tasks', 'Задания' + (kidIds().some(k => ptOf(k, ['wait']).length) ? ' •' : '')], ['portrait', 'Портрет'], ['shop', 'Призы'], ['set', 'Настройки']];
-  let body = '';
-  if (FAM) famParentPull();
-  if (cur.parentTab === 'report') body = vReport(cur.parentKid);
-  else if (cur.parentTab === 'tasks') body = KIDS[cur.parentKid] ? vPTParent() : '';
-  else if (cur.parentTab === 'portrait') body = `<div class="row">${kidIds().map(k => `<button class="chip ${cur.parentKid === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}</button>`).join('')}</div>` + (cur.parentKid && KIDS[cur.parentKid] ? vPortrait(cur.parentKid) : '');
-  else if (cur.parentTab === 'shop') { const pk = cur.parentKid, sh = S.kids[pk].shop || [], wait = sh.filter(x => x.price == null).length;
-    body = `<div class="row">${kidIds().map(k => `<button class="chip ${pk === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}${(S.kids[k].shop || []).some(x => x.price == null) ? ' •' : ''}</button>`).join('')}</div>
-    <div class="card"><h2>Призы, которые выбрал(а) ${KIDS[pk].name}</h2><p class="hint">Призы выбирает сам ребёнок. Вы только ставите цену в баллах (1 балл = 1 минута игры, за день максимум 60).${wait ? ` <b>Ждут цены: ${wait}.</b>` : ''}</p>
-    ${sh.length ? sh.map((it, i) => `<div class="shoprow"><span>${U.esc(it.name)}${it.own ? ' <em class="hint">(своё)</em>' : ''}</span><input id="sp${i}" inputmode="numeric" value="${it.price == null ? '' : it.price}" placeholder="цена" aria-label="Цена"><button class="link" data-act="delshop" data-i="${i}">Убрать</button></div>`).join('') : '<p>Ещё не выбирал(а). Список появится после первого входа ребёнка.</p>'}
-    ${sh.length ? '<button class="btn small" data-act="saveshop">Сохранить цены</button>' : ''}</div>`; }
-  else body = vSettings();
-  return `<main class="wrap"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span>Родителям</span></header>
-  <nav class="tabs">${tabs.map(([k, t]) => `<button class="tab ${cur.parentTab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${t}</button>`).join('')}</nav>${FAM && cur.parentTab === 'report' ? famSumCard() : ''}${cur.parentTab === 'report' || cur.parentTab === 'set' ? testCard() : ''}${body}</main>`;
-}
-function vReport(kid){
-  const K = S.kids[kid], d = KIDS[kid];
-  const kidSw = `<div class="row">${kidIds().map(k => `<button class="chip ${kid === k ? 'on' : ''}" data-act="pkid" data-k="${k}">${KIDS[k].name}</button>`).join('')}</div>`;
-  const subs = Object.entries(d.cur).filter(([k, c]) => c.units).map(([k, c]) => { const rows = [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []);
-    return rows.map(([tr, list, nm]) => { const i = Math.min(K.pos[k + tr] || 0, list.length); const tried = list.filter(u => K.stats[u.id]); const a = tried.length ? Math.round(tried.reduce((s, u) => s + acc(K, u.id), 0) / tried.length * 100) : null;
-      return `<tr><td>${nm}</td><td>${(n0 => n0 < list.length ? (i <= n0 ? `${i} из ${n0} + ${list.length - n0} в «Продолжении»` : `основная программа пройдена, «Продолжение»: ${i - n0} из ${list.length - n0}`) : `${i} из ${list.length}`)(list.filter(u => !u.cont).length)}</td><td>${CONT_MARK(list[Math.min(i, list.length - 1)])}${U.esc((list[Math.min(i, list.length - 1)] || {}).t || '')}</td><td>${a == null ? '—' : a + '%'}</td></tr>`; }).join(''); }).join('');
-  const weak = Object.entries(K.stats).filter(([, s]) => s.n >= 3).map(([id, s]) => [id, s.ok / s.n]).sort((a, b) => a[1] - b[1]).slice(0, 6).map(([id, x]) => { const u = Object.values(d.cur).flatMap(c => (c.units || []).concat(c.alt || [])).find(u => u.id === id); return `<li>${CONT_MARK(u)}${U.esc(u ? u.t : id)} — ${Math.round(x * 100)}%</li>`; }).join('');
-  const rd = K.reading.slice(-10).reverse().map(r => `<tr><td>${r.d}</td><td>${U.esc(r.title)}</td><td>${r.lang}</td><td>${r.wpm}</td><td>${r.acc == null ? '—' : Math.round(r.acc * 100) + '%'}</td><td>${U.esc((r.errs || []).join(', '))}</td></tr>`).join('');
-  const fbs = S.log.filter(e => e.kid === d.name && e.type === 'урок завершён').slice(-10).reverse().map(e => `<li>${e.t.slice(0, 10)} · ${U.esc(e.subj)}: ${e.grade} (${e.score}) · ${['', '🙁', '😐', '🙂', '😀'][e.mood || 0] || ''} ${U.esc(e.diff || '')}${e.text ? ' · «' + U.esc(e.text) + '»' : ''}</li>`).join('');
-  const errs = S.log.filter(e => e.kid === d.name && e.type === 'ответ' && e.ok === 'ошибка').slice(-12).reverse().map(e => `<li><b>${U.esc(e.subj)}</b>: ${U.esc(e.q)} — ответил(а) «${U.esc(e.ans)}», надо «${U.esc(e.right)}»</li>`).join('');
-  return kidSw + timeCard(kid) + `<div class="card"><h2>${d.name}: баллы ${K.coins}, прочитано слов ${K.words}, в повторении ${K.srs.length} заданий</h2>
-  <div class="tscroll"><table><thead><tr><th>Предмет</th><th>Темы</th><th>Сейчас</th><th>Точность</th></tr></thead><tbody>${subs}</tbody></table></div></div>
-  <div class="card"><h2>Слабые места</h2>${weak ? `<ul>${weak}</ul>` : '<p>Пока мало данных.</p>'}</div>
-  <div class="card"><h2>Чтение вслух</h2>${rd ? `<div class="tscroll"><table><thead><tr><th>Дата</th><th>Текст</th><th>Язык</th><th>сл/мин</th><th>Точность</th><th>Ошибки</th></tr></thead><tbody>${rd}</tbody></table></div>` : '<p>Ещё не читал(а).</p>'}<p class="hint">Норма к концу года: ${d.norm} ${U.pl(d.norm, 'слово', 'слова', 'слов')} в минуту. Сейчас читает вслух по ${wordsLimit(kid)} ${U.pl(wordsLimit(kid), 'слову', 'слова', 'слов')} за урок.</p></div>
-  <div class="card"><h2>Последние ошибки</h2>${errs ? `<ul>${errs}</ul>` : '<p>Ошибок нет.</p>'}</div>
-  <div class="card"><h2>Отзывы после уроков</h2>${fbs ? `<ul>${fbs}</ul>` : '<p>Пока нет.</p>'}</div>
-  <div class="card"><h2>Быстрые действия</h2><p><button class="btn small" data-act="ptab" data-t="tasks">Дать задание ребёнку</button> <span class="hint">дело по дому, задачку или отрывок книги — во вкладке «Задания»</span></p>
-  <form class="form" data-form="coins"><label>Баллы (+ или −)<input id="coinadd" inputmode="numeric" autocomplete="off"></label><button class="btn small">Начислить</button></form></div>`;
-}
+/* ----- Родителям: см. parent.js ----- */
 function devInfo(){ const ua = navigator.userAgent; const m = ua.match(/OS (\d+)[_.](\d+)/) || ua.match(/Version\/(\d+)\.(\d+)/); const ios = m ? m[1] + '.' + m[2] : '?'; const pwa = (window.navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches)) ? 'с главного экрана' : 'в браузере';
   return `Версия системы: ${ios}, открыто ${pwa}. Распознавание чтения вслух: ${SR ? '✅ есть' : '❌ нет — нужен iPadOS 14.5 или новее (Настройки → Основные → Обновление ПО); пока скорость чтения считается по таймеру'}. Микрофон: ${navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? 'доступен' : 'недоступен'}.`; }
 function vSettings(){
   const unitSel = kid => Object.entries(KIDS[kid].cur).filter(([, c]) => c.units).map(([k, c]) => [['', c.units, c.name]].concat(c.alt ? [['_alt', c.alt, c.altName]] : []).map(([tr, list, nm]) => `<label>${KIDS[kid].name} · ${nm}<select id="sel_${kid}_${k}${tr}">${list.map((u, i) => `${u.cont && !(list[i - 1] || {}).cont ? '<optgroup label="Продолжение (следующий класс)">' : ''}<option value="${i}" ${(S.kids[kid].pos[k + tr] || 0) === i ? 'selected' : ''}>${i + 1}. ${CONT_MARK(u)}${U.esc(U.noEmo(u.t))}</option>${u.cont && i === list.length - 1 ? '</optgroup>' : ''}`).join('')}</select></label>`).join('')).join('');
-  return (typeof lookSettings === 'function' ? lookSettings() : '') + `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div><div class="card"><h2>Перерывы</h2><p class="hint">Каждые ~20 минут ребёнка спрашивают «Не устал?»: можно продолжить или выбрать отдых 15/20/30 мин. После часа занятий за сессию — обязательный перерыв 2 часа.</p>${kidIds().map(k => { const K0 = S.kids[k], x = extraSecs(K0) / 60, used = Math.round((K0.sess || 0) / 60); return `<div class="xtrow"><span><b>${KIDS[k].name}</b>: сегодня в сессии ${used} из ${60 + x} мин${x ? ` (+${x} от вас)` : ''}</span> <button class="btn small" data-act="xtadd" data-k="${k}" data-m="10">+10 мин</button> ${x ? `<button class="btn ghost small" data-act="xtadd" data-k="${k}" data-m="-10">−10</button>` : ''}</div>`; }).join('')}<p class="hint">Добавленное время — только на сегодня. Если ребёнок уже на большом перерыве, он сразу снимается.</p>${kidIds().map(k => `<p>${KIDS[k].name}: ${restLeft(k) ? `перерыв до ${hhmm(S.kids[k].restUntil)} <button class="btn small" data-act="norest" data-k="${k}">Снять перерыв</button>` : 'можно заниматься'}</p>`).join('')}</div><div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>
-  ${FAM ? '' : `<div class="card form" ><h2>Связь с таблицей родителя</h2><label>Адрес скрипта Google<input id="syncurl" value="${U.esc(S.cfg.sync || '')}" autocomplete="off"></label><p class="hint">В очереди на отправку: ${S.queue.length}.</p><div class="row"><button class="btn small" data-act="savesync">Сохранить и отправить</button></div></div>`}
-  <div class="card"><h2>Начать заново</h2><p class="hint">Стирает на этом айпаде весь прогресс, монеты, покупки и коды. После теста нажмите — и приложение будет как новое.</p><button class="btn small stop" data-act="resetall">Сбросить всё на этом устройстве</button></div>
-  ${FAM ? famSettings() : `<form class="card form" data-form="pins"><h2>Коды</h2><label>Новый код родителя<input id="np" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ярика<input id="ny" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ани<input id="na" inputmode="numeric" maxlength="4" autocomplete="off"></label><button class="btn small">Сменить коды</button></form>`}`;
+  const grp = (t, h) => `<details class="pp-group"><summary>${t}</summary>${h}</details>`;
+  /* Частое — сверху; редкое и служебное — свёрнуто (совет ChatGPT и Gemini 22.11). Перерывы и добавочное время — на экране «Время». */
+  return (FAM ? famSettings() : grp('Коды входа', `<form class="card form" data-form="pins"><h2>Коды</h2><label>Новый код родителя<input id="np" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ярика<input id="ny" inputmode="numeric" maxlength="4" autocomplete="off"></label><label>Новый код Ани<input id="na" inputmode="numeric" maxlength="4" autocomplete="off"></label><button class="btn small">Сменить коды</button></form>`))
+    + grp('С какой темы продолжать', `<div class="card form"><h2>Темы: с чего продолжать</h2>${kidIds().map(unitSel).join('')}<button class="btn small" data-act="saveunits">Сохранить темы</button></div>`)
+    + (typeof lookSettings === 'function' && lookSettings() ? grp('Оформление', lookSettings()) : '')
+    + grp('Служебное: устройство, проверка, сброс', `<div class="card"><h2>Это устройство</h2><p>${devInfo()}</p></div>${FAM ? '' : `<div class="card form" ><h2>Связь с таблицей родителя</h2><label>Адрес скрипта Google<input id="syncurl" value="${U.esc(S.cfg.sync || '')}" autocomplete="off"></label><p class="hint">В очереди на отправку: ${S.queue.length}.</p><div class="row"><button class="btn small" data-act="savesync">Сохранить и отправить</button></div></div>`}
+  <div class="card"><h2>Начать заново</h2><p class="hint">Стирает на этом айпаде весь прогресс, монеты, покупки и коды. После теста нажмите — и приложение будет как новое.</p><button class="btn small stop" data-act="resetall">Сбросить всё на этом устройстве</button></div>` + testCard());
 }
 
 /* ===== События ===== */
@@ -1030,7 +998,7 @@ document.addEventListener('click', e => {
   const kid = cur.kid; const D = kid && dayRec(kid, cur.ds); const L = D && cur.subj && D.les[cur.subj];
   switch (act) {
     case 'login': askPin(b.dataset.kid, () => { cur.kid = b.dataset.kid; snapCheck(cur.kid); ev(cur.kid, 'вход', {}); const K = S.kids[cur.kid]; if (!K.prizesSet) { cur.prSel = []; cur.prOwn = []; cur.prBack = 'home'; go('prizes'); } else go('home'); }); break;
-    case 'parent': askPin('parent', () => go('parent', { kid: null })); break;
+    case 'parent': askPin('parent', () => go('parent', { kid: null, parentTab: 'home' })); break;
     case 'chpin': { const k0 = kid; askPin(k0, () => { cur.pinSet = { kid: k0 }; go('pin', { pinFor: k0, msg: 'Придумай новый код из 4 цифр' }); }, 'Введи свой старый код'); break; }
     case 'cancelpin': cur.pinSet = null; go(cur.kid ? 'home' : 'login'); break;
     case 'always': { const F = alwaysGet(b.dataset.id); if (!F) break; if (typeof rlReset === 'function') rlReset(F.id); if (F.open) F.open(cur.kid || null); go('always', { aid: F.id }); break; }
@@ -1119,7 +1087,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (libAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; if (ptAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (ppAct(act, b)) break; if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (libAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; if (ptAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t, ms){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), ms || 2200); }
@@ -1127,7 +1095,8 @@ document.addEventListener('submit', e => {
   const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const k = f.dataset.form;
   const val = id => (document.getElementById(id) || {}).value || '';
   if (FAM && famForm(k, f, val)) return;
-  if (FAM && !cur.kid && (k === 'hw' || k === 'coins')) { const tk = cur.parentKid; setTimeout(() => famSnapTouch(tk), 0); }
+  if (ppForm(k, val)) return;
+  if (FAM && !cur.kid && k === 'hw') { const tk = cur.parentKid; setTimeout(() => famSnapTouch(tk), 0); }
   if (k === 'ptnew') return ptSubmit();
   if (k === 'setup') { const p = val('pp'), y = val('py'), a = val('pa'); if (![p, y, a].every(x => /^\d{4}$/.test(x))) return alertMsg('Нужно по четыре цифры'); if (new Set([p, y, a]).size < 3) return alertMsg('Коды Юры, Ярика и Ани должны быть разными'); S.parentPin = hashPin(p); S.kids.yarik.pin = hashPin(y); S.kids.anya.pin = hashPin(a); save(); go('login'); }
   { const F = ALWAYS.filter(x => k.indexOf(x.id) === 0)[0]; if (F && F.form) return F.form(k, f); }
@@ -1137,7 +1106,7 @@ document.addEventListener('submit', e => {
   if (k === 'prize') { const t = val('prname').trim().slice(0, 60); if (t) { const it = { id: 'o' + Date.now(), name: t, price: null, own: true }; cur.prOwn.push(it); cur.prSel.push(it.id); render(); } }
   if (k === 'pins') { const p = val('np'), y = val('ny'), a = val('na'); { const H = { p: /^\d{4}$/.test(p) ? hashPin(p) : S.parentPin, y: /^\d{4}$/.test(y) ? hashPin(y) : S.kids.yarik.pin, a: /^\d{4}$/.test(a) ? hashPin(a) : S.kids.anya.pin }; if (new Set([H.p, H.y, H.a]).size < 3) return alertMsg('Коды Юры, Ярика и Ани должны быть разными'); } if (/^\d{4}$/.test(p)) S.parentPin = hashPin(p); if (/^\d{4}$/.test(y)) S.kids.yarik.pin = hashPin(y); if (/^\d{4}$/.test(a)) S.kids.anya.pin = hashPin(a); save(); alertMsg('Коды обновлены'); render(); }
   if (k === 'hw') { const t = val('hwtext').trim(); if (t) { S.kids[cur.parentKid].hwText.push({ id: 'h' + Date.now(), text: t, done: false }); save(); alertMsg('Задание добавлено'); render(); } }
-  if (k === 'coins') { const n = parseInt(val('coinadd')); if (n) { const K0 = S.kids[cur.parentKid]; if (K0.coins + n < 0) return alertMsg(`Столько списать нельзя: на счету ${K0.coins}`); K0.coins += n; ev(cur.parentKid, 'баллы от Юры', { coins: S.kids[cur.parentKid].coins, price: n }); save(); alertMsg('Готово'); render(); } }
+  if (k === 'coins') { const n = parseInt(String(val('coinadd')).replace('−', '-')); if (n) ppCoinAdd(cur.parentKid, n); }
 });
 window.addEventListener('online', () => { flush(); pull(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { pull(); flush(); if (cur.ds !== U.today() && cur.view === 'home') render(); } });
