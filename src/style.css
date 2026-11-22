@@ -135,6 +135,7 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 .w{ border-radius:5px; padding:0 1px; transition:background .2s; }
 .w.r1{ color:var(--green); }
 .w.r2{ background:rgba(200,49,43,.15); color:var(--red); text-decoration:underline wavy; }
+.w.r3{ background:rgba(232,185,35,.25); text-decoration:underline dotted; } /* похоже, но не уверены — подсказка без штрафа */
 .w.rc{ background:var(--accsoft); outline:2px solid var(--acc); }
 .rest summary,.peek summary{ cursor:pointer; color:var(--acc); font-weight:600; padding:8px 0; }
 .rest{ margin-top:12px; color:var(--ink2); }
@@ -408,3 +409,10 @@ button.dot{ cursor:pointer; font:inherit; font-size:14px; }
 .hwc, .hwc p, .hwc b{ color:#2a2622; } .hwc .hint{ color:#5a524a !important; } .hwc{ border:2px solid var(--acc); }
 .restscr h1, .restscr p, .restscr h3, .restscr li{ color:#2a2622; } .restscr .hint{ color:#5a524a !important; } .tmr{ text-align:left; margin:8px 0 12px; padding-left:20px; } .tmr li{ margin:6px 0; }
 .xtrow{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:8px 0; }
+/* Читальня */
+.libc h2 .ic{ width:28px; height:28px; vertical-align:-6px; margin-right:6px; }
+.libc.off{ opacity:.75; } .libc.on{ border:2px solid var(--acc); }
+.libblk{ display:flex; flex-direction:column; gap:12px; margin:16px 0; }
+.libbar{ display:flex; align-items:center; gap:12px; margin:8px 0 14px; } .libbar .prog{ flex:1; margin:0; } .libbar span{ white-space:nowrap; font-weight:600; }
+.lib .reading .text{ font-size:22px; line-height:1.7; }
+@media (max-width:480px){ .libbar{ flex-direction:column; align-items:stretch; } .lib .reading .text{ font-size:20px; } }

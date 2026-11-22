@@ -54,12 +54,14 @@ const hashPin = p => String(U.h('uroki:' + p));
 /* ===== Синхронизация с Google Таблицей родителя ===== */
 function strip(h){ return String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); }
 function ev(kid, type, data){ const e = Object.assign({ t: new Date().toISOString(), kid: KIDS[kid].name, type }, data); if (!TEST) S.queue.push(e); S.log.push(e); if (S.log.length > 1500) S.log = S.log.slice(-1500); try { dripOn(kid, type, data || {}); } catch (x) {} if (typeof pfOn === 'function') pfOn(kid, e); save(); flushSoon(); }
+/* озвучка в уроке: одна запись на шаг (для динамики самостоятельного чтения) */
+function voiceEv(kid, L, what){ if (!L) return; const k = what + ':' + (L.phase || '') + ':' + (L.i || 0); L._vo = L._vo || {}; if (L._vo[k]) return; L._vo[k] = 1; ev(kid, 'озвучка', { subj: subjName(kid, cur.subj, cur.ds), unit: (unitById(kid, cur.subj, L.uid) || {}).t || '', text: what }); }
 /* «Капающий процент»: каждый верный ответ с первой попытки — где угодно в приложении — немного увеличивает накопленный капитал (счёт + копилка).
    +0,4% капитала за ответ (не меньше 0,2 балла); серия 5 верных подряд — ×1,5, серия 10 — ×2; ошибка обнуляет серию и ничего не даёт.
    Потолок за день: 3% капитала, но не меньше 10 баллов. Капает в копилку (в воскресенье +10% сверху). */
 const DRIP_RATE = .004, DRIP_MIN = .2, DRIP_CAP = .03, DRIP_CAP_MIN = 10;
 function dripRec(K){ const d = U.today(); if (!K.drip || K.drip.d !== d) K.drip = { d, got: 0, frac: 0, streak: (K.drip && K.drip.streak) || 0, sess: (K.drip && K.drip.sess) || 0, cap: Math.max(DRIP_CAP_MIN, Math.round(((K.coins || 0) + (K.piggy || 0)) * DRIP_CAP)) }; return K.drip; }
-function dripOn(kid, type, d){ const K = S.kids[kid]; if (!K) return;
+function dripOn(kid, type, d){ const K = S.kids[kid]; if (!K) return; if (/^(загадка|головоломка|задача на смекалку|шахматы|программирование)$/.test(type)) return; /* после уроков баллы — только чтением (правило Юры 22.11) */
   const chessOk = type === 'шахматы' && /с первой попытки/.test(d.text || '') && !/не с первой/.test(d.text || ''), chessBad = type === 'шахматы' && /не с первой/.test(d.text || '');
   const ok = d.ok === 'верно' || chessOk, bad = d.ok === 'ошибка' || d.ok === 'со 2-й попытки' || chessBad; if (!ok && !bad) return;
   const R = dripRec(K); if (bad) { R.streak = 0; return; }
@@ -146,14 +148,38 @@ function sim(a, b){ if (a === b) return true; if (Math.abs(a.length - b.length) 
   if (!/[а-я]/.test(b)) return false; const x = simPh(a), y = simPh(b); if (x === y) return true;
   const sh = Math.min(x.length, y.length), lg = Math.max(x.length, y.length); if (sh >= 3 && lg - sh <= 2 && (x.startsWith(y) || y.startsWith(x))) return true;
   return lg >= 4 && lev(x, y) <= (lg >= 7 ? 2 : 1); }
-function align(T, spoken){ const st = new Array(T.length).fill(0); let p = 0, extra = 0;
-  const hit = (i, j) => { if (!T[j]) return 0; const s = spoken[i]; if (sim(s, T[j])) return 1; if (i + 1 < spoken.length && T[j].length > s.length) { const s2 = s + spoken[i + 1]; if (sim(s2, T[j])) return 2; if (i + 2 < spoken.length && sim(s2 + spoken[i + 2], T[j])) return 3; } return 0; };
-  for (let i = 0; i < spoken.length; i++) { if (!spoken[i]) continue; let f = -1, n = 0;
-    for (let j = p; j < Math.min(T.length, p + 5); j++) { n = hit(i, j); if (n) { f = j; break; } }
-    /* не застреваем: если слово не узнано, ищем дальше, но только когда и следующее сказанное слово совпадает со следующим в тексте */
-    if (f < 0) for (let j = p + 5; j < Math.min(T.length, p + 25); j++) { n = hit(i, j); if (n && i + n < spoken.length && j + 1 < T.length && hit(i + n, j + 1)) { f = j; break; } n = 0; }
-    if (f < 0) { extra++; continue; } for (let k = p; k < f; k++) st[k] = T[k].length <= 2 ? 1 : 2; st[f] = 1; p = f + 1; i += n - 1; }
-  return { st, p, extra }; }
+/* Сверка прочитанного с текстом (22.11, см. «Голос — итог 22.11»): выравниваем весь отрывок целиком, а не «жадно».
+   Правило: ошибку засчитываем, только когда уверены. st: 1 — верно, 3 — похоже (подсказка, без штрафа), 2 — ошибка, 0 — ещё не читал или не услышали. */
+const NUMW = /^(од|дв|тр|чет|пят|шест|сем|восем|девят|десят|сорок|девяност|сот|ст[оа]|тысяч|нол|нул)/;
+const ALC = new Map(); /* кэш сравнений слов между пересчётами — живая подсветка пересчитывается много раз */
+function alignSc(s, t){ if (s === t) return 2; if (/^\d+$/.test(s)) return NUMW.test(t) ? 2 : -1; if (simPh(s) === simPh(t)) return 2; return sim(s, t) ? 1 : -1; }
+function align(T, spoken){ const m = T.length, n = spoken.length, st = new Array(m).fill(0);
+  if (!m || !n) return { st, p: 0, extra: n };
+  const W = 40, NEG = -1e9, sc = (s, t) => { const k = s + '|' + t; let v = ALC.get(k); if (v === undefined) { if (ALC.size > 60000) ALC.clear(); v = alignSc(s, t); ALC.set(k, v); } return v; };
+  const D = [], P = []; for (let i = 0; i <= m; i++) { D.push(new Float32Array(n + 1).fill(NEG)); P.push(new Uint8Array(n + 1)); }
+  D[0][0] = 0; for (let j = 1; j <= n; j++) { D[0][j] = -0.5 * j; P[0][j] = 2; } for (let i = 1; i <= m && i <= W; i++) { D[i][0] = -i; P[i][0] = 1; }
+  for (let i = 1; i <= m; i++) { const lo = Math.max(1, i - W), hi = Math.min(n, i + W); const Ti = T[i - 1];
+    for (let j = lo; j <= hi; j++) { let best = NEG, bp = 0, v;
+      if (D[i - 1][j - 1] > NEG) { v = D[i - 1][j - 1] + sc(spoken[j - 1], Ti); if (v > best) { best = v; bp = 0; } }
+      if (D[i - 1][j] > NEG) { v = D[i - 1][j] - 1; if (v > best) { best = v; bp = 1; } }
+      if (D[i][j - 1] > NEG) { v = D[i][j - 1] - 0.5; if (v > best) { best = v; bp = 2; } }
+      if (j >= 2 && D[i - 1][j - 2] > NEG && Ti.length > spoken[j - 1].length) { const x = sc(spoken[j - 2] + spoken[j - 1], Ti); if (x > 0) { v = D[i - 1][j - 2] + x; if (v > best) { best = v; bp = 3; } } } /* «проказница» + «мартышка» */
+      if (i >= 2 && D[i - 2][j - 1] > NEG) { const x = sc(spoken[j - 1], T[i - 2] + Ti); if (x > 0) { v = D[i - 2][j - 1] + x + 0.5; if (v > best) { best = v; bp = 4; } } } /* «стара я» = «старая» */
+      D[i][j] = best; P[i][j] = bp; } }
+  /* конец чтения — там, где выравнивание лучше всего (дальше ребёнок ещё не читал) */
+  let bi = 0, bv = D[0][n]; for (let i = 1; i <= m; i++) if (D[i][n] > bv + 1e-6) { bv = D[i][n]; bi = i; }
+  let i = bi, j = n, extra = 0; const del = new Array(m).fill(false);
+  while (i > 0 || j > 0) { const p = i > 0 && j > 0 ? P[i][j] : i > 0 ? 1 : 2;
+    if (p === 0) { const x = sc(spoken[j - 1], T[i - 1]); st[i - 1] = x === 2 ? 1 : x === 1 ? 3 : 2; i--; j--; }
+    else if (p === 3) { st[i - 1] = 1; i--; j -= 2; } else if (p === 4) { st[i - 1] = st[i - 2] = 1; i -= 2; j--; }
+    else if (p === 1) { del[i - 1] = true; i--; } else { extra++; j--; } }
+  const digits = spoken.some(w => /^\d+$/.test(w));
+  /* не услышали слово — это не ошибка ребёнка (диктовка теряет слова). Ошибка — только пропуск целой фразы (4+ слов подряд) */
+  for (let k = 0; k < bi; k++) if (del[k]) { let e = k; while (e < bi && del[e]) e++; const run = e - k;
+    for (let q = k; q < e; q++) st[q] = T[q].length <= 2 || (digits && NUMW.test(T[q])) ? 1 : run >= 4 ? 2 : 0; k = e - 1; }
+  return { st, p: bi, extra }; }
+/* класс слова при чтении вслух */
+function wCls(st, k, p){ return st ? (st[k] === 1 ? 'r1' : st[k] === 2 ? 'r2' : st[k] === 3 ? 'r3' : k === p ? 'rc' : '') : ''; }
 
 /* Часы работы (правило Юры 21.11): детская часть — с 8:00 до 21:00 по Лиссабону. «Для родителей» и тестовый режим — всегда. */
 const OPEN_H = 8, CLOSE_H = 21;
@@ -165,7 +191,7 @@ setInterval(() => { if (cur.kid && !TEST && cur.view !== 'parent' && ((sleepNow(
 /* ===== Состояние экрана ===== */
 const cur = { kid:null, view:'login', subj:null, ds:U.today(), K(){ return KIDS[this.kid]; }, pinFor:null, onPin:null, parentTab:'report', parentKid:'yarik', msg:'' };
 const app = () => document.getElementById('app');
-function go(view, extra){ try { sayStop(); } catch (e) {} try { micStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
+function go(view, extra){ try { sayStop(); } catch (e) {} try { micStop(); } catch (e) {} try { if (view !== 'lib') libStop(); } catch (e) {} Object.assign(cur, { view, rview: null, rtask: null, rtry: null, rtCheck: null, rtDraft: '' }, extra || {}); render(); window.scrollTo(0, 0);
   if (view === 'lesson' && cur.kid && cur.subj) { const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L && L.scrollY && L.scrollY.ph === (L.phase || '') + (L.fphase || '')) { const y = L.scrollY.y; setTimeout(() => window.scrollTo(0, y), 60); } } }
 /* Запоминаем, докуда ребёнок долистал текст, чтобы вернуться на то же место */
 function rememberScroll(){ if (cur.view !== 'lesson' || !cur.kid || !cur.subj) return; const D = S.kids[cur.kid].days[cur.ds], L = D && D.les[cur.subj]; if (L) { L.scrollY = { ph: (L.phase || '') + (L.fphase || ''), y: window.scrollY || 0 }; save(); } }
@@ -176,11 +202,11 @@ function render(){
   if (S.parentPin) for (const k of kidIds()) { burnCheck(k); piggyCheck(k); }
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
   if (typeof hpApply === 'function') hpApply();
-  let v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : vLogin();
-  if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vSleep(); }
-  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} v = vRestScreen(cur.kid); }
-  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active)) v = vAsk(cur.kid);
-  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
+  let v = FAM && famGate() ? famGate() : !S.parentPin ? vSetup() : cur.view === 'pin' ? vPin() : cur.view === 'home' ? vHome() : cur.view === 'lesson' ? vLesson() : cur.view === 'prizes' ? vPrizes() : cur.view === 'shop' ? vShop() : cur.view === 'books' ? vBooks() : cur.view === 'book' ? vBook() : cur.view === 'bkadd' ? vBkAdd() : cur.view === 'parent' ? vParent() : cur.view === 'always' ? vAlways() : cur.view === 'poem' ? vPoem() : cur.view === 'hwfix' ? vHwFix() : cur.view === 'lib' ? vLib() : vLogin();
+  if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && sleepNow()) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} try { libStop(); } catch (e) {} v = vSleep(); }
+  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} try { libStop(); } catch (e) {} v = vRestScreen(cur.kid); }
+  else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active) && !(LR && LR.active)) v = vAsk(cur.kid);
+  document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix', 'lib'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
   if (typeof lookVars === 'function') lookVars(document.body.className ? cur.kid : null);
   if (FAM) famBody();
   app().innerHTML = (TEST ? testBar() : '') + v; afterRender();
@@ -264,6 +290,7 @@ function vHome(){
    <div class="prog tipc" data-tip="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${tiles}${poemTile(kid, D)}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
+  ${libCard(kid)}
   ${alwaysTiles(kid)}
   <p class="center"><button class="link" data-act="chpin">🔑 Поменять пароль</button></p>
   ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
@@ -709,7 +736,7 @@ function aloudPart(text, limit){ const words = text.split(/\s+/); if (words.leng
   for (const ln of lines) { const w = ln.split(/\s+/).filter(Boolean).length; if (cnt < n) { out.push(ln); cnt += w; } else rest.push(ln); }
   return { aloud: out.join('\n'), rest: rest.join('\n') }; }
 function wordsLimit(kid){ const K = S.kids[kid]; if (KIDS[kid].rplan) { const b = rpBand(kid); return Math.max(b.lo, Math.min(b.hi, K.readWords || b.lo)); } return K.readWords || KIDS[kid].startWords; }
-function tokensHtml(text, st, p){ let i = 0; return text.split('\n').map(line => '<p>' + line.split(/\s+/).filter(Boolean).map(w => { const k = i++; const c = st ? (st[k] === 1 ? 'r1' : st[k] === 2 ? 'r2' : k === p ? 'rc' : '') : ''; return `<span class="w ${c}" data-i="${k}">${U.esc(w)}</span>`; }).join(' ') + '</p>').join(''); }
+function tokensHtml(text, st, p){ let i = 0; return text.split('\n').map(line => '<p>' + line.split(/\s+/).filter(Boolean).map(w => { const k = i++; const c = wCls(st, k, p); return `<span class="w ${c}" data-i="${k}">${U.esc(w)}</span>`; }).join(' ') + '</p>').join(''); }
 function vRead(kid, L){
   const t = readText(kid), K = S.kids[kid];
   if (!L.gl && L.phase === 'warm') { L.gl = glossFor(kid, t.text, 4); save(); }
@@ -847,7 +874,7 @@ function readBar(startAct, startLbl){ const live = RD && RD.active, paused = RD 
 function updRead(){
   const spoken = (RD.base + ' ' + RD.cur).split(/\s+/).map(normW).filter(Boolean);
   const r = align(RD.T, spoken); RD.st = r.st; RD.p = r.p; RD.extra = r.extra;
-  document.querySelectorAll('#rtext .w, .ftext .w').forEach(el => { const k = +el.dataset.i; el.className = 'w ' + (r.st[k] === 1 ? 'r1' : r.st[k] === 2 ? 'r2' : k === r.p ? 'rc' : ''); });
+  document.querySelectorAll('#rtext .w, .ftext .w').forEach(el => { const k = +el.dataset.i; el.className = 'w ' + wCls(r.st, k, r.p); });
   const cur_ = document.querySelector('.w.rc'); if (cur_ && cur_.scrollIntoView) cur_.scrollIntoView({ block: 'center', behavior: 'smooth' });
   const stat = document.getElementById('rstat'); if (stat) stat.textContent = `Прочитано ${r.p} из ${RD.T.length}`;
   if (r.p >= RD.T.length) setTimeout(stopRead, 600);
@@ -1020,12 +1047,12 @@ document.addEventListener('click', e => {
     case 'seen': { const m = S.kids[kid].msgs.find(x => x.id === b.dataset.id); if (m) m.seen = true; save(); render(); break; }
     case 'dunno': { L.helpN = (L.helpN || 0) + 1; const u = unitById(kid, cur.subj, L.uid); ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, text: L.phase === 'theory' ? 'объяснение темы' : 'задание' }); save(); render(); if (L.phase === 'theory' && L.helpN === 1) say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
     case 'dunnotask': { L.showTh = L.i; L.helpN = (L.helpN || 0) + 1; const t = lessonTasks(L, kid, cur.subj)[L.i], u = (t.uid && t.sj ? unitById(kid, t.sj, t.uid) : unitById(kid, cur.subj, L.uid)) || { t: '' }; ev(kid, 'не понимаю', { subj: subjName(kid, cur.subj, cur.ds), unit: u.t, q: strip(t.q) }); save(); render(); if (!t.sp) say(strip(String(t.q)).replace(/_+/g, ' пропуск '), 'ru-RU'); break; }
-    case 'sayqtext': { const t = lessonTasks(L, kid, cur.subj)[L.i]; if (t) say(strip(String(t.q)).replace(/_+/g, ' пропуск '), 'ru-RU'); break; }
+    case 'sayqtext': { voiceEv(kid, L, 'задание'); const t = lessonTasks(L, kid, cur.subj)[L.i]; if (t) say(strip(String(t.q)).replace(/_+/g, ' пропуск '), 'ru-RU'); break; }
     case 'sayex': say(b.dataset.t, 'ru-RU'); break;
-    case 'saytheory': { const u = unitById(kid, cur.subj, L.uid); say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
+    case 'saytheory': { voiceEv(kid, L, 'объяснение'); const u = unitById(kid, cur.subj, L.uid); say(strip(u.th.replace(/<br>/g, '. ')), 'ru-RU'); break; }
     case 'topractice': L.phase = 'practice'; save(); render(); break;
     case 'choose': answer(b.dataset.v); break;
-    case 'sayq': { const T = lessonTasks(L, kid, cur.subj); const t = T[L.i]; say(t.sp, LCODE(kid, L.tr)); break; }
+    case 'sayq': { voiceEv(kid, L, 'задание (язык)'); const T = lessonTasks(L, kid, cur.subj); const t = T[L.i]; say(t.sp, LCODE(kid, L.tr)); break; }
     case 'next': nextTask(); break;
     case 'fb': { L.fb = L.fb || {}; L.fb[b.dataset.k] = isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v; const tx = document.getElementById('fbtext'); if (tx) L.fb.text = tx.value; save(); render(); break; }
     case 'sendfb': { const tx = document.getElementById('fbtext'); if (tx) L.fb.text = tx.value.trim(); finishLesson(); break; }
@@ -1058,7 +1085,7 @@ document.addEventListener('click', e => {
     case 'wdone': { const K = S.kids[kid]; K.vocab = K.vocab || []; (L.gl || []).forEach((g, k) => { if (!K.vocab.some(v => v.w === g.w)) K.vocab.push({ w: g.w, d: g.d, e: g.e, ok: !!(L.wans && L.wans[k] && L.wans[k].ok), ds: cur.ds }); }); L.phase = 'survey'; save(); render(); window.scrollTo(0, 0); break; }
     case 'rnext': { const qs = readQs(kid, L); if ((L.i || 0) + 1 < qs.length) { L.i = (L.i || 0) + 1; } else { L.phase = 'spot'; L.wi = 0; const K = S.kids[kid]; K.texts++; if (!(L.res && L.res.repeat)) { K.pos.read = (K.pos.read || 0) + 1; if (KIDS[kid].rplan) rpDone(kid, readText(kid)); } } save(); render(); break; }
     case 'startfread': if (!(RD && RD.paused)) RD = null; startRead(LCODE(cur.kid, L.tr)); break;
-    case 'sayfull': say(curForeign(L).text, LCODE(cur.kid, L.tr)); break;
+    case 'sayfull': voiceEv(kid, L, 'текст (язык)'); say(curForeign(L).text, LCODE(cur.kid, L.tr)); break;
     case 'fq': foreignAnswer(b.dataset.v); break;
     case 'fnext': { if (L.fi + 1 < L.fq) L.fi++; else { L.phase = 'survey'; const key = L.tr === '_alt' ? 'enRead' : 'ptRead'; S.kids[kid].pos[key] = (S.kids[kid].pos[key] || 0) + 1; } save(); render(); break; }
     case 'shop': go('shop'); break;
@@ -1078,7 +1105,7 @@ document.addEventListener('click', e => {
       save(); go(cur.prBack || 'home'); break; }
     case 'saveunits': for (const kd of kidIds()) for (const [k, c] of Object.entries(KIDS[kd].cur)) for (const tr of ['', '_alt']) { const el = document.getElementById(`sel_${kd}_${k}${tr}`); if (el) S.kids[kd].pos[k + tr] = +el.value; } save(); alertMsg('Темы сохранены'); break;
     case 'savesync': S.cfg.sync = document.getElementById('syncurl').value.trim(); save(); flush(); pull(); alertMsg('Сохранено'); break;
-    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
+    default: { if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (libAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
 function alertMsg(t){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }

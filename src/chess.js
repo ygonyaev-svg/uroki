@@ -198,7 +198,7 @@ function chView(kid){
   return h + '</main>';
 }
 function chMenu(kid){
-  var C = chK(kid), h = '<section class="hello"><h1>♞ Шахматы</h1><p>Здесь можно заниматься всегда, даже в перерыв. ' + (chDayLeft(kid) ? 'За задачи, решённые с первой попытки без подсказки, — по 1 баллу в копилку (до ' + CHESS_DAY_MAX + ' в день, сегодня осталось ' + chDayLeft(kid) + ').' : 'Баллы за задачи на сегодня уже получены, но решать можно сколько хочешь.') + '</p></section>';
+  var C = chK(kid), h = '<section class="hello"><h1>♞ Шахматы</h1><p>Здесь можно заниматься всегда, даже в перерыв. ' + (LIB_NOTE + ' ') + (false ? 'За задачи, решённые с первой попытки без подсказки, — по 1 баллу в копилку (до ' + CHESS_DAY_MAX + ' в день, сегодня осталось ' + chDayLeft(kid) + ').' : '') + '</p></section>';
   var mine = T(kid) === 'yarik', i, L, n, tot, done;
   var cdone = 0; for (i = 0; i < CH_COURSE.length; i++) if (C.course[CH_COURSE[i].id]) cdone++;
   var courseTile = '<button class="tile chtile" data-act="chcourse"><span class="ico">♙</span><span class="tt"><span class="sn">Учимся играть' + (mine ? ' <em>начни здесь</em>' : '') + '</span><span class="ut">Как ходят фигуры, шах, мат, рокировка. Уроков пройдено: ' + cdone + ' из ' + CH_COURSE.length + '</span></span></button>';
@@ -273,7 +273,7 @@ function chPzSolved(kid, lv, pre){
   var C = chK(kid), key = lv + ':' + CHS.i, was = !!C.solved[key], pts = 0;
   if (!was) { C.solved[key] = 1; C.n = (C.n || 0) + 1; if (CHS.first) pts = chPts(kid, 1); }
   C.pos[lv] = CHS.i + 1;
-  CHS.ok = true; CHS.msg = pre + (CHS.first ? 'Отлично, с первой попытки!' : 'Решено!') + (pts ? ' +1 балл в копилку.' : was ? '' : CHS.first && !chDayLeft(kid) ? ' (баллы за шахматы на сегодня уже получены)' : '');
+  CHS.ok = true; CHS.msg = pre + (CHS.first ? 'Отлично, с первой попытки!' : 'Решено!') + (pts ? ' +1 балл в копилку.' : was ? '' : '');
   if (!was) ev(kid, 'шахматы', { subj:'Шахматы', unit: CH_LEVELS.filter(function(x){ return x.id === lv; })[0].t, text:'задача ' + (CHS.i + 1) + (CHS.first ? ' с первой попытки' : ' не с первой попытки'), coins: S.kids[kid].coins, price: pts || 0 });
   save(); render();
 }
