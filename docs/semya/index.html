@@ -964,7 +964,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v96eeb55a */
+<script>/* v53df8a30 */
 var FAM = 1;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -8424,7 +8424,7 @@ function ppToday(kid){ const K = S.kids[kid], t = U.today(), D = K.days && K.day
   const done = order.filter(s => D && D.les && D.les[s] && D.les[s].phase === 'done'), left = order.filter(s => done.indexOf(s) < 0);
   const pts = K.dg && K.dg.d === t ? K.dg.n : 0, name = KIDS[kid].name;
   const evs = S.log.filter(e => e.kid === name && String(e.t).slice(0, 10) === t);
-  const last = evs.length ? new Date(evs[evs.length - 1].t).getTime() : 0;
+  let last = evs.length ? new Date(evs[evs.length - 1].t).getTime() : 0; if (K.modT && U.today() === t && new Date(K.modT).toDateString() === new Date().toDateString()) last = Math.max(last, K.modT);
   return { done, left, n: order.length, pts, evs, last }; }
 function ppSubj(kid, s){ if (s === 'read') return 'чтение'; if (s === 'hw') return 'домашнее задание'; const c = KIDS[kid].cur[s]; return c ? U.noEmo(c.name).toLowerCase() : s; }
 function ppWaitN(kid){ const K = S.kids[kid]; return { pr: (K.shop || []).filter(x => x.price == null).length, pt: typeof ptOf === 'function' ? ptOf(kid, ['wait']).length : 0 }; }
@@ -8444,8 +8444,14 @@ function ppTile(act, ic, title, sub, badge, wide){ return `<button class="pp-til
 function ppHead(title, back){ const k = cur.parentKid, many = kidIds().length > 1;
   return `<header class="bar"><button class="link" data-act="${back ? 'ptab' : 'logout'}" data-t="home">${back ? '← Назад' : '← Выйти'}</button><span>${title}</span>${back ? '' : `<button class="pp-gear" data-act="ptab" data-t="set" aria-label="Настройки">${icon('gear')}</button>`}</header>` +
     (back && many && k && cur.parentTab !== 'set' && !(FAM && cur.parentTab === 'sum') ? `<div class="row pp-sw">${kidIds().map(x => `<button class="chip ${x === k ? 'on' : ''}" data-act="pkid" data-k="${x}">${U.esc(KIDS[x].name)}${ppWait(x) ? ' •' : ''}</button>`).join('')}</div>` : ''); }
+/* Телефон родителя в «Уроках» (S.viewer): прогресс детей — со снимков на сервере (лист «Снимки»), только чтение. На сервер отсюда ничего не уходит. */
+let PP_PULL = 0;
+function ppPull(force){ if (FAM || !S.viewer || !S.cfg.sync || !navigator.onLine || (!force && Date.now() - PP_PULL < 30000)) return; PP_PULL = Date.now();
+  Promise.all(kidIds().map(kid => fetch(S.cfg.sync + (S.cfg.sync.includes('?') ? '&' : '?') + 'action=snap&kid=' + encodeURIComponent(kid)).then(r => r.json()).then(j => {
+    if (!j || !j.ok || !j.state || !(j.t > (S.kids[kid].modT || 0))) return false; const R = JSON.parse(j.state); if (!R || !R.days) return false; R.modT = j.t; S.kids[kid] = R; return true; }).catch(() => false)))
+    .then(a => { S.viewAt = Date.now(); save(); if (cur.view === 'parent' && !ptTyping()) render(); }); }
 function vParent(){
-  if (FAM) famParentPull();
+  if (FAM) famParentPull(); else ppPull();
   let tab = PP_OLD[cur.parentTab] || cur.parentTab || 'home'; cur.parentTab = tab;
   const k = ppKid();
   if (!k) return `<main class="wrap pp">${ppHead('Родителям')}<div class="card"><p>Детей пока нет.</p>${FAM ? '<button class="btn" data-act="fkedit">Добавить детей</button>' : ''}</div></main>`;
@@ -8454,12 +8460,13 @@ function vParent(){
   if (tab === 'home') {
     const K = S.kids[k], T0 = ppToday(k), w = ppWait(k), n = typeof ptOf === 'function' ? ptOf(k, ['new']).length : 0, x = extraSecs(K) / 60;
     return `<main class="wrap pp">${ppHead('Родителям')}<div class="pp-kids">${kidIds().map(x => ppKidCard(x, x === k)).join('')}</div>
-    ${w ? (W => `<button class="pp-attn" data-act="ptab" data-t="ok"><span>Ждут вашей проверки: ${[W.pt ? agree(W.pt + ' заданий') : '', W.pr ? (W.pr === 1 ? 'цена приза' : 'цены ' + W.pr + ' призов') : ''].filter(Boolean).join(', ')}</span><b>Проверить</b></button>`)(ppWaitN(k)) : ''}
+    ${S.viewer && !FAM ? `<div class="card pp-view"><p><b>Телефон родителя: только просмотр.</b> Данные с айпадов детей${S.viewAt ? ', обновлено в ' + hhmm(S.viewAt) : ''}. Цены призов, баллы и время меняются на айпаде ребёнка.</p><button class="btn small ghost" data-act="pppull">Обновить</button></div>` : ''}
+    ${w && !(S.viewer && !FAM) ? (W => `<button class="pp-attn" data-act="ptab" data-t="ok"><span>Ждут вашей проверки: ${[W.pt ? agree(W.pt + ' заданий') : '', W.pr ? (W.pr === 1 ? 'цена приза' : 'цены ' + W.pr + ' призов') : ''].filter(Boolean).join(', ')}</span><b>Проверить</b></button>`)(ppWaitN(k)) : ''}
     <div class="pp-grid">${ppTile('sum', 'note', 'Сводка сейчас', U.esc(KIDS[k].name) + ': что сделано за день', '', true)}
-    ${ppTile('tasks', 'pen', 'Дать задание', n ? 'активных: ' + n : 'дело, задачка, чтение')}
-    ${ppTile('ok', 'check', 'Проверить', w ? 'ждут вас: ' + w : 'задания и цены призов', w)}
-    ${ppTile('time', 'clock', 'Время', restLeft(k) ? 'отдых до ' + hhmm(K.restUntil) : (baseList(k).filter(x => x.m > 0).map(x => x.name.toLowerCase() + ' ' + x.m).join(', ') || 'настроить') + (baseList(k).some(x => x.m > 0) ? ' мин' : ''))}
-    ${ppTile('coins', 'coin', 'Баллы +/−', 'на счету ' + K.coins + (K.piggy ? ', в копилке ' + K.piggy : ''))}
+    ${S.viewer && !FAM ? '' : ppTile('tasks', 'pen', 'Дать задание', n ? 'активных: ' + n : 'дело, задачка, чтение')}
+    ${S.viewer && !FAM ? '' : ppTile('ok', 'check', 'Проверить', w ? 'ждут вас: ' + w : 'задания и цены призов', w)}
+    ${S.viewer && !FAM ? '' : ppTile('time', 'clock', 'Время', restLeft(k) ? 'отдых до ' + hhmm(K.restUntil) : (baseList(k).filter(x => x.m > 0).map(x => x.name.toLowerCase() + ' ' + x.m).join(', ') || 'настроить') + (baseList(k).some(x => x.m > 0) ? ' мин' : ''))}
+    ${S.viewer && !FAM ? '' : ppTile('coins', 'coin', 'Баллы +/−', 'на счету ' + K.coins + (K.piggy ? ', в копилке ' + K.piggy : ''))}
     ${ppTile('report', 'chart', 'Учёба', 'предметы, чтение, ошибки')}
     ${ppTile('portrait', 'brain', 'Развитие', 'сильные стороны')}</div>
     <button class="pp-setl" data-act="ptab" data-t="set">${icon('gear')} Настройки</button></main>`; }
@@ -8542,6 +8549,7 @@ function ppAct(act, b){ const k = cur.parentKid;
     case 'ppaldel': { const L = baseList(k).slice(), x = L.splice(+b.dataset.i, 1)[0]; if (x) ppAllowSave(k, L, 'Убрано: ' + x.name); return true; }
     case 'ppalidea': { const e = document.getElementById('ppaln'); cur.ppAl = Object.assign({}, cur.ppAl, { n: b.dataset.n }); if (e) e.value = b.dataset.n; return true; }
     case 'ppalnm': { const e = document.getElementById('ppaln'); cur.ppAl = Object.assign({}, cur.ppAl, { m: +b.dataset.m, n: e ? e.value : '' }); const y = window.scrollY; render(); window.scrollTo(0, y); return true; }
+    case 'pppull': ppPull(true); alertMsg('Обновляем…'); return true;
     case 'ppwhy': cur.ppWhy = cur.ppWhy === b.dataset.w ? '' : b.dataset.w; render(); return true;
     case 'ppcoins': ppCoinAdd(k, +b.dataset.n); return true;
     case 'ppprice': ppSetPrice(k, +b.dataset.i, +b.dataset.p); return true;
@@ -9480,9 +9488,13 @@ function vSetup(){
    <label>Код родителя<input id="pp" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required autocomplete="off"></label>
    <label>Код Глеба<input id="py" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required autocomplete="off"></label>
    <label>Код Кати<input id="pa" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required autocomplete="off"></label>
-   <button class="btn big">Сохранить</button></form></main>`;
+   <button class="btn big">Сохранить</button></form>
+  <div class="card"><h2>Это телефон родителя?</h2><p class="hint">Если дети занимаются на своих айпадах, а здесь вы хотите только смотреть отчёты, придумайте один код родителя. Данные детей подтянутся с сервера, айпады это никак не затронет.</p>
+  <form class="form pp-own" data-form="setupview"><input id="pv" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="код родителя, 4 цифры"><button class="btn">Войти</button></form></div></main>`;
 }
 function vLogin(){
+  if (!FAM && S.viewer) return `<main class="wrap login"><header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Телефон родителя</h1><p>Здесь только отчёты: дети занимаются на своих айпадах.</p></header>
+  <p class="center"><button class="btn big" data-act="parent">Войти как родитель</button></p></main>`;
   const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}${typeof lookBody === 'function' ? lookBody(k) : ''}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
   return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header>
   <div class="kids">${kidIds().map(card).join('')}</div>${FAM ? famLoginExtra() : ''}
@@ -10355,6 +10367,7 @@ document.addEventListener('submit', e => {
   if (ppForm(k, val)) return;
   if (FAM && !cur.kid && k === 'hw') { const tk = cur.parentKid; setTimeout(() => famSnapTouch(tk), 0); }
   if (k === 'ptnew') return ptSubmit();
+  if (k === 'setupview') { const p = val('pv'); if (!/^\d{4}$/.test(p)) return alertMsg('Нужно четыре цифры'); S.parentPin = hashPin(p); S.viewer = true; save(); return askPin('parent', () => go('parent', { kid: null, parentTab: 'home' })); }
   if (k === 'setup') { const p = val('pp'), y = val('py'), a = val('pa'); if (![p, y, a].every(x => /^\d{4}$/.test(x))) return alertMsg('Нужно по четыре цифры'); if (new Set([p, y, a]).size < 3) return alertMsg('Коды папы, Глеба и Кати должны быть разными'); S.parentPin = hashPin(p); S.kids.yarik.pin = hashPin(y); S.kids.anya.pin = hashPin(a); save(); go('login'); }
   { const F = ALWAYS.filter(x => k.indexOf(x.id) === 0)[0]; if (F && F.form) return F.form(k, f); }
   if (k === 'num') answer(val('numin'));

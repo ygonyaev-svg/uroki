@@ -226,9 +226,13 @@ function vSetup(){
    <label>Код родителя<input id="pp" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required autocomplete="off"></label>
    <label>Код Ярика<input id="py" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required autocomplete="off"></label>
    <label>Код Ани<input id="pa" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required autocomplete="off"></label>
-   <button class="btn big">Сохранить</button></form></main>`;
+   <button class="btn big">Сохранить</button></form>
+  <div class="card"><h2>Это телефон родителя?</h2><p class="hint">Если дети занимаются на своих айпадах, а здесь вы хотите только смотреть отчёты, придумайте один код родителя. Данные детей подтянутся с сервера, айпады это никак не затронет.</p>
+  <form class="form pp-own" data-form="setupview"><input id="pv" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="код родителя, 4 цифры"><button class="btn">Войти</button></form></div></main>`;
 }
 function vLogin(){
+  if (!FAM && S.viewer) return `<main class="wrap login"><header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Телефон родителя</h1><p>Здесь только отчёты: дети занимаются на своих айпадах.</p></header>
+  <p class="center"><button class="btn big" data-act="parent">Войти как родитель</button></p></main>`;
   const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}${typeof lookBody === 'function' ? lookBody(k) : ''}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
   return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header>
   <div class="kids">${kidIds().map(card).join('')}</div>${FAM ? famLoginExtra() : ''}
@@ -1101,6 +1105,7 @@ document.addEventListener('submit', e => {
   if (ppForm(k, val)) return;
   if (FAM && !cur.kid && k === 'hw') { const tk = cur.parentKid; setTimeout(() => famSnapTouch(tk), 0); }
   if (k === 'ptnew') return ptSubmit();
+  if (k === 'setupview') { const p = val('pv'); if (!/^\d{4}$/.test(p)) return alertMsg('Нужно четыре цифры'); S.parentPin = hashPin(p); S.viewer = true; save(); return askPin('parent', () => go('parent', { kid: null, parentTab: 'home' })); }
   if (k === 'setup') { const p = val('pp'), y = val('py'), a = val('pa'); if (![p, y, a].every(x => /^\d{4}$/.test(x))) return alertMsg('Нужно по четыре цифры'); if (new Set([p, y, a]).size < 3) return alertMsg('Коды Юры, Ярика и Ани должны быть разными'); S.parentPin = hashPin(p); S.kids.yarik.pin = hashPin(y); S.kids.anya.pin = hashPin(a); save(); go('login'); }
   { const F = ALWAYS.filter(x => k.indexOf(x.id) === 0)[0]; if (F && F.form) return F.form(k, f); }
   if (k === 'num') answer(val('numin'));
