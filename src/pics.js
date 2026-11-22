@@ -251,14 +251,19 @@ function picGroups(n, k, shape, col){ n = +n; k = +k; const cols = (col || '#ef4
   for (let i = 0; i < n; i++) { const x0 = 8 + i * (gw + 10), c = cols[i % cols.length]; g += `<rect x="${x0}" y="6" width="${gw}" height="${gh}" rx="${gh / 2}" fill="none" stroke="#475569" stroke-width="2"/>`;
     for (let j = 0; j < k; j++) { const cx = x0 + 8 + (j % per) * s + s / 2, cy = 14 + Math.floor(j / per) * s + s / 2;
       g += shape === 'tri' ? `<polygon points="${cx},${cy - 8} ${cx - 8},${cy + 7} ${cx + 8},${cy + 7}" fill="${c}"/>` : shape === 'sq' ? `<rect x="${cx - 7}" y="${cy - 7}" width="14" height="14" rx="2" fill="${c}"/>` : `<circle cx="${cx}" cy="${cy}" r="8" fill="${c}"/>`; } }
-  return PX.svg(n * (gw + 10) + 6, gh + 12, g, 'groups'); }
+  const rest = +(arguments[4] || 0); let W = n * (gw + 10) + 6; for (let j = 0; j < rest; j++) { g += `<circle cx="${W + 12 + j * 22}" cy="${14 + s / 2}" r="8" fill="#94a3b8"/>`; } if (rest) W += rest * 22 + 16;
+  return PX.svg(W, gh + 12, g, 'groups'); }
+/* Окружность с центром, радиусом и диаметром */
+function picCircle(){ return PX.svg(200, 170, `<circle cx="100" cy="85" r="70" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/><circle cx="100" cy="85" r="4" fill="#0f172a"/><line x1="100" y1="85" x2="150" y2="36" stroke="#e11d48" stroke-width="3"/><line x1="30" y1="85" x2="170" y2="85" stroke="#16a34a" stroke-width="3"/>` + PX.t(92, 104, 'O', 15) + PX.t(136, 70, 'r', 16, '#e11d48') + PX.t(55, 78, 'd', 16, '#16a34a'), 'circle'); }
+/* Прямой угол с отметкой-квадратиком */
+function picRight(){ return PX.svg(160, 120, `<line x1="30" y1="100" x2="150" y2="100" stroke="#334155" stroke-width="4"/><line x1="30" y1="100" x2="30" y2="10" stroke="#334155" stroke-width="4"/><path d="M30,80 h20 v20" fill="none" stroke="#e11d48" stroke-width="3"/>`, 'angle'); }
 /* Тетради по 2 копейки (Моро, «Умножение») */
 function picNotebooks(n, price){ n = +n; let g = '';
   for (let i = 0; i < n; i++) { const x = 10 + i * 70; g += `<rect x="${x}" y="8" width="54" height="68" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="2" transform="rotate(-6 ${x + 27} 42)"/><line x1="${x + 10}" x2="${x + 44}" y1="24" y2="21" stroke="#94a3b8"/><line x1="${x + 10}" x2="${x + 44}" y1="34" y2="31" stroke="#94a3b8"/>`
     + `<circle cx="${x + 30}" cy="86" r="15" fill="#fbbf24" stroke="#b45309" stroke-width="2"/>` + PX.t(x + 30, 92, price, 16, '#78350f'); }
   return PX.svg(n * 70 + 10, 106, g, 'notes'); }
-/* Отрезок-схема «часть и часть — целое» (рис. 44 у Виленкина, схемы задач у Моро): parts — подписи частей через «,», whole — подпись целого */
-function picSeg(parts, whole){ const P = String(parts).split(','), W = 280, x0 = 12, ws = P.map(p => /^\?|x|y|z|□$/.test(p.trim()) ? 1 : 1.6), tot = ws.reduce((a, b) => a + b, 0); let x = x0, g = '';
+/* Отрезок-схема «часть и часть — целое» (рис. 44 у Виленкина, схемы задач у Моро): parts — подписи частей через «^», whole — подпись целого */
+function picSeg(parts, whole){ const P = String(parts).split('^'), W = 280, x0 = 12, ws = P.map(p => /^\?|x|y|z|□$/.test(p.trim()) ? 1 : 1.6), tot = ws.reduce((a, b) => a + b, 0); let x = x0, g = '';
   P.forEach((p, i) => { const w = ws[i] / tot * W, c = /\?|x|y|z|□/.test(p) ? '#f43f5e' : ['#3b82f6', '#16a34a', '#f59e0b'][i % 3];
     g += `<rect x="${x}" y="30" width="${w - 2}" height="18" rx="3" fill="${c}" opacity=".85"/>` + PX.t(x + w / 2, 22, p.trim(), 15, c); x += w; });
   g += `<path d="M${x0},56 q0,10 10,10 h${W / 2 - 20} q10,0 10,10 q0,-10 10,-10 h${W / 2 - 20} q10,0 10,-10" fill="none" stroke="#475569" stroke-width="2"/>` + PX.t(x0 + W / 2, 96, whole, 15);
@@ -283,12 +288,15 @@ function picScale2(l, r){ const item = (t, cx) => { t = t.trim();
   <line x1="75" y1="34" x2="40" y2="90" stroke="#94a3b8"/><line x1="75" y1="34" x2="110" y2="90" stroke="#94a3b8"/><line x1="245" y1="34" x2="210" y2="90" stroke="#94a3b8"/><line x1="245" y1="34" x2="280" y2="90" stroke="#94a3b8"/>`
   + side(l, 75) + side(r, 245) + `<path d="M15,90 h120 a60,16 0 0,1 -120,0" fill="#cbd5e1"/><path d="M185,90 h120 a60,16 0 0,1 -120,0" fill="#cbd5e1"/>`;
   return PX.svg(320, 178, g, 'scale'); }
-function thPic(spec){ if (String(spec).includes(';')) return `<div class="pair">${String(spec).split(';').map(thPic1).join('')}</div>`; return thPic1(spec); }
+function thPic(spec){ const h = String(spec).includes(';') ? `<div class="pair">${String(spec).split(';').map(thPic1).join('')}</div>` : thPic1(spec);
+  return h.replace(/>([^<]+)</g, (m, t) => '>' + t.replace(/(\d)\.(\d)/g, '$1,$2') + '<'); } /* в подписях десятичная запятая */
 function thPic1(spec){ const [n, ...a] = String(spec).split('|'); try {
   switch (n) {
     case 'snd': return picSnd(a[0], a[1]);
     case 'w': { const ps = wordPics(a[0], 3); return ps.length ? `<div class="wpics">${ps.map(e => `<span>${e}</span>`).join('')}</div>` : ''; }
-    case 'groups': return picGroups(a[0], a[1], a[2], a[3]);
+    case 'groups': return picGroups(a[0], a[1], a[2], a[3], a[4]);
+    case 'right': return picRight();
+    case 'circle': return picCircle();
     case 'notes': return picNotebooks(a[0], a[1]);
     case 'scale': return picScale(a[0], a[1]);
     case 'scale2': return picScale2(a[0], a[1]);
@@ -297,7 +305,7 @@ function thPic1(spec){ const [n, ...a] = String(spec).split('|'); try {
     case 'tens': return picTens(a.filter(x => /^\d+$/.test(x)).map(Number), a.find(x => !/^\d+$/.test(x)) || '');
     case 'pie': return picPie(+a[0], +a[1]);
     case 'pct': return picPct(+a[0]);
-    case 'rect': return picRect(+a[0], +a[1], a[2], a[3]);
+    case 'rect': return picRect(PX.num(a[0]), PX.num(a[1]), a[2], a[3]);
     case 'box': return picBox(a[0], a[1], a[2], a[3]);
     case 'ruler': return picRuler(+a[0]);
     case 'clock': return picClock(+a[0], +a[1]);
