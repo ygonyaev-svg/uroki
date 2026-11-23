@@ -507,3 +507,6 @@ html.fam body:not(.yarik):not(.anya) .wrap.pp > p.hint{ background:var(--card); 
 .pp-group > summary::-webkit-details-marker{ display:none; }
 .pp-group > summary:after{ content:'›'; float:right; font-size:22px; line-height:20px; transform:rotate(90deg); }
 .pp-group[open] > summary:after{ transform:rotate(-90deg); }
+
+.pzlbl{ margin:10px 0 0; font-weight:600; }
+.pzwrap.sol .pzsvg g.pze.was .ghost{ stroke:#e74c3c !important; stroke-dasharray:.12 .1; stroke-width:.07; opacity:.85; }
