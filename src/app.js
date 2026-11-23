@@ -743,8 +743,9 @@ const BASE_GAME = 60, BASE_YT = 30;
 function baseList(kid){ const K = S.kids[kid]; return K && Array.isArray(K.allow) ? K.allow : [{ id: 'g', name: 'Игры', m: BASE_GAME }, { id: 'y', name: 'YouTube', m: BASE_YT }]; }
 function baseIcon(name){ const n = String(name).toLowerCase(); return /игр|комп|приставк|роблокс|майнкрафт/.test(n) ? 'game' : /youtube|ютуб|мульт|фильм|кино|сериал|тв|телевиз|видео/.test(n) ? 'video' : /телефон|планшет|айпад/.test(n) ? 'phone' : /прогул|улиц|двор|парк/.test(n) ? 'tree' : /друз|гост/.test(n) ? 'people' : /музык|песн/.test(n) ? 'music' : /мяч|футбол/.test(n) ? 'ball' : 'clock'; }
 function baseTime(kid){ const L = baseList(kid); return { game: (L[0] || {}).m || 0, yt: (L[1] || {}).m || 0, cut: 0, list: L }; }
+function dayWorked(kid, ds){ const D = S.kids[kid].days[ds]; if (!D || !D.les) return false; const n = (KIDS[kid].order || []).length || 6, done = Object.keys(D.les).filter(s => D.les[s] && D.les[s].phase === 'done' && (KIDS[kid].order || []).includes(s)).length; return done >= Math.ceil(n / 2); }
 function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) { K.lastDone = t; K.burnDate = t; return; } if (K.burnDate === t) return; K.burnDate = t;
-  let missed = 0, d = K.lastDone; while (U.addDays(d, 1) < t) { d = U.addDays(d, 1); missed++; }
+  let missed = 0, d = K.lastDone; while (U.addDays(d, 1) < t) { d = U.addDays(d, 1); if (!dayWorked(kid, d)) missed++; } /* день, где сделана хотя бы половина уроков, не пропуск (например, не успел до 21:00) */
   const before = K.burnBase == null ? missed : missed - K.burnBase; K.burnBase = missed;
   if (missed < 1 || before < 1 || (K.coins <= 0 && !(K.piggy > 0))) return;
   K.okStreak = 0;
@@ -752,7 +753,7 @@ function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) 
   const bt = baseTime(kid);
   K.burnMsg = `Ты пропустил(а) занятия — сгорело ${agree(lost + ' баллов')}.`;
   ev(kid, 'баллы сгорели', { coins: K.coins, price: -lost, text: `пропущено дней: ${missed}` }); save(); }
-function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0) return '';
+function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0 || dayWorked(kid, t)) return '';
   const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'} (${K.coins}).</div>`; }
 function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
   return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2">${bt.list.filter(x => x.m > 0).map(x => `<span class="tipc" data-tip="base">${icon(baseIcon(x.name))} ${U.esc(x.name)} <b>${x.m} мин</b></span>`).join('')}<span class="tipc" data-tip="coins">⭐ Баллы <b>${K.coins}</b>&nbsp;(+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }

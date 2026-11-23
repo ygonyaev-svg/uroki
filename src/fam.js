@@ -86,11 +86,11 @@ function famInit(){
     var mt = q('mt'), mk = null, mp = 0;
     if (mt === 0) { mk = 'yarik'; mp = 0; } else if (mt === 1) { mk = 'yarik'; mp = 5; }
     else if (mt === 2) { if (c.age <= 9) { mk = 'yarik'; mp = 11; } else { mk = 'anya'; mp = 0; } }
-    else if (mt === 3) { if (c.age >= 8) { mk = 'anya'; mp = 0; } else { mk = 'yarik'; mp = 13; } }
+    else if (mt === 3) { if (c.age >= 11) { mk = 'age'; mp = 0; } else if (c.age >= 8) { mk = 'anya'; mp = 0; } else { mk = 'yarik'; mp = 13; } }
     /* Курс своего возраста (src/cur_ages.js): его предметы заменяют предметы шаблона */
     var ac = typeof AGE_CUR !== 'undefined' && AGE_CUR[+c.age];
     if (ac) a.cur = Object.assign({}, KIDS_TPL[a.tpl].cur, ac);
-    /* Анкета «отстаёт» (mt 0–1) или «опережает» (mt 3) — математика из соседнего курса; «по возрасту» (mt 2) — своя */
+    /* Анкета «отстаёт» (mt 0–1) или «опережает» (mt 3) — математика из соседнего курса; «по возрасту» (mt 2) — своя. С 11 лет «опережает» — тоже свой курс: курс Ани (5 класс) для 12–13 лет был бы шагом назад */
     if (ac && ac.math && (mt == null || mt === 2)) { mk = null; if (mt === 2) { mk = 'age'; mp = 0; } }
     if (mk && mk !== 'age') a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur, { math: KIDS_TPL[mk].cur.math });
     var ls = famLangs(c), lset = ls.map(function(k){ return k + (+c.lg[k]); }).join(',');
