@@ -248,7 +248,7 @@ function chPzMove(kid, m){
   var left = Math.ceil((sol.length - CHS.ply) / 2);
   if (mateLv) { final = CH.status(P1) === 'mate'; good = final || (!CHS.free && u === sol[CHS.ply]);
     if (!good && left > 1 && chAllMate(P1, left - 1)) { good = true; CHS.free = true; } }
-  else { good = u === sol[0];
+  else { good = u === sol[0] || !!(z.alt && z.alt.indexOf(u) >= 0); /* alt — другие ходы, которые выигрывают не меньше (проверено движком) */
     if (!good && lv === 'hang') { var m0 = CH.findMove(CHS.P, sol[0]); if (m0 && m.cap && m.to === m0.to && -chQS(P1, -1e9, 1e9, 1) >= -chQS(CH.make(CHS.P, m0), -1e9, 1e9, 1)) good = true; }
     final = good; }
   if (!good) {
@@ -258,7 +258,7 @@ function chPzMove(kid, m){
   }
   CHS.P = P1; CHS.last = [m.f, m.to]; CHS.sel = null; CHS.hint = null; CHS.ply++;
   if (final) { chPzSolved(kid, lv, mateLv ? 'Мат! ' : '');
-    if (lv === 'tac' && sol.length >= 3) { chPzAuto(sol.slice(1, 3), 'Дальше: ', ['соперник — ', 'ты — ']); }
+    if (lv === 'tac' && sol.length >= 3 && u === sol[0]) { chPzAuto(sol.slice(1, 3), 'Дальше: ', ['соперник — ', 'ты — ']); }
     return; }
   CHS.msg = 'Верно! Теперь ход соперника…'; CHS.ok = null; CHS.busy = true; render();
   setTimeout(function(){ var r = CHS.free ? chFreeReply(CHS.P, Math.ceil((sol.length - CHS.ply) / 2)) : CH.findMove(CHS.P, sol[CHS.ply]); if (!r) { CHS.busy = false; return; } CHS.msg = 'Соперник: ' + CH.moveText(CHS.P, r) + '. Твой ход!'; CHS.P = CH.make(CHS.P, r); CHS.last = [r.f, r.to]; CHS.ply++; CHS.busy = false; if (cur.view === 'always') render(); }, 700);
