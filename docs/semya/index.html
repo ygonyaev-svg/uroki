@@ -981,7 +981,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* vd376890f */
+<script>/* vbd5b9b41 */
 var FAM = 1;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -10309,7 +10309,7 @@ const hashPin = p => String(U.h('uroki:' + p));
 /* ===== Синхронизация с Google Таблицей родителя ===== */
 function strip(h){ return String(h || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); }
 /* В таблицу — чистый текст: без HTML, &nbsp; и эмодзи */
-function evClean(e){ const o = {}; for (const k in e) { let v = e[k]; if (typeof v === 'string' && k !== 't') { v = v.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'); v = emoStrip(v.replace(EMO_RE, '\u0001')).replace(/\u0001+/g, m => m.length > 1 ? '[' + m.length + ' карт.]' : '').replace(/[ \u00a0]{2,}/g, ' ').trim(); } o[k] = v; } return o; }
+function evClean(e){ const o = {}; for (const k in e) { let v = e[k]; if (typeof v === 'string' && k !== 't') { v = v.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'); v = emoStrip(v.replace(EMO_RE, '\u0001')).replace(/\u0001+/g, m => m.length > 1 ? '[' + m.length + ' карт.]' : '').replace(/[ \u00a0]{2,}/g, ' ').trim(); if (/^[=+]/.test(v)) v = "'" + v; /* «=» в начале Таблица считает формулой (#ERROR!) */ } o[k] = v; } return o; }
 function ev(kid, type, data){ const e = Object.assign({ t: new Date().toISOString(), kid: KIDS[kid].name, type }, data); if (!TEST) S.queue.push(evClean(e)); S.log.push(e); if (S.log.length > 1500) S.log = S.log.slice(-1500); try { dripOn(kid, type, data || {}); } catch (x) {} if (typeof pfOn === 'function') pfOn(kid, e); save(); flushSoon(); }
 /* озвучка в уроке: одна запись на шаг (для динамики самостоятельного чтения) */
 function voiceEv(kid, L, what){ if (!L) return; const k = what + ':' + (L.phase || '') + ':' + (L.i || 0); L._vo = L._vo || {}; if (L._vo[k]) return; L._vo[k] = 1; ev(kid, 'озвучка', { subj: subjName(kid, cur.subj, cur.ds), unit: (unitById(kid, cur.subj, L.uid) || {}).t || '', text: what }); }
