@@ -528,6 +528,10 @@ html.fam body:not(.yarik):not(.anya) .wrap.pp > p.hint{ background:var(--card); 
 
 .pzlbl{ margin:10px 0 0; font-weight:600; }
 .pzwrap.sol .pzsvg g.pze.was .ghost{ stroke:#e74c3c !important; stroke-dasharray:.12 .1; stroke-width:.07; opacity:.85; }
+.finec{ border:2px solid #e74c3c; background:#fff4f2; }
+.finec h2{ color:#c0392b; }
+.anya .finec{ background:#3a1f2a; border-color:#e06666; }
+.anya .finec h2{ color:#ff9b9b; }
 
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
@@ -1129,7 +1133,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v80a95cd5 */
+<script>/* v6cd4a58d */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -9766,7 +9770,7 @@ function vHome(){
   <div class="banner" aria-hidden="true">${THEME[TH(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[TH(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${rusNote(kid)}${dripCard(kid)}${restCard(kid)}${hwCard(kid)}${capLeft(K) ? '' : '<div class="note">✅ Баллы на сегодня собраны (' + DAY_CAP + ' из ' + DAY_CAP + '). Можно заниматься дальше для ума — новые баллы завтра.</div>'}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog tipc" data-tip="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${ptHomeBtn(kid)}
-  ${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
+  ${fineCard(kid)}${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
   <section class="tiles">${typeof sylTile === 'function' ? sylTile(kid, D) : ''}${tiles}${poemTile(kid, D)}${extraTile(kid, D)}${proTile(kid, D)}${trainTile(kid, D)}</section>
   ${libCard(kid)}
   ${alwaysTiles(kid)}
@@ -9937,6 +9941,7 @@ function vLesson(){
 function vTask(kid, subj, L){
   const T = lessonTasks(L, kid, subj); if (!T.length) return vHwText(kid, L);
   const t = T[L.i], a = L.ans[L.i] || { tries: 0 }; const fin = a.final;
+  if (!fin) { L.qt = L.qt || {}; if (!L.qt[L.i]) L.qt[L.i] = Date.now(); }
   const lang = subj === 'lang' ? LCODE(kid, L.tr) : 'ru-RU';
   let inp;
   if (t.k === 'c') inp = `<div class="opts">${t.opts.map(o => { const cls = fin && o === t.a ? 'right' : (a.wrong || []).includes(o) ? 'wrong' : ''; return `<button class="opt ${cls}" data-act="choose" data-v="${U.esc(o)}" ${fin || (a.wrong || []).includes(o) ? 'disabled' : ''}>${o}</button>`; }).join('')}</div>`;
@@ -9995,13 +10000,32 @@ function vSurvey(L){
 }
 function vResult(kid, subj, L){
   const msg = L.consolidate ? 'Хорошо! Завтра закрепим эту тему ещё раз — с новыми заданиями.' : L.passed === true ? 'Тема пройдена! Завтра — следующая.' : L.passed === false ? 'Завтра повторим эту тему с новыми заданиями.' : '';
-  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[TH(kid)].win)}</div>` : ''}<div class="bigmark m${L.grade}">${L.grade}</div><p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.ootCut ? '<p class="hint">Урок был не по порядку — баллов только треть.</p>' : ''}${L.hwCut ? '<p class="hint">📒 Домашнее задание по прошлому уроку не было сделано — баллов 70%.</p>' : ''}${L.rusCut ? `<p class="hint">📚 Баллы за этот урок — ${L.rusCut}%: русский пока не на пятёрку. Подтяни русский, и все баллы станут полными.</p>` : ''}${L.fastCut ? '<p class="hint">Слишком быстро — баллов меньше. Решай внимательно, проверяй себя.</p>' : ''}${typeof srResult === 'function' ? srResult(kid, L) : ''}${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article>${fixCard(kid, subj, L)}<button class="btn big" data-act="home">К урокам</button>`;
+  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[TH(kid)].win)}</div>` : ''}<div class="bigmark m${L.grade}">${L.grade}</div><p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.ootCut ? '<p class="hint">Урок был не по порядку — баллов только треть.</p>' : ''}${L.hwCut ? '<p class="hint">📒 Домашнее задание по прошлому уроку не было сделано — баллов 70%.</p>' : ''}${L.rusCut ? `<p class="hint">📚 Баллы за этот урок — ${L.rusCut}%: русский пока не на пятёрку. Подтяни русский, и все баллы станут полными.</p>` : ''}${L.fastCut ? '<p class="hint">Слишком быстро — баллов меньше. Решай внимательно, проверяй себя.</p>' : ''}${fineCard(kid)}${typeof srResult === 'function' ? srResult(kid, L) : ''}${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article>${fixCard(kid, subj, L)}<button class="btn big" data-act="home">К урокам</button>`;
 }
 /* Работа над ошибками: в любое время, без перерыва. Баллы не меняются, но результат можно довести до 100%. */
 function fixList(kid, subj, L){ const T = lessonTasks(L, kid, subj) || []; return T.map((t, j) => j).filter(j => { const a = L.ans[j]; return a && a.final && !(a.ok && a.tries === 1); }); }
 function fixCard(kid, subj, L){ if (!L.ans || ITEMS(subj) && subj === 'hw') return ''; const W = fixList(kid, subj, L); if (!W.length) return ''; const F = W.filter(j => L.ans[j].fix).length, tot = L.total || lessonTasks(L, kid, subj).length, pct = Math.round(((L.score || 0) + F) / Math.max(1, tot) * 100), nx = W.find(j => !L.ans[j].fix);
   return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Исправлено <b>${F} из ${W.length}</b> · результат с исправлениями: <b>${pct}%</b></p><p class="hint">Это и есть домашнее задание: исправь ошибки до следующего урока по предмету, иначе за него будет только 70% баллов. Можно в любое время, даже в перерыв.</p>${nx != null ? `<button class="btn" data-act="rtask" data-i="${nx}">${F ? 'Дальше исправлять' : 'Исправить ошибки'}</button>` : '<p class="earn">✅ Все ошибки исправлены — 100%!</p>'}</article>`; }
 
+/* ----- Штраф за небрежность (решение Юрия 23.11, правила — совет с ChatGPT и Gemini) -----
+   «Наугад» — неверный ответ быстрее, чем можно прочитать вопрос: 2 с + 0,9 с на слово (Ярик) / 0,4 с (Аня), не меньше 3 с.
+   Первые 2 ответа наугад в уроке прощаются, с 3-го — минус 2 балла за каждый, не больше 6 за урок и 12 за день, ниже нуля не уходит.
+   Честные (медленные) ошибки и «Не понимаю» не штрафуются. Следующий урок того же предмета без ответов наугад возвращает половину снятого.
+   Ребёнок видит карточку сразу после урока и при следующем входе. В Словоходе — только если родитель включил. */
+const FINE_FREE = 2, FINE_EACH = 2, FINE_LESSON = 6, FINE_DAY = 12;
+function fineOn(){ return FAM ? !!(S.cfg && S.cfg.fineOn) : !(S.cfg && S.cfg.fineOff); }
+function guessSecs(kid, t){ const w = String(strip(t.q || '')).split(/\s+/).filter(Boolean).length; return Math.max(3, 2 + w * (TPL(kid) === 'yarik' ? .9 : .4)); }
+function fineCheck(kid, subj, L, D){ if (!fineOn() || !L.ans) return; const K = S.kids[kid], g = L.ans.filter(a => a && a.guess != null), nm = subjName(kid, subj, cur.ds); K.fines = K.fines || []; K.fineBack = K.fineBack || {};
+  const back = K.fineBack[subj];
+  if (!g.length && back) { K.coins += back; K.fines.push({ d: cur.ds, back: back, subj: U.noEmo(nm), seen: false }); ev(kid, 'штраф возвращён', { subj: nm, price: back, coins: K.coins, text: 'урок без ответов наугад' }); delete K.fineBack[subj]; }
+  if (g.length <= FINE_FREE) return;
+  let n = Math.min(FINE_LESSON, (g.length - FINE_FREE) * FINE_EACH); D.fine = D.fine || 0; n = Math.min(n, FINE_DAY - D.fine, K.coins); if (n <= 0) return;
+  K.coins -= n; D.fine += n; L.fine = n; const fast = Math.min.apply(null, g.map(a => a.guess)), slow = Math.max.apply(null, g.map(a => a.guess));
+  const why = `${g.length} ${U.pl(g.length, 'ответ', 'ответа', 'ответов')} наугад: быстрее, чем можно прочитать вопрос (за ${fast === slow ? U.dec(fast) : U.dec(fast) + '–' + U.dec(slow)} с). Первые ${FINE_FREE} прощаются.`;
+  K.fines.push({ d: cur.ds, n: n, subj: U.noEmo(nm), unit: lessonTitle(kid, subj, cur.ds), why: why, seen: false }); K.fineBack[subj] = (K.fineBack[subj] || 0) + Math.ceil(n / 2);
+  ev(kid, 'штраф', { subj: nm, unit: lessonTitle(kid, subj, cur.ds), price: -n, coins: K.coins, text: why }); }
+function fineCard(kid){ const K = S.kids[kid], F = (K.fines || []).filter(f => !f.seen); if (!F.length) return '';
+  return `<article class="card finec"><h2>${F.some(f => f.n) ? 'Сняты баллы за спешку' : 'Баллы вернулись'}</h2><ul class="plain">${F.map(f => f.n ? `<li><b>−${f.n}</b> · ${U.esc(f.subj)}${f.unit ? ' «' + U.esc(U.noEmo(f.unit)) + '»' : ''}: ${U.esc(f.why)}</li>` : `<li><b>+${f.back}</b> · ${U.esc(f.subj)}: урок без ответов наугад, вернули половину снятого.</li>`).join('')}</ul>${F.some(f => f.n) ? `<p class="hint">Сделай следующий урок по этому предмету внимательно — и половина вернётся.</p>` : ''}<button class="btn" data-act="fineseen">Понятно</button></article>`; }
 /* ----- Ответы ----- */
 function answer(v){
   const kid = cur.kid, subj = cur.subj, L = dayRec(kid, cur.ds).les[subj], T = lessonTasks(L, kid, subj), t = T[L.i];
@@ -10014,6 +10038,7 @@ function answer(v){
   if (!ok && t.k === 'c') a.wrong.push(v);
   const lastTry = (subj === 'pro' && !t.pro) || (t.k === 'c' && t.opts.length - a.wrong.length <= 1);
   if (ok || a.tries >= 1 || lastTry) { /* засчитывается только первый ответ */ a.final = true; a.ok = ok;
+    if (!ok && a.tries === 1 && fineOn()) { const sec = (Date.now() - ((L.qt || {})[L.i] || Date.now())) / 1000; if (sec < guessSecs(kid, t)) { a.guess = Math.round(sec * 10) / 10; } }
     const K = S.kids[kid];
     const uid = ITEMS(subj) ? (t.uid || subj) : L.uid;
     t.uid = uid;
@@ -10079,6 +10104,7 @@ function finishLesson(){
   if (subj !== 'read' && !ITEMS(subj) && typeof srPts === 'function') pts = srPts(kid, subj, L, lessonTasks(L, kid, subj), pts);
   if (L.oot && !subs.every(s => s === subj || (D.les[s] && D.les[s].phase === 'done'))) { pts = Math.round(pts / 3); L.ootCut = true; } D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
   pts = piggyAdd(K, pts); L.coins = pts; L.phase = 'done';
+  fineCheck(kid, subj, L, D);
   if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
     if (subs.every(s => (D.les[s].q || 0) >= .9 && !D.les[s].fastCut && !D.les[s].oot)) { let b = Math.max(0, DAY_MAX - D.pts); b = piggyAdd(K, b); D.pts += b; L.coins += b; L.perfect = true; D.perfect = b; }
     const mins = Math.round(D.secs / 60); K.extraN = K.extraN || 0; if (mins < 40) K.extraN = Math.min(3, K.extraN + 1); else if (mins > 65) K.extraN = Math.max(-2, K.extraN - 1);
@@ -10489,6 +10515,7 @@ document.addEventListener('click', e => {
     case 'home': if (RD && (RD.active || RD.paused)) pauseRead(); RD = null; rememberScroll(); go('home'); break;
     case 'piggyearly': { const K0 = S.kids[kid]; if (!(K0.piggy > 0)) break; if (!window.confirm(`Забрать ${K0.piggy} сейчас? Тогда прибавки +10% (${Math.round(K0.piggy * PIGGY_RATE)}) не будет.`)) break; K0.coins += K0.piggy; ev(kid, 'копилка досрочно', { coins: K0.coins, price: K0.piggy, text: 'без процента' }); K0.piggy = 0; save(); render(); break; }
     case 'voice': { const K0 = S.kids[kid]; K0.voice = K0.voice === 'm' ? 'f' : 'm'; save(); render(); say(K0.voice === 'm' ? 'Привет! Теперь задания читаю я.' : 'Привет! Теперь задания читаю я.', 'ru-RU'); break; }
+    case 'fineseen': (S.kids[kid].fines || []).forEach(f => { f.seen = true; }); if (S.kids[kid].fines.length > 30) S.kids[kid].fines = S.kids[kid].fines.slice(-30); save(); render(); break;
     case 'piggyseen': S.kids[kid].piggyMsg = ''; save(); render(); break;
     case 'opentrain': { if (restGate(kid, 'train')) break; if (D.les.train) { go('lesson', { subj: 'train' }); break; } if (!trainReady(kid, D)) break; startLesson('train'); break; }
     case 'openpro': { if (restGate(kid, 'pro')) break; if (D.les.pro) { go('lesson', { subj: 'pro' }); break; } if (!proReady(kid, D)) break; startLesson('pro'); break; }
