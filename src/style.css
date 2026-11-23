@@ -510,3 +510,7 @@ html.fam body:not(.yarik):not(.anya) .wrap.pp > p.hint{ background:var(--card); 
 
 .pzlbl{ margin:10px 0 0; font-weight:600; }
 .pzwrap.sol .pzsvg g.pze.was .ghost{ stroke:#e74c3c !important; stroke-dasharray:.12 .1; stroke-width:.07; opacity:.85; }
+.finec{ border:2px solid #e74c3c; background:#fff4f2; }
+.finec h2{ color:#c0392b; }
+.anya .finec{ background:#3a1f2a; border-color:#e06666; }
+.anya .finec h2{ color:#ff9b9b; }
