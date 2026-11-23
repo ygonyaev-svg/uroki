@@ -961,12 +961,17 @@ function foreignAnswer(v){ const kid = cur.kid, L = dayRec(kid, cur.ds).les[cur.
 /* ----- Магазин ----- */
 const CASH_MAX = 2; /* призы-деньги («5 €», «10 €») — не чаще 2 раз в месяц на ребёнка (решение Юрия 23.11) */
 function isCash(it){ return /^\s*\d+([.,]\d+)?\s*(€|евро|eur)\s*$/i.test(String(it && it.name || '')); }
+/* призы с игровым временем (15/30 мин, час игры, мультики) — каждый не чаще раза в неделю, с понедельника (решение Юрия 23.11) */
+function isWeekly(it){ return ['g15', 'g30', 'g60', 'tv', 't3'].includes(it && it.id) || /(\d+\s*минут|час)[^,]*(игр|мульт|сериал)/i.test(String(it && it.name || '')); }
+function weekOf(ds){ return Math.floor((U.dayNum(ds) + 3) / 7); }
+function weeklyTaken(K, it){ const w = weekOf(U.today()); return (K.purchases || []).some(p => String(p.name) === String(it.name) && p.d && weekOf(p.d) === w); }
+function prizeLock(K, it){ return isCash(it) && cashLeft(K) <= 0 ? 'деньги — 2 раза в месяц, уже взято' : isWeekly(it) && weeklyTaken(K, it) ? 'уже взято на этой неделе, снова с понедельника' : ''; }
 function cashLeft(K){ const m = U.today().slice(0, 7); return CASH_MAX - (K.purchases || []).filter(p => String(p.d || '').slice(0, 7) === m && isCash(p)).length; }
 function vShop(){
   const kid = cur.kid, K = S.kids[kid];
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <section class="lesson"><p class="eyebrow">Призы</p><h1>Мои призы</h1><p class="hint">1 балл = 1 минута игры. Обмен подтверждает взрослый своим кодом.</p>
-  <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от Юры</span></div>` : `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span>${isCash(it) && cashLeft(K) <= 0 ? '<span class="hint">деньги — 2 раза в месяц, уже взято</span>' : `<button class="btn small" data-act="buy" data-id="${it.id}" ${K.coins < it.price ? 'disabled' : ''}>${K.coins < it.price ? `ещё ${it.price - K.coins}` : 'Обменять'}</button>`}</div>`).join('')}</div>
+  <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от Юры</span></div>` : `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span>${prizeLock(K, it) ? `<span class="hint">${prizeLock(K, it)}</span>` : `<button class="btn small" data-act="buy" data-id="${it.id}" ${K.coins < it.price ? 'disabled' : ''}>${K.coins < it.price ? `ещё ${it.price - K.coins}` : 'Обменять'}</button>`}</div>`).join('')}</div>
   <button class="btn ghost" data-act="editprizes">✏️ Изменить мои призы</button>
   ${K.purchases.length ? `<div class="shop-own"><h2>Мои награды</h2><ul class="plain">${K.purchases.slice(-10).reverse().map(p => `<li>${p.d} — ${U.esc(p.name)} (${p.price})</li>`).join('')}</ul></div>` : ''}</section></main>`;
 }
@@ -1083,7 +1088,7 @@ document.addEventListener('click', e => {
     case 'fq': foreignAnswer(b.dataset.v); break;
     case 'fnext': { if (L.fi + 1 < L.fq) L.fi++; else { L.phase = 'survey'; const key = L.tr === '_alt' ? 'enRead' : 'ptRead'; S.kids[kid].pos[key] = (S.kids[kid].pos[key] || 0) + 1; } save(); render(); break; }
     case 'shop': go('shop'); break;
-    case 'buy': { const it = (S.kids[kid].shop || []).find(x => x.id === b.dataset.id); if (!it || it.price == null || (isCash(it) && cashLeft(S.kids[kid]) <= 0)) break; const k0 = kid; askPin('parent', () => { const K = S.kids[k0]; if (K.coins >= it.price && !(isCash(it) && cashLeft(K) <= 0)) { K.coins -= it.price; K.purchases.push({ d: cur.ds, name: it.name, price: it.price }); ev(k0, 'награда', { unit: it.name, coins: K.coins, price: it.price }); save(); } cur.kid = k0; go('shop'); }, `Подтвердите: «${it.name}» за ${it.price} монет`); break; }
+    case 'buy': { const it = (S.kids[kid].shop || []).find(x => x.id === b.dataset.id); if (!it || it.price == null || prizeLock(S.kids[kid], it)) break; const k0 = kid; askPin('parent', () => { const K = S.kids[k0]; if (K.coins >= it.price && !prizeLock(K, it)) { K.coins -= it.price; K.purchases.push({ d: cur.ds, name: it.name, price: it.price }); ev(k0, 'награда', { unit: it.name, coins: K.coins, price: it.price }); save(); } cur.kid = k0; go('shop'); }, `Подтвердите: «${it.name}» за ${it.price} монет`); break; }
     case 'resetall': if (window.confirm('Стереть весь прогресс, монеты и коды на этом айпаде?')) { if (kidIds().length) ev(kidIds()[0], 'сброс устройства', {}); flush().finally(() => { try { localStorage.removeItem(KEY); } catch (x) {} location.reload(); }); } break;
     case 'ptab': go('parent', { parentTab: b.dataset.t }); if (b.dataset.t === 'tasks') ptSync(); break;
     case 'pkid': go('parent', { parentKid: b.dataset.k }); break;
