@@ -318,7 +318,7 @@ Y_LOGIC.push(
      x:'(6 и 2 → 4), (9 и 3 → 6): разность. (8 и 5 → 3).', c:'проверь правило на всех фигурах.' }),
    g: r => { const R=[['сумма',(a,b)=>a+b],['разность',(a,b)=>Math.abs(a-b)],['произведение',(a,b)=>a*b]];
      for (let guard=0; guard<50; guard++) { const ri=r.int(0,2), hi=ri===2?6:15, ex=[0,1,2].map(()=>[r.int(2,hi), r.int(2,hi)]); const f=R[ri][1];
-       if (ex.some(([a,b])=>a===b)) continue; if (R.filter(([,g])=>ex.slice(0,2).every(([a,b])=>g(a,b)===f(a,b))).length!==1) continue;
+       if (ex.some(([a,b])=>a===b)) continue; if (new Set(ex.map(([a,b])=>Math.min(a,b)+'-'+Math.max(a,b))).size<3) continue; /* три разные пары: два одинаковых примера ничего не подсказывают */ if (R.filter(([,g])=>ex.slice(0,2).every(([a,b])=>g(a,b)===f(a,b))).length!==1) continue;
        const [a,b]=ex[2], ans=f(a,b); return NW(`В каждой фигуре число в середине получено из чисел в углах по одному правилу.<br>1) В углах ${ex[0][0]} и ${ex[0][1]}, в середине ${f(...ex[0])}.<br>2) В углах ${ex[1][0]} и ${ex[1][1]}, в середине ${f(...ex[1])}.<br>3) В углах ${a} и ${b}. Что в середине?`, ans, R.filter((_,i)=>i!==ri).map(([,g])=>g(a,b)).concat([ans+1, ans+2]), `Правило — ${R[ri][0]}: ${ri===0?`${a} + ${b}`:ri===1?`${Math.max(a,b)} − ${Math.min(a,b)}`:`${a} · ${b}`} = ${ans}`); }
      return NW('В углах 3 и 5, в середине 8. В углах 4 и 6, в середине 10. В углах 7 и 2. Что в середине?', 9, [5, 14, 10], 'Правило — сумма: 7 + 2 = 9'); } },
  { id:'l2_13', t:'Логика с «все» и «некоторые»',
