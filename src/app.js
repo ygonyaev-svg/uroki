@@ -205,7 +205,8 @@ function coinsHtml(n){ const K = cur.kid && S.kids[cur.kid]; return `<span class
 function GIRL(kid){ const k = KIDS[kid]; return k && k.sex ? k.sex === 'f' : T(kid) === 'anya'; }
 function sexify(h, kid){ if (!kid || !KIDS[kid] || !KIDS[kid].sex) return h; const f = KIDS[kid].sex === 'f'; return h.replace(/([А-Яа-яЁё]+)\(а\)/g, (m, w) => f ? w + 'а' : w); }
 function render(){
-  if (S.parentPin) for (const k of kidIds()) { burnCheck(k); piggyCheck(k); }
+  /* Сгорание и копилку считаем только по сверенному с таблицей прогрессу ребёнка: на чужом айпаде копия может быть старой (23.11: у Ярика «сгорели» баллы на айпаде Ани, хотя день 22.11 он закрыл на своём) */
+  if (S.parentPin) for (const k of kidIds()) { if (!FAM && !TEST && S.cfg.sync && typeof SNAP_OK !== 'undefined' && !SNAP_OK[k]) continue; burnCheck(k); piggyCheck(k); }
   if (cur.kid && S.kids[cur.kid] && cur.view !== 'parent') ptPay(cur.kid);
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
   if (typeof hpApply === 'function') hpApply();
