@@ -123,9 +123,13 @@ const BOOK_A = [
        ['Что сказал Зеб в конце?','страшное часто оказывается простым','никогда не ездите ночью','всадник вернётся','не верьте мустангерам']] }
 ];
 /* Новые книги на декабрь–март (тексты Викитеки, вопросы — books/meta2.txt). Аня: после «Каштанки» — «Ночь перед Рождеством». */
+/* READ_T — чтение 12–13 лет (Словоход): Чехов, Пушкин, Тургенев, Лермонтов, Гоголь; дальше — список Ани */
+var READ_T = [];
 { const X = BOOK_X.map(b => Object.assign({}, b)); X.forEach(b => delete b.k);
   BOOK_Y.push(...X.filter((b, i) => BOOK_X[i].k === 'y'));
   const XA = X.filter((b, i) => BOOK_X[i].k === 'a'), np = XA.filter(b => /^bnp/.test(b.id)), rest = XA.filter(b => !/^bnp/.test(b.id));
+  READ_T = X.filter((b, i) => BOOK_X[i].k === 't');
   const ka = BOOK_A.findIndex(b => b.id === 'bka4') + 1; BOOK_A.splice(ka, 0, ...np); BOOK_A.push(...rest); }
 READ_Y.unshift(...BOOK_Y);
 READ_A.unshift(...BOOK_A);
+READ_T = READ_T.concat(READ_A);
