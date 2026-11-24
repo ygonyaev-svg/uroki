@@ -3,6 +3,7 @@
 import os, json, re, sys
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 A_PREF = {'np', 'mu', 'kp', 'dp', 'bp', 'ck', 'ma', 'bl'}
+T_PREF = {'tt', 'hm', 'zl', 'vy', 'me', 'bi', 'ss', 'be', 'tb'}  # 12–13 лет (Словоход)
 
 def load():
     parts = json.load(open(os.path.join(root, 'books', 'parts2.json'), encoding='utf-8'))
@@ -13,7 +14,7 @@ def load():
         if ln.startswith('@'):
             pid, book, title, author, kw = ln[1:].split('|')
             if pid not in parts: errs.append('нет текста ' + pid); continue
-            cur = {'id': 'b' + pid, 'k': 'a' if pid[:2] in A_PREF else 'y', 'book': book, 'title': title, 'author': author,
+            cur = {'id': 'b' + pid, 'k': 't' if pid[:2] in T_PREF else 'a' if pid[:2] in A_PREF else 'y', 'book': book, 'title': title, 'author': author,
                    'text': parts[pid], 'kw': [w.strip() for w in kw.split(',') if w.strip()], 'qs': []}
             out.append(cur)
         else:
