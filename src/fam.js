@@ -283,7 +283,8 @@ function famSnapPull(ids, asKid){ if (!famSnapOn() || !navigator.onLine) return 
     (j.snaps || []).forEach(function(x){ var K = S.kids[x.kid]; if (!K || !x.state) return; var loc = Math.max(K.modT || 0, K.dirtyT || 0);
       if (!K.modT && snapWork(K) && asKid) return; /* первый раз на этом устройстве, и здесь уже есть свои занятия — свой прогресс не затираем */
       if (x.t <= loc) return; var R; try { R = JSON.parse(x.state); } catch (e) { return; } if (!R || !R.K || !R.K.days) return;
-      FSNAP.busy = true; if (K.pin && !R.K.pin) R.K.pin = K.pin; S.kids[x.kid] = R.K; S.kids[x.kid].modT = x.t; FSNAP.pushed[x.kid] = x.t; famLogMerge(R.log); if (typeof posFix === 'function') try { posFix(x.kid); } catch (e) {} FSNAP.busy = false; ch = true; });
+      var M = snapMerge(K, R.K, x.t); if (M === K) { famLogMerge(R.log); K.modT = Date.now(); if (asKid) FSNAP.ok[x.kid] = true; ch = true; return; } /* у себя сделано больше — своё не затираем, отправим его */
+      R.K = M; FSNAP.busy = true; if (K.pin && !R.K.pin) R.K.pin = K.pin; S.kids[x.kid] = R.K; S.kids[x.kid].modT = x.t; FSNAP.pushed[x.kid] = x.t; famLogMerge(R.log); if (typeof posFix === 'function') try { posFix(x.kid); } catch (e) {} FSNAP.busy = false; ch = true; });
     ids.forEach(function(k){ FSNAP.pulled[k] = Date.now(); });
     if (asKid) ids.forEach(function(k){ var K = S.kids[k]; if (!K) return; FSNAP.ok[k] = true; if (!K.modT || (K.dirtyT && K.dirtyT > K.modT)) K.modT = Date.now(); delete K.dirtyT; });
     S.fam.snapAt = Date.now(); save(); if (asKid) famSnapPush(); return ch; }).catch(function(){ return false; }); }
