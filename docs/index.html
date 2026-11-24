@@ -1133,7 +1133,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* vd41893d0 */
+<script>/* vf2ad9935 */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -8789,13 +8789,32 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-hear
    Пока сверка не прошла, свой снимок не отправляем, чтобы пустое устройство не затёрло настоящий прогресс. */
 const SNAP_OK = {}, SNAP_PUSHED = {}; let SNAP_T = null, SNAP_BUSY = false;
 function snapWork(K){ return Object.keys(K.days || {}).some(d => Object.keys((K.days[d] || {}).les || {}).length); }
+/* Слияние снимков (24.11.2026): незаконченный урок продолжается с того же места на любом устройстве.
+   Решает не только время снимка, но и сделанная работа: более «старый» по часам, но с большим числом пройденного снимок
+   не затирается чужим (родитель на телефоне поменял цену — его копия ребёнка была старой). Начатые уроки, где своё
+   устройство продвинулось дальше, переносятся в принятый снимок; баллы за урок начисляются только при его завершении — двойных нет. */
+const SNAP_PH = { theory:1, warm:1, read:2, practice:2, silent:3, fread:3, retell:4, qs:5, spot:6, words:7, survey:8 };
+function snapLesProg(L){ if (!L) return -1; if (L.phase === 'done') return 1e6; const a = (L.ans || []).filter(x => x != null).length; return (SNAP_PH[L.phase] || 0) * 1000 + a * 10 + (L.i || 0) + (L.wi || 0) + (L.rt ? 5 : 0); }
+function snapWorkN(K){ let n = 0; for (const d of Object.keys(K.days || {})) { const les = (K.days[d] || {}).les || {}; for (const s of Object.keys(les)) n += les[s] && les[s].phase === 'done' ? 1000 : 1 + Math.min(999, Math.floor(snapLesProg(les[s]) / 10)); } return n + (K.purchases || []).length + (K.hwText || []).filter(h => h.done).length; }
+function snapMerge(L, R, rt){ try {
+  if (!L || !snapWork(L)) return R;
+  if (snapWorkN(R) < snapWorkN(L)) { /* в пришедшем снимке меньше сделано — это устаревшая копия; оставляем своё, забираем только настройки родителя */
+    ['shop', 'allow', 'xt', 'prizesSet'].forEach(f => { if (R[f] !== undefined) L[f] = R[f]; });
+    const ids = {}; (L.msgs || []).forEach(m => { ids[m.id] = 1; }); (R.msgs || []).forEach(m => { if (!ids[m.id]) L.msgs.push(m); });
+    const hw = {}; (L.hwText || []).forEach(h => { hw[h.id] = h; }); (R.hwText || []).forEach(h => { if (!hw[h.id]) L.hwText.push(h); else if (h.done) hw[h.id].done = h.done; });
+    return L; }
+  for (const d of Object.keys(L.days || {})) { const ll = (L.days[d] || {}).les || {}; for (const s of Object.keys(ll)) { const a = ll[s]; if (!a || a.phase === 'done') continue;
+    const RD = R.days[d] || (R.days[d] = { les: {}, bonus: false }); RD.les = RD.les || {}; if (snapLesProg(a) > snapLesProg(RD.les[s])) RD.les[s] = a; } }
+  if (L.openDay && (!R.openDay || L.openDay > R.openDay)) R.openDay = L.openDay;
+  } catch (e) {} return R; }
 function snapMark(){ if (TEST || !cur.kid || SNAP_BUSY) return; if (FAM) return famSnapMark(cur.kid); const K = S.kids[cur.kid]; if (!K) return; if (!SNAP_OK[cur.kid]) { if (snapWork(K) && K.modT) K.dirtyT = Date.now(); return; } K.modT = Date.now(); clearTimeout(SNAP_T); SNAP_T = setTimeout(snapPush, 45000); }
 function snapPush(){ if (FAM) return famSnapPush(); if (TEST || !S.cfg.sync || !navigator.onLine) return; clearTimeout(SNAP_T);
   Object.keys(SNAP_OK).forEach(kid => { const K = S.kids[kid]; if (!K || !K.modT || SNAP_PUSHED[kid] === K.modT) return; const t = K.modT;
-    try { fetch(S.cfg.sync, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ snap: 1, kid, t, state: JSON.stringify(K) }) }).then(() => { SNAP_PUSHED[kid] = t; }).catch(() => {}); } catch (e) {} }); }
+    const body = JSON.stringify({ snap: 1, kid, t, state: JSON.stringify(K) }); /* keepalive браузер принимает только до 64 КБ — большой снимок с ним молча не уходил (у Ани с 22.11) */
+    try { fetch(S.cfg.sync, { method: 'POST', mode: 'no-cors', keepalive: body.length < 60000, headers: { 'Content-Type': 'text/plain' }, body }).then(() => { SNAP_PUSHED[kid] = t; }).catch(() => {}); } catch (e) {} }); }
 async function snapCheck(kid){ if (FAM) return famSnapCheck(kid); if (TEST || !kid || SNAP_OK[kid] || !S.cfg.sync || !navigator.onLine) return;
   try { const r = await fetch(S.cfg.sync + (S.cfg.sync.includes('?') ? '&' : '?') + 'action=snap&kid=' + encodeURIComponent(kid)); const j = await r.json(); if (!j || !j.ok) return;
-    const K = S.kids[kid]; if (j.t && j.state && j.t > Math.max(K.modT || 0, K.dirtyT || 0)) { const R = JSON.parse(j.state); if (R && typeof R === 'object' && R.days) { SNAP_BUSY = true; S.kids[kid] = R; if (typeof posFix === 'function') posFix(kid); save(); SNAP_BUSY = false; SNAP_PUSHED[kid] = R.modT; if (cur.kid === kid) { alertMsg('Прогресс загружен ✓'); if (cur.view === 'prizes' && R.prizesSet) go('home'); else render(); } } }
+    const K = S.kids[kid]; if (j.t && j.state && j.t > Math.max(K.modT || 0, K.dirtyT || 0)) { let R = JSON.parse(j.state); if (R && typeof R === 'object' && R.days) { R = snapMerge(K, R, j.t); if (R === K) { SNAP_OK[kid] = true; K.modT = Date.now(); snapPush(); return; } SNAP_BUSY = true; S.kids[kid] = R; if (typeof posFix === 'function') posFix(kid); save(); SNAP_BUSY = false; SNAP_PUSHED[kid] = R.modT; if (cur.kid === kid) { alertMsg('Прогресс загружен ✓'); if (cur.view === 'prizes' && R.prizesSet) go('home'); else render(); } } }
     SNAP_OK[kid] = true; if (!S.kids[kid].modT) { S.kids[kid].modT = Date.now(); } snapPush();
   } catch (e) {} }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') snapPush(); else if (cur.kid) snapCheck(cur.kid); });
