@@ -16,6 +16,8 @@ const KIDS = FAM ? {} : KIDS_TPL;
 const TPL = k => T(k);
 function T(k){ return FAM ? ((KIDS[k] && KIDS[k].tpl) || 'yarik') : k; }
 function LK(k){ return FAM ? ((KIDS[k] && KIDS[k].look) || T(k)) : (typeof lookId === 'function' && lookId(k) ? LOOKS[lookId(k)].base : k); }
+/* акварельные картинки для пустых экранов и «всё сделано» (24.11): docs/img/ui/*.webp */
+function uiPic(kid, kind){ let v = 'any'; try { const b = (THEME[TH(kid)].banner || []).join(''); v = /⚽|🏆|👟|ic-ball|ic-goal/.test(b) ? 'foot' : /🪄|🔮|🦉|ic-wand|ic-owl/.test(b) ? 'magic' : 'any'; } catch (e) {} const f = kind === 'done' && v === 'any' ? 'login-door' : kind + '-' + v; return `<img class="uipic" src="img/ui/${f}.webp" alt="" loading="lazy">`; }
 function TH(k){ return FAM && THEME['k:' + k] ? 'k:' + k : !FAM && typeof lookTheme === 'function' && S && S.kids && S.kids[k] ? lookTheme(k) : LK(k); }
 function kidIds(){ return FAM ? Object.keys(KIDS) : ['yarik', 'anya']; }
 const SUBJ_ICON = { read:'Аа', math:'7+5', rus:'Ёё', world:'☼', hist:'XV', logic:'?!', lang:'Pt', hw:'ДЗ' };
@@ -236,7 +238,7 @@ function vLogin(){
   if (!FAM && S.viewer) return `<main class="wrap login"><header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Телефон родителя</h1><p>Здесь только отчёты: дети занимаются на своих айпадах.</p></header>
   <p class="center"><button class="btn big" data-act="parent">Войти как родитель</button></p></main>`;
   const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}${typeof lookBody === 'function' ? lookBody(k) : ''}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
-  return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header>
+  return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header><img class="uipic loginpic" src="img/ui/login-door.webp" alt="">
   <div class="kids">${kidIds().map(card).join('')}</div>${FAM ? famLoginExtra() : ''}
   ${alwaysTiles(null)}
   <p class="center"><button class="link" data-act="parent">Для родителей</button></p>${window.INSTALL_EV ? '<p class="center"><button class="btn ghost" data-act="install">📲 Установить на экран телефона</button></p>' : ''}</main>`;
@@ -302,7 +304,7 @@ function vHome(){
     const locked = !TEST && ((st === 'new' && restLeft(kid) > 0) || (st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s)));
     return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${icon(s === 'lang' && track('lang', cur.ds) === '_alt' ? 's_en' : ((s === 'world' && T(kid) === 'yarik') || (s === 'logic' && T(kid) === 'anya')) && track(s, cur.ds) === '_alt' ? 's_fin' : SUBJ_IC[s], 'big') || SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && T(kid) === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">Выйти</button><button class="link voice" data-act="voice" title="Кто читает задания">🔊 ${K.voice === 'm' ? 'Мужской голос' : 'Женский голос'}</button><span class="coins">${coinsHtml(K.coins)}</span></header>
-  <div class="banner" aria-hidden="true">${THEME[TH(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[TH(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${rusNote(kid)}${dripCard(kid)}${restCard(kid)}${hwCard(kid)}${capLeft(K) ? '' : '<div class="note">✅ Баллы на сегодня собраны (' + DAY_CAP + ' из ' + DAY_CAP + '). Можно заниматься дальше для ума — новые баллы завтра.</div>'}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
+  <div class="banner" aria-hidden="true">${THEME[TH(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[TH(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p><div class="dayprog" aria-hidden="true">${subs.map((s, i) => `<i class="${i < done ? 'on' : ''}"></i>`).join('')}</div>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${rusNote(kid)}${dripCard(kid)}${restCard(kid)}${hwCard(kid)}${capLeft(K) ? '' : '<div class="note">✅ Баллы на сегодня собраны (' + DAY_CAP + ' из ' + DAY_CAP + '). Можно заниматься дальше для ума — новые баллы завтра.</div>'}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog tipc" data-tip="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${ptHomeBtn(kid)}
   ${fineCard(kid)}${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
@@ -310,7 +312,7 @@ function vHome(){
   ${libCard(kid)}
   ${alwaysTiles(kid)}
   <p class="center"><button class="link" data-act="chpin">🔑 Поменять пароль</button></p>
-  ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}${proReady(kid, D) && !D.les.pro ? ' Все уроки на 4 и 5 — тебе открыт уровень PRO: ещё до 30 минут!' : ''}</p></div>` : ''}
+  ${done === subs.length ? `<div class="card win">${uiPic(kid, 'done')}<h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}${proReady(kid, D) && !D.les.pro ? ' Все уроки на 4 и 5 — тебе открыт уровень PRO: ещё до 30 минут!' : ''}</p></div>` : ''}
   ${FAM ? '' : bkHomeCard(kid)}
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
   <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
@@ -667,7 +669,7 @@ function rusState(kid){ const K = S.kids[kid], qs = [];
   const k = n < 3 ? .85 : avg >= .9 && !low5 ? 1 : avg >= .8 ? .85 : avg >= .7 ? .7 : .55;
   return { n, avg, k }; }
 function rusK(kid, subj){ return RUS_SUBJ[subj] || subj === 'hw' ? 1 : rusState(kid).k; }
-function rusNote(kid){ const r = rusState(kid); if (r.k >= 1) return ''; if (r.n < 3) return `<div class="note">📚 Сначала покажи себя в русском и чтении: после трёх уроков станет ясно, полные ли баллы за остальные предметы. Пока они идут на ${Math.round(r.k * 100)}%.</div>`; return `<div class="note">📚 Русский пока не на пятёрку, поэтому за остальные предметы баллы идут на ${Math.round(r.k * 100)}%. Подтяни чтение и русский — и все баллы станут полными!</div>`; }
+function rusNote(kid){ const r = rusState(kid); if (r.k >= 1) return ''; if (r.n < 3) return `<div class="note">📚 Пройди 3 урока русского и чтения на отлично — и за все предметы баллы станут полными. Пока остальные идут на ${Math.round(r.k * 100)}%.</div>`; return `<div class="note">📚 Русский пока не на пятёрку, поэтому за остальные предметы баллы идут на ${Math.round(r.k * 100)}%. Подтяни чтение и русский — и все баллы станут полными!</div>`; }
 const DAY_MAX = 60, DAY_BONUS = 10, LESSON_POOL = DAY_MAX - DAY_BONUS, SKIP_PRICE = 10, EXTRA_BONUS = 5, PRO_BONUS = 30;
 function extraTile(kid, D){ if (!D.bonus || cur.ds !== U.today()) return ''; const L = D.les.extra;
   if (!L && !extraTasks(kid, D).length) return '';
@@ -1015,7 +1017,8 @@ function vShop(){
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <section class="lesson"><p class="eyebrow">Призы</p><h1>Мои призы</h1><p class="hint">1 балл = 1 минута игры. Обмен подтверждает взрослый своим кодом.</p>
   <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от Юры</span></div>` : `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span>${prizeLock(K, it) ? `<span class="hint">${prizeLock(K, it)}</span>` : `<button class="btn small" data-act="buy" data-id="${it.id}" ${K.coins < it.price ? 'disabled' : ''}>${K.coins < it.price ? `ещё ${it.price - K.coins}` : 'Обменять'}</button>`}</div>`).join('')}</div>
-  <button class="btn ghost" data-act="editprizes">✏️ Изменить мои призы</button>
+  ${(K.shop || []).length ? '' : `<div class="card">${uiPic(kid, 'es-prizes')}<p>Призов пока нет. Выбери, ради чего будешь учиться: минуты игры, мультики, поход в кафе всей семьёй.</p></div>`}
+  <button class="btn ${(K.shop || []).length ? 'ghost' : 'big'}" data-act="editprizes">✏️ ${(K.shop || []).length ? 'Изменить мои призы' : 'Выбрать призы'}</button>
   ${K.purchases.length ? `<div class="shop-own"><h2>Мои награды</h2><ul class="plain">${K.purchases.slice(-10).reverse().map(p => `<li>${p.d} — ${U.esc(p.name)} (${p.price})</li>`).join('')}</ul></div>` : ''}</section></main>`;
 }
 
@@ -1152,7 +1155,7 @@ document.addEventListener('click', e => {
     default: { if (ppAct(act, b)) break; if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (libAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; if (ptAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
-function alertMsg(t, ms){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), ms || 2200); }
+function alertMsg(t, ms){ const d = document.createElement('div'); d.className = 'toast'; try { t = String(t).replace(/\s*\p{Extended_Pictographic}\uFE0F?\s*/gu, '. ').replace(/^\.\s*|\.\s*$/g, '').replace(/([.!?…:])\.\s/g, '$1 '); } catch (e) {} d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), ms || 2200); }
 document.addEventListener('submit', e => {
   const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const k = f.dataset.form;
   const val = id => (document.getElementById(id) || {}).value || '';
