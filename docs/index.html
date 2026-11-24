@@ -1133,7 +1133,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v6144ee70 */
+<script>/* v441c7c0b */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -8677,10 +8677,12 @@ function libAct(act, b){
    иначе за следующий урок баллов будет 70%. Делать можно в любое время, даже в перерыв.
    Задание исправлено, если ребёнок решил его сам; после ошибки даём похожее новое задание (ответ уже показан — повторять то же нечестно). */
 const HW_K = .7;
+/* ДЗ бесплатное: снимает штраф, но результат урока не повышает (a.hw). Платная работа над ошибками (a.fix) тоже засчитывается как ДЗ. */
+const hwDone = a => !!(a && (a.fix || a.hw));
 function hwLes(kid, ds, s){ const D = S.kids[kid].days[ds], L = D && D.les && D.les[s]; return L && L.phase === 'done' && L.ans && L.ans.length && !ITEMS(s) && s !== 'read' ? L : null; }
 /* последний урок по предмету до дня ds (не включая) — если в нём есть неисправленные ошибки */
 function hwOwed(kid, s, ds){ const days = Object.keys(S.kids[kid].days || {}).filter(d => d < ds).sort().reverse().slice(0, 30);
-  for (const d of days) { const L = hwLes(kid, d, s); if (!L) continue; const W = fixList(kid, s, L).filter(j => !L.ans[j].fix); return W.length ? { ds: d, n: W.length, all: fixList(kid, s, L).length } : null; } return null; }
+  for (const d of days) { const L = hwLes(kid, d, s); if (!L) continue; const W = fixList(kid, s, L).filter(j => !hwDone(L.ans[j])); return W.length ? { ds: d, n: W.length, all: fixList(kid, s, L).length } : null; } return null; }
 function hwAll(kid){ const tomorrow = U.addDays(U.today(), 1); return (KIDS[kid].order || []).map(s => { const o = hwOwed(kid, s, tomorrow); return o ? Object.assign({ s }, o) : null; }).filter(Boolean); }
 function hwCard(kid){ if (TEST && !cur.kid) return ''; const H = hwAll(kid); if (!H.length) return '';
   return `<div class="card hwc"><h2>📒 Домашнее задание</h2><p class="hint">Исправь ошибки до следующего урока по предмету. Если не сделаешь — за следующий урок будет только 70% баллов. Делать можно в любое время, даже в перерыв.</p>
@@ -8688,8 +8690,8 @@ function hwCard(kid){ if (TEST && !cur.kid) return ''; const H = hwAll(kid); if 
 function hwNote(kid, s){ const o = hwOwed(kid, s, cur.ds); if (!o) return ''; return `<div class="note">📒 Не сделано домашнее задание по прошлому уроку (${o.n} ${U.pl(o.n, 'ошибка', 'ошибки', 'ошибок')}). Если начнёшь урок без него, баллов будет 70%. <button class="link" data-act="hwgo" data-s="${s}" data-d="${o.ds}">Сделать ДЗ →</button></div>`; }
 function hwSimilar(kid, s, L, t, n){ if (!n) return t; const u = unitById(kid, s, L.uid); if (!u || t.rev) return t; const shape = x => strip(x.q).replace(/\d+([,.]\d+)?/g, '#').slice(0, 18);
   const c = genTasks(u, (L.seed || 1) * 13 + n * 211, 14).filter(x => x.q !== t.q); const x = c.find(x => shape(x) === shape(t)) || c.find(x => x.k === (t.was || t.k)); return x ? asChoice(x, (L.seed || 1) + n * 17, c) : t; }
-function hwCur(){ const h = cur.hw, kid = cur.kid, L = h && hwLes(kid, h.ds, h.s); if (!L) return null; const W = fixList(kid, h.s, L), left = W.filter(j => !L.ans[j].fix);
-  const i = h.i != null && W.includes(h.i) && (!L.ans[h.i].fix || h.done) ? h.i : left[0]; if (i == null) return { L, W, left }; const a = L.ans[i]; const t = hwSimilar(kid, h.s, L, lessonTasks(L, kid, h.s)[i], a.hwN || 0); return { L, W, left, i, a, t }; }
+function hwCur(){ const h = cur.hw, kid = cur.kid, L = h && hwLes(kid, h.ds, h.s); if (!L) return null; const W = fixList(kid, h.s, L), left = W.filter(j => !hwDone(L.ans[j]));
+  const i = h.i != null && W.includes(h.i) && (!hwDone(L.ans[h.i]) || h.done) ? h.i : left[0]; if (i == null) return { L, W, left }; const a = L.ans[i]; const t = hwSimilar(kid, h.s, L, lessonTasks(L, kid, h.s)[i], a.hwN || 0); return { L, W, left, i, a, t }; }
 function vHwFix(){ const kid = cur.kid, h = cur.hw || {}, c = hwCur(); const head = `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← К урокам</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header><section class="lesson"><p class="eyebrow">📒 Домашнее задание</p><h1>${U.esc(c ? subjName(kid, h.s, h.ds) : '')}: работа над ошибками</h1>`;
   if (!c) return head + '<p>Не нашёл этот урок.</p></section></main>';
   if (c.i == null) return head + `<article class="card result"><div class="cheer">✅ Домашнее задание сделано!</div><p>Все ошибки исправлены. Следующий урок по этому предмету — с полными баллами.</p></article><button class="btn big" data-act="home">К урокам</button></section></main>`;
@@ -8704,7 +8706,7 @@ function vHwFix(){ const kid = cur.kid, h = cur.hw || {}, c = hwCur(); const hea
 function hwAnswer(v){ const kid = cur.kid, c = hwCur(); if (!c || c.i == null) return; const h = cur.hw, t = c.t; if (h.r && h.r.fin) return; let ok;
   if (t.k === 'n') { const x = Number(String(v).replace(',', '.').replace(/\s/g, '')); if (String(v).trim() === '' || isNaN(x)) return; ok = Math.abs(x - t.a) < 1e-6; } else if (t.k === 't') { if (!String(v).trim()) return; ok = txtOk(t, v); } else ok = v === t.a;
   h.r = { fin: true, ok, v }; h.i = c.i; h.done = true;
-  if (ok) c.a.fix = true; else c.a.hwN = (c.a.hwN || 0) + 1;
+  if (ok) c.a.hw = true; else c.a.hwN = (c.a.hwN || 0) + 1;
   ev(kid, ok ? 'дз исправлено' : 'дз ошибка', { subj: subjName(kid, h.s, h.ds), unit: (unitById(kid, h.s, c.L.uid) || {}).t || '', q: strip(t.q), ans: String(v), right: String(t.a), ok: ok ? 'верно' : 'ошибка' });
   save(); render(); }
 function hwAct(act, b){ if (act === 'hwgo') { go('hwfix', { hw: { s: b.dataset.s, ds: b.dataset.d } }); return true; }
@@ -10019,7 +10021,7 @@ function vRetry(kid, subj, L, i){ const T = lessonTasks(L, kid, subj), t = T[i];
   else inp = `<form class="numf" data-form="rtry"><input id="rtin" ${t.k === 't' ? 'autocapitalize="off" autocorrect="off" spellcheck="false"' : 'inputmode="decimal"'} autocomplete="off" ${fin ? 'disabled' : ''} value="${fin ? U.esc(r.v) : ''}" aria-label="Ответ"><button class="btn" ${fin ? 'disabled' : ''}>Проверить</button></form>`;
   const ra = t.k === 'n' ? U.dec(t.a) : U.esc(t.a);
   const fb = fin ? (r.ok ? `<div class="fb ok"><b>Верно!</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>` : `<div class="fb bad"><b>Правильный ответ: ${ra}</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>`) : r.tries ? '<div class="fb try">Не совсем. Подумай ещё раз.</div>' : '';
-  const was = a0.final ? `<p class="hint">${a0.fix ? '🛠 Исправлено в работе над ошибками. ' : ''}В уроке: ${a0.ok && a0.tries === 1 ? 'верно с первого раза ✓' : a0.ok ? 'верно со второй попытки' : 'ошибка, ответ был ' + U.esc(String(a0.v))}</p>` : '';
+  const was = a0.final ? `<p class="hint">${a0.fix ? '🛠 Исправлено в работе над ошибками. ' : !L.fixPaid && !(a0.ok && a0.tries === 1) ? 'Чтобы исправление пошло в результат, нужна работа над ошибками (' + FIX_PRICE + ' баллов). ' : ''}В уроке: ${a0.ok && a0.tries === 1 ? 'верно с первого раза ✓' : a0.ok ? 'верно со второй попытки' : 'ошибка, ответ был ' + U.esc(String(a0.v))}</p>` : '';
   const W = fixList(kid, subj, L), nf = W.find(j => j !== i && !L.ans[j].fix), nxt = nf != null ? nf : T.findIndex((x, j) => j > i && L.ans[j] && L.ans[j].final);
   return `<div class="note">Повторение задания ${i + 1} — баллы не меняются.</div><article class="card task"><div class="q">${t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, t.sj || subj, t)}${was}${inp}${fb}</article>
   <div class="row">${fin ? '<button class="btn ghost" data-act="rtryagain">↻ Ещё раз</button>' : ''}${nxt >= 0 ? `<button class="btn ghost" data-act="rtask" data-i="${nxt}">${nf != null ? 'Следующая ошибка →' : 'Следующее →'}</button>` : ''}</div><button class="btn big" data-act="rview" data-s="">Вернуться к уроку</button>`; }
@@ -10028,7 +10030,7 @@ function retryAnswer(v){ const kid = cur.kid, L = dayRec(kid, cur.ds).les[cur.su
   if (t.k === 'n') { const x = Number(String(v).replace(',', '.').replace(/\s/g, '')); if (String(v).trim() === '' || isNaN(x)) return; ok = Math.abs(x - t.a) < 1e-6; } else if (t.k === 't') { if (!String(v).trim()) return; ok = txtOk(t, v); } else ok = v === t.a;
   r.tries++; r.v = v; if (!ok && t.k === 'c') r.wrong.push(v);
   if (ok || r.tries >= 2 || (t.k === 'c' && t.opts.length - r.wrong.length <= 1)) { r.fin = true; r.ok = ok; }
-  const a0 = L.ans[i]; if (ok && a0 && a0.final && !(a0.ok && a0.tries === 1) && !a0.fix && !(t.k === 'c' && t.opts.length <= 2 && r.tries > 1)) { a0.fix = true; const W = fixList(kid, cur.subj, L), left = W.filter(j => !L.ans[j].fix).length;
+  const a0 = L.ans[i]; if (ok && L.fixPaid && a0 && a0.final && !(a0.ok && a0.tries === 1) && !a0.fix && !(t.k === 'c' && t.opts.length <= 2 && r.tries > 1)) { a0.fix = true; fixRegrade(kid, cur.subj, L); const W = fixList(kid, cur.subj, L), left = W.filter(j => !L.ans[j].fix).length;
     ev(kid, 'исправлено', { subj: subjName(kid, cur.subj, cur.ds), unit: (unitById(kid, cur.subj, L.uid) || {}).t || '', q: strip(t.q), ans: String(v), right: String(t.a), ok: 'верно' }); save(); if (!left) alertMsg('Все ошибки исправлены — 100%! 💪'); }
   render(); }
 function vHwText(kid, L){ const K = S.kids[kid]; const items = K.hwText.filter(h => (L.txt || []).includes(h.id));
@@ -10047,10 +10049,17 @@ function vResult(kid, subj, L){
   const msg = L.consolidate ? 'Хорошо! Завтра закрепим эту тему ещё раз — с новыми заданиями.' : L.passed === true ? 'Тема пройдена! Завтра — следующая.' : L.passed === false ? 'Завтра повторим эту тему с новыми заданиями.' : '';
   return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[TH(kid)].win)}</div>` : ''}<div class="bigmark m${L.grade}">${L.grade}</div><p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.ootCut ? '<p class="hint">Урок был не по порядку — баллов только треть.</p>' : ''}${L.hwCut ? '<p class="hint">📒 Домашнее задание по прошлому уроку не было сделано — баллов 70%.</p>' : ''}${L.rusCut ? `<p class="hint">📚 Баллы за этот урок — ${L.rusCut}%: русский пока не на пятёрку. Подтяни русский, и все баллы станут полными.</p>` : ''}${L.fastCut ? '<p class="hint">Слишком быстро — баллов меньше. Решай внимательно, проверяй себя.</p>' : ''}${fineCard(kid)}${typeof srResult === 'function' ? srResult(kid, L) : ''}${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.proOpen ? '<div class="card win"><h2>Открыт уровень PRO!</h2><p>Все уроки сегодня на 4 и 5. В PRO можно заработать ещё до 30 минут сверх дневной нормы.</p></div>' : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article>${fixCard(kid, subj, L)}<button class="btn big" data-act="home">К урокам</button>`;
 }
-/* Работа над ошибками: в любое время, без перерыва. Баллы не меняются, но результат можно довести до 100%. */
+/* Работа над ошибками: в любое время, без перерыва. Платная (Юрий 24.11): 10 баллов за урок — тогда исправленные ошибки поднимают результат урока до 100%.
+   Бесплатное домашнее задание (hw.js) снимает штраф 70%, но результат урока не меняет. */
+const FIX_PRICE = 10;
 function fixList(kid, subj, L){ const T = lessonTasks(L, kid, subj) || []; return T.map((t, j) => j).filter(j => { const a = L.ans[j]; return a && a.final && !(a.ok && a.tries === 1); }); }
 function fixCard(kid, subj, L){ if (!L.ans || ITEMS(subj) && subj === 'hw') return ''; const W = fixList(kid, subj, L); if (!W.length) return ''; const F = W.filter(j => L.ans[j].fix).length, tot = L.total || lessonTasks(L, kid, subj).length, pct = Math.round(((L.score || 0) + F) / Math.max(1, tot) * 100), nx = W.find(j => !L.ans[j].fix);
-  return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Исправлено <b>${F} из ${W.length}</b> · результат с исправлениями: <b>${pct}%</b></p><p class="hint">Это и есть домашнее задание: исправь ошибки до следующего урока по предмету, иначе за него будет только 70% баллов. Можно в любое время, даже в перерыв.</p>${nx != null ? `<button class="btn" data-act="rtask" data-i="${nx}">${F ? 'Дальше исправлять' : 'Исправить ошибки'}</button>` : '<p class="earn">✅ Все ошибки исправлены — 100%!</p>'}</article>`; }
+  if (!L.fixPaid) { const c = S.kids[kid].coins || 0; return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Результат урока: <b>${pct}%</b>. Хочешь улучшить? Исправь ошибки — результат станет до 100%, а оценка для уровня PRO — до четвёрки.</p><p class="hint">Работа над ошибками стоит ${FIX_PRICE} баллов. Бесплатное домашнее задание на главной снимает штраф за следующий урок, но результат этого урока не меняет.</p>${c >= FIX_PRICE ? `<button class="btn" data-act="fixbuy">Улучшить результат за ${FIX_PRICE} баллов</button>` : `<p class="hint">Нужно ${FIX_PRICE} баллов, у тебя ${c}.</p>`}</article>`; }
+  return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Исправлено <b>${F} из ${W.length}</b> · результат с исправлениями: <b>${pct}%</b></p><p class="hint">Оплачено. Исправляй в любое время, даже в перерыв. Исправленные ошибки засчитываются и как домашнее задание.</p>${nx != null ? `<button class="btn" data-act="rtask" data-i="${nx}">${F ? 'Дальше исправлять' : 'Исправить ошибки'}</button>` : '<p class="earn">✅ Все ошибки исправлены — 100%!</p>'}</article>`; }
+function fixRegrade(kid, subj, L){ const tot = L.total || lessonTasks(L, kid, subj).length, F = fixList(kid, subj, L).filter(j => L.ans[j].fix).length; L.fixGrade = Math.min(4, grade(((L.score || 0) + F) / Math.max(1, tot)));
+  const D = dayRec(kid, cur.ds); if (cur.ds === U.today() && D.bonus && !D.proOpen && proOk(kid, D)) { D.proOpen = true; ev(kid, 'PRO открыт', { text: 'после работы над ошибками' }); setTimeout(() => alertMsg('Открыт уровень PRO! Там можно заработать ещё до 30 минут.'), 0); } }
+function fixBuy(kid, subj, L){ const K = S.kids[kid]; if (!L || L.fixPaid || (K.coins || 0) < FIX_PRICE) return; K.coins -= FIX_PRICE; L.fixPaid = true;
+  ev(kid, 'работа над ошибками', { subj: subjName(kid, subj, cur.ds), unit: (unitById(kid, subj, L.uid) || {}).t || '', price: -FIX_PRICE, coins: K.coins }); save(); }
 
 /* ----- Штраф за небрежность (решение Юрия 23.11, правила — совет с ChatGPT и Gemini) -----
    «Наугад» — неверный ответ быстрее, чем можно прочитать вопрос: 2 с + 0,9 с на слово (Ярик) / 0,4 с (Аня), не меньше 3 с.
@@ -10224,7 +10233,9 @@ function trainTile(kid, D){ if (!trainReady(kid, D)) return ''; const L = D.les.
   return `<button class="tile pro ${st}" data-act="opentrain"><span class="ico">🔥</span><span class="tt"><span class="sn">Испытание</span><span class="ut">${st === 'done' ? `Пройдено: +${L.coins || 0} ${U.pl(L.coins || 0, 'балл', 'балла', 'баллов')}` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Сложные задачи по темам, которые будут дальше. Одна попытка. До +15 баллов'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : ''}</button>`; }
 /* Уровень PRO: после всех уроков и Экстры — тот же день заново, но сложнее. По 3 задания на сегодняшнюю тему и 2 на следующую (на завтра). Одна попытка. */
 /* Правило Юры 24.11: PRO открывается, когда все уроки дня пройдены на 4 и 5 (повторение ошибок не считается). Экстру ждать не нужно. */
-function proOk(kid, D){ const subs = todaySubjects(kid).filter(s => s !== 'hw'); return subs.length > 0 && subs.every(s => D.les[s] && D.les[s].phase === 'done' && (D.les[s].grade || 0) >= 4); }
+function proOk(kid, D){ const subs = todaySubjects(kid).filter(s => s !== 'hw'); return subs.length > 0 && subs.every(s => D.les[s] && D.les[s].phase === 'done' && lesGrade(D.les[s]) >= 4); }
+/* оценка с учётом платной работы над ошибками: исправленный урок засчитывается в PRO не выше четвёрки */
+function lesGrade(L){ return Math.max(L.grade || 0, L.fixGrade || 0); }
 function proReady(kid, D){ return !!D.bonus && cur.ds === U.today() && proOk(kid, D); }
 function proTasks(kid, D){ const out = [];
   for (const s of Object.keys(D.les)) { const L = D.les[s]; if (!L.uid || L.phase !== 'done') continue; const u = unitById(kid, s, L.uid); if (!u) continue;
@@ -10233,8 +10244,8 @@ function proTasks(kid, D){ const out = [];
     if (nx) for (const x of genTasks(nx, U.h(kid + cur.ds + 'pro2' + s), 2)) { x.sj = s; x.uid = nx.id; x.pro = 1; out.push(x); } }
   return U.rng(U.h(kid + cur.ds + 'proMix')).shuffle(out).slice(0, 16); }
 function proTile(kid, D){ if (!proReady(kid, D)) { if (cur.ds !== U.today() || D.les.pro) return '';
-    const low = D.bonus ? todaySubjects(kid).filter(s => s !== 'hw' && D.les[s] && (D.les[s].grade || 0) < 4) : [];
-    return `<div class="tile pro locked"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${D.bonus ? `Сегодня не открылся: ${low.map(s => subjName(kid, s, cur.ds)).join(', ')} ниже четвёрки. Завтра пройди все уроки на 4 и 5 — и PRO твой!` : 'Откроется, если все уроки дня будут на 4 и 5. Там можно заработать ещё до 30 минут'}</span></span><span class="state">до +30</span></div>`; }
+    const low = D.bonus ? todaySubjects(kid).filter(s => s !== 'hw' && D.les[s] && lesGrade(D.les[s]) < 4) : [];
+    return `<div class="tile pro locked"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${D.bonus ? `Сегодня не открылся: ${low.map(s => subjName(kid, s, cur.ds)).join(', ')} ниже четвёрки. Исправь там ошибки в работе над ошибками (${FIX_PRICE} баллов за урок) — и PRO откроется!` : 'Откроется, если все уроки дня будут на 4 и 5. Там можно заработать ещё до 30 минут'}</span></span><span class="state">до +30</span></div>`; }
   const L = D.les.pro; if (!L && !proTasks(kid, D).length) return '';
   const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new';
   return `<button class="tile pro ${st}" data-act="openpro"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${st === 'done' ? `Пройден: +${L.coins || 0} ${U.pl(L.coins || 0, 'балл', 'балла', 'баллов')}` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Пройди этот день ещё раз — задачи на смекалку и тема завтрашнего урока. Одна попытка'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : '<span class="state">до +30</span>'}</button>`; }
@@ -10574,6 +10585,7 @@ document.addEventListener('click', e => {
     case 'rtask': { cur.rtask = +b.dataset.i; cur.rtry = null; rememberScroll(); render(); window.scrollTo(0, 0); break; }
     case 'rtryc': retryAnswer(b.dataset.v); break;
     case 'rtryagain': cur.rtry = null; render(); break;
+    case 'fixbuy': { const L0 = dayRec(kid, cur.ds).les[cur.subj]; if (!L0 || L0.fixPaid || (S.kids[kid].coins || 0) < FIX_PRICE || !window.confirm(`Работа над ошибками стоит ${FIX_PRICE} баллов. Исправленные ошибки поднимут результат урока. Оплатить?`)) break; fixBuy(kid, cur.subj, L0); render(); break; }
     case 'openextra': { if (restGate(kid, 'extra')) break; if (D.les.extra && D.les.extra.phase === 'done') { go('lesson', { subj: 'extra' }); break; } startLesson('extra'); break; }
     case 'open': { const s0 = b.dataset.subj, L0 = D.les[s0]; if (restGate(kid, s0)) break; if (!TEST && !(L0 && L0.phase === 'done') && s0 !== nextOpen(kid) && !(D.unlock || []).includes(s0)) {
       const K0 = S.kids[kid]; if (K0.coins < SKIP_PRICE) { alertMsg(`Сначала закончи предыдущий урок 🔒 Открыть раньше можно за ${SKIP_PRICE} баллов`); break; }
