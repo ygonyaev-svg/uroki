@@ -1143,7 +1143,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* vecfcd78c */
+<script>/* vb576d220 */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -1682,18 +1682,18 @@ const A_FIN = [
  { id:'af_1', t:'Доход: зарплата, «грязными» и «чистыми»',
    th:'<b>Доход</b> — деньги, которые получает человек: зарплата, плата за услуги, проценты, подарки.<br>Из зарплаты удерживают <b>налоги</b> и взносы. «Грязными» (брутто) — до вычета, «чистыми» (нетто) — то, что приходит на счёт.<br><b>Процент — это «из каждых 100».</b> Налог 20% значит: из каждых 100 € 20 € забирают, 80 € остаются тебе. 10% — раздели на 10; 20% — это два раза по 10%.<br>Пример: брутто 1 500 € — это 15 раз по 100 €. С каждой сотни удержали 20 €: 15 × 20 = 300 €. Нетто 1 500 − 300 = <b>1 200 €</b>.',
    g: r => { const t = r.int(0, 2);
-     if (t === 0) { const g = r.int(10, 30) * 100, p = r.pick([10, 15, 20, 25]); return N(`Зарплата брутто ${g} €, налоги и взносы в этой задаче — ровно ${p}%. Сколько евро придёт на счёт?`, g - g * p / 100, `${p}% от ${g} = ${g * p / 100}; ${g} − ${g * p / 100} = ${g - g * p / 100} €.`); }
+     if (t === 0) { const g = r.int(1, 3) * 1000, p = r.pick([10, 20, 25, 50]); return N(`Зарплата брутто ${g} €, налоги и взносы в этой задаче — ровно ${p}%. Сколько евро придёт на счёт?`, g - g * p / 100, `${p}% от ${g} = ${g * p / 100}; ${g} − ${g * p / 100} = ${g - g * p / 100} €.`); }
      if (t === 1) { const h = r.int(15, 40), w = r.int(6, 12); return N(`Подросток работает в кафе летом ${h} часов в месяц по ${w} € в час. Сколько он заработает за 3 месяца?`, h * w * 3, `${h} × ${w} × 3 = ${h * w * 3} €.`); }
      return C('Что из этого — доход?', 'Проценты по вкладу в банке', ['Оплата за интернет', 'Покупка телефона', 'Налог'], 'Доход — деньги, которые приходят к тебе.'); } },
  { id:'af_2', t:'Налоги: зачем они и как считать',
    th:'<b>Налоги</b> — деньги, которые граждане и компании платят государству. На них работают школы, больницы, дороги, полиция.<br>В Португалии в цену почти всех товаров уже входит <b>НДС (IVA) 23%</b>. Цена без налога 100 € → в магазине 123 €.',
    g: r => { const t = r.int(0, 2);
-     if (t === 0) { const p = r.int(2, 9) * 100; return N(`Цена товара без НДС ${p} €. НДС 23%. Какая цена в магазине?`, R2(p * 1.23), `${p} × 1,23 = ${U.dec(R2(p * 1.23))} €.`); }
-     if (t === 1) { const p = r.int(1, 9) * 100; return N(`Сколько составит НДС 23% от ${p} €?`, R2(p * .23), `${p} × 0,23 = ${U.dec(R2(p * .23))} €.`); }
+     if (t === 0) { const p = r.int(1, 2) * 100; return N(`Цена товара без НДС ${p} €. НДС 23%. Какая цена в магазине?`, R2(p * 1.23), `${p} × 1,23 = ${U.dec(R2(p * 1.23))} €.`); }
+     if (t === 1) { const p = r.int(1, 3) * 100; return N(`Сколько составит НДС 23% от ${p} €?`, R2(p * .23), `${p} × 0,23 = ${U.dec(R2(p * .23))} €.`); }
      return C('На что государство тратит налоги?', 'На школы, больницы и дороги', ['На карманные деньги школьникам', 'Ни на что, их копят', 'На покупки чиновникам для себя'], 'Налоги — общий бюджет страны.'); } },
  { id:'af_3', t:'Бюджет: правило 50/30/20',
    th:'Популярное правило бюджета: <b>50%</b> дохода — на необходимое (жильё, еда, транспорт), <b>30%</b> — на желания, <b>20%</b> — в сбережения.<br>Если расходы больше доходов — <b>дефицит</b>, если меньше — <b>профицит</b>.',
-   g: r => { const t = r.int(0, 4), inc = r.int(8, 30) * 100;
+   g: r => { const t = r.int(0, 4), inc = r.int(1, 3) * 1000;
      if (t === 3) { const it = r.pick([['Оплата квартиры', 'на необходимое'], ['Продукты на неделю', 'на необходимое'], ['Проезд до школы и работы', 'на необходимое'], ['Лекарства', 'на необходимое'], ['Билеты в кино', 'на желания'], ['Новая игра для приставки', 'на желания'], ['Ужин в кафе', 'на желания'], ['Запас денег на случай болезни или поломки', 'в сбережения'], ['Копилка на летнюю поездку', 'в сбережения']]);
        return C(`По правилу 50/30/20: куда относится трата «${it[0]}»?`, it[1], ['на необходимое', 'на желания', 'в сбережения', 'в налоги'].filter(x => x !== it[1]).slice(0, 3), 'Необходимое — без чего не прожить; желания — то, без чего можно обойтись; сбережения — на будущее.'); }
      if (t === 4) { const w = inc * r.pick([20, 30, 40, 50]) / 100, ok = w <= inc * .3; return C(`Доход семьи ${U.big(inc)} €, на желания (кафе, игры, кино) уходит ${U.big(w)} €. Укладывается ли семья в правило 50/30/20?`, ok ? 'да, на желания не больше 30%' : 'нет, на желания больше 30%', [ok ? 'нет, на желания больше 30%' : 'да, на желания не больше 30%', 'нет, на желания нужно 50%', 'правило про желания ничего не говорит'], `30% от ${U.big(inc)} = ${U.big(inc * .3)} €.`); }
@@ -1702,14 +1702,14 @@ const A_FIN = [
      const a = r.int(20, 60) * 10, b = a + r.int(1, 10) * 10; return C(`Доход ${a} €, расходы ${b} €. Это…`, 'дефицит', ['профицит', 'баланс', 'инфляция'], `Расходы больше доходов на ${b - a} €.`); } },
  { id:'af_4', t:'Простой и сложный процент',
    th:'<b>Простой процент</b> начисляется только на первоначальную сумму: 1 000 € под 10% → каждый год +100 €.<br><b>Сложный процент</b> — «процент на процент»: 1 000 → 1 100 → 1 210 → 1 331…<br>Чем раньше начнёшь копить, тем сильнее работает сложный процент.',
-   g: r => { const t = r.int(0, 2), s = r.int(1, 9) * 1000, p = r.pick([5, 10]);
+   g: r => { const t = r.int(0, 2), s = r.int(1, 3) * 1000, p = 10;
      if (t === 0) return N(`Вклад ${s} € под ${p}% годовых, простой процент. Сколько будет через 3 года?`, s + s * p / 100 * 3, `Каждый год +${s * p / 100}; ${s} + 3 × ${s * p / 100} = ${s + s * p / 100 * 3} €.`);
      if (t === 1) { const y1 = s * (1 + p / 100), y2 = R2(y1 * (1 + p / 100)); return EC(`Вклад ${U.big(s)} € под ${p}%, проценты добавляются к вкладу каждый год (сложный процент). Сколько будет через 2 года?`, y2, [s * (1 + 2 * p / 100), y1, s * (1 + 3 * p / 100), R2(y2 * (1 + p / 100))], `${U.big(s)} → ${EU(R2(y1))} → ${EU(y2)}. Во второй год процент начисляется уже на ${EU(R2(y1))}.`); }
-     const a = r.int(2, 9) * 100; return N(`В копилке ${a} баллов, каждую неделю прибавляется 10%, если не трогать. Сколько будет через 2 недели?`, Math.round(a * 1.21), `${a} × 1,1 = ${U.dec(R2(a * 1.1))}; × 1,1 = ${U.dec(R2(a * 1.21))}.`); } },
+     const a = r.int(1, 5) * 100; return N(`В копилке ${a} баллов, каждую неделю прибавляется 10%, если не трогать. Сколько будет через 2 недели?`, Math.round(a * 1.21), `${a} × 1,1 = ${U.dec(R2(a * 1.1))}; × 1,1 = ${U.dec(R2(a * 1.21))}.`); } },
  { id:'af_5', t:'Кредит и долг: сколько стоит «взять сейчас»',
    th:'<b>Кредит</b> — деньги, взятые в долг у банка. Возвращать нужно больше: сумму + <b>проценты</b>.<br>Кредитная карта под 20% годовых: долг 1 000 € через год превращается в 1 200 €, если не платить.<br>Правило: в долг — только на важное и если точно сможешь вернуть.',
    g: r => { const t = r.int(0, 2);
-     if (t === 0) { const s = r.int(2, 9) * 100, p = r.pick([10, 15, 20]); return N(`Взяли кредит ${s} € на год под ${p}% годовых, без комиссий. Сколько всего придётся вернуть?`, R2(s * (1 + p / 100)), `${s} + ${s * p / 100} = ${R2(s * (1 + p / 100))} €.`); }
+     if (t === 0) { const s = r.int(1, 9) * 100, p = r.pick([10, 20]); return N(`Взяли кредит ${s} € на год под ${p}% годовых, без комиссий. Сколько всего придётся вернуть?`, R2(s * (1 + p / 100)), `${s} + ${s * p / 100} = ${R2(s * (1 + p / 100))} €.`); }
      if (t === 1) { const m = r.pick([6, 10, 12]), pay = r.int(5, 12) * 10, price = pay * m - r.int(2, 6) * 10; return N(`Телефон стоит ${price} €. В рассрочку — ${m} платежей по ${pay} €. На сколько евро рассрочка дороже?`, pay * m - price, `${m} × ${pay} = ${pay * m}; ${pay * m} − ${price} = ${pay * m - price} €.`); }
      if (r() < .5) { const n = r.pick([6, 10, 12]), pay = r.int(3, 8) * 10, fee = r.int(2, 6) * 5, cash = pay * n + r.pick([-1, 1]) * r.int(1, 3) * 5 + (r() < .5 ? fee : 0), tot = pay * n + fee;
        return C(`Телефон за ${U.big(cash)} € сразу — или «рассрочка без процентов»: ${n} платежей по ${pay} € плюс плата за оформление ${fee} €. Что дешевле?`, tot < cash ? `рассрочка: ${U.big(tot)} €` : `сразу: ${U.big(cash)} €`, [tot < cash ? `сразу: ${U.big(cash)} €` : `рассрочка: ${U.big(tot)} €`, tot < cash ? `сразу: рассрочка всегда дороже` : `рассрочка: в ней нет процентов`, 'одинаково'], `${n} × ${pay} + ${fee} = ${U.big(tot)} €. Скрытая плата тоже входит в цену!`); }
@@ -1717,7 +1717,7 @@ const A_FIN = [
  { id:'af_6', t:'Инфляция: почему всё дорожает',
    th:'<b>Инфляция</b> — рост цен. При инфляции 5% то, что стоило 100 €, через год стоит 105 €.<br>Деньги «под подушкой» теряют силу: на ту же сумму можно купить меньше. Поэтому сбережения стараются хранить так, чтобы процент был не ниже инфляции.',
    g: r => { const t = r.int(0, 2);
-     if (t === 0) { const p = r.int(2, 8) * 10, i = r.pick([2, 5, 10]); return N(`Корзина продуктов стоит ${p} €. Инфляция ${i}% в год. Сколько она будет стоить через год?`, R2(p * (1 + i / 100)), `${p} + ${i}% = ${U.dec(R2(p * (1 + i / 100)))} €.`); }
+     if (t === 0) { const p = r.int(1, 5) * 20, i = r.pick([5, 10]); return N(`Корзина продуктов стоит ${p} €. Инфляция ${i}% в год. Сколько она будет стоить через год?`, R2(p * (1 + i / 100)), `${p} + ${i}% = ${U.dec(R2(p * (1 + i / 100)))} €.`); }
      if (t === 1) return C('Вклад даёт 2% в год, инфляция 5%. Что происходит с деньгами?', 'Их покупательная сила падает', ['Они растут быстрее цен', 'Ничего не меняется', 'Их становится меньше в банке'], 'Цены растут быстрее, чем проценты.');
      return C('Что такое инфляция?', 'Рост цен со временем', ['Снижение зарплат', 'Налог на покупки', 'Скидка в магазине'], 'Инфляция — деньги дешевеют, цены растут.'); } },
  { id:'af_7', t:'Инвестиции, риск и доходность',
@@ -1726,7 +1726,7 @@ const A_FIN = [
      'Что значит «не класть все яйца в одну корзину»?|Распределять деньги между разными вложениями|Хранить деньги только в банке;Покупать только яйца;Не инвестировать никогда|Это и есть диверсификация.',
      'Что такое акция?|Доля в компании|Долг банку;Скидочный купон;Налог|Купив акцию, ты владеешь кусочком компании.',
      'Кто-то обещает «гарантированные 50% в месяц». Это…|Почти наверняка обман|Отличная возможность;Обычный банковский вклад;Государственная программа|Высокая доходность без риска не бывает.']),
-     r => { const a = r.int(2, 9) * 100, p = r.pick([10, 20, 30]), up = r() < .5; return N(`Купили акции на ${a} €. Цена ${up ? 'выросла' : 'упала'} на ${p}%. Сколько они стоят теперь?`, R2(a * (1 + (up ? 1 : -1) * p / 100)), `${a} ${up ? '+' : '−'} ${a * p / 100} = ${R2(a * (1 + (up ? 1 : -1) * p / 100))} €. Акции могут и дорожать, и дешеветь — это и есть риск.`); }) },
+     r => { const a = r.int(1, 9) * 100, p = r.pick([10, 20, 50]), up = r() < .5; return N(`Купили акции на ${a} €. Цена ${up ? 'выросла' : 'упала'} на ${p}%. Сколько они стоят теперь?`, R2(a * (1 + (up ? 1 : -1) * p / 100)), `${a} ${up ? '+' : '−'} ${a * p / 100} = ${R2(a * (1 + (up ? 1 : -1) * p / 100))} €. Акции могут и дорожать, и дешеветь — это и есть риск.`); }) },
  { id:'af_8', t:'Банки, карты и безопасность',
    th:'<b>Дебетовая карта</b> тратит твои деньги со счёта. <b>Кредитная</b> — деньги банка в долг.<br>Никому не сообщают <b>PIN, пароль, код из SMS</b> — даже «сотруднику банка». Банк никогда не просит их по телефону.',
    g: B(['Звонит «сотрудник банка» и просит код из SMS. Что делать?|Положить трубку и позвонить в банк по номеру с карты|Назвать код;Назвать только половину кода;Отправить код в мессенджер|Настоящий банк не просит коды.',
@@ -1751,11 +1751,11 @@ const A_FIN = [
  { id:'af_12', t:'Предпринимательство: доход, расход, прибыль',
    th:'<b>Выручка</b> — все деньги от продаж. <b>Расходы</b> — материалы, аренда, реклама. <b>Прибыль</b> = выручка − расходы.<br>Наценка: купил за 10 €, продаёшь за 15 € — наценка 50%.',
    g: r => { const t = r.int(0, 2);
-     if (t === 2) { const x = r.int(5, 40) * 10, pct = r.pick([1, 2, 3]), fx = r.int(2, 6), f1 = x * pct / 100;
+     if (t === 2) { const x = r.int(1, 6) * 100, pct = r.pick([1, 2, 3]), fx = r.int(2, 6), f1 = x * pct / 100;
        if (Math.abs(f1 - fx) < 1e-9) return C(`Перевод ${x} €. Банк А берёт комиссию ${pct}%, банк Б — ${fx} € за любой перевод. Где дешевле?`, 'одинаково', ['в банке А', 'в банке Б', 'бесплатно в обоих'], `${pct}% от ${x} = ${fx} €.`);
        return C(`Перевод ${x} €. Банк А берёт комиссию ${pct}%, банк Б — ${fx} € за любой перевод. Где дешевле?`, f1 < fx ? 'в банке А' : 'в банке Б', [f1 < fx ? 'в банке Б' : 'в банке А', 'одинаково', 'бесплатно в обоих'], `${pct}% от ${x} = ${U.dec(f1)} €, а в банке Б — ${fx} €.`); }
      if (t === 0) { const n = r.int(20, 60), p = r.int(3, 8), c = r.int(1, p - 1), fix = Math.min(r.int(2, 6) * 10, Math.floor((n * (p - c) - 5) / 10) * 10) || 0; return N(`Аня печёт печенье: продала ${n} ${U.pl(n, 'упаковку', 'упаковки', 'упаковок')} по ${p} €. Материалы на упаковку ${c} €, аренда места на ярмарке ${fix} €. Какая прибыль?`, n * (p - c) - fix, `${n} × (${p} − ${c}) − ${fix} = ${n * (p - c) - fix} €.`); }
-     const c = r.int(2, 9) * 10, m = r.pick([20, 25, 50]); return EC(`Товар куплен за ${c} €, наценка ${m}%. За сколько его продают?`, R2(c * (1 + m / 100)), [c * m / 100, c + m, R2(c * (1 - m / 100)), c * 2], `${m}% от ${c} = ${U.dec(c * m / 100)} €; ${c} + ${U.dec(c * m / 100)} = ${EU(R2(c * (1 + m / 100)))}.`); } }
+     const c = r.int(1, 5) * 20, m = r.pick([20, 25, 50]); return EC(`Товар куплен за ${c} €, наценка ${m}%. За сколько его продают?`, R2(c * (1 + m / 100)), [c * m / 100, c + m, R2(c * (1 - m / 100)), c * 2], `${m}% от ${c} = ${U.dec(c * m / 100)} €; ${c} + ${U.dec(c * m / 100)} = ${EU(R2(c * (1 + m / 100)))}.`); } }
 ];
 
 /* ===== Ярик: «Учимся читать» — блок в начале курса русского (решение методсовета 21.11.2026, п.1).
@@ -2889,7 +2889,7 @@ const A_MATH = [
      r:['Чтобы обратить десятичную дробь в проценты, надо её умножить на 100: 0,25 = 25%.', 'Чтобы перевести проценты в десятичную дробь, надо разделить число процентов на 100: 8% = 0,08.', 'Чтобы найти несколько процентов от числа: найти 1% (разделить на 100) и умножить на число процентов.'],
      x:'25% от 80: 80 : 100 = 0,8; 0,8 · 25 = 20. Или 80 · 0,25 = 20.', c:'25% — это четверть, а 80 : 4 = 20.' }),
    g: MIX(
-     r => { const p=r.pick([5,10,20,25,50,75]), base=r.int(1,20)*20; return N(`Найди ${p}% от ${base}.`, base*p/100, `${base} · ${p/100}`.replace('.',',')); },
+     r => { const p=r.pick([10,20,25,50]), base=r.int(1,10)*20; return N(`Найди ${p}% от ${base}.`, base*p/100, `${base} · ${p/100}`.replace('.',',')); },
      r => { const p=r.pick([10,20,25,50,75]), base=r.int(2,10)*20; return N(`Сколько процентов составляет ${base*p/100} от ${base}?`, p, `${base*p/100} : ${base} = ${p/100}`.replace('.',',')); },
      r => { const p=r.pick([10,20,25,50]), price=r.int(2,6)*20; return N(`Рюкзак стоил ${price} €. Цену снизили на ${p}%. Сколько стоит рюкзак теперь?`, price*(100-p)/100, `${price} − ${price*p/100}`); }
    ) },
@@ -6345,7 +6345,7 @@ var ZAD2 = [
 'Часы бьют 6 ударов за 5 секунд. Сколько секунд они будут бить 12 ударов?|11|Между 6 ударами 5 промежутков по 1 секунде, между 12 ударами — 11 промежутков.|10;12;6',
 'Бассейн наполняется одной трубой за 6 часов, другой — за 3 часа. За сколько часов он наполнится, если открыть обе трубы?|2|За час первая наполняет 1/6 бассейна, вторая — 2/6, вместе — 3/6, то есть половину. Весь — за 2 часа.|4,5;9;3',
 'Сколько чисел от 1 до 50 делятся и на 3, и на 5?|3|Делятся на 15: это 15, 30 и 45.|10;16;26',
- 'Карандаш и ластик вместе стоят 110 копеек. Карандаш на 100 копеек дороже ластика. Сколько стоит ластик?|5|Ластик 5 копеек, карандаш 105, вместе 110. Если ластик 10, карандаш 110, а вместе уже 120.|10;15;50',
+ 'Карандаш и ластик вместе стоят 110 центов. Карандаш на 100 центов дороже ластика. Сколько центов стоит ластик?|5|Ластик 5 центов, карандаш 105, вместе 110. Если ластик 10, карандаш 110, а вместе уже 120.|10;15;50',
  'Бревно распилили на 6 частей. Каждый распил занимает 2 минуты. Сколько минут пилили?|10|Распилов на один меньше, чем частей: 5 распилов по 2 минуты.|12;6;14',
  'Мама старше дочери на 26 лет. На сколько лет она будет старше дочери через 10 лет?|26|Обе становятся старше на 10 лет, разница не меняется.|36;16;10'
 ];
@@ -8687,10 +8687,12 @@ function libAct(act, b){
    иначе за следующий урок баллов будет 70%. Делать можно в любое время, даже в перерыв.
    Задание исправлено, если ребёнок решил его сам; после ошибки даём похожее новое задание (ответ уже показан — повторять то же нечестно). */
 const HW_K = .7;
+/* ДЗ бесплатное: снимает штраф, но результат урока не повышает (a.hw). Платная работа над ошибками (a.fix) тоже засчитывается как ДЗ. */
+const hwDone = a => !!(a && (a.fix || a.hw));
 function hwLes(kid, ds, s){ const D = S.kids[kid].days[ds], L = D && D.les && D.les[s]; return L && L.phase === 'done' && L.ans && L.ans.length && !ITEMS(s) && s !== 'read' ? L : null; }
 /* последний урок по предмету до дня ds (не включая) — если в нём есть неисправленные ошибки */
 function hwOwed(kid, s, ds){ const days = Object.keys(S.kids[kid].days || {}).filter(d => d < ds).sort().reverse().slice(0, 30);
-  for (const d of days) { const L = hwLes(kid, d, s); if (!L) continue; const W = fixList(kid, s, L).filter(j => !L.ans[j].fix); return W.length ? { ds: d, n: W.length, all: fixList(kid, s, L).length } : null; } return null; }
+  for (const d of days) { const L = hwLes(kid, d, s); if (!L) continue; const W = fixList(kid, s, L).filter(j => !hwDone(L.ans[j])); return W.length ? { ds: d, n: W.length, all: fixList(kid, s, L).length } : null; } return null; }
 function hwAll(kid){ const tomorrow = U.addDays(U.today(), 1); return (KIDS[kid].order || []).map(s => { const o = hwOwed(kid, s, tomorrow); return o ? Object.assign({ s }, o) : null; }).filter(Boolean); }
 function hwCard(kid){ if (TEST && !cur.kid) return ''; const H = hwAll(kid); if (!H.length) return '';
   return `<div class="card hwc"><h2>📒 Домашнее задание</h2><p class="hint">Исправь ошибки до следующего урока по предмету. Если не сделаешь — за следующий урок будет только 70% баллов. Делать можно в любое время, даже в перерыв.</p>
@@ -8698,8 +8700,8 @@ function hwCard(kid){ if (TEST && !cur.kid) return ''; const H = hwAll(kid); if 
 function hwNote(kid, s){ const o = hwOwed(kid, s, cur.ds); if (!o) return ''; return `<div class="note">📒 Не сделано домашнее задание по прошлому уроку (${o.n} ${U.pl(o.n, 'ошибка', 'ошибки', 'ошибок')}). Если начнёшь урок без него, баллов будет 70%. <button class="link" data-act="hwgo" data-s="${s}" data-d="${o.ds}">Сделать ДЗ →</button></div>`; }
 function hwSimilar(kid, s, L, t, n){ if (!n) return t; const u = unitById(kid, s, L.uid); if (!u || t.rev) return t; const shape = x => strip(x.q).replace(/\d+([,.]\d+)?/g, '#').slice(0, 18);
   const c = genTasks(u, (L.seed || 1) * 13 + n * 211, 14).filter(x => x.q !== t.q); const x = c.find(x => shape(x) === shape(t)) || c.find(x => x.k === (t.was || t.k)); return x ? asChoice(x, (L.seed || 1) + n * 17, c) : t; }
-function hwCur(){ const h = cur.hw, kid = cur.kid, L = h && hwLes(kid, h.ds, h.s); if (!L) return null; const W = fixList(kid, h.s, L), left = W.filter(j => !L.ans[j].fix);
-  const i = h.i != null && W.includes(h.i) && (!L.ans[h.i].fix || h.done) ? h.i : left[0]; if (i == null) return { L, W, left }; const a = L.ans[i]; const t = hwSimilar(kid, h.s, L, lessonTasks(L, kid, h.s)[i], a.hwN || 0); return { L, W, left, i, a, t }; }
+function hwCur(){ const h = cur.hw, kid = cur.kid, L = h && hwLes(kid, h.ds, h.s); if (!L) return null; const W = fixList(kid, h.s, L), left = W.filter(j => !hwDone(L.ans[j]));
+  const i = h.i != null && W.includes(h.i) && (!hwDone(L.ans[h.i]) || h.done) ? h.i : left[0]; if (i == null) return { L, W, left }; const a = L.ans[i]; const t = hwSimilar(kid, h.s, L, lessonTasks(L, kid, h.s)[i], a.hwN || 0); return { L, W, left, i, a, t }; }
 function vHwFix(){ const kid = cur.kid, h = cur.hw || {}, c = hwCur(); const head = `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← К урокам</button><span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header><section class="lesson"><p class="eyebrow">📒 Домашнее задание</p><h1>${U.esc(c ? subjName(kid, h.s, h.ds) : '')}: работа над ошибками</h1>`;
   if (!c) return head + '<p>Не нашёл этот урок.</p></section></main>';
   if (c.i == null) return head + `<article class="card result"><div class="cheer">✅ Домашнее задание сделано!</div><p>Все ошибки исправлены. Следующий урок по этому предмету — с полными баллами.</p></article><button class="btn big" data-act="home">К урокам</button></section></main>`;
@@ -8714,7 +8716,7 @@ function vHwFix(){ const kid = cur.kid, h = cur.hw || {}, c = hwCur(); const hea
 function hwAnswer(v){ const kid = cur.kid, c = hwCur(); if (!c || c.i == null) return; const h = cur.hw, t = c.t; if (h.r && h.r.fin) return; let ok;
   if (t.k === 'n') { const x = Number(String(v).replace(',', '.').replace(/\s/g, '')); if (String(v).trim() === '' || isNaN(x)) return; ok = Math.abs(x - t.a) < 1e-6; } else if (t.k === 't') { if (!String(v).trim()) return; ok = txtOk(t, v); } else ok = v === t.a;
   h.r = { fin: true, ok, v }; h.i = c.i; h.done = true;
-  if (ok) c.a.fix = true; else c.a.hwN = (c.a.hwN || 0) + 1;
+  if (ok) c.a.hw = true; else c.a.hwN = (c.a.hwN || 0) + 1;
   ev(kid, ok ? 'дз исправлено' : 'дз ошибка', { subj: subjName(kid, h.s, h.ds), unit: (unitById(kid, h.s, c.L.uid) || {}).t || '', q: strip(t.q), ans: String(v), right: String(t.a), ok: ok ? 'верно' : 'ошибка' });
   save(); render(); }
 function hwAct(act, b){ if (act === 'hwgo') { go('hwfix', { hw: { s: b.dataset.s, ds: b.dataset.d } }); return true; }
@@ -8799,13 +8801,32 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-hear
    Пока сверка не прошла, свой снимок не отправляем, чтобы пустое устройство не затёрло настоящий прогресс. */
 const SNAP_OK = {}, SNAP_PUSHED = {}; let SNAP_T = null, SNAP_BUSY = false;
 function snapWork(K){ return Object.keys(K.days || {}).some(d => Object.keys((K.days[d] || {}).les || {}).length); }
+/* Слияние снимков (24.11.2026): незаконченный урок продолжается с того же места на любом устройстве.
+   Решает не только время снимка, но и сделанная работа: более «старый» по часам, но с большим числом пройденного снимок
+   не затирается чужим (родитель на телефоне поменял цену — его копия ребёнка была старой). Начатые уроки, где своё
+   устройство продвинулось дальше, переносятся в принятый снимок; баллы за урок начисляются только при его завершении — двойных нет. */
+const SNAP_PH = { theory:1, warm:1, read:2, practice:2, silent:3, fread:3, retell:4, qs:5, spot:6, words:7, survey:8 };
+function snapLesProg(L){ if (!L) return -1; if (L.phase === 'done') return 1e6; const a = (L.ans || []).filter(x => x != null).length; return (SNAP_PH[L.phase] || 0) * 1000 + a * 10 + (L.i || 0) + (L.wi || 0) + (L.rt ? 5 : 0); }
+function snapWorkN(K){ let n = 0; for (const d of Object.keys(K.days || {})) { const les = (K.days[d] || {}).les || {}; for (const s of Object.keys(les)) n += les[s] && les[s].phase === 'done' ? 1000 : 1 + Math.min(999, Math.floor(snapLesProg(les[s]) / 10)); } return n + (K.purchases || []).length + (K.hwText || []).filter(h => h.done).length; }
+function snapMerge(L, R, rt){ try {
+  if (!L || !snapWork(L)) return R;
+  if (snapWorkN(R) < snapWorkN(L)) { /* в пришедшем снимке меньше сделано — это устаревшая копия; оставляем своё, забираем только настройки родителя */
+    ['shop', 'allow', 'xt', 'prizesSet'].forEach(f => { if (R[f] !== undefined) L[f] = R[f]; });
+    const ids = {}; (L.msgs || []).forEach(m => { ids[m.id] = 1; }); (R.msgs || []).forEach(m => { if (!ids[m.id]) L.msgs.push(m); });
+    const hw = {}; (L.hwText || []).forEach(h => { hw[h.id] = h; }); (R.hwText || []).forEach(h => { if (!hw[h.id]) L.hwText.push(h); else if (h.done) hw[h.id].done = h.done; });
+    return L; }
+  for (const d of Object.keys(L.days || {})) { const ll = (L.days[d] || {}).les || {}; for (const s of Object.keys(ll)) { const a = ll[s]; if (!a || a.phase === 'done') continue;
+    const RD = R.days[d] || (R.days[d] = { les: {}, bonus: false }); RD.les = RD.les || {}; if (snapLesProg(a) > snapLesProg(RD.les[s])) RD.les[s] = a; } }
+  if (L.openDay && (!R.openDay || L.openDay > R.openDay)) R.openDay = L.openDay;
+  } catch (e) {} return R; }
 function snapMark(){ if (TEST || !cur.kid || SNAP_BUSY) return; if (FAM) return famSnapMark(cur.kid); const K = S.kids[cur.kid]; if (!K) return; if (!SNAP_OK[cur.kid]) { if (snapWork(K) && K.modT) K.dirtyT = Date.now(); return; } K.modT = Date.now(); clearTimeout(SNAP_T); SNAP_T = setTimeout(snapPush, 45000); }
 function snapPush(){ if (FAM) return famSnapPush(); if (TEST || !S.cfg.sync || !navigator.onLine) return; clearTimeout(SNAP_T);
   Object.keys(SNAP_OK).forEach(kid => { const K = S.kids[kid]; if (!K || !K.modT || SNAP_PUSHED[kid] === K.modT) return; const t = K.modT;
-    try { fetch(S.cfg.sync, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ snap: 1, kid, t, state: JSON.stringify(K) }) }).then(() => { SNAP_PUSHED[kid] = t; }).catch(() => {}); } catch (e) {} }); }
+    const body = JSON.stringify({ snap: 1, kid, t, state: JSON.stringify(K) }); /* keepalive браузер принимает только до 64 КБ — большой снимок с ним молча не уходил (у Ани с 22.11) */
+    try { fetch(S.cfg.sync, { method: 'POST', mode: 'no-cors', keepalive: body.length < 60000, headers: { 'Content-Type': 'text/plain' }, body }).then(() => { SNAP_PUSHED[kid] = t; }).catch(() => {}); } catch (e) {} }); }
 async function snapCheck(kid){ if (FAM) return famSnapCheck(kid); if (TEST || !kid || SNAP_OK[kid] || !S.cfg.sync || !navigator.onLine) return;
   try { const r = await fetch(S.cfg.sync + (S.cfg.sync.includes('?') ? '&' : '?') + 'action=snap&kid=' + encodeURIComponent(kid)); const j = await r.json(); if (!j || !j.ok) return;
-    const K = S.kids[kid]; if (j.t && j.state && j.t > Math.max(K.modT || 0, K.dirtyT || 0)) { const R = JSON.parse(j.state); if (R && typeof R === 'object' && R.days) { SNAP_BUSY = true; S.kids[kid] = R; if (typeof posFix === 'function') posFix(kid); save(); SNAP_BUSY = false; SNAP_PUSHED[kid] = R.modT; if (cur.kid === kid) { alertMsg('Прогресс загружен ✓'); if (cur.view === 'prizes' && R.prizesSet) go('home'); else render(); } } }
+    const K = S.kids[kid]; if (j.t && j.state && j.t > Math.max(K.modT || 0, K.dirtyT || 0)) { let R = JSON.parse(j.state); if (R && typeof R === 'object' && R.days) { R = snapMerge(K, R, j.t); if (R === K) { SNAP_OK[kid] = true; K.modT = Date.now(); snapPush(); return; } SNAP_BUSY = true; S.kids[kid] = R; if (typeof posFix === 'function') posFix(kid); save(); SNAP_BUSY = false; SNAP_PUSHED[kid] = R.modT; if (cur.kid === kid) { alertMsg('Прогресс загружен ✓'); if (cur.view === 'prizes' && R.prizesSet) go('home'); else render(); } } }
     SNAP_OK[kid] = true; if (!S.kids[kid].modT) { S.kids[kid].modT = Date.now(); } snapPush();
   } catch (e) {} }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') snapPush(); else if (cur.kid) snapCheck(cur.kid); });
@@ -9800,7 +9821,7 @@ function vHome(){
   const done = subs.filter(s => D.les[s] && D.les[s].phase === 'done').length;
   const streak = readStreak(kid);
   const msgs = K.msgs.filter(m => !m.seen);
-  const tiles = subs.map(s => { const L = D.les[s]; const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new'; const g = L && L.grade;
+  const tiles = subs.map(s => { const L = D.les[s]; const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new'; const g = L && lesGrade(L);
     const locked = !TEST && ((st === 'new' && restLeft(kid) > 0) || (st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s)));
     return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${icon(s === 'lang' && track('lang', cur.ds) === '_alt' ? 's_en' : ((s === 'world' && T(kid) === 'yarik') || (s === 'logic' && T(kid) === 'anya')) && track(s, cur.ds) === '_alt' ? 's_fin' : SUBJ_IC[s], 'big') || SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && T(kid) === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">Выйти</button><button class="link voice" data-act="voice" title="Кто читает задания">🔊 ${K.voice === 'm' ? 'Мужской голос' : 'Женский голос'}</button><span class="coins">${coinsHtml(K.coins)}</span></header>
@@ -9812,7 +9833,7 @@ function vHome(){
   ${libCard(kid)}
   ${alwaysTiles(kid)}
   <p class="center"><button class="link" data-act="chpin">🔑 Поменять пароль</button></p>
-  ${done === subs.length ? `<div class="card win">${uiPic(kid, 'done')}<h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
+  ${done === subs.length ? `<div class="card win">${uiPic(kid, 'done')}<h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}${proReady(kid, D) && !D.les.pro ? ' Все уроки на 4 и 5 — тебе открыт уровень PRO: ещё до 30 минут!' : ''}</p></div>` : ''}
   ${FAM ? '' : bkHomeCard(kid)}
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
   <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
@@ -10012,7 +10033,7 @@ function vRetry(kid, subj, L, i){ const T = lessonTasks(L, kid, subj), t = T[i];
   else inp = `<form class="numf" data-form="rtry"><input id="rtin" ${t.k === 't' ? 'autocapitalize="off" autocorrect="off" spellcheck="false"' : 'inputmode="decimal"'} autocomplete="off" ${fin ? 'disabled' : ''} value="${fin ? U.esc(r.v) : ''}" aria-label="Ответ"><button class="btn" ${fin ? 'disabled' : ''}>Проверить</button></form>`;
   const ra = t.k === 'n' ? U.dec(t.a) : U.esc(t.a);
   const fb = fin ? (r.ok ? `<div class="fb ok"><b>Верно!</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>` : `<div class="fb bad"><b>Правильный ответ: ${ra}</b> ${t.e ? U.esc(strip(t.e)) : ''}</div>`) : r.tries ? '<div class="fb try">Не совсем. Подумай ещё раз.</div>' : '';
-  const was = a0.final ? `<p class="hint">${a0.fix ? '🛠 Исправлено в работе над ошибками. ' : ''}В уроке: ${a0.ok && a0.tries === 1 ? 'верно с первого раза ✓' : a0.ok ? 'верно со второй попытки' : 'ошибка, ответ был ' + U.esc(String(a0.v))}</p>` : '';
+  const was = a0.final ? `<p class="hint">${a0.fix ? '🛠 Исправлено в работе над ошибками. ' : !L.fixPaid && !(a0.ok && a0.tries === 1) ? 'Чтобы исправление пошло в результат, нужна работа над ошибками (' + FIX_PRICE + ' баллов). ' : ''}В уроке: ${a0.ok && a0.tries === 1 ? 'верно с первого раза ✓' : a0.ok ? 'верно со второй попытки' : 'ошибка, ответ был ' + U.esc(String(a0.v))}</p>` : '';
   const W = fixList(kid, subj, L), nf = W.find(j => j !== i && !L.ans[j].fix), nxt = nf != null ? nf : T.findIndex((x, j) => j > i && L.ans[j] && L.ans[j].final);
   return `<div class="note">Повторение задания ${i + 1} — баллы не меняются.</div><article class="card task"><div class="q">${t.q.replace(/_+/g, '<span class="gap">?</span>')}</div>${illus(kid, t.sj || subj, t)}${was}${inp}${fb}</article>
   <div class="row">${fin ? '<button class="btn ghost" data-act="rtryagain">↻ Ещё раз</button>' : ''}${nxt >= 0 ? `<button class="btn ghost" data-act="rtask" data-i="${nxt}">${nf != null ? 'Следующая ошибка →' : 'Следующее →'}</button>` : ''}</div><button class="btn big" data-act="rview" data-s="">Вернуться к уроку</button>`; }
@@ -10021,7 +10042,7 @@ function retryAnswer(v){ const kid = cur.kid, L = dayRec(kid, cur.ds).les[cur.su
   if (t.k === 'n') { const x = Number(String(v).replace(',', '.').replace(/\s/g, '')); if (String(v).trim() === '' || isNaN(x)) return; ok = Math.abs(x - t.a) < 1e-6; } else if (t.k === 't') { if (!String(v).trim()) return; ok = txtOk(t, v); } else ok = v === t.a;
   r.tries++; r.v = v; if (!ok && t.k === 'c') r.wrong.push(v);
   if (ok || r.tries >= 2 || (t.k === 'c' && t.opts.length - r.wrong.length <= 1)) { r.fin = true; r.ok = ok; }
-  const a0 = L.ans[i]; if (ok && a0 && a0.final && !(a0.ok && a0.tries === 1) && !a0.fix && !(t.k === 'c' && t.opts.length <= 2 && r.tries > 1)) { a0.fix = true; const W = fixList(kid, cur.subj, L), left = W.filter(j => !L.ans[j].fix).length;
+  const a0 = L.ans[i]; if (ok && L.fixPaid && a0 && a0.final && !(a0.ok && a0.tries === 1) && !a0.fix && !(t.k === 'c' && t.opts.length <= 2 && r.tries > 1)) { a0.fix = true; fixRegrade(kid, cur.subj, L); const W = fixList(kid, cur.subj, L), left = W.filter(j => !L.ans[j].fix).length;
     ev(kid, 'исправлено', { subj: subjName(kid, cur.subj, cur.ds), unit: (unitById(kid, cur.subj, L.uid) || {}).t || '', q: strip(t.q), ans: String(v), right: String(t.a), ok: 'верно' }); save(); if (!left) alertMsg('Все ошибки исправлены — 100%! 💪'); }
   render(); }
 function vHwText(kid, L){ const K = S.kids[kid]; const items = K.hwText.filter(h => (L.txt || []).includes(h.id));
@@ -10038,12 +10059,19 @@ function vSurvey(L){
 }
 function vResult(kid, subj, L){
   const msg = L.consolidate ? 'Хорошо! Завтра закрепим эту тему ещё раз — с новыми заданиями.' : L.passed === true ? 'Тема пройдена! Завтра — следующая.' : L.passed === false ? 'Завтра повторим эту тему с новыми заданиями.' : '';
-  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[TH(kid)].win)}</div>` : ''}<div class="bigmark m${L.grade}">${L.grade}</div><p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.ootCut ? '<p class="hint">Урок был не по порядку — баллов только треть.</p>' : ''}${L.hwCut ? '<p class="hint">📒 Домашнее задание по прошлому уроку не было сделано — баллов 70%.</p>' : ''}${L.rusCut ? `<p class="hint">📚 Баллы за этот урок — ${L.rusCut}%: русский пока не на пятёрку. Подтяни русский, и все баллы станут полными.</p>` : ''}${L.fastCut ? '<p class="hint">Слишком быстро — баллов меньше. Решай внимательно, проверяй себя.</p>' : ''}${fineCard(kid)}${typeof srResult === 'function' ? srResult(kid, L) : ''}${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article>${fixCard(kid, subj, L)}<button class="btn big" data-act="home">К урокам</button>`;
+  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[TH(kid)].win)}</div>` : ''}<div class="bigmark m${lesGrade(L)}">${lesGrade(L)}</div>${lesGrade(L) > (L.grade || 0) ? `<p class="hint">Оценка исправлена в работе над ошибками, в уроке было ${L.grade}.</p>` : ''}<p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.ootCut ? '<p class="hint">Урок был не по порядку — баллов только треть.</p>' : ''}${L.hwCut ? '<p class="hint">📒 Домашнее задание по прошлому уроку не было сделано — баллов 70%.</p>' : ''}${L.rusCut ? `<p class="hint">📚 Баллы за этот урок — ${L.rusCut}%: русский пока не на пятёрку. Подтяни русский, и все баллы станут полными.</p>` : ''}${L.fastCut ? '<p class="hint">Слишком быстро — баллов меньше. Решай внимательно, проверяй себя.</p>' : ''}${fineCard(kid)}${typeof srResult === 'function' ? srResult(kid, L) : ''}${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.proOpen ? '<div class="card win"><h2>Открыт уровень PRO!</h2><p>Все уроки сегодня на 4 и 5. В PRO можно заработать ещё до 30 минут сверх дневной нормы.</p></div>' : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article>${fixCard(kid, subj, L)}<button class="btn big" data-act="home">К урокам</button>`;
 }
-/* Работа над ошибками: в любое время, без перерыва. Баллы не меняются, но результат можно довести до 100%. */
+/* Работа над ошибками: в любое время, без перерыва. Платная (Юрий 24.11): 10 баллов за урок — тогда исправленные ошибки поднимают результат урока до 100%.
+   Бесплатное домашнее задание (hw.js) снимает штраф 70%, но результат урока не меняет. */
+const FIX_PRICE = 10;
 function fixList(kid, subj, L){ const T = lessonTasks(L, kid, subj) || []; return T.map((t, j) => j).filter(j => { const a = L.ans[j]; return a && a.final && !(a.ok && a.tries === 1); }); }
 function fixCard(kid, subj, L){ if (!L.ans || ITEMS(subj) && subj === 'hw') return ''; const W = fixList(kid, subj, L); if (!W.length) return ''; const F = W.filter(j => L.ans[j].fix).length, tot = L.total || lessonTasks(L, kid, subj).length, pct = Math.round(((L.score || 0) + F) / Math.max(1, tot) * 100), nx = W.find(j => !L.ans[j].fix);
-  return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Исправлено <b>${F} из ${W.length}</b> · результат с исправлениями: <b>${pct}%</b></p><p class="hint">Это и есть домашнее задание: исправь ошибки до следующего урока по предмету, иначе за него будет только 70% баллов. Можно в любое время, даже в перерыв.</p>${nx != null ? `<button class="btn" data-act="rtask" data-i="${nx}">${F ? 'Дальше исправлять' : 'Исправить ошибки'}</button>` : '<p class="earn">✅ Все ошибки исправлены — 100%!</p>'}</article>`; }
+  if (!L.fixPaid) { const c = S.kids[kid].coins || 0; return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Результат урока: <b>${pct}%</b>. Хочешь улучшить? Исправь ошибки — результат станет до 100%, а оценка для уровня PRO — до четвёрки.</p><p class="hint">Работа над ошибками стоит ${FIX_PRICE} баллов. Бесплатное домашнее задание на главной снимает штраф за следующий урок, но результат этого урока не меняет.</p>${c >= FIX_PRICE ? `<button class="btn" data-act="fixbuy">Улучшить результат за ${FIX_PRICE} баллов</button>` : `<p class="hint">Нужно ${FIX_PRICE} баллов, у тебя ${c}.</p>`}</article>`; }
+  return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Исправлено <b>${F} из ${W.length}</b> · результат с исправлениями: <b>${pct}%</b></p><p>Оценка урока для уровня PRO: <b>${lesGrade(L)}</b></p><p class="hint">Оплачено. Исправляй в любое время, даже в перерыв. Исправленные ошибки засчитываются и как домашнее задание.</p>${nx != null ? `<button class="btn" data-act="rtask" data-i="${nx}">${F ? 'Дальше исправлять' : 'Исправить ошибки'}</button>` : '<p class="earn">✅ Все ошибки исправлены — 100%!</p>'}</article>`; }
+function fixRegrade(kid, subj, L){ L.fixGrade = lesGrade(L);
+  const D = dayRec(kid, cur.ds); if (cur.ds === U.today() && D.bonus && !D.proOpen && proOk(kid, D)) { D.proOpen = true; ev(kid, 'PRO открыт', { text: 'после работы над ошибками' }); setTimeout(() => alertMsg('Открыт уровень PRO! Там можно заработать ещё до 30 минут.'), 0); } }
+function fixBuy(kid, subj, L){ const K = S.kids[kid]; if (!L || L.fixPaid || (K.coins || 0) < FIX_PRICE) return; K.coins -= FIX_PRICE; L.fixPaid = true; fixRegrade(kid, subj, L);
+  ev(kid, 'работа над ошибками', { subj: subjName(kid, subj, cur.ds), unit: (unitById(kid, subj, L.uid) || {}).t || '', price: -FIX_PRICE, coins: K.coins }); save(); }
 
 /* ----- Штраф за небрежность (решение Юрия 23.11, правила — совет с ChatGPT и Gemini) -----
    «Наугад» — неверный ответ быстрее, чем можно прочитать вопрос: 2 с + 0,9 с на слово (Ярик) / 0,4 с (Аня), не меньше 3 с.
@@ -10145,6 +10173,7 @@ function finishLesson(){
   fineCheck(kid, subj, L, D);
   if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
     if (subs.every(s => (D.les[s].q || 0) >= .9 && !D.les[s].fastCut && !D.les[s].oot)) { let b = Math.max(0, DAY_MAX - D.pts); b = piggyAdd(K, b); D.pts += b; L.coins += b; L.perfect = true; D.perfect = b; }
+    if (proOk(kid, D)) { L.proOpen = true; D.proOpen = true; ev(kid, 'PRO открыт', { text: 'все уроки дня на 4 и 5' }); }
     const mins = Math.round(D.secs / 60); K.extraN = K.extraN || 0; if (mins < 40) K.extraN = Math.min(3, K.extraN + 1); else if (mins > 65) K.extraN = Math.max(-2, K.extraN - 1);
     ev(kid, 'день завершён', { coins: K.coins, score: D.pts + ' мин игры заработано', secs: D.secs, text: `занимался ${mins} мин` }); }
   ev(kid, 'урок завершён', { subj: subjName(kid, subj, cur.ds), unit: lessonTitle(kid, subj, cur.ds), score: `${first}/${tot}`, grade: L.grade, passed: L.passed === undefined ? '' : L.consolidate ? 'сдано 1 из 2 (закрепление завтра)' : L.passed ? 'тема пройдена' : 'повтор', mood: (L.fb || {}).mood, diff: (L.fb || {}).diff, like: (L.fb || {}).like, text: (L.fb || {}).text, coins: K.coins });
@@ -10215,14 +10244,22 @@ function trainTile(kid, D){ if (!trainReady(kid, D)) return ''; const L = D.les.
   const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new';
   return `<button class="tile pro ${st}" data-act="opentrain"><span class="ico">🔥</span><span class="tt"><span class="sn">Испытание</span><span class="ut">${st === 'done' ? `Пройдено: +${L.coins || 0} ${U.pl(L.coins || 0, 'балл', 'балла', 'баллов')}` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Сложные задачи по темам, которые будут дальше. Одна попытка. До +15 баллов'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : ''}</button>`; }
 /* Уровень PRO: после всех уроков и Экстры — тот же день заново, но сложнее. По 3 задания на сегодняшнюю тему и 2 на следующую (на завтра). Одна попытка. */
-function proReady(kid, D){ if (!D.bonus || cur.ds !== U.today()) return false; const E = D.les.extra; return (E && E.phase === 'done') || (!E && !extraTasks(kid, D).length); }
+/* Правило Юры 24.11: PRO открывается, когда все уроки дня пройдены на 4 и 5 (повторение ошибок не считается). Экстру ждать не нужно. */
+function proOk(kid, D){ const subs = todaySubjects(kid).filter(s => s !== 'hw'); return subs.length > 0 && subs.every(s => D.les[s] && D.les[s].phase === 'done' && lesGrade(D.les[s]) >= 4); }
+/* оценка с учётом платной работы над ошибками: исправленный урок засчитывается в PRO не выше четвёрки */
+function lesGrade(L){ if (!L.fixPaid || !L.ans) return L.grade || 0; const F = L.ans.filter(a => a && a.final && !(a.ok && a.tries === 1) && a.fix).length, tot = L.total || L.ans.length;
+  return Math.max(L.grade || 0, Math.min(4, grade(((L.score || 0) + F) / Math.max(1, tot)))); }
+function proReady(kid, D){ return !!D.bonus && cur.ds === U.today() && proOk(kid, D); }
 function proTasks(kid, D){ const out = [];
   for (const s of Object.keys(D.les)) { const L = D.les[s]; if (!L.uid || L.phase !== 'done') continue; const u = unitById(kid, s, L.uid); if (!u) continue;
     for (const x of genTasks(HARD[u.id] ? { g: HARD[u.id] } : u, U.h(kid + cur.ds + 'pro' + s), HARD[u.id] ? 4 : 3)) { x.sj = s; x.uid = u.id; out.push(x); }
     const list = unitsOf(kid, s, L.tr), j = list.indexOf(u), nx = j >= 0 && list[j + 1] && (u.cont || !list[j + 1].cont) ? list[j + 1] : null; /* «Продолжение» не подмешиваем, пока идёт основная программа */
     if (nx) for (const x of genTasks(nx, U.h(kid + cur.ds + 'pro2' + s), 2)) { x.sj = s; x.uid = nx.id; x.pro = 1; out.push(x); } }
   return U.rng(U.h(kid + cur.ds + 'proMix')).shuffle(out).slice(0, 16); }
-function proTile(kid, D){ if (!proReady(kid, D)) return ''; const L = D.les.pro; if (!L && !proTasks(kid, D).length) return '';
+function proTile(kid, D){ if (!proReady(kid, D)) { if (cur.ds !== U.today() || D.les.pro) return '';
+    const low = D.bonus ? todaySubjects(kid).filter(s => s !== 'hw' && D.les[s] && lesGrade(D.les[s]) < 4) : [];
+    return `<div class="tile pro locked"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${D.bonus ? `Сегодня не открылся: ${low.map(s => subjName(kid, s, cur.ds)).join(', ')} ниже четвёрки. Исправь там ошибки в работе над ошибками (${FIX_PRICE} баллов за урок) — и PRO откроется!` : 'Откроется, если все уроки дня будут на 4 и 5. Там можно заработать ещё до 30 минут'}</span></span><span class="state">до +30</span></div>`; }
+  const L = D.les.pro; if (!L && !proTasks(kid, D).length) return '';
   const st = L && L.phase === 'done' ? 'done' : L ? 'go' : 'new';
   return `<button class="tile pro ${st}" data-act="openpro"><span class="ico">🏆</span><span class="tt"><span class="sn">Уровень PRO</span><span class="ut">${st === 'done' ? `Пройден: +${L.coins || 0} ${U.pl(L.coins || 0, 'балл', 'балла', 'баллов')}` : st === 'go' ? `Задание ${L.i + 1} из ${L.items.length}` : 'Пройди этот день ещё раз — задачи на смекалку и тема завтрашнего урока. Одна попытка'}</span></span>${L && L.grade ? `<span class="mark m${L.grade}">${L.grade}</span>` : '<span class="state">до +30</span>'}</button>`; }
 /* Экстра: по 3 новых задания на темы, где сегодня были ошибки, и по 1 на закрепление остальных; не больше 10 */
@@ -10562,6 +10599,7 @@ document.addEventListener('click', e => {
     case 'rtask': { cur.rtask = +b.dataset.i; cur.rtry = null; rememberScroll(); render(); window.scrollTo(0, 0); break; }
     case 'rtryc': retryAnswer(b.dataset.v); break;
     case 'rtryagain': cur.rtry = null; render(); break;
+    case 'fixbuy': { const L0 = dayRec(kid, cur.ds).les[cur.subj]; if (!L0 || L0.fixPaid || (S.kids[kid].coins || 0) < FIX_PRICE || !window.confirm(`Работа над ошибками стоит ${FIX_PRICE} баллов. Исправленные ошибки поднимут результат урока. Оплатить?`)) break; fixBuy(kid, cur.subj, L0); render(); break; }
     case 'openextra': { if (restGate(kid, 'extra')) break; if (D.les.extra && D.les.extra.phase === 'done') { go('lesson', { subj: 'extra' }); break; } startLesson('extra'); break; }
     case 'open': { const s0 = b.dataset.subj, L0 = D.les[s0]; if (restGate(kid, s0)) break; if (!TEST && !(L0 && L0.phase === 'done') && s0 !== nextOpen(kid) && !(D.unlock || []).includes(s0)) {
       const K0 = S.kids[kid]; if (K0.coins < SKIP_PRICE) { alertMsg(`Сначала закончи предыдущий урок 🔒 Открыть раньше можно за ${SKIP_PRICE} баллов`); break; }
