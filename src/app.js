@@ -544,10 +544,10 @@ const FIX_PRICE = 10;
 function fixList(kid, subj, L){ const T = lessonTasks(L, kid, subj) || []; return T.map((t, j) => j).filter(j => { const a = L.ans[j]; return a && a.final && !(a.ok && a.tries === 1); }); }
 function fixCard(kid, subj, L){ if (!L.ans || ITEMS(subj) && subj === 'hw') return ''; const W = fixList(kid, subj, L); if (!W.length) return ''; const F = W.filter(j => L.ans[j].fix).length, tot = L.total || lessonTasks(L, kid, subj).length, pct = Math.round(((L.score || 0) + F) / Math.max(1, tot) * 100), nx = W.find(j => !L.ans[j].fix);
   if (!L.fixPaid) { const c = S.kids[kid].coins || 0; return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Результат урока: <b>${pct}%</b>. Хочешь улучшить? Исправь ошибки — результат станет до 100%, а оценка для уровня PRO — до четвёрки.</p><p class="hint">Работа над ошибками стоит ${FIX_PRICE} баллов. Бесплатное домашнее задание на главной снимает штраф за следующий урок, но результат этого урока не меняет.</p>${c >= FIX_PRICE ? `<button class="btn" data-act="fixbuy">Улучшить результат за ${FIX_PRICE} баллов</button>` : `<p class="hint">Нужно ${FIX_PRICE} баллов, у тебя ${c}.</p>`}</article>`; }
-  return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Исправлено <b>${F} из ${W.length}</b> · результат с исправлениями: <b>${pct}%</b></p><p class="hint">Оплачено. Исправляй в любое время, даже в перерыв. Исправленные ошибки засчитываются и как домашнее задание.</p>${nx != null ? `<button class="btn" data-act="rtask" data-i="${nx}">${F ? 'Дальше исправлять' : 'Исправить ошибки'}</button>` : '<p class="earn">✅ Все ошибки исправлены — 100%!</p>'}</article>`; }
-function fixRegrade(kid, subj, L){ const tot = L.total || lessonTasks(L, kid, subj).length, F = fixList(kid, subj, L).filter(j => L.ans[j].fix).length; L.fixGrade = Math.min(4, grade(((L.score || 0) + F) / Math.max(1, tot)));
+  return `<article class="card fixc"><h2>🛠 Работа над ошибками</h2><p>Исправлено <b>${F} из ${W.length}</b> · результат с исправлениями: <b>${pct}%</b></p><p>Оценка урока для уровня PRO: <b>${lesGrade(L)}</b></p><p class="hint">Оплачено. Исправляй в любое время, даже в перерыв. Исправленные ошибки засчитываются и как домашнее задание.</p>${nx != null ? `<button class="btn" data-act="rtask" data-i="${nx}">${F ? 'Дальше исправлять' : 'Исправить ошибки'}</button>` : '<p class="earn">✅ Все ошибки исправлены — 100%!</p>'}</article>`; }
+function fixRegrade(kid, subj, L){ L.fixGrade = lesGrade(L);
   const D = dayRec(kid, cur.ds); if (cur.ds === U.today() && D.bonus && !D.proOpen && proOk(kid, D)) { D.proOpen = true; ev(kid, 'PRO открыт', { text: 'после работы над ошибками' }); setTimeout(() => alertMsg('Открыт уровень PRO! Там можно заработать ещё до 30 минут.'), 0); } }
-function fixBuy(kid, subj, L){ const K = S.kids[kid]; if (!L || L.fixPaid || (K.coins || 0) < FIX_PRICE) return; K.coins -= FIX_PRICE; L.fixPaid = true;
+function fixBuy(kid, subj, L){ const K = S.kids[kid]; if (!L || L.fixPaid || (K.coins || 0) < FIX_PRICE) return; K.coins -= FIX_PRICE; L.fixPaid = true; fixRegrade(kid, subj, L);
   ev(kid, 'работа над ошибками', { subj: subjName(kid, subj, cur.ds), unit: (unitById(kid, subj, L.uid) || {}).t || '', price: -FIX_PRICE, coins: K.coins }); save(); }
 
 /* ----- Штраф за небрежность (решение Юрия 23.11, правила — совет с ChatGPT и Gemini) -----
@@ -724,7 +724,8 @@ function trainTile(kid, D){ if (!trainReady(kid, D)) return ''; const L = D.les.
 /* Правило Юры 24.11: PRO открывается, когда все уроки дня пройдены на 4 и 5 (повторение ошибок не считается). Экстру ждать не нужно. */
 function proOk(kid, D){ const subs = todaySubjects(kid).filter(s => s !== 'hw'); return subs.length > 0 && subs.every(s => D.les[s] && D.les[s].phase === 'done' && lesGrade(D.les[s]) >= 4); }
 /* оценка с учётом платной работы над ошибками: исправленный урок засчитывается в PRO не выше четвёрки */
-function lesGrade(L){ return Math.max(L.grade || 0, L.fixGrade || 0); }
+function lesGrade(L){ if (!L.fixPaid || !L.ans) return L.grade || 0; const F = L.ans.filter(a => a && a.final && !(a.ok && a.tries === 1) && a.fix).length, tot = L.total || L.ans.length;
+  return Math.max(L.grade || 0, Math.min(4, grade(((L.score || 0) + F) / Math.max(1, tot)))); }
 function proReady(kid, D){ return !!D.bonus && cur.ds === U.today() && proOk(kid, D); }
 function proTasks(kid, D){ const out = [];
   for (const s of Object.keys(D.les)) { const L = D.les[s]; if (!L.uid || L.phase !== 'done') continue; const u = unitById(kid, s, L.uid); if (!u) continue;
