@@ -33,7 +33,7 @@ function libCard(kid){ if (!kid) return ''; var B = libK(kid), left = LIB_DAY_MI
 
 /* --- экран --- */
 function vLib(){ var kid = cur.kid, K = S.kids[kid], B = libK(kid);
-  var head = '<main class="wrap ' + LK(kid) + '"><header class="bar"><button class="link" data-act="libhome">← К урокам</button><span class="coins">' + coinsHtml(K.coins) + '</span></header><section class="lesson lib"><p class="eyebrow">Читальня</p>';
+  var head = '<main class="wrap ' + LK(kid) + '"><header class="bar"><button class="link" data-act="libhome">← К урокам</button><span class="coins">' + coinsHtml(K.coins) + '</span></header><section class="lesson lib"><p class="eyebrow">Читальня</p>' + (B.blk ? '' : scrArt('art-lib', 'hero'));
   if (!libOpen(kid)) return head + '<h1>Сначала уроки</h1><p>Читальня откроется, когда сделаешь все уроки дня.</p></section></main>';
   var b = B.blk;
   if (!b) { var left = LIB_DAY_MIN - (B.min || 0);
