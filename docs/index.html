@@ -899,6 +899,12 @@ body.anya .reading .text,body.anya .peek .text,body.anya .ptext p{ font-family:"
 .micbar .hint.micerr{ color:#B42318; font-weight:600; }
 .tipin h3 .ic{ margin-right:6px; }
 
+/* полоска прогресса дня на главной (совет рецензентов 24.11) */
+.hello .dayprog{ display:flex; margin:8px 0 2px; max-width:360px; }
+.hello .dayprog i{ flex:1; height:10px; border-radius:6px; background:rgba(255,255,255,.35); box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); }
+.hello .dayprog i + i{ margin-left:6px; }
+.hello .dayprog i.on{ background:#fbbf24; }
+
 /* Задания от родителей */
 .ptbtn{ display:flex; align-items:center; gap:14px; width:100%; margin:14px 0 4px; padding:14px 16px; border-radius:20px; border:2px dashed rgba(20,33,61,.18); background:rgba(241,245,249,.92); color:#64748B; text-align:left; font:inherit; cursor:default; }
 .ptbtn .ptico{ flex:0 0 auto; width:54px; height:54px; border-radius:16px; background:#E2E8F0; display:flex; align-items:center; justify-content:center; filter:grayscale(1); opacity:.6; }
@@ -1133,7 +1139,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v756472ed */
+<script>/* vb5ec4af9 */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -9792,7 +9798,7 @@ function vHome(){
     const locked = !TEST && ((st === 'new' && restLeft(kid) > 0) || (st !== 'done' && s !== nextOpen(kid) && !(D.unlock || []).includes(s)));
     return `<button class="tile ${st} ${s === 'read' ? 'main' : ''} ${locked ? 'locked' : ''}" data-act="open" data-subj="${s}" ${locked ? 'aria-disabled="true"' : ''}><span class="ico">${icon(s === 'lang' && track('lang', cur.ds) === '_alt' ? 's_en' : ((s === 'world' && T(kid) === 'yarik') || (s === 'logic' && T(kid) === 'anya')) && track(s, cur.ds) === '_alt' ? 's_fin' : SUBJ_IC[s], 'big') || SUBJ_ICON[s]}</span><span class="tt"><span class="sn">${subjName(kid, s, cur.ds)}${s === 'read' && T(kid) === 'yarik' ? ' <em>главное</em>' : ''}</span><span class="ut">${U.esc(lessonTitle(kid, s, cur.ds))}</span></span>${g ? `<span class="mark m${g}">${g}</span>` : st === 'go' ? '<span class="state">начат</span>' : ''}</button>`; }).join('');
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">Выйти</button><button class="link voice" data-act="voice" title="Кто читает задания">🔊 ${K.voice === 'm' ? 'Мужской голос' : 'Женский голос'}</button><span class="coins">${coinsHtml(K.coins)}</span></header>
-  <div class="banner" aria-hidden="true">${THEME[TH(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[TH(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${rusNote(kid)}${dripCard(kid)}${restCard(kid)}${hwCard(kid)}${capLeft(K) ? '' : '<div class="note">✅ Баллы на сегодня собраны (' + DAY_CAP + ' из ' + DAY_CAP + '). Можно заниматься дальше для ума — новые баллы завтра.</div>'}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
+  <div class="banner" aria-hidden="true">${THEME[TH(kid)].banner.map((e, i) => `<span style="animation-delay:${i * .3}s">${e}</span>`).join('')}</div><section class="hello"><p class="eyebrow">${THEME[TH(kid)].hello}</p><h1>Привет, ${KIDS[kid].name}!</h1><p>${fmtDate(cur.ds)} · сделано ${done} из ${subs.length}</p><div class="dayprog" aria-hidden="true">${subs.map((s, i) => `<i class="${i < done ? 'on' : ''}"></i>`).join('')}</div>${cur.ds !== U.today() ? `<div class="note">Сначала закончи уроки за ${fmtDate(cur.ds)}. Новые откроются потом.</div>` : ''}${K.burnMsg ? `<div class="note">🔥 ${U.esc(K.burnMsg)} <button class="link" data-act="burnseen">Понятно</button></div>` : ''}${burnWarn(kid)}${rusNote(kid)}${dripCard(kid)}${restCard(kid)}${hwCard(kid)}${capLeft(K) ? '' : '<div class="note">✅ Баллы на сегодня собраны (' + DAY_CAP + ' из ' + DAY_CAP + '). Можно заниматься дальше для ума — новые баллы завтра.</div>'}${timeCard(kid)}<p class="hint">Уроки идут по порядку: следующий откроется, когда закончишь предыдущий. Открыть урок раньше можно за 10 баллов, но за него дадут только треть баллов, пока не сделаны все уроки дня. 1 балл = 1 минута игры. Заработанное копится в копилке 🐷 и в воскресенье переходит на счёт с прибавкой +10%.</p>
    <div class="prog tipc" data-tip="prog"><i style="width:${Math.round(done / subs.length * 100)}%"></i></div></section>
   ${ptHomeBtn(kid)}
   ${fineCard(kid)}${msgs.map(m => `<div class="note">✉ ${U.esc(noPapa(m.text))} <button class="link" data-act="seen" data-id="${m.id}">Прочитал(а)</button></div>`).join('')}
@@ -10149,7 +10155,7 @@ function rusState(kid){ const K = S.kids[kid], qs = [];
   const k = n < 3 ? .85 : avg >= .9 && !low5 ? 1 : avg >= .8 ? .85 : avg >= .7 ? .7 : .55;
   return { n, avg, k }; }
 function rusK(kid, subj){ return RUS_SUBJ[subj] || subj === 'hw' ? 1 : rusState(kid).k; }
-function rusNote(kid){ const r = rusState(kid); if (r.k >= 1) return ''; if (r.n < 3) return `<div class="note">📚 Сначала покажи себя в русском и чтении: после трёх уроков станет ясно, полные ли баллы за остальные предметы. Пока они идут на ${Math.round(r.k * 100)}%.</div>`; return `<div class="note">📚 Русский пока не на пятёрку, поэтому за остальные предметы баллы идут на ${Math.round(r.k * 100)}%. Подтяни чтение и русский — и все баллы станут полными!</div>`; }
+function rusNote(kid){ const r = rusState(kid); if (r.k >= 1) return ''; if (r.n < 3) return `<div class="note">📚 Пройди 3 урока русского и чтения на отлично — и за все предметы баллы станут полными. Пока остальные идут на ${Math.round(r.k * 100)}%.</div>`; return `<div class="note">📚 Русский пока не на пятёрку, поэтому за остальные предметы баллы идут на ${Math.round(r.k * 100)}%. Подтяни чтение и русский — и все баллы станут полными!</div>`; }
 const DAY_MAX = 60, DAY_BONUS = 10, LESSON_POOL = DAY_MAX - DAY_BONUS, SKIP_PRICE = 10, EXTRA_BONUS = 5, PRO_BONUS = 30;
 function extraTile(kid, D){ if (!D.bonus || cur.ds !== U.today()) return ''; const L = D.les.extra;
   if (!L && !extraTasks(kid, D).length) return '';
@@ -10489,7 +10495,8 @@ function vShop(){
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <section class="lesson"><p class="eyebrow">Призы</p><h1>Мои призы</h1><p class="hint">1 балл = 1 минута игры. Обмен подтверждает взрослый своим кодом.</p>
   <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от Юры</span></div>` : `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span>${prizeLock(K, it) ? `<span class="hint">${prizeLock(K, it)}</span>` : `<button class="btn small" data-act="buy" data-id="${it.id}" ${K.coins < it.price ? 'disabled' : ''}>${K.coins < it.price ? `ещё ${it.price - K.coins}` : 'Обменять'}</button>`}</div>`).join('')}</div>
-  <button class="btn ghost" data-act="editprizes">✏️ Изменить мои призы</button>
+  ${(K.shop || []).length ? '' : `<div class="card"><p>Призов пока нет. Выбери, ради чего будешь учиться: минуты игры, мультики, поход в кафе всей семьёй.</p></div>`}
+  <button class="btn ${(K.shop || []).length ? 'ghost' : 'big'}" data-act="editprizes">✏️ ${(K.shop || []).length ? 'Изменить мои призы' : 'Выбрать призы'}</button>
   ${K.purchases.length ? `<div class="shop-own"><h2>Мои награды</h2><ul class="plain">${K.purchases.slice(-10).reverse().map(p => `<li>${p.d} — ${U.esc(p.name)} (${p.price})</li>`).join('')}</ul></div>` : ''}</section></main>`;
 }
 
@@ -10625,7 +10632,7 @@ document.addEventListener('click', e => {
     default: { if (ppAct(act, b)) break; if (typeof lookAct === 'function' && lookAct(act, b)) break; if (testAct(act, b)) break; if (spotAct(act, b)) break; if (libAct(act, b)) break; if (hwAct(act, b)) break; if (poemAct(act, b)) break; if (FAM && famAct(act, b)) break; if (ptAct(act, b)) break; const F = cur.view === 'always' && alwaysGet(cur.aid); if (F && F.act) F.act(act, b); }
   }
 });
-function alertMsg(t, ms){ const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), ms || 2200); }
+function alertMsg(t, ms){ const d = document.createElement('div'); d.className = 'toast'; try { t = String(t).replace(/\s*\p{Extended_Pictographic}\uFE0F?\s*/gu, '. ').replace(/^\.\s*|\.\s*$/g, '').replace(/([.!?…:])\.\s/g, '$1 '); } catch (e) {} d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), ms || 2200); }
 document.addEventListener('submit', e => {
   const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const k = f.dataset.form;
   const val = id => (document.getElementById(id) || {}).value || '';
