@@ -16,6 +16,8 @@ const KIDS = FAM ? {} : KIDS_TPL;
 const TPL = k => T(k);
 function T(k){ return FAM ? ((KIDS[k] && KIDS[k].tpl) || 'yarik') : k; }
 function LK(k){ return FAM ? ((KIDS[k] && KIDS[k].look) || T(k)) : (typeof lookId === 'function' && lookId(k) ? LOOKS[lookId(k)].base : k); }
+/* акварельные картинки для пустых экранов и «всё сделано» (24.11): docs/img/ui/*.webp */
+function uiPic(kid, kind){ let v = 'any'; try { const b = (THEME[TH(kid)].banner || []).join(''); v = /⚽|🏆|👟|ic-ball|ic-goal/.test(b) ? 'foot' : /🪄|🔮|🦉|ic-wand|ic-owl/.test(b) ? 'magic' : 'any'; } catch (e) {} const f = kind === 'done' && v === 'any' ? 'login-door' : kind + '-' + v; return `<img class="uipic" src="img/ui/${f}.webp" alt="" loading="lazy">`; }
 function TH(k){ return FAM && THEME['k:' + k] ? 'k:' + k : !FAM && typeof lookTheme === 'function' && S && S.kids && S.kids[k] ? lookTheme(k) : LK(k); }
 function kidIds(){ return FAM ? Object.keys(KIDS) : ['yarik', 'anya']; }
 const SUBJ_ICON = { read:'Аа', math:'7+5', rus:'Ёё', world:'☼', hist:'XV', logic:'?!', lang:'Pt', hw:'ДЗ' };
@@ -236,7 +238,7 @@ function vLogin(){
   if (!FAM && S.viewer) return `<main class="wrap login"><header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Телефон родителя</h1><p>Здесь только отчёты: дети занимаются на своих айпадах.</p></header>
   <p class="center"><button class="btn big" data-act="parent">Войти как родитель</button></p></main>`;
   const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}${typeof lookBody === 'function' ? lookBody(k) : ''}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
-  return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header>
+  return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header><img class="uipic loginpic" src="img/ui/login-door.webp" alt="">
   <div class="kids">${kidIds().map(card).join('')}</div>${FAM ? famLoginExtra() : ''}
   ${alwaysTiles(null)}
   <p class="center"><button class="link" data-act="parent">Для родителей</button></p>${window.INSTALL_EV ? '<p class="center"><button class="btn ghost" data-act="install">📲 Установить на экран телефона</button></p>' : ''}</main>`;
@@ -310,7 +312,7 @@ function vHome(){
   ${libCard(kid)}
   ${alwaysTiles(kid)}
   <p class="center"><button class="link" data-act="chpin">🔑 Поменять пароль</button></p>
-  ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
+  ${done === subs.length ? `<div class="card win">${uiPic(kid, 'done')}<h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
   ${FAM ? '' : bkHomeCard(kid)}
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
   <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
@@ -999,7 +1001,7 @@ function vShop(){
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <section class="lesson"><p class="eyebrow">Призы</p><h1>Мои призы</h1><p class="hint">1 балл = 1 минута игры. Обмен подтверждает взрослый своим кодом.</p>
   <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от Юры</span></div>` : `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span>${prizeLock(K, it) ? `<span class="hint">${prizeLock(K, it)}</span>` : `<button class="btn small" data-act="buy" data-id="${it.id}" ${K.coins < it.price ? 'disabled' : ''}>${K.coins < it.price ? `ещё ${it.price - K.coins}` : 'Обменять'}</button>`}</div>`).join('')}</div>
-  ${(K.shop || []).length ? '' : `<div class="card"><p>Призов пока нет. Выбери, ради чего будешь учиться: минуты игры, мультики, поход в кафе всей семьёй.</p></div>`}
+  ${(K.shop || []).length ? '' : `<div class="card">${uiPic(kid, 'es-prizes')}<p>Призов пока нет. Выбери, ради чего будешь учиться: минуты игры, мультики, поход в кафе всей семьёй.</p></div>`}
   <button class="btn ${(K.shop || []).length ? 'ghost' : 'big'}" data-act="editprizes">✏️ ${(K.shop || []).length ? 'Изменить мои призы' : 'Выбрать призы'}</button>
   ${K.purchases.length ? `<div class="shop-own"><h2>Мои награды</h2><ul class="plain">${K.purchases.slice(-10).reverse().map(p => `<li>${p.d} — ${U.esc(p.name)} (${p.price})</li>`).join('')}</ul></div>` : ''}</section></main>`;
 }

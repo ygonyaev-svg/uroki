@@ -905,6 +905,10 @@ body.anya .reading .text,body.anya .peek .text,body.anya .ptext p{ font-family:"
 .hello .dayprog i + i{ margin-left:6px; }
 .hello .dayprog i.on{ background:#fbbf24; }
 
+/* картинки пустых экранов (24.11) */
+.card .uipic{ display:block; width:100%; height:auto; aspect-ratio:4/3; object-fit:cover; border-radius:14px; margin:0 0 12px; }
+.login .loginpic{ display:block; width:100%; max-width:520px; height:190px; object-fit:cover; margin:0 auto 16px; border-radius:18px; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+
 /* Задания от родителей */
 .ptbtn{ display:flex; align-items:center; gap:14px; width:100%; margin:14px 0 4px; padding:14px 16px; border-radius:20px; border:2px dashed rgba(20,33,61,.18); background:rgba(241,245,249,.92); color:#64748B; text-align:left; font:inherit; cursor:default; }
 .ptbtn .ptico{ flex:0 0 auto; width:54px; height:54px; border-radius:16px; background:#E2E8F0; display:flex; align-items:center; justify-content:center; filter:grayscale(1); opacity:.6; }
@@ -1139,7 +1143,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* vb5ec4af9 */
+<script>/* vecfcd78c */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -5812,7 +5816,7 @@ function vBooks(){
     return '<button class="tile bk ' + (t ? 'go' : 'new') + '" data-act="bkbook" data-id="' + b.id + '"><span class="ico bkthumb">' + (b.thumb ? '<img src="' + b.thumb + '" alt="">' : '📖') + '</span><span class="tt"><span class="sn">' + U.esc(b.title || 'Новая книга') + (b.author ? ' <em>' + U.esc(b.author) + '</em>' : '') + '</span><span class="ut">' + st + (n ? ' · сделано ' + dn + ' из ' + n : '') + '</span></span>' + (b.msg && !b.msgSeen ? '<span class="state">✉</span>' : '') + '</button>'; }).join('');
   return '<main class="wrap ' + kid + '">' + bkHead('home') + '<section class="hello"><h1>📚 Мои книги</h1><p>Книги, которые ты читаешь на бумаге. Айпад нужен только чтобы сфотографировать и ответить на вопросы.</p></section>' +
     '<p id="bkup" class="hint">' + bkUpHtml() + '</p>' +
-    (list ? '<section class="tiles">' + list + '</section>' : '<div class="card"><p>Пока книг нет. Найди дома книгу, которую хочешь прочитать, и сфотографируй её.</p></div>') +
+    (list ? '<section class="tiles">' + list + '</section>' : '<div class="card">' + uiPic(cur.kid, 'es-books') + '<p>Пока книг нет. Найди дома книгу, которую хочешь прочитать, и сфотографируй её.</p></div>') +
     '<button class="btn big ghost" data-act="bkadd">📷 Добавить книгу</button></main>';
 }
 /* Наглядные подсказки: что фотографировать (пример — Л. Н. Толстой «Рассказы для детей»; выходные данные условные) */
@@ -9512,6 +9516,8 @@ const KIDS = FAM ? {} : KIDS_TPL;
 const TPL = k => T(k);
 function T(k){ return FAM ? ((KIDS[k] && KIDS[k].tpl) || 'yarik') : k; }
 function LK(k){ return FAM ? ((KIDS[k] && KIDS[k].look) || T(k)) : (typeof lookId === 'function' && lookId(k) ? LOOKS[lookId(k)].base : k); }
+/* акварельные картинки для пустых экранов и «всё сделано» (24.11): docs/img/ui/*.webp */
+function uiPic(kid, kind){ let v = 'any'; try { const b = (THEME[TH(kid)].banner || []).join(''); v = /⚽|🏆|👟|ic-ball|ic-goal/.test(b) ? 'foot' : /🪄|🔮|🦉|ic-wand|ic-owl/.test(b) ? 'magic' : 'any'; } catch (e) {} const f = kind === 'done' && v === 'any' ? 'login-door' : kind + '-' + v; return `<img class="uipic" src="img/ui/${f}.webp" alt="" loading="lazy">`; }
 function TH(k){ return FAM && THEME['k:' + k] ? 'k:' + k : !FAM && typeof lookTheme === 'function' && S && S.kids && S.kids[k] ? lookTheme(k) : LK(k); }
 function kidIds(){ return FAM ? Object.keys(KIDS) : ['yarik', 'anya']; }
 const SUBJ_ICON = { read:'Аа', math:'7+5', rus:'Ёё', world:'☼', hist:'XV', logic:'?!', lang:'Pt', hw:'ДЗ' };
@@ -9732,7 +9738,7 @@ function vLogin(){
   if (!FAM && S.viewer) return `<main class="wrap login"><header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Телефон родителя</h1><p>Здесь только отчёты: дети занимаются на своих айпадах.</p></header>
   <p class="center"><button class="btn big" data-act="parent">Войти как родитель</button></p></main>`;
   const card = k => { const K = S.kids[k], d = KIDS[k]; return `<button class="kidcard ${LK(k)}${typeof lookBody === 'function' ? lookBody(k) : ''}"${FAM ? famCardStyle(k) : ''} data-act="login" data-kid="${k}"><span class="avatar">${d.name[0]}</span><span class="kb">${THEME[TH(k)].banner.slice(0, 4).join(' ')}</span><span class="kn">${d.name}</span><span class="kg">${d.grade}</span><span class="kc">${coinsHtml(K.coins)}</span></button>`; };
-  return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header>
+  return `<main class="wrap login">${FAM ? famBrand(false) : ''}<header class="hero"><p class="eyebrow">${fmtDate(cur.ds)}</p><h1>Кто сегодня учится?</h1></header><img class="uipic loginpic" src="img/ui/login-door.webp" alt="">
   <div class="kids">${kidIds().map(card).join('')}</div>${FAM ? famLoginExtra() : ''}
   ${alwaysTiles(null)}
   <p class="center"><button class="link" data-act="parent">Для родителей</button></p>${window.INSTALL_EV ? '<p class="center"><button class="btn ghost" data-act="install">📲 Установить на экран телефона</button></p>' : ''}</main>`;
@@ -9806,7 +9812,7 @@ function vHome(){
   ${libCard(kid)}
   ${alwaysTiles(kid)}
   <p class="center"><button class="link" data-act="chpin">🔑 Поменять пароль</button></p>
-  ${done === subs.length ? `<div class="card win"><h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
+  ${done === subs.length ? `<div class="card win">${uiPic(kid, 'done')}<h2>Все уроки на сегодня сделаны!</h2><p>Завтра будут новые. ${D.perfect ? `Безупречный день: бонус +${D.perfect} получен.` : ''}</p></div>` : ''}
   ${FAM ? '' : bkHomeCard(kid)}
   <section class="shelf card"><h2>Моя книжная полка</h2><p>Прочитано текстов: <b>${K.texts}</b> · слов вслух: <b>${K.words}</b>${streak > 1 ? ` · читаю ${streak} ${U.pl(streak,'день','дня','дней')} подряд` : ''}</p>${lastReading(kid)}</section>
   <p class="center"><button class="btn ghost" data-act="shop">🎁 Мои призы</button></p></main>`;
@@ -10495,7 +10501,7 @@ function vShop(){
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <section class="lesson"><p class="eyebrow">Призы</p><h1>Мои призы</h1><p class="hint">1 балл = 1 минута игры. Обмен подтверждает взрослый своим кодом.</p>
   <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от Юры</span></div>` : `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span>${prizeLock(K, it) ? `<span class="hint">${prizeLock(K, it)}</span>` : `<button class="btn small" data-act="buy" data-id="${it.id}" ${K.coins < it.price ? 'disabled' : ''}>${K.coins < it.price ? `ещё ${it.price - K.coins}` : 'Обменять'}</button>`}</div>`).join('')}</div>
-  ${(K.shop || []).length ? '' : `<div class="card"><p>Призов пока нет. Выбери, ради чего будешь учиться: минуты игры, мультики, поход в кафе всей семьёй.</p></div>`}
+  ${(K.shop || []).length ? '' : `<div class="card">${uiPic(kid, 'es-prizes')}<p>Призов пока нет. Выбери, ради чего будешь учиться: минуты игры, мультики, поход в кафе всей семьёй.</p></div>`}
   <button class="btn ${(K.shop || []).length ? 'ghost' : 'big'}" data-act="editprizes">✏️ ${(K.shop || []).length ? 'Изменить мои призы' : 'Выбрать призы'}</button>
   ${K.purchases.length ? `<div class="shop-own"><h2>Мои награды</h2><ul class="plain">${K.purchases.slice(-10).reverse().map(p => `<li>${p.d} — ${U.esc(p.name)} (${p.price})</li>`).join('')}</ul></div>` : ''}</section></main>`;
 }
