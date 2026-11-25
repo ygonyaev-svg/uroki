@@ -112,12 +112,24 @@ function applyCfg(rows){ let fresh = false;
     else if (type.startsWith('врем')) { const t = U.today(), m = Math.round((Number(row.value) || 10) / 10) * 10; if (!K.xt || K.xt.d !== t) K.xt = { d: t, m: 0 }; K.xt.m = Math.max(0, Math.min(180, K.xt.m + m)); if (m > 0 && K.restForced && K.restUntil > Date.now()) { K.restUntil = 0; K.restForced = false; K.sess = Math.max(0, SESS_SECS + extraSecs(K) - m * 60); K.blkAt = Date.now(); } }
     else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; }
     else if (type.startsWith('цен')) { const n = Math.round(Number(row.value)), q = String(row.subj || '').toLowerCase().trim(); const nm = x => emoStrip(String(x.name)).toLowerCase().replace(/\s+/g, ''), qn = q.replace(/\s+/g, ''), sh = K.shop || []; const part = sh.filter(x => qn.length >= 4 && isNaN(Number(qn)) && nm(x).includes(qn)); const it = q && (sh.find(x => x.id.toLowerCase() === q) || sh.find(x => nm(x) === qn) || (part.length === 1 ? part[0] : null)); /* сначала точное совпадение id/названия; часть названия — только если однозначно и не число (Таблица превращает «5€» в 5) */ if (!it || !(n > 0)) continue; /* приза ещё нет на этом устройстве — попробуем при следующей загрузке */ it.price = n; ev(kid, 'цена приза', { unit: it.name, price: n }); }
+    else if (type.startsWith('оцен')) regradeRow(kid, row);
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     else continue; /* незнакомую команду не отмечаем — её выполнит следующая версия приложения */
     K.applied.push(row.id); fresh = true;
   }
   if (fresh) { save(); if (cur.kid) softRender(); }
 }
+
+/* Лист «Указания», тип «оценка»: пересчитать завершённый урок, если в нём было непонятное задание.
+   предмет — как в «теме», значение — «5/5» (верно с первого раза / всего) и, через пробел, дата ГГГГ-ММ-ДД (по умолчанию сегодня).
+   Ставит новую оценку, засчитывает тему (если ≥80%) и доплачивает разницу в баллах. */
+function regradeRow(kid, row){ const K = S.kids[kid], s = subjByName(kid, row.subj), m = String(row.value || '').match(/(\d+)\s*\/\s*(\d+)(?:\s+(\d{4}-\d\d-\d\d))?/); if (!s || !m) return;
+  const ds = m[3] || U.today(), D = K.days[ds], L = D && D.les && D.les[s]; if (!L || L.phase !== 'done') return;
+  const first = +m[1], tot = Math.max(1, +m[2]), ratio = Math.min(1, first / tot), g0 = L.grade || 0; L.score = first; L.total = tot; L.grade = Math.max(g0, grade(ratio)); L.q = Math.max(L.q || 0, ratio); L.regraded = true;
+  if (!ITEMS(s) && s !== 'read' && !L.passed && ratio >= .8) { L.passed = true; K.passN = K.passN || {}; const pn = (K.passN[L.uid] || 0) + (ratio === 1 ? 2 : 1); K.passN[L.uid] = pn; const key = s + (L.tr || ''); if (pn >= 2) { K.pos[key] = (K.pos[key] || 0) + 1; L.topicDone = true; L.consolidate = false; } else L.consolidate = true; }
+  const subs = todaySubjects(kid), W = KIDS[kid].w || {}, wsum = subs.reduce((a, x) => a + (W[x] || .1), 0), M = LESSON_POOL * (W[s] || .1) / Math.max(1, wsum);
+  let add = Math.max(0, Math.round(M * L.q * L.q) - (L.coins || 0)); D.pts = D.pts || 0; add = Math.max(0, Math.min(add, LESSON_POOL - D.pts)); D.pts += add; add = piggyAdd(K, add); L.coins = (L.coins || 0) + add;
+  ev(kid, 'оценка пересчитана', { subj: subjName(kid, s, ds), score: `${first}/${tot}`, grade: L.grade, coins: K.coins, text: `было ${g0}, стало ${L.grade}; +${add} баллов` }); }
 
 /* ===== Помощники по программе ===== */
 function track(subj, ds){ const c = cur.K().cur[subj]; return c && c.alt && (U.dayNum(ds) % 2 === 1) ? '_alt' : ''; }
@@ -278,7 +290,10 @@ function lessonTitle(kid, subj, ds){
   const tr = track(subj, ds), u = unitAt(kid, subj, tr).u; return u.t + (((S.kids[kid].passN || {})[u.id] || 0) === 1 ? ' · закрепление' : '');
 }
 function subjName(kid, subj, ds){ if (subj === 'hw') return 'Домашнее задание'; if (subj === 'extra') return '⭐ Экстра'; if (subj === 'pro') return '🏆 Уровень PRO'; if (subj === 'train') return '🔥 Испытание'; const c = KIDS[kid].cur[subj]; return track(subj, ds) === '_alt' ? c.altName : c.name; }
-function hwDue(kid){ const K = S.kids[kid]; return K.srs.filter(x => x.due <= cur.ds); }
+/* Задания, убранные из программы как непонятные: из повторения и ДЗ тоже не выдаём (25.11.2026 — «Чем отличаются слова сыр и сон») */
+const DROP_Q = [/Чем они отличаются\?/];
+function dropQ(t){ const q = strip(String((t && t.q) || '')); return DROP_Q.some(re => re.test(q)); }
+function hwDue(kid){ const K = S.kids[kid]; return K.srs.filter(x => x.due <= cur.ds && !dropQ(x.task)); }
 function todaySubjects(kid){ const list = KIDS[kid].order.slice(); const D = dayRec(kid, cur.ds); if (D.bonus) { if (D.les.hw) list.push('hw'); return list; } /* закрытый день не открываем заново */ if (hwDue(kid).length || S.kids[kid].hwText.some(h => !h.done) || D.les.hw) list.push('hw'); return list; }
 
 /* Учебный день: пока не закончены все уроки начатого дня, новый день не открывается */
