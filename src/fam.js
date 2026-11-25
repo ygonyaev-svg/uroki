@@ -99,13 +99,13 @@ function famInit(){
       if (l1) { lang.alt = famLangCourse(l1, +c.lg[l1], c.age); lang.altName = FAM_LANGS[l1][0]; lc._alt = FAM_LANGS[l1][1]; }
       a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur, { lang: lang }); a.lc = lc; }
     else { a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur); delete a.cur.lang; a.order = KIDS_TPL[a.tpl].order.filter(function(sj){ return sj !== 'lang'; }); } /* «Не изучать» везде — иностранного языка в плане нет */
-    a.read = famReadList(rd >= 2 && c.age >= 12 ? READ_T : rd >= 3 && c.age >= 9 ? READ_A : rd === 0 && c.age <= 10 ? READ_Y : KIDS_TPL[a.tpl].read, c.done);
+    a.read = famReadList((rd >= 2 && c.age >= 12 ? READ_T : rd >= 3 && c.age >= 9 ? READ_A : rd <= 1 && c.age <= 7 ? READ_S.concat(READ_Y) : rd === 0 && c.age <= 10 ? READ_Y : KIDS_TPL[a.tpl].read).filter(function(t){ return !/Ярик/.test(t.text || ''); }), c.done); /* 6–7 лет — свои короткие тексты; тексты «про Ярика» — только в Уроках */
     KIDS[c.id] = Object.assign({}, KIDS_TPL[a.tpl], a, { name: c.name, rdLv: rd, age: +c.age, grade: c.age + ' ' + U.pl(+c.age, 'год', 'года', 'лет'), sex: c.sex || '', look: c.look || famLookOf(c) });
     var th = famThemeOf(c); if (th) THEME['k:' + c.id] = th; else delete THEME['k:' + c.id];
     if (!S.kids[c.id]) S.kids[c.id] = newKid(); if (c.pin) S.kids[c.id].pin = c.pin;
     var K = S.kids[c.id], ms = mk ? mt + '|' + mk : ''; if (ms && K.mathSet !== ms) { K.pos.math = mp; K.mathSet = ms; }
     var as = ac ? c.age + ':' + Object.keys(ac).join(',') : ''; if ((K.ageSet || '') !== as) { if (ac) Object.keys(ac).forEach(function(sj){ delete K.pos[sj]; delete K.pos[sj + '_alt']; }); K.ageSet = as; }
-    var rs = a.read.length && READ_T.indexOf(a.read[0]) >= 0 && READ_A.indexOf(a.read[0]) < 0 ? 't' : ''; if ((K.readSet || '') !== rs) { K.pos.read = 0; K.readSet = rs; } /* свой список чтения 12–13 лет — с начала */
+    var rs = !a.read.length ? '' : READ_S.indexOf(a.read[0]) >= 0 ? 's' : READ_T.indexOf(a.read[0]) >= 0 && READ_A.indexOf(a.read[0]) < 0 ? 't' : ''; if ((K.readSet || '') !== rs) { K.pos.read = 0; K.readSet = rs; } /* свой список чтения 12–13 лет — с начала */
     if ((K.langSet || '') !== lset) { delete K.pos.lang; delete K.pos.lang_alt; K.langSet = lset; } });
   if (S.fam && S.fam.ppin) S.parentPin = S.fam.ppin;
 }
