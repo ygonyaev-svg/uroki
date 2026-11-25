@@ -538,7 +538,7 @@ function vSurvey(L){
 }
 function vResult(kid, subj, L){
   const msg = L.consolidate ? 'Хорошо! Завтра закрепим эту тему ещё раз — с новыми заданиями.' : L.passed === true ? 'Тема пройдена! Завтра — следующая.' : L.passed === false ? 'Завтра повторим эту тему с новыми заданиями.' : '';
-  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[TH(kid)].win)}</div>` : ''}<div class="bigmark m${lesGrade(L)}">${lesGrade(L)}</div>${lesGrade(L) > (L.grade || 0) ? `<p class="hint">Оценка исправлена в работе над ошибками, в уроке было ${L.grade}.</p>` : ''}<p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.ootCut ? '<p class="hint">Урок был не по порядку — баллов только треть.</p>' : ''}${L.hwCut ? '<p class="hint">📒 Домашнее задание по прошлому уроку не было сделано — баллов 70%.</p>' : ''}${L.rusCut ? `<p class="hint">📚 Баллы за этот урок — ${L.rusCut}%: русский пока не на пятёрку. Подтяни русский, и все баллы станут полными.</p>` : ''}${L.fastCut ? '<p class="hint">Слишком быстро — баллов меньше. Решай внимательно, проверяй себя.</p>' : ''}${fineCard(kid)}${typeof srResult === 'function' ? srResult(kid, L) : ''}${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.proOpen ? '<div class="card win"><h2>Открыт уровень PRO!</h2><p>Все уроки сегодня на 4 и 5. В PRO можно заработать ещё до 30 минут сверх дневной нормы.</p></div>' : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article>${fixCard(kid, subj, L)}<button class="btn big" data-act="home">К урокам</button>`;
+  return `<article class="card result">${L.grade >= 4 ? `<div class="cheer">${U.rng(L.seed || 3).pick(THEME[TH(kid)].win)}</div>` : ''}<div class="bigmark m${lesGrade(L)}">${lesGrade(L)}</div>${lesGrade(L) > (L.grade || 0) ? `<p class="hint">Оценка исправлена в работе над ошибками, в уроке было ${L.grade}.</p>` : ''}<p>Правильно с первого раза: <b>${L.score} из ${L.total}</b></p><p>${msg}</p><p class="earn">Заработано минут игры: ${coinsHtml(L.coins || 0)}</p>${L.ootCut ? '<p class="hint">Урок был не по порядку — баллов только треть.</p>' : ''}${L.hwCut ? '<p class="hint">📒 Домашнее задание по прошлому уроку не было сделано — баллов 70%.</p>' : ''}${L.rusBonus ? `<p class="hint">📚 Бонус за отличный урок: +${L.rusBonus}</p>` : ''}${L.fastCut ? '<p class="hint">Слишком быстро — баллов меньше. Решай внимательно, проверяй себя.</p>' : ''}${fineCard(kid)}${typeof srResult === 'function' ? srResult(kid, L) : ''}${L.coins ? `<div class="burst" aria-hidden="true">${Array.from({ length: Math.min(14, 4 + L.coins) }, (_, i) => `<span style="--dx:${Math.round(Math.cos(i * 2.4) * 160)}px;--dy:${Math.round(-60 - Math.abs(Math.sin(i * 1.7)) * 180)}px;--r:${i * 40}deg;animation-delay:${i * 60}ms">${i % 3 ? '🪙' : L.grade >= 5 ? '⭐' : '✨'}</span>`).join('')}</div>` : ''}${L.proOpen ? '<div class="card win"><h2>Открыт уровень PRO!</h2><p>Все уроки сегодня на 4 и 5. В PRO можно заработать ещё до 30 минут сверх дневной нормы.</p></div>' : ''}${L.perfect ? '<p class="earn">🌟 Безупречный день: +10 минут!</p>' : L.q != null && L.q < .6 ? '<p class="hint">Слишком много ошибок — за этот урок минут нет. Будь внимательнее!</p>' : ''}</article>${fixCard(kid, subj, L)}<button class="btn big" data-act="home">К урокам</button>`;
 }
 /* Работа над ошибками: в любое время, без перерыва. Платная (Юрий 24.11): 10 баллов за урок — тогда исправленные ошибки поднимают результат урока до 100%.
    Бесплатное домашнее задание (hw.js) снимает штраф 70%, но результат урока не меняет. */
@@ -563,6 +563,7 @@ function guessSecs(kid, t){ const w = String(strip(t.q || '')).split(/\s+/).filt
 function fineCheck(kid, subj, L, D){ if (!fineOn() || !L.ans) return; const K = S.kids[kid], g = L.ans.filter(a => a && a.guess != null), nm = subjName(kid, subj, cur.ds); K.fines = K.fines || []; K.fineBack = K.fineBack || {};
   const back = K.fineBack[subj];
   if (!g.length && back) { K.coins += back; K.fines.push({ d: cur.ds, back: back, subj: U.noEmo(nm), seen: false }); ev(kid, 'штраф возвращён', { subj: nm, price: back, coins: K.coins, text: 'урок без ответов наугад' }); delete K.fineBack[subj]; }
+  return; /* 25.11: баллы за спешку больше не снимаются (решение Юрия), остался только возврат прежних штрафов */
   if (g.length <= FINE_FREE) return;
   let n = Math.min(FINE_LESSON, (g.length - FINE_FREE) * FINE_EACH); D.fine = D.fine || 0; n = Math.min(n, FINE_DAY - D.fine, K.coins); if (n <= 0) return;
   K.coins -= n; D.fine += n; L.fine = n; const fast = Math.min.apply(null, g.map(a => a.guess)), slow = Math.max.apply(null, g.map(a => a.guess));
@@ -579,11 +580,14 @@ function answer(v){
   if (t.k === 'n') { const x = Number(String(v).replace(',', '.').replace(/\s/g, '')); if (String(v).trim() === '' || isNaN(x)) return; ok = Math.abs(x - t.a) < 1e-6; }
   else if (t.k === 't') { if (!String(v).trim()) return; ok = txtOk(t, v); }
   else ok = v === t.a;
+  const secA = (Date.now() - ((L.qt || {})[L.i] || Date.now())) / 1000, fastA = t.k === 'c' && a.tries === 0 && secA < guessSecs(kid, t);
+  /* 25.11 Юрий: вместо штрафа — серия быстрых ответов: после быстрой ошибки следующий слишком быстрый ответ не принимается, просим прочитать вопрос */
+  if (fastA && (L.rush || 0) >= 1) { (L.qt = L.qt || {})[L.i] = Date.now(); save(); alertMsg('Не спеши. Прочитай вопрос до конца и ответь ещё раз', 3200); return; }
   a.tries++; a.v = v;
   if (!ok && t.k === 'c') a.wrong.push(v);
   const lastTry = (subj === 'pro' && !t.pro) || (t.k === 'c' && t.opts.length - a.wrong.length <= 1);
   if (ok || a.tries >= 1 || lastTry) { /* засчитывается только первый ответ */ a.final = true; a.ok = ok;
-    if (!ok && a.tries === 1 && fineOn()) { const sec = (Date.now() - ((L.qt || {})[L.i] || Date.now())) / 1000; if (sec < guessSecs(kid, t)) { a.guess = Math.round(sec * 10) / 10; } }
+    if (!ok && fastA) { a.guess = Math.round(secA * 10) / 10; L.rush = (L.rush || 0) + 1; } else L.rush = 0;
     const K = S.kids[kid];
     const uid = ITEMS(subj) ? (t.uid || subj) : L.uid;
     t.uid = uid;
@@ -648,6 +652,7 @@ function finishLesson(){
   { const rk = rusK(kid, subj); if (rk < 1 && pts > 0) { L.rusCut = Math.round(rk * 100); pts = Math.round(pts * rk); } }
   if (subj !== 'read' && !ITEMS(subj) && typeof srPts === 'function') pts = srPts(kid, subj, L, lessonTasks(L, kid, subj), pts);
   if (L.oot && !subs.every(s => s === subj || (D.les[s] && D.les[s].phase === 'done'))) { pts = Math.round(pts / 3); L.ootCut = true; } D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
+  if (RUS_SUBJ[subj] && q >= .9) { const rb = Math.max(0, Math.min(RUS_BONUS, DAY_MAX - D.pts)); if (rb) { D.pts += rb; pts += rb; L.rusBonus = rb; } }
   pts = piggyAdd(K, pts); L.coins = pts; L.phase = 'done';
   fineCheck(kid, subj, L, D);
   if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
@@ -668,8 +673,10 @@ function rusState(kid){ const K = S.kids[kid], qs = [];
   const n = qs.length, avg = n ? qs.reduce((a, b) => a + b, 0) / n : 0, low5 = qs.slice(0, 5).some(x => x < .75);
   const k = n < 3 ? .85 : avg >= .9 && !low5 ? 1 : avg >= .8 ? .85 : avg >= .7 ? .7 : .55;
   return { n, avg, k }; }
-function rusK(kid, subj){ return RUS_SUBJ[subj] || subj === 'hw' ? 1 : rusState(kid).k; }
-function rusNote(kid){ const r = rusState(kid); if (r.k >= 1) return ''; if (r.n < 3) return `<div class="note">📚 Пройди 3 урока русского и чтения на отлично — и за все предметы баллы станут полными. Пока остальные идут на ${Math.round(r.k * 100)}%.</div>`; return `<div class="note">📚 Русский пока не на пятёрку, поэтому за остальные предметы баллы идут на ${Math.round(r.k * 100)}%. Подтяни чтение и русский — и все баллы станут полными!</div>`; }
+/* 25.11 Юрий: понижение баллов отменено, вместо него бонус +RUS_BONUS за урок чтения или русского на отлично */
+const RUS_BONUS = 5;
+function rusK(kid, subj){ return 1; }
+function rusNote(kid){ const D = dayRec(kid, U.today()), subs = todaySubjects(kid), left = ['read', 'rus'].filter(x => subs.includes(x) && !(D.les[x] && D.les[x].phase === 'done')); if (!left.length) return ''; return `<div class="note">📚 Чтение и русский на отлично — +${RUS_BONUS} бонусных баллов за каждый из этих уроков.</div>`; }
 const DAY_MAX = 60, DAY_BONUS = 10, LESSON_POOL = DAY_MAX - DAY_BONUS, SKIP_PRICE = 10, EXTRA_BONUS = 5, PRO_BONUS = 30;
 function extraTile(kid, D){ if (!D.bonus || cur.ds !== U.today()) return ''; const L = D.les.extra;
   if (!L && !extraTasks(kid, D).length) return '';
