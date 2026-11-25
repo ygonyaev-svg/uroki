@@ -113,6 +113,7 @@ function applyCfg(rows){ let fresh = false;
     else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; }
     else if (type.startsWith('цен')) { const n = Math.round(Number(row.value)), q = String(row.subj || '').toLowerCase().trim(); const nm = x => emoStrip(String(x.name)).toLowerCase().replace(/\s+/g, ''), qn = q.replace(/\s+/g, ''), sh = K.shop || []; const part = sh.filter(x => qn.length >= 4 && isNaN(Number(qn)) && nm(x).includes(qn)); const it = q && (sh.find(x => x.id.toLowerCase() === q) || sh.find(x => nm(x) === qn) || (part.length === 1 ? part[0] : null)); /* сначала точное совпадение id/названия; часть названия — только если однозначно и не число (Таблица превращает «5€» в 5) */ if (!it || !(n > 0)) continue; /* приза ещё нет на этом устройстве — попробуем при следующей загрузке */ it.price = n; ev(kid, 'цена приза', { unit: it.name, price: n }); }
     else if (type.startsWith('оцен')) regradeRow(kid, row);
+    else if (type.startsWith('перес')) { const Dt = K.days[U.today()]; if (Dt && Dt.les && !Dt.retakeDone) { Dt.retakeDone = true; Dt.retake = []; for (const s of todaySubjects(kid)) { const Lx = Dt.les[s]; if (s !== 'hw' && Lx && Lx.phase === 'done' && lesGrade(Lx) < 4) { Dt.retake.push(s); delete Dt.les[s]; } } if (Dt.retake.length) { Dt.proOpen = false; ev(kid, 'пересдача', { text: Dt.retake.join(', ') }); } } } /* одна пересдача за день: уроки дня на 3 и ниже начинаются заново с другими заданиями, баллы второй раз не идут */
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     else continue; /* незнакомую команду не отмечаем — её выполнит следующая версия приложения */
     K.applied.push(row.id); fresh = true;
@@ -452,7 +453,7 @@ function startLesson(subj){
     else if (subj === 'pro') { D.les.pro = { items: proTasks(kid, D), phase: 'practice', i: 0, ans: [], seed: U.h(kid + cur.ds + 'pro') }; }
     else if (subj === 'extra') { D.les.extra = { items: extraTasks(kid, D), phase: 'practice', i: 0, ans: [], seed: U.h(kid + cur.ds + 'extra') }; }
     else if (subj === 'hw') { const due = hwDue(kid).slice(0, 8); D.les.hw = { items: due.map(x => x.task), keys: due.map(x => x.key), phase: 'practice', i: 0, ans: [], txt: S.kids[kid].hwText.filter(h => !h.done).map(h => h.id) }; }
-    else { const tr = track(subj, cur.ds), { u } = unitAt(kid, subj, tr); D.les[subj] = { uid: u.id, tr, seed: U.h(kid + cur.ds + subj), phase: 'theory', i: 0, ans: [], n: nTasks(kid, subj) }; }
+    else { const tr = track(subj, cur.ds), { u } = unitAt(kid, subj, tr); const rt = (D.retake || []).includes(subj); D.les[subj] = { uid: u.id, tr, seed: U.h(kid + cur.ds + subj + (rt ? 'r' : '')), phase: 'theory', i: 0, ans: [], n: nTasks(kid, subj), retake: rt || undefined }; }
     D.les[subj].t0 = Date.now();
     S.kids[kid].openDay = cur.ds; save(); ev(kid, 'урок начат', { subj: subjName(kid, subj, cur.ds), unit: lessonTitle(kid, subj, cur.ds) });
   }
@@ -666,10 +667,11 @@ function finishLesson(){
   if (subj !== 'read' && !ITEMS(subj)) { const ow = hwOwed(kid, subj, cur.ds); if (ow && pts > 0) { pts = Math.round(pts * HW_K); L.hwCut = ow.n; } }
   { const rk = rusK(kid, subj); if (rk < 1 && pts > 0) { L.rusCut = Math.round(rk * 100); pts = Math.round(pts * rk); } }
   if (subj !== 'read' && !ITEMS(subj) && typeof srPts === 'function') pts = srPts(kid, subj, L, lessonTasks(L, kid, subj), pts);
-  if (L.oot && !subs.every(s => s === subj || (D.les[s] && D.les[s].phase === 'done'))) { pts = Math.round(pts / 3); L.ootCut = true; } D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
-  if (RUS_SUBJ[subj] && q >= .9) { const rb = Math.max(0, Math.min(RUS_BONUS, DAY_MAX - D.pts)); if (rb) { D.pts += rb; pts += rb; L.rusBonus = rb; } }
+  if (L.oot && !subs.every(s => s === subj || (D.les[s] && D.les[s].phase === 'done'))) { pts = Math.round(pts / 3); L.ootCut = true; } D.pts = D.pts || 0; if (L.retake) pts = 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
+  if (RUS_SUBJ[subj] && q >= .9 && !L.retake) { const rb = Math.max(0, Math.min(RUS_BONUS, DAY_MAX - D.pts)); if (rb) { D.pts += rb; pts += rb; L.rusBonus = rb; } }
   pts = piggyAdd(K, pts); L.coins = pts; L.phase = 'done';
   fineCheck(kid, subj, L, D);
+  if (D.bonus && L.retake && !D.proOpen && proOk(kid, D)) { L.proOpen = true; D.proOpen = true; ev(kid, 'PRO открыт', { text: 'после пересдачи' }); }
   if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
     if (subs.every(s => (D.les[s].q || 0) >= .9 && !D.les[s].fastCut && !D.les[s].oot)) { let b = Math.max(0, DAY_MAX - D.pts); b = piggyAdd(K, b); D.pts += b; L.coins += b; L.perfect = true; D.perfect = b; }
     if (proOk(kid, D)) { L.proOpen = true; D.proOpen = true; ev(kid, 'PRO открыт', { text: 'все уроки дня на 4 и 5' }); }

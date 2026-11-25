@@ -999,7 +999,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v378ad74f */
+<script>/* v27f907be */
 var FAM = 1;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -10891,6 +10891,7 @@ function applyCfg(rows){ let fresh = false;
     else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; }
     else if (type.startsWith('цен')) { const n = Math.round(Number(row.value)), q = String(row.subj || '').toLowerCase().trim(); const nm = x => emoStrip(String(x.name)).toLowerCase().replace(/\s+/g, ''), qn = q.replace(/\s+/g, ''), sh = K.shop || []; const part = sh.filter(x => qn.length >= 4 && isNaN(Number(qn)) && nm(x).includes(qn)); const it = q && (sh.find(x => x.id.toLowerCase() === q) || sh.find(x => nm(x) === qn) || (part.length === 1 ? part[0] : null)); /* сначала точное совпадение id/названия; часть названия — только если однозначно и не число (Таблица превращает «5€» в 5) */ if (!it || !(n > 0)) continue; /* приза ещё нет на этом устройстве — попробуем при следующей загрузке */ it.price = n; ev(kid, 'цена приза', { unit: it.name, price: n }); }
     else if (type.startsWith('оцен')) regradeRow(kid, row);
+    else if (type.startsWith('перес')) { const Dt = K.days[U.today()]; if (Dt && Dt.les && !Dt.retakeDone) { Dt.retakeDone = true; Dt.retake = []; for (const s of todaySubjects(kid)) { const Lx = Dt.les[s]; if (s !== 'hw' && Lx && Lx.phase === 'done' && lesGrade(Lx) < 4) { Dt.retake.push(s); delete Dt.les[s]; } } if (Dt.retake.length) { Dt.proOpen = false; ev(kid, 'пересдача', { text: Dt.retake.join(', ') }); } } } /* одна пересдача за день: уроки дня на 3 и ниже начинаются заново с другими заданиями, баллы второй раз не идут */
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     else continue; /* незнакомую команду не отмечаем — её выполнит следующая версия приложения */
     K.applied.push(row.id); fresh = true;
@@ -11230,7 +11231,7 @@ function startLesson(subj){
     else if (subj === 'pro') { D.les.pro = { items: proTasks(kid, D), phase: 'practice', i: 0, ans: [], seed: U.h(kid + cur.ds + 'pro') }; }
     else if (subj === 'extra') { D.les.extra = { items: extraTasks(kid, D), phase: 'practice', i: 0, ans: [], seed: U.h(kid + cur.ds + 'extra') }; }
     else if (subj === 'hw') { const due = hwDue(kid).slice(0, 8); D.les.hw = { items: due.map(x => x.task), keys: due.map(x => x.key), phase: 'practice', i: 0, ans: [], txt: S.kids[kid].hwText.filter(h => !h.done).map(h => h.id) }; }
-    else { const tr = track(subj, cur.ds), { u } = unitAt(kid, subj, tr); D.les[subj] = { uid: u.id, tr, seed: U.h(kid + cur.ds + subj), phase: 'theory', i: 0, ans: [], n: nTasks(kid, subj) }; }
+    else { const tr = track(subj, cur.ds), { u } = unitAt(kid, subj, tr); const rt = (D.retake || []).includes(subj); D.les[subj] = { uid: u.id, tr, seed: U.h(kid + cur.ds + subj + (rt ? 'r' : '')), phase: 'theory', i: 0, ans: [], n: nTasks(kid, subj), retake: rt || undefined }; }
     D.les[subj].t0 = Date.now();
     S.kids[kid].openDay = cur.ds; save(); ev(kid, 'урок начат', { subj: subjName(kid, subj, cur.ds), unit: lessonTitle(kid, subj, cur.ds) });
   }
@@ -11444,10 +11445,11 @@ function finishLesson(){
   if (subj !== 'read' && !ITEMS(subj)) { const ow = hwOwed(kid, subj, cur.ds); if (ow && pts > 0) { pts = Math.round(pts * HW_K); L.hwCut = ow.n; } }
   { const rk = rusK(kid, subj); if (rk < 1 && pts > 0) { L.rusCut = Math.round(rk * 100); pts = Math.round(pts * rk); } }
   if (subj !== 'read' && !ITEMS(subj) && typeof srPts === 'function') pts = srPts(kid, subj, L, lessonTasks(L, kid, subj), pts);
-  if (L.oot && !subs.every(s => s === subj || (D.les[s] && D.les[s].phase === 'done'))) { pts = Math.round(pts / 3); L.ootCut = true; } D.pts = D.pts || 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
-  if (RUS_SUBJ[subj] && q >= .9) { const rb = Math.max(0, Math.min(RUS_BONUS, DAY_MAX - D.pts)); if (rb) { D.pts += rb; pts += rb; L.rusBonus = rb; } }
+  if (L.oot && !subs.every(s => s === subj || (D.les[s] && D.les[s].phase === 'done'))) { pts = Math.round(pts / 3); L.ootCut = true; } D.pts = D.pts || 0; if (L.retake) pts = 0; pts = Math.max(0, Math.min(pts, LESSON_POOL - D.pts)); D.pts += pts;
+  if (RUS_SUBJ[subj] && q >= .9 && !L.retake) { const rb = Math.max(0, Math.min(RUS_BONUS, DAY_MAX - D.pts)); if (rb) { D.pts += rb; pts += rb; L.rusBonus = rb; } }
   pts = piggyAdd(K, pts); L.coins = pts; L.phase = 'done';
   fineCheck(kid, subj, L, D);
+  if (D.bonus && L.retake && !D.proOpen && proOk(kid, D)) { L.proOpen = true; D.proOpen = true; ev(kid, 'PRO открыт', { text: 'после пересдачи' }); }
   if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
     if (subs.every(s => (D.les[s].q || 0) >= .9 && !D.les[s].fastCut && !D.les[s].oot)) { let b = Math.max(0, DAY_MAX - D.pts); b = piggyAdd(K, b); D.pts += b; L.coins += b; L.perfect = true; D.perfect = b; }
     if (proOk(kid, D)) { L.proOpen = true; D.proOpen = true; ev(kid, 'PRO открыт', { text: 'все уроки дня на 4 и 5' }); }
