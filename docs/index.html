@@ -1147,7 +1147,7 @@ body.th-doll .card h2,body.th-doll .card h3{ color:#D6337F; }
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v1b389d90 */
+<script>/* v56f2d616 */
 var FAM = 0;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -10182,9 +10182,11 @@ function fineCheck(kid, subj, L, D){ if (!fineOn() || !L.ans) return; const K = 
 function fineCard(kid){ const K = S.kids[kid], F = (K.fines || []).filter(f => !f.seen); if (!F.length) return '';
   return `<article class="card finec"><h2>${F.some(f => f.n) ? 'Сняты баллы за спешку' : 'Баллы вернулись'}</h2><ul class="plain">${F.map(f => f.n ? `<li><b>−${f.n}</b> · ${U.esc(f.subj)}${f.unit ? ' «' + U.esc(U.noEmo(f.unit)) + '»' : ''}: ${U.esc(f.why)}</li>` : `<li><b>+${f.back}</b> · ${U.esc(f.subj)}: урок без ответов наугад, вернули половину снятого.</li>`).join('')}</ul>${F.some(f => f.n) ? `<p class="hint">Сделай следующий урок по этому предмету внимательно — и половина вернётся.</p>` : ''}<button class="btn" data-act="fineseen">Понятно</button></article>`; }
 /* ----- Ответы ----- */
+const CALM_PH = ['Ошибка — это нормально. Выдохни и дальше спокойно', 'Не страшно. Медленно прочитай следующий вопрос', 'Спокойно. Кто не спешит, тот отвечает верно', 'Ничего. Посмотри правильный ответ и запомни его'];
 function answer(v){
   const kid = cur.kid, subj = cur.subj, L = dayRec(kid, cur.ds).les[subj], T = lessonTasks(L, kid, subj), t = T[L.i];
   const a = L.ans[L.i] || (L.ans[L.i] = { tries: 0, wrong: [] }); if (a.final) return;
+  if (L.calm && Date.now() < L.calm) return; /* пауза «выдохни» после ошибки */
   let ok;
   if (t.k === 'n') { const x = Number(String(v).replace(',', '.').replace(/\s/g, '')); if (String(v).trim() === '' || isNaN(x)) return; ok = Math.abs(x - t.a) < 1e-6; }
   else if (t.k === 't') { if (!String(v).trim()) return; ok = txtOk(t, v); }
@@ -10196,6 +10198,8 @@ function answer(v){
   if (!ok && t.k === 'c') a.wrong.push(v);
   const lastTry = (subj === 'pro' && !t.pro) || (t.k === 'c' && t.opts.length - a.wrong.length <= 1);
   if (ok || a.tries >= 1 || lastTry) { /* засчитывается только первый ответ */ a.final = true; a.ok = ok;
+    /* 25.11 Юрий: усидчивость. После ошибки 4 с паузы с ободрением, кнопки не работают; две ошибки подряд — совет передохнуть */
+    if (!ok) { L.wrow = (L.wrow || 0) + 1; L.calm = Date.now() + 4000; const P = CALM_PH; alertMsg(L.wrow >= 2 ? 'Две ошибки подряд. Встань, потянись, попей воды. Потом читай вопрос медленно, до конца' : P[(L.i + (L.ans.length || 0)) % P.length], 3800); } else L.wrow = 0;
     if (!ok && fastA) { a.guess = Math.round(secA * 10) / 10; L.rush = (L.rush || 0) + 1; } else L.rush = 0;
     const K = S.kids[kid];
     const uid = ITEMS(subj) ? (t.uid || subj) : L.uid;
@@ -10736,7 +10740,7 @@ document.addEventListener('click', e => {
     case 'topractice': L.phase = 'practice'; save(); render(); break;
     case 'choose': answer(b.dataset.v); break;
     case 'sayq': { voiceEv(kid, L, 'задание (язык)'); const T = lessonTasks(L, kid, cur.subj); const t = T[L.i]; say(t.sp, LCODE(kid, L.tr)); break; }
-    case 'next': nextTask(); break;
+    case 'next': { const Lc = cur.subj && dayRec(cur.kid, cur.ds).les[cur.subj]; if (Lc && Lc.calm && Date.now() < Lc.calm) break; nextTask(); break; }
     case 'fb': { L.fb = L.fb || {}; L.fb[b.dataset.k] = isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v; const tx = document.getElementById('fbtext'); if (tx) L.fb.text = tx.value; save(); render(); break; }
     case 'sendfb': { const tx = document.getElementById('fbtext'); if (tx) L.fb.text = tx.value.trim(); finishLesson(); break; }
     case 'hwtxt': { const h = S.kids[kid].hwText.find(x => x.id === b.dataset.id); if (h) h.done = b.checked; save(); break; }
