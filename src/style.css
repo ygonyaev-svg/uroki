@@ -514,3 +514,7 @@ html.fam body:not(.yarik):not(.anya) .wrap.pp > p.hint{ background:var(--card); 
 .finec h2{ color:#c0392b; }
 .anya .finec{ background:#3a1f2a; border-color:#e06666; }
 .anya .finec h2{ color:#ff9b9b; }
+/* Старинные слова прямо в тексте: нажал — объяснение (25.11) */
+.w[data-gw]{ border-bottom:2px dotted var(--acc); cursor:pointer; }
+.card.about{ border-left:4px solid var(--acc); }
+.card.about p{ margin:.3em 0 0; }
