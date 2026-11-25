@@ -999,7 +999,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v27f907be */
+<script>/* vc13357d9 */
 var FAM = 1;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -10891,7 +10891,7 @@ function applyCfg(rows){ let fresh = false;
     else if (type.startsWith('перер')) { K.restUntil = 0; K.blk = 0; K.sess = 0; K.ask = false; }
     else if (type.startsWith('цен')) { const n = Math.round(Number(row.value)), q = String(row.subj || '').toLowerCase().trim(); const nm = x => emoStrip(String(x.name)).toLowerCase().replace(/\s+/g, ''), qn = q.replace(/\s+/g, ''), sh = K.shop || []; const part = sh.filter(x => qn.length >= 4 && isNaN(Number(qn)) && nm(x).includes(qn)); const it = q && (sh.find(x => x.id.toLowerCase() === q) || sh.find(x => nm(x) === qn) || (part.length === 1 ? part[0] : null)); /* сначала точное совпадение id/названия; часть названия — только если однозначно и не число (Таблица превращает «5€» в 5) */ if (!it || !(n > 0)) continue; /* приза ещё нет на этом устройстве — попробуем при следующей загрузке */ it.price = n; ev(kid, 'цена приза', { unit: it.name, price: n }); }
     else if (type.startsWith('оцен')) regradeRow(kid, row);
-    else if (type.startsWith('перес')) { const Dt = K.days[U.today()]; if (Dt && Dt.les && !Dt.retakeDone) { Dt.retakeDone = true; Dt.retake = []; for (const s of todaySubjects(kid)) { const Lx = Dt.les[s]; if (s !== 'hw' && Lx && Lx.phase === 'done' && lesGrade(Lx) < 4) { Dt.retake.push(s); delete Dt.les[s]; } } if (Dt.retake.length) { Dt.proOpen = false; ev(kid, 'пересдача', { text: Dt.retake.join(', ') }); } } } /* одна пересдача за день: уроки дня на 3 и ниже начинаются заново с другими заданиями, баллы второй раз не идут */
+    else if (type.startsWith('перес')) { const Dt = K.days[U.today()]; const rs = row.subj && !/^вс/i.test(String(row.subj)) ? subjByName(kid, row.subj) : null; if (rs && Dt && Dt.les) { if (Dt.les[rs]) { delete Dt.les[rs]; Dt.retake = (Dt.retake || []).concat(rs); Dt.proOpen = false; ev(kid, 'пересдача', { text: rs }); } } /* родитель открыл заново один предмет — сверх правила одной пересдачи */ else if (Dt && Dt.les && !Dt.retakeDone) { Dt.retakeDone = true; Dt.retake = []; for (const s of todaySubjects(kid)) { const Lx = Dt.les[s]; if (s !== 'hw' && Lx && Lx.phase === 'done' && lesGrade(Lx) < 4) { Dt.retake.push(s); delete Dt.les[s]; } } if (Dt.retake.length) { Dt.proOpen = false; ev(kid, 'пересдача', { text: Dt.retake.join(', ') }); } } } /* одна пересдача за день: уроки дня на 3 и ниже начинаются заново с другими заданиями, баллы второй раз не идут */
     else if (type.startsWith('уров')) { const s = subjByName(kid, row.subj), n = Math.round(Number(row.value)); if (s && !isNaN(n)) K.lvl[s] = Math.max(-2, Math.min(5, n)); } /* число заданий в уроке: база + уровень */
     else continue; /* незнакомую команду не отмечаем — её выполнит следующая версия приложения */
     K.applied.push(row.id); fresh = true;
@@ -11414,7 +11414,7 @@ function finishLesson(){
   const ans = subj === 'read' ? L.ans : L.ans; const total = subj === 'read' ? (readText(kid).qs.length) : T.length;
   const first = ans.filter(a => a && a.ok && a.tries === 1).length + (L.fans ? L.fans.filter(a => a && a.ok && a.tries === 1).length : 0);
   const tot = total + (L.fans ? L.fq : 0);
-  const ratio = tot ? first / tot : 1; L.score = first; L.total = tot; L.grade = grade(ratio);
+  const ratio = tot ? first / tot : 1; L.score = first; L.total = tot; L.grade = grade(ratio); if (subj === 'read' && tot <= 4 && tot - first === 1) L.grade = Math.max(L.grade, 4); /* короткий текст: одна ошибка из 3–4 вопросов — 4, а не 3 */
   const q = lessonQuality(kid, subj, L, ratio); L.q = q;
   if (subj !== 'read' && !ITEMS(subj)) {
     const key = subj + L.tr; L.passed = ratio >= .8;
