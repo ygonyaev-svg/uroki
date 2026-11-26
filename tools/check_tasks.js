@@ -40,6 +40,7 @@ const HAS_OBJ = /«[^»]+»|"[^"]+"|\[[^\]]+\]|:\s*\S/; /* в вопросе е�
     for (const [re, w] of RULES) if (re.test(q) && !(/обычно|всегда|бывает/i.test(q) && !/«\s*»|undefined|NaN/.test(q))) why.push(w);
     if (NEED_PIC.test(q) && !vis) why.push('говорит про картинку, а картинки нет');
     if (/(^|[^а-яё])(это|этот|эта|эти) (слово|слова|предложение|число|пример)\b/i.test(q) && !HAS_OBJ.test(q) && !vis) why.push('«это слово» без самого слова');
+    const nm = q.match(/(^|\s)[Уу] ([А-ЯЁ][а-яё]+) [^.?]*, у ([А-ЯЁ][а-яё]+)/); if (nm && nm[2] === nm[3]) why.push('одно и то же имя дважды');
     if (t.k === 'c' && Array.isArray(t.opts)) { const o = t.opts.map(strip); if (!o.includes(strip(t.a))) why.push('верного ответа нет среди вариантов'); if (new Set(o).size !== o.length) why.push('одинаковые варианты'); }
     if (why.length) { const key = t.src + ' | ' + t.ut + ' | ' + q; if (!bad.has(key)) bad.set(key, why.join('; ')); } }
   const out = [...errs, ...[...bad].map(([k, w]) => k + '  →  ' + w)];
