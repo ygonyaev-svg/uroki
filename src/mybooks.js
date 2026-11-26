@@ -71,7 +71,11 @@ function vBooks(){
     return '<button class="tile bk ' + (t ? 'go' : 'new') + '" data-act="bkbook" data-id="' + b.id + '"><span class="ico bkthumb">' + (b.thumb ? '<img src="' + b.thumb + '" alt="">' : '📖') + '</span><span class="tt"><span class="sn">' + U.esc(b.title || 'Новая книга') + (b.author ? ' <em>' + U.esc(b.author) + '</em>' : '') + '</span><span class="ut">' + st + (n ? ' · сделано ' + dn + ' из ' + n : '') + '</span></span>' + (b.msg && !b.msgSeen ? '<span class="state">✉</span>' : '') + '</button>'; }).join('');
   return '<main class="wrap ' + kid + '">' + bkHead('home') + '<section class="hello"><h1>📚 Мои книги</h1><p>Книги, которые ты читаешь на бумаге. Айпад нужен только чтобы сфотографировать и ответить на вопросы.</p></section>' +
     '<p id="bkup" class="hint">' + bkUpHtml() + '</p>' +
+<<<<<<< HEAD
     (list ? '<section class="tiles">' + list + '</section>' : '<div class="card">' + scrArt('art-books', 'hero') + '<p>Пока книг нет. Найди дома книгу, которую хочешь прочитать, и сфотографируй её.</p></div>') +
+=======
+    (list ? '<section class="tiles">' + list + '</section>' : '<div class="card">' + uiPic(cur.kid, 'es-books') + '<p>Пока книг нет. Найди дома книгу, которую хочешь прочитать, и сфотографируй её.</p></div>') +
+>>>>>>> origin/main
     '<button class="btn big ghost" data-act="bkadd">📷 Добавить книгу</button></main>';
 }
 /* Наглядные подсказки: что фотографировать (пример — Л. Н. Толстой «Рассказы для детей»; выходные данные условные) */

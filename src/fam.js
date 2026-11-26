@@ -99,13 +99,13 @@ function famInit(){
       if (l1) { lang.alt = famLangCourse(l1, +c.lg[l1], c.age); lang.altName = FAM_LANGS[l1][0]; lc._alt = FAM_LANGS[l1][1]; }
       a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur, { lang: lang }); a.lc = lc; }
     else { a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur); delete a.cur.lang; a.order = KIDS_TPL[a.tpl].order.filter(function(sj){ return sj !== 'lang'; }); } /* «Не изучать» везде — иностранного языка в плане нет */
-    a.read = famReadList(rd >= 2 && c.age >= 12 ? READ_T : rd >= 3 && c.age >= 9 ? READ_A : rd === 0 && c.age <= 10 ? READ_Y : KIDS_TPL[a.tpl].read, c.done);
+    a.read = famReadList((rd >= 2 && c.age >= 12 ? READ_T : rd >= 3 && c.age >= 9 ? READ_A : (rd <= 1 && c.age <= 7) || (rd === 0 && c.age <= 10) ? READ_S.concat(READ_Y) : rd <= 2 && c.age <= 10 ? READ_Y : KIDS_TPL[a.tpl].read).filter(function(t){ return !/Ярик/.test(t.text || ''); }), c.done); /* 6–7 лет и нечитающие до 10 — короткие тексты; 8–10 лет — классика 2–4 классов (Мамин-Сибиряк, Гаршин, Аксаков…); тексты «про Ярика» — только в Уроках */
     KIDS[c.id] = Object.assign({}, KIDS_TPL[a.tpl], a, { name: c.name, rdLv: rd, age: +c.age, grade: c.age + ' ' + U.pl(+c.age, 'год', 'года', 'лет'), sex: c.sex || '', look: c.look || famLookOf(c) });
     var th = famThemeOf(c); if (th) THEME['k:' + c.id] = th; else delete THEME['k:' + c.id];
     if (!S.kids[c.id]) S.kids[c.id] = newKid(); if (c.pin) S.kids[c.id].pin = c.pin;
     var K = S.kids[c.id], ms = mk ? mt + '|' + mk : ''; if (ms && K.mathSet !== ms) { K.pos.math = mp; K.mathSet = ms; }
     var as = ac ? c.age + ':' + Object.keys(ac).join(',') : ''; if ((K.ageSet || '') !== as) { if (ac) Object.keys(ac).forEach(function(sj){ delete K.pos[sj]; delete K.pos[sj + '_alt']; }); K.ageSet = as; }
-    var rs = a.read.length && READ_T.indexOf(a.read[0]) >= 0 && READ_A.indexOf(a.read[0]) < 0 ? 't' : ''; if ((K.readSet || '') !== rs) { K.pos.read = 0; K.readSet = rs; } /* свой список чтения 12–13 лет — с начала */
+    var rs = !a.read.length ? '' : READ_S.indexOf(a.read[0]) >= 0 ? 's' : READ_T.indexOf(a.read[0]) >= 0 && READ_A.indexOf(a.read[0]) < 0 ? 't' : ''; if ((K.readSet || '') !== rs) { K.pos.read = 0; K.readSet = rs; } /* свой список чтения 12–13 лет — с начала */
     if ((K.langSet || '') !== lset) { delete K.pos.lang; delete K.pos.lang_alt; K.langSet = lset; } });
   if (S.fam && S.fam.ppin) S.parentPin = S.fam.ppin;
 }
@@ -183,7 +183,6 @@ function famLoginExtra(){ return '<p class="fammotto center">' + FAM_MOTTO + '</
 function famSettings(){
   return '<div class="card"><h2>Семья</h2><p class="hint">' + U.esc(S.fam.email || '') + '</p><div class="row"><button class="btn small" data-act="fkedit">Дети и коды</button> <button class="btn small stop" data-act="fkout">Выйти из аккаунта</button></div></div>' +
     '<div class="card"><h2>Вечерняя сводка на почту</h2><p class="hint">Каждый день около 20:30 (Лиссабон) на ' + U.esc(S.fam.email || '') + ' приходит письмо: что дети сделали и чего не сделали за день. Сводку на эту минуту можно получить на главном экране родителя, кнопка «Сводка сейчас».</p><p>' + (S.fam.sumOff ? 'Сейчас отключена.' : 'Сейчас включена.') + '</p><div class="row"><button class="btn small' + (S.fam.sumOff ? '' : ' ghost') + '" data-act="' + (S.fam.sumOff ? 'fsumon' : 'fsumoff') + '">' + (S.fam.sumOff ? 'Включить' : 'Отключить') + '</button></div></div>' +
-    '<div class="card"><h2>Штраф за спешку</h2><p class="hint">Если ребёнок в одном уроке отвечает наугад (неверно и быстрее, чем можно прочитать вопрос) больше двух раз, с третьего такого ответа снимается 2 балла, не больше 6 за урок и 12 за день. Честные ошибки не штрафуются. Следующий аккуратный урок по тому же предмету возвращает половину. Ребёнок видит, за что сняли.</p><button class="btn small" data-act="ffine">' + (S.cfg && S.cfg.fineOn ? 'Выключить' : 'Включить') + '</button>' + (S.cfg && S.cfg.fineOn ? ' <b>Включено</b>' : '') + '</div>' +
     '<form class="card form" data-form="ffb"><h2>Отзыв о тестовой версии</h2><label>Что понравилось, что мешает, чего не хватает<textarea id="ffbt" rows="4" maxlength="2000" style="display:block;width:100%;box-sizing:border-box;margin-top:6px;font:inherit;padding:10px;border-radius:12px;border:1px solid #cbd5e1"></textarea></label><button class="btn small">Отправить</button></form>';
 }
 function famAct(act, b){
