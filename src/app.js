@@ -231,6 +231,7 @@ function render(){
   else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restLeft(cur.kid)) { try { if (RD && RD.active) pauseRead(); } catch (e) {} try { micStop(); } catch (e) {} try { libStop(); } catch (e) {} v = vRestScreen(cur.kid); }
   else if (!TEST && cur.kid && S.parentPin && cur.view !== 'parent' && cur.view !== 'pin' && restAsk(cur.kid) && !(RD && RD.active) && !(LR && LR.active)) v = vAsk(cur.kid);
   document.body.className = cur.kid && ['home', 'lesson', 'shop', 'prizes', 'books', 'book', 'bkadd', 'always', 'hwfix', 'lib'].includes(cur.view) ? LK(cur.kid) + (typeof lookBody === 'function' ? lookBody(cur.kid) : '') + (typeof hpBodyCls === 'function' ? hpBodyCls(cur.kid) : '') : '';
+  document.body.setAttribute('data-v', cur.view || '');
   if (typeof lookVars === 'function') lookVars(document.body.className ? cur.kid : null);
   if (FAM) famBody();
   app().innerHTML = (TEST ? testBar() : '') + (FAM ? sexify(v, cur.view === 'parent' ? cur.parentKid : cur.kid) : v); afterRender();
@@ -739,7 +740,7 @@ setInterval(screenTick, 30000);
 function tomorrowHtml(kid){ const tm = U.addDays(U.today(), 1), it = []; try { const r = lessonTitle(kid, 'read', tm); if (r) it.push('📖 Новая глава: <b>' + U.esc(r) + '</b>'); } catch (e) {} try { const m = lessonTitle(kid, 'math', tm); if (m) it.push('🔢 Математика: <b>' + U.esc(m) + '</b>'); } catch (e) {}
   it.push('🎵 Новое стихотворение или продолжение', '🎁 Сюрприз-загадка дня'); return '<ul class="tmr">' + it.map(x => '<li>' + x + '</li>').join('') + '</ul>'; }
 function vRestScreen(kid){ const K = S.kids[kid], ms = restLeft(kid), g = T(kid) === 'anya', forced = K.restForced, got = dayGot(K).n;
-  return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span class="coins">${coinsHtml(K.coins)}</span></header><section class="lesson"><article class="card result restscr">
+  return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="logout">← Выйти</button><span class="coins">${coinsHtml(K.coins)}</span></header><section class="lesson"><article class="card result restscr">${scrArt('art-rest', 'hero')}
    ${forced ? `<div class="cheer">🌟</div><h1>На сегодня всё, ты ${g ? 'молодчина' : 'молодец'}!</h1><p>Ты отлично ${g ? 'позанималась' : 'позанимался'} целый час. Сегодня собрано <b>${got}</b> ${U.pl(got, 'балл', 'балла', 'баллов')}. Теперь — отдых для глаз и головы: погуляй, поиграй в мяч, почитай бумажную книжку.</p><p>${new Date(K.restUntil).getHours() >= CLOSE_H - 1 || new Date(K.restUntil).getDate() !== new Date().getDate() ? 'Следующее занятие — <b>завтра с 8 утра</b>.' : `Следующее занятие — в <b>${hhmm(K.restUntil)}</b> (через <span id="restleft">${fmtLeft(ms)}</span>).`}</p><h3>Завтра тебя ждёт:</h3>${tomorrowHtml(kid)}`
    : `<div class="cheer">😴</div><h1>Отдыхаешь</h1><p>Вернёшься через <b><span id="restleft">${fmtLeft(ms)}</span></b> (в ${hhmm(K.restUntil)}). Отойди от экрана: подвигайся, попей воды, посмотри в окно.</p>`}
    <p class="hint">Все баллы и прогресс сохранены.</p></article></section></main>`; }
@@ -1089,7 +1090,7 @@ function vShop(){
   const kid = cur.kid, K = S.kids[kid];
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <section class="lesson"><p class="eyebrow">Призы</p><h1>Мои призы</h1><p class="hint">1 балл = 1 минута игры. Обмен подтверждает взрослый своим кодом.</p>
-  <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от Юры</span></div>` : `<div class="card item${it.price >= GOAL_MIN ? ' goalit' : ''}"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span>${prizeLock(K, it) ? `<span class="hint">${prizeLock(K, it)}</span>` : (h => `<button class="btn small" data-act="buy" data-id="${it.id}" ${h < it.price ? 'disabled' : ''}>${h < it.price ? `ещё ${it.price - h}` : 'Обменять'}</button>`)(K.coins + goalOf(K, it))}${goalHtml(K, it)}</div>`).join('')}</div>
+  <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item">${prizeArt(it)}<span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от Юры</span></div>` : `<div class="card item${it.price >= GOAL_MIN ? ' goalit' : ''}${it.price >= 600 ? ' big' : ''}">${prizeArt(it)}<span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span>${prizeLock(K, it) ? `<span class="hint">${prizeLock(K, it)}</span>` : (h => `<button class="btn small" data-act="buy" data-id="${it.id}" ${h < it.price ? 'disabled' : ''}>${h < it.price ? `ещё ${it.price - h}` : 'Обменять'}</button>`)(K.coins + goalOf(K, it))}${goalHtml(K, it)}</div>`).join('')}</div>
   ${(K.shop || []).length ? '' : `<div class="card">${uiPic(kid, 'es-prizes')}<p>Призов пока нет. Выбери, ради чего будешь учиться: минуты игры, мультики, поход в кафе всей семьёй.</p></div>`}
   <button class="btn ${(K.shop || []).length ? 'ghost' : 'big'}" data-act="editprizes">✏️ ${(K.shop || []).length ? 'Изменить мои призы' : 'Выбрать призы'}</button>
   ${K.purchases.length ? `<div class="shop-own"><h2>Мои награды</h2><ul class="plain">${K.purchases.slice(-10).reverse().map(p => `<li>${p.d} — ${U.esc(p.name)} (${p.price})</li>`).join('')}</ul></div>` : ''}</section></main>`;
@@ -1106,9 +1107,9 @@ function prizeIdeas(kid){
 function vPrizes(){
   const kid = cur.kid, ideas = prizeIdeas(kid).concat(cur.prOwn || []), sel = cur.prSel || [];
   return `<main class="wrap ${LK(kid)}"><header class="bar">${S.kids[kid].prizesSet ? '<button class="link" data-act="home">← Назад</button>' : '<span></span>'}<span class="coins">${coinsHtml(S.kids[kid].coins)}</span></header>
-  <section class="lesson"><p class="eyebrow">Мои призы</p><h1>${S.kids[kid].prizesSet ? 'Измени свои призы' : 'Сначала выбери, ради чего будешь учиться'}</h1>
+  <section class="lesson"><p class="eyebrow">Мои призы</p><h1>${S.kids[kid].prizesSet ? 'Измени свои призы' : 'Сначала выбери, ради чего будешь учиться'}</h1>${scrArt('art-prizes', 'hero')}
   <p>За уроки ты получаешь баллы: <b>1 балл = 1 минута игры</b>, за день можно заработать до 60. Баллы можно копить и менять на призы. Выбери хотя бы 3 приза или придумай свои.</p>
-  <div class="prizes">${ideas.map(it => `<button class="chip ${sel.includes(it.id) ? 'on' : ''}" data-act="prtoggle" data-id="${it.id}">${U.esc(it.name)}${it.price != null ? ` · ${it.price}` : ' · цену назначит Юра'}</button>`).join('')}</div>
+  <div class="prizes prpics">${ideas.map(it => `<button class="chip prc ${it.price >= 600 ? 'big' : ''} ${sel.includes(it.id) ? 'on' : ''}" data-act="prtoggle" data-id="${it.id}">${prizeArt(it)}<span class="prn">${U.esc(it.name)}</span><span class="prp">${it.price != null ? it.price : 'цену назначит Юра'}</span></button>`).join('')}</div>
   <form class="card form" data-form="prize"><label>Свой приз<input id="prname" maxlength="60" autocomplete="off" placeholder="Например: новая игра, поход в кино…"></label><button class="btn small">Добавить</button><p class="hint">Цену в баллах для своего приза поставит Юра.</p></form>
   <button class="btn big" data-act="prdone" ${sel.length < 3 ? 'disabled' : ''}>Готово (${sel.length})</button></section></main>`;
 }
