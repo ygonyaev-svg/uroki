@@ -518,3 +518,6 @@ html.fam body:not(.yarik):not(.anya) .wrap.pp > p.hint{ background:var(--card); 
 .w[data-gw]{ border-bottom:2px dotted var(--acc); cursor:pointer; }
 .card.about{ border-left:4px solid var(--acc); }
 .card.about p{ margin:.3em 0 0; }
+.goal{ display:grid; gap:6px; } .goal .prog{ margin:0; }
+.goalin{ display:flex; gap:8px; align-items:center; } .goalin input{ width:110px; font-size:18px; padding:8px 10px; border-radius:12px; border:1px solid var(--soft); }
+.shop .goalit{ grid-column:1/-1; }
