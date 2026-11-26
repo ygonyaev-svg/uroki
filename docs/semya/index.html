@@ -1026,7 +1026,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v187e2b3f */
+<script>/* vfaaabdb9 */
 var FAM = 1;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -1735,8 +1735,8 @@ const Y_READL = (function(){
       RB([`Какой звук можно петь долго-долго?|[а]|[к];[т];[п]|Гласные звуки поются: а-а-а.`,
           `Какой звук нельзя петь: мешают губы?|[м]|[а];[у];[о]|[м] — губы сомкнуты. Это согласный.`,
           `Какой звук нельзя петь: мешает язык?|[т]|[о];[ы];[у]|[т] — язык мешает воздуху. Это согласный.`,
-          `Сколько всего гласных звуков?|шесть|пять;десять;два|Гласных звуков шесть: [а], [о], [у], [ы], [и], [э].`,
-          `Какой звук гласный, его можно тянуть?|[о]|[с];[м];[к]|[о] поётся — это гласный.`])
+          `Сколько всего гласных звуков в русском языке?|шесть|пять;десять;два|Гласных звуков шесть: [а], [о], [у], [ы], [и], [э].`,
+          `Какой звук гласный, его можно петь?|[о]|[т];[п];[к]|[о] поётся — это гласный.`])
     ) };
 
   const U3 = { id:'rl_3', first:1, t:'Звуковой анализ слова',
@@ -11192,7 +11192,7 @@ function lessonTitle(kid, subj, ds){
 }
 function subjName(kid, subj, ds){ if (subj === 'hw') return 'Домашнее задание'; if (subj === 'extra') return '⭐ Экстра'; if (subj === 'pro') return '🏆 Уровень PRO'; if (subj === 'train') return '🔥 Испытание'; const c = KIDS[kid].cur[subj]; return track(subj, ds) === '_alt' ? c.altName : c.name; }
 /* Задания, убранные из программы как непонятные: из повторения и ДЗ тоже не выдаём (25.11.2026 — «Чем отличаются слова сыр и сон») */
-const DROP_Q = [/Чем они отличаются\?/];
+const DROP_Q = [/Чем они отличаются\?/, /^Сколько всего гласных звуков\?$/, /^Какой звук гласный, его можно тянуть\?$/];
 function dropQ(t){ const q = strip(String((t && t.q) || '')); return DROP_Q.some(re => re.test(q)); }
 function hwDue(kid){ const K = S.kids[kid]; return K.srs.filter(x => x.due <= cur.ds && !dropQ(x.task)); }
 function todaySubjects(kid){ const list = KIDS[kid].order.slice(); const D = dayRec(kid, cur.ds); if (D.bonus) { if (D.les.hw) list.push('hw'); return list; } /* закрытый день не открываем заново */ if (hwDue(kid).length || S.kids[kid].hwText.some(h => !h.done) || D.les.hw) list.push('hw'); return list; }

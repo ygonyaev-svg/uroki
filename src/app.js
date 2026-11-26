@@ -293,7 +293,7 @@ function lessonTitle(kid, subj, ds){
 }
 function subjName(kid, subj, ds){ if (subj === 'hw') return 'Домашнее задание'; if (subj === 'extra') return '⭐ Экстра'; if (subj === 'pro') return '🏆 Уровень PRO'; if (subj === 'train') return '🔥 Испытание'; const c = KIDS[kid].cur[subj]; return track(subj, ds) === '_alt' ? c.altName : c.name; }
 /* Задания, убранные из программы как непонятные: из повторения и ДЗ тоже не выдаём (25.11.2026 — «Чем отличаются слова сыр и сон») */
-const DROP_Q = [/Чем они отличаются\?/];
+const DROP_Q = [/Чем они отличаются\?/, /^Сколько всего гласных звуков\?$/, /^Какой звук гласный, его можно тянуть\?$/];
 function dropQ(t){ const q = strip(String((t && t.q) || '')); return DROP_Q.some(re => re.test(q)); }
 function hwDue(kid){ const K = S.kids[kid]; return K.srs.filter(x => x.due <= cur.ds && !dropQ(x.task)); }
 function todaySubjects(kid){ const list = KIDS[kid].order.slice(); const D = dayRec(kid, cur.ds); if (D.bonus) { if (D.les.hw) list.push('hw'); return list; } /* закрытый день не открываем заново */ if (hwDue(kid).length || S.kids[kid].hwText.some(h => !h.done) || D.les.hw) list.push('hw'); return list; }
