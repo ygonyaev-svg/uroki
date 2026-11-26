@@ -536,6 +536,9 @@ html.fam body:not(.yarik):not(.anya) .wrap.pp > p.hint{ background:var(--card); 
 .w[data-gw]{ border-bottom:2px dotted var(--acc); cursor:pointer; }
 .card.about{ border-left:4px solid var(--acc); }
 .card.about p{ margin:.3em 0 0; }
+.goal{ display:grid; gap:6px; } .goal .prog{ margin:0; }
+.goalin{ display:flex; gap:8px; align-items:center; } .goalin input{ width:110px; font-size:18px; padding:8px 10px; border-radius:12px; border:1px solid var(--soft); }
+.shop .goalit{ grid-column:1/-1; }
 
 /* ===== Яркое оформление (сгенерировано tools/theme_css.py) ===== */
 :root:root{ color-scheme:light; --paper:#f0f9ff; --grid:transparent; --ink:#1f2a44; --ink2:#55607a; --line:#e2e8f0; --card:#ffffff; --soft:#f1f5f9;
@@ -999,7 +1002,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* va29e6da5 */
+<script>/* v50e87546 */
 var FAM = 1;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -11083,7 +11086,7 @@ function GIRL(kid){ const k = KIDS[kid]; return k && k.sex ? k.sex === 'f' : T(k
 function sexify(h, kid){ if (!kid || !KIDS[kid] || !KIDS[kid].sex) return h; const f = KIDS[kid].sex === 'f'; return h.replace(/([А-Яа-яЁё]+)\(а\)/g, (m, w) => f ? w + 'а' : w); }
 function render(){
   /* Сгорание и копилку считаем только по сверенному с таблицей прогрессу ребёнка: на чужом айпаде копия может быть старой (23.11: у Глеба «сгорели» баллы на айпаде Кати, хотя день 22.11 он закрыл на своём) */
-  if (S.parentPin) for (const k of kidIds()) { if (!FAM && !TEST && S.cfg.sync && typeof SNAP_OK !== 'undefined' && !SNAP_OK[k]) continue; burnCheck(k); piggyCheck(k); }
+  if (S.parentPin) for (const k of kidIds()) { if (!FAM && !TEST && S.cfg.sync && typeof SNAP_OK !== 'undefined' && !SNAP_OK[k]) continue; burnCheck(k); piggyCheck(k); goalCheck(k); }
   if (cur.kid && S.kids[cur.kid] && cur.view !== 'parent') ptPay(cur.kid);
   cur.ds = cur.kid ? lessonDay(cur.kid) : U.today();
   if (typeof hpApply === 'function') hpApply();
@@ -11687,6 +11690,15 @@ function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
   return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2">${bt.list.filter(x => x.m > 0).map(x => `<span class="tipc" data-tip="base">${icon(baseIcon(x.name))} ${U.esc(x.name)} <b>${x.m} мин</b></span>`).join('')}<span class="tipc" data-tip="coins">⭐ Баллы <b>${K.coins}</b>&nbsp;(+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
 /* ----- Копилка: заработанное за неделю копится и в воскресенье переходит на счёт с прибавкой +10%. Забрать раньше можно, но без прибавки. ----- */
 const PIGGY_RATE = .10;
+/* Копилка на большой приз (Юрий 26.11): ребёнок откладывает баллы на конкретный приз — назад забрать нельзя.
+   1-го числа к сумме, лежавшей весь прошлый месяц (b), прибавляется 10%. Отложенное не сгорает. */
+const GOAL_MIN = 1000, GOAL_RATE = .10;
+function goalOf(K, it){ const g = (K.goals || {})[it.id]; return g ? g.s || 0 : 0; }
+function goalCheck(kid){ const K = S.kids[kid], m = U.today().slice(0, 7); if (!K.goals) K.goals = {}; if (!K.goalMonth) { K.goalMonth = m; return; } if (K.goalMonth === m) return;
+  for (const [id, g] of Object.entries(K.goals)) { const it = (K.shop || []).find(x => x.id === id); const add = Math.round((g.b || 0) * GOAL_RATE), top = it && it.price ? Math.max(0, it.price - g.s) : add, a = Math.min(add, top); if (a > 0) { g.s += a; ev(kid, 'копилка на приз: +10%', { unit: it ? it.name : id, price: a, text: 'отложено ' + g.s }); } g.b = g.s; }
+  K.goalMonth = m; save(); }
+function goalHtml(K, it){ if (it.price == null || it.price < GOAL_MIN) return ''; const s = goalOf(K, it), b = ((K.goals || {})[it.id] || {}).b || 0, pc = Math.min(100, Math.round(s / it.price * 100));
+  return `<div class="goal"><div class="prog"><i style="width:${pc}%"></i></div><span class="hint">Отложено на этот приз: <b>${s}</b> из ${it.price}${b ? ` · 1-го числа +${Math.round(b * GOAL_RATE)} (10%)` : ' · с 1-го числа каждый месяц +10%'}</span>${s < it.price && K.coins > 0 ? `<span class="goalin"><input type="number" inputmode="numeric" min="1" id="gs${it.id}" placeholder="сколько"><button class="btn small ghost" data-act="goalput" data-id="${it.id}">Отложить</button></span>` : ''}</div>`; }
 function weekStart(ds){ const n = U.dayNum(ds), wd = (n + 3) % 7; /* 0 = понедельник */ return U.addDays(ds, -wd); }
 /* Общий дневной потолок на ВСЁ приложение (правило папы 21.11): уроки, Экстра, PRO, загадки, шахматы, программирование, стихи, книги, проценты.
    Когда потолок набран — заниматься можно, но без баллов. */
@@ -11941,7 +11953,7 @@ function vShop(){
   const kid = cur.kid, K = S.kids[kid];
   return `<main class="wrap ${LK(kid)}"><header class="bar"><button class="link" data-act="home">← Назад</button><span class="coins">${coinsHtml(K.coins)}</span></header>
   <section class="lesson"><p class="eyebrow">Призы</p><h1>Мои призы</h1><p class="hint">1 балл = 1 минута игры. Обмен подтверждает взрослый своим кодом.</p>
-  <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от родителей</span></div>` : `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span>${prizeLock(K, it) ? `<span class="hint">${prizeLock(K, it)}</span>` : `<button class="btn small" data-act="buy" data-id="${it.id}" ${K.coins < it.price ? 'disabled' : ''}>${K.coins < it.price ? `ещё ${it.price - K.coins}` : 'Обменять'}</button>`}</div>`).join('')}</div>
+  <div class="shop">${(K.shop || []).map(it => it.price == null ? `<div class="card item"><span class="iname">${U.esc(it.name)}</span><span class="hint">ждёт цену от родителей</span></div>` : `<div class="card item${it.price >= GOAL_MIN ? ' goalit' : ''}"><span class="iname">${U.esc(it.name)}</span><span class="price">${coinsHtml(it.price)}</span>${prizeLock(K, it) ? `<span class="hint">${prizeLock(K, it)}</span>` : (h => `<button class="btn small" data-act="buy" data-id="${it.id}" ${h < it.price ? 'disabled' : ''}>${h < it.price ? `ещё ${it.price - h}` : 'Обменять'}</button>`)(K.coins + goalOf(K, it))}${goalHtml(K, it)}</div>`).join('')}</div>
   ${(K.shop || []).length ? '' : `<div class="card">${uiPic(kid, 'es-prizes')}<p>Призов пока нет. Выбери, ради чего будешь учиться: минуты игры, мультики, поход в кафе всей семьёй.</p></div>`}
   <button class="btn ${(K.shop || []).length ? 'ghost' : 'big'}" data-act="editprizes">✏️ ${(K.shop || []).length ? 'Изменить мои призы' : 'Выбрать призы'}</button>
   ${K.purchases.length ? `<div class="shop-own"><h2>Мои награды</h2><ul class="plain">${K.purchases.slice(-10).reverse().map(p => `<li>${p.d} — ${U.esc(p.name)} (${p.price})</li>`).join('')}</ul></div>` : ''}</section></main>`;
@@ -12071,14 +12083,18 @@ document.addEventListener('click', e => {
     case 'fq': foreignAnswer(b.dataset.v); break;
     case 'fnext': { if (L.fi + 1 < L.fq) L.fi++; else { L.phase = 'survey'; const key = L.tr === '_alt' ? 'enRead' : 'ptRead'; S.kids[kid].pos[key] = (S.kids[kid].pos[key] || 0) + 1; } save(); render(); break; }
     case 'shop': go('shop'); break;
-    case 'buy': { const it = (S.kids[kid].shop || []).find(x => x.id === b.dataset.id); if (!it || it.price == null || prizeLock(S.kids[kid], it)) break; const k0 = kid; askPin('parent', () => { const K = S.kids[k0]; if (K.coins >= it.price && !prizeLock(K, it)) { K.coins -= it.price; K.purchases.push({ d: cur.ds, name: it.name, price: it.price }); ev(k0, 'награда', { unit: it.name, coins: K.coins, price: it.price }); save(); } cur.kid = k0; go('shop'); }, `Подтвердите: «${it.name}» за ${it.price} монет`); break; }
+    case 'buy': { const it = (S.kids[kid].shop || []).find(x => x.id === b.dataset.id); if (!it || it.price == null || prizeLock(S.kids[kid], it)) break; const k0 = kid; askPin('parent', () => { const K = S.kids[k0]; const gs = goalOf(K, it); if (K.coins + gs >= it.price && !prizeLock(K, it)) { const fromG = Math.min(gs, it.price); K.coins -= it.price - fromG; if (K.goals) delete K.goals[it.id]; K.purchases.push({ d: cur.ds, name: it.name, price: it.price }); ev(k0, 'награда', { unit: it.name, coins: K.coins, price: it.price }); save(); } cur.kid = k0; go('shop'); }, `Подтвердите: «${it.name}» за ${it.price} монет`); break; }
     case 'resetall': if (window.confirm('Стереть весь прогресс, монеты и коды на этом айпаде?')) { if (kidIds().length) ev(kidIds()[0], 'сброс устройства', {}); flush().finally(() => { try { localStorage.removeItem(KEY); } catch (x) {} location.reload(); }); } break;
     case 'ptab': go('parent', { parentTab: b.dataset.t }); if (b.dataset.t === 'tasks') ptSync(); break;
     case 'pkid': go('parent', { parentKid: b.dataset.k }); break;
     case 'delshop': S.kids[cur.parentKid].shop.splice(+b.dataset.i, 1); save(); render(); break;
     case 'saveshop': { const K = S.kids[cur.parentKid]; K.shop.forEach((it, i) => { const v = parseInt(document.getElementById('sp' + i).value); if (v > 0) { if (it.price !== v) ev(cur.parentKid, 'цена приза', { unit: it.name, price: v }); it.price = v; } }); save(); alertMsg('Цены сохранены'); render(); break; }
     case 'editprizes': { const K = S.kids[kid]; cur.prSel = (K.shop || []).map(x => x.id); cur.prOwn = (K.shop || []).filter(x => x.own).map(x => Object.assign({}, x)); cur.prBack = 'shop'; go('prizes'); break; }
-    case 'prtoggle': { const id = b.dataset.id, i = cur.prSel.indexOf(id); if (i >= 0) cur.prSel.splice(i, 1); else cur.prSel.push(id); render(); break; }
+    case 'goalput': { const K0 = S.kids[kid], it = (K0.shop || []).find(x => x.id === b.dataset.id), el = document.getElementById('gs' + b.dataset.id); if (!it || !el) break; const s0 = goalOf(K0, it), n = Math.min(Math.round(Number(el.value) || 0), K0.coins, it.price - s0); if (!(n > 0)) { alertMsg('Напиши, сколько баллов отложить'); break; }
+      if (!window.confirm(`Отложить ${n} на «${it.name}»? Забрать обратно будет нельзя — только обменять на этот приз. Каждый месяц к отложенному +10%.`)) break;
+      K0.goals = K0.goals || {}; const g = K0.goals[it.id] = K0.goals[it.id] || { s: 0, b: 0 }; g.s += n; K0.coins -= n; if (!K0.goalMonth) K0.goalMonth = U.today().slice(0, 7);
+      ev(kid, 'копилка на приз', { unit: it.name, price: -n, coins: K0.coins, text: 'отложено ' + g.s }); save(); render(); break; }
+    case 'prtoggle': { const id = b.dataset.id, i = cur.prSel.indexOf(id); if (i >= 0 && ((S.kids[kid].goals || {})[id] || {}).s > 0) { alertMsg('На этот приз уже отложены баллы — убрать его нельзя'); break; } if (i >= 0) cur.prSel.splice(i, 1); else cur.prSel.push(id); render(); break; }
     case 'prdone': { const K = S.kids[kid]; if (cur.prSel.length < 3) { alertMsg('Выбери хотя бы 3 приза'); break; }
       const all = prizeIdeas(kid).concat(cur.prOwn), old = K.shop || [];
       K.shop = cur.prSel.map(id => { const o = old.find(x => x.id === id); if (o) return o; const it = all.find(x => x.id === id); return it ? Object.assign({}, it) : null; }).filter(Boolean);
