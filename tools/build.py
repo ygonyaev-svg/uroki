@@ -45,7 +45,9 @@ json.dump({'name': 'Словоход' if FAM else 'Уроки для Ярика 
 if FAM:
     import shutil; shutil.copy(os.path.join(root, 'tools', 'fam_admin.html'), os.path.join(out, 'admin.html'))
     for f in os.listdir(os.path.join(root, 'tools', 'semya')): shutil.copy(os.path.join(root, 'tools', 'semya', f), os.path.join(out, f))
-    print('ok', out, ver); sys.exit(0)
+    print('ok', out, ver)
+    _chk = subprocess.run(['node', os.path.join(root, 'tools', 'check_tasks.js'), os.path.join(out, 'index.html')])
+    sys.exit('СБОРКА ОСТАНОВЛЕНА: исправьте задания из списка выше' if _chk.returncode else 0)
 open(os.path.join(out, 'sw.js'), 'w').write(f'''const C='uroki-{ver}';
 self.addEventListener('install',e=>{{e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icon-180.png','img/bg-yarik.webp','img/bg-anya.webp'])));self.skipWaiting();}});
 self.addEventListener('activate',e=>{{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();}});
@@ -68,3 +70,6 @@ try:
 except ImportError:
     print('PIL нет — иконки не созданы')
 print('ok', out, ver)
+# Проверка всех заданий: вопрос без слова/картинки, пустые подстановки, ответа нет среди вариантов — сборка не проходит
+_chk = subprocess.run(['node', os.path.join(root, 'tools', 'check_tasks.js'), os.path.join(out, 'index.html')])
+if _chk.returncode: sys.exit('СБОРКА ОСТАНОВЛЕНА: исправьте задания из списка выше')
