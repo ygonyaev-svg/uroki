@@ -99,7 +99,7 @@ function famInit(){
       if (l1) { lang.alt = famLangCourse(l1, +c.lg[l1], c.age); lang.altName = FAM_LANGS[l1][0]; lc._alt = FAM_LANGS[l1][1]; }
       a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur, { lang: lang }); a.lc = lc; }
     else { a.cur = Object.assign({}, a.cur || KIDS_TPL[a.tpl].cur); delete a.cur.lang; a.order = KIDS_TPL[a.tpl].order.filter(function(sj){ return sj !== 'lang'; }); } /* «Не изучать» везде — иностранного языка в плане нет */
-    a.read = famReadList((rd >= 2 && c.age >= 12 ? READ_T : rd >= 3 && c.age >= 9 ? READ_A : rd <= 1 && c.age <= 7 ? READ_S.concat(READ_Y) : rd === 0 && c.age <= 10 ? READ_Y : KIDS_TPL[a.tpl].read).filter(function(t){ return !/Ярик/.test(t.text || ''); }), c.done); /* 6–7 лет — свои короткие тексты; тексты «про Ярика» — только в Уроках */
+    a.read = famReadList((rd >= 2 && c.age >= 12 ? READ_T : rd >= 3 && c.age >= 9 ? READ_A : (rd <= 1 && c.age <= 7) || (rd === 0 && c.age <= 10) ? READ_S.concat(READ_Y) : rd <= 2 && c.age <= 10 ? READ_Y : KIDS_TPL[a.tpl].read).filter(function(t){ return !/Ярик/.test(t.text || ''); }), c.done); /* 6–7 лет и нечитающие до 10 — короткие тексты; 8–10 лет — классика 2–4 классов (Мамин-Сибиряк, Гаршин, Аксаков…); тексты «про Ярика» — только в Уроках */
     KIDS[c.id] = Object.assign({}, KIDS_TPL[a.tpl], a, { name: c.name, rdLv: rd, age: +c.age, grade: c.age + ' ' + U.pl(+c.age, 'год', 'года', 'лет'), sex: c.sex || '', look: c.look || famLookOf(c) });
     var th = famThemeOf(c); if (th) THEME['k:' + c.id] = th; else delete THEME['k:' + c.id];
     if (!S.kids[c.id]) S.kids[c.id] = newKid(); if (c.pin) S.kids[c.id].pin = c.pin;
