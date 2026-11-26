@@ -999,7 +999,7 @@ html.fam body:not(.yarik):not(.anya) .fkints .chip.on{ background:#2D4A32; color
 </style></head>
 <body><div id="app"></div>
 <script>window.onerror=function(m,u,l){var a=document.getElementById('app');if(a&&!a.children.length)a.innerHTML='<div style="margin:40px auto;max-width:520px;background:#fff;padding:20px;border-radius:16px;font:16px sans-serif">Не удалось запустить приложение. Закройте и откройте его заново.<br><small>'+m+' ('+l+')</small></div>';};</script>
-<script>/* v69bffb50 */
+<script>/* v9b1f1c65 */
 var FAM = 1;
 const CH_IMG_LIST = ["a1", "a3", "bac1", "bac10", "bac2", "bac3", "bac4", "bac5", "bac6", "bac7", "bac8", "bac9", "bbe1", "bbe2", "bbe3", "bbe4", "bbe5", "bbe6", "bbe7", "bbi1", "bbi2", "bbl1", "bbp1", "bbp2", "bbp3", "bbp4", "bbp5", "bbp6", "bbp7", "bck1", "bck2", "bck3", "bck4", "bck5", "bck6", "bcs1", "bcs2", "bcs3", "bcs4", "bcs5", "bdp1", "bdp2", "bdp3", "bdp4", "bdp5", "bdp6", "bdp7", "bdp8", "bdp9", "bfi1", "bgt1", "bgt2", "bgt3", "bhm1", "bka1", "bka2", "bka3", "bka4", "bkm1", "bkm2", "bkp1", "bkp2", "bkp3", "bkp4", "bkp5", "bkp6", "bkz1", "blg1", "blg2", "bma1", "bmc1", "bmc2", "bmc3", "bme1", "bme2", "bmh1", "bmh2", "bmh3", "bmh4", "bmi1", "bmi2", "bmi3", "bmk1", "bmk2", "bmu1", "bmu2", "bmu3", "bmu4", "bmu5", "bmu6", "bnp1", "bnp2", "bnp3", "bnp4", "bnp5", "bnp6", "bnp7", "bnp8", "bnp9", "br1", "br2", "br3", "brr1", "bsh1", "bsh2", "bsh3", "bsh4", "bsl1", "bsl2", "bsp1", "bss1", "bss2", "bss3", "btb1", "btb2", "btb3", "btb4", "btb5", "btb6", "btb7", "btt1", "buv1", "buv2", "buv3", "bvr1", "bvr2", "bvr3", "bvv1", "bvv2", "bvv3", "bvy1", "bvy2", "bvy3", "bzl1", "bzy1", "y10", "y11", "y2", "y4", "y6", "y8"];
 var TEST_SHIFT = 0; /* тестовый режим: «новый день» сдвигает календарь вперёд */
@@ -11238,9 +11238,26 @@ function startLesson(subj){
   go('lesson', { subj });
 }
 function unitById(kid, subj, uid){ const c = KIDS[kid].cur[subj]; return (c.units || []).concat(c.alt || [], c.old || []).find(u => u.id === uid); }
+/* «Найди ошибку помощника» (совет ChatGPT 25.11): готовое решение в 3 шага, в одном шаге ошибка — ребёнок выступает экспертом */
+function helperBug(kid, seed){ const r = U.rng(seed), y = TPL(kid) === 'yarik'; let st, res;
+  if (y) { if (r.int(0, 1)) { const a = r.int(2, 6) * 10 + r.int(2, 8), b = r.int(1, 3) * 10 + r.int(2, 9); const at = a - a % 10, bt = b - b % 10, au = a % 10, bu = b % 10;
+      st = [[`${at} + ${bt}`, at + bt], [`${au} + ${bu}`, au + bu], [`${at + bt} + ${au + bu}`, a + b]]; res = `${a} + ${b}`; }
+    else { const a = r.int(5, 9) * 10 + r.int(1, 5), b = r.int(1, 3) * 10 + r.int(6, 9); const bt = b - b % 10, bu = b % 10, x = a - bt, ad = a % 10;
+      st = [[`${a} − ${bt}`, x], [`${x} − ${ad}`, x - ad], [`${x - ad} − ${bu - ad}`, a - b]]; res = `${a} − ${b}`; } }
+  else { const a = r.int(12, 48), b = r.int(13, 29), bt = b - b % 10, bu = b % 10;
+    st = [[`${a} × ${bt}`, a * bt], [`${a} × ${bu}`, a * bu], [`${a * bt} + ${a * bu}`, a * b]]; res = `${a} × ${b}`; }
+  const bad = r.int(0, 2); let d = r.pick(y ? [10, -10, 1, -1] : [10, -10, 100, -100]); if (!y && st[bad][1] < 300 && Math.abs(d) === 100) d = d / 10; if (st[bad][1] + d <= 0) d = Math.abs(d); const shown = st.map((x, i) => [x[0], x[1] + (i === bad ? d : 0)]);
+  /* шаг после ошибки опирается на неверное число — так ошибка выглядит естественно */
+  if (bad < 2) { if (y && st[0][0].indexOf('−') > 0 && bad === 0) { shown[1] = [`${shown[0][1]} − ${st[1][0].split(' − ')[1]}`, shown[0][1] - Number(st[1][0].split(' − ')[1])]; shown[2] = [`${shown[1][1]} − ${st[2][0].split(' − ')[1]}`, shown[1][1] - Number(st[2][0].split(' − ')[1])]; }
+    else if (y && st[0][0].indexOf('−') > 0 && bad === 1) shown[2] = [`${shown[1][1]} − ${st[2][0].split(' − ')[1]}`, shown[1][1] - Number(st[2][0].split(' − ')[1])];
+    else shown[2] = [`${shown[0][1]} + ${shown[1][1]}`, shown[0][1] + shown[1][1]]; }
+  const q = `Помощник решал пример <b>${res}</b> и ошибся в одном шаге. Найди, в каком.<br>Шаг 1: ${shown[0][0]} = ${shown[0][1]}<br>Шаг 2: ${shown[1][0]} = ${shown[1][1]}<br>Шаг 3: ${shown[2][0]} = ${shown[2][1]}`;
+  const opts = ['Шаг 1', 'Шаг 2', 'Шаг 3'], a = opts[bad];
+  const t = C(q, a, opts.filter(o => o !== a).concat(['Ошибок нет']), `Ошибка в шаге ${bad + 1}: ${st[bad][0]} = ${st[bad][1]}, а не ${st[bad][1] + d}. Верный ответ: ${res} = ${st[2][1]}.`); t.ord = 1; t.kc = 1; t.rev = 'Найди ошибку помощника'; return t; }
 function lessonTasks(L, kid, subj){ if (ITEMS(subj)) { if (!L._c || L._c.src !== L.items) { const c = allChoice(L.items, L.seed || 3); c.src = L.items; Object.defineProperty(L, '_c', { value: c, enumerable: false, configurable: true, writable: true }); } return L._c; } if (!L._t) { const u = unitById(kid, subj, L.uid); let T = genTasks(u, L.seed, L.n);
     /* Математика: в конце урока 3 задания на повторение пройденных тем (вперемешку, со вводом ответа) */
     if (subj === 'math' && L.mix !== 0) { const list = unitsOf(kid, subj, L.tr || ''), j = list.indexOf(u); if (j > 0) { const r = U.rng(L.seed + 5); for (let k = 0; k < 3; k++) { const pu = list[r.int(Math.max(0, j - 12), j - 1)], x = genTasks(HARD[pu.id] ? { g: HARD[pu.id] } : pu, L.seed + 17 * k, 1)[0]; if (x) { x.rev = pu.t; T.push(x); } } } }
+    if (subj === 'math' && L.mix !== 0) { const hb = helperBug(kid, (L.seed || 3) + 31); if (hb) T.splice(Math.min(T.length, Math.max(1, T.length - 3)), 0, hb); }
     T = allChoice(T, L.seed); Object.defineProperty(L, '_t', { value: T, enumerable: false }); } return L._t; }
 
 function vLesson(){
