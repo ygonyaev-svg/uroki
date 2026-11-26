@@ -16,7 +16,7 @@ js = '\n'.join(['var FAM = %d;' % FAM, 'const CH_IMG_LIST = ' + json.dumps(CHL) 
 if FAM:
     import re
     for a, b in [('Задание от Юры', 'Задание от родителей'), ('ждёт цену от Юры', 'ждёт цену от родителей'), ('цену назначит Юра', 'цену назначат родители'), ('баллы от Юры', 'баллы от родителей'), ('с Юрой', 'с папой'), ('поставит Юра', 'поставят родители'), ('Юра увидит и поможет', 'родители увидят и помогут')]: js = js.replace(a, b)
-    js = re.sub(r'(?<![А-Яа-яЁё])Юр(а|ы|е|у|ой)(?![А-Яа-яЁё])', r'пап\1', js); js = re.sub(r'((?:^|[.!?…]\s+|\\n|«|^— |\\n— ))пап', r'\1Пап', js, flags=re.M); js = re.sub(r'(?<![А-Яа-яЁё])Ярик', 'Глеб', js); js = re.sub(r'(?<![А-Яа-яЁё])Ан(я|и|е|ю|ей)(?![А-Яа-яЁё])', r'Кат\1', js)
+    js = re.sub(r'(?<![А-Яа-яЁё])Юр(а|ы|е|у|ой)(?![А-Яа-яЁё])', r'пап\1', js); js = re.sub(r'((?:^|[.!?…]\s+|\\n|«|^— |\\n— ))пап', r'\1Пап', js, flags=re.M); js = re.sub(r'(?<![А-Яа-яЁё])Ярик', 'Глеб', js); js = re.sub(r'(?<![А-Яа-яЁё])Ан(я|и|е|ю|ей)(?![А-Яа-яЁё])', r'Сон\1', js); js = re.sub(r'(?<![A-Za-z])Yarik', 'Gleb', js)  # Соня, а не Катя: Катя уже есть в задачах — получались «Катя и Катя»
 import subprocess; subprocess.run([sys.executable, os.path.join(root, 'tools', 'theme_css.py')], check=True)
 css = '\n'.join(open(os.path.join(src, f), encoding='utf-8').read() for f in ('fonts.css', 'style.css', 'theme.css', 'code.css', 'design.css', 'ptask.css') + (('fam.css',) if FAM else ('hp.css', 'looks.css')))
 ver = hashlib.md5((js + css).encode()).hexdigest()[:8]
