@@ -693,10 +693,10 @@ function finishLesson(){
   if (RUS_SUBJ[subj] && q >= .9 && !L.retake) { const rb = Math.max(0, Math.min(RUS_BONUS, DAY_MAX - D.pts)); if (rb) { D.pts += rb; pts += rb; L.rusBonus = rb; } }
   pts = piggyAdd(K, pts); L.coins = pts; L.phase = 'done';
   fineCheck(kid, subj, L, D);
-  if (D.bonus && L.retake && !D.proOpen && proOk(kid, D)) { L.proOpen = true; D.proOpen = true; ev(kid, 'PRO открыт', { text: 'после пересдачи' }); }
+  if (cur.ds === U.today() && D.bonus && L.retake && !D.proOpen && proOk(kid, D)) { L.proOpen = true; D.proOpen = true; ev(kid, 'PRO открыт', { text: 'после пересдачи' }); }
   if (!D.bonus && subs.every(s => D.les[s] && D.les[s].phase === 'done')) { D.bonus = true; { const t0 = U.today(); K.okStreak = (K.lastDone === U.addDays(t0, -1) || K.lastDone === t0) ? (K.okStreak || 0) + 1 : 1; if (K.okStreak >= 2 && K.baseCut) { K.baseCut = 0; ev(kid, 'базовое время вернулось', { text: 'игры 60 мин, YouTube 30 мин' }); } } K.lastDone = U.today(); K.burnBase = 0;
     if (subs.every(s => (D.les[s].q || 0) >= .9 && !D.les[s].fastCut && !D.les[s].oot)) { let b = Math.max(0, DAY_MAX - D.pts); b = piggyAdd(K, b); D.pts += b; L.coins += b; L.perfect = true; D.perfect = b; }
-    if (proOk(kid, D)) { L.proOpen = true; D.proOpen = true; ev(kid, 'PRO открыт', { text: 'все уроки дня на 4 и 5' }); }
+    if (cur.ds === U.today() && proOk(kid, D)) { L.proOpen = true; D.proOpen = true; ev(kid, 'PRO открыт', { text: 'все уроки дня на 4 и 5' }); }
     const mins = Math.round(D.secs / 60); K.extraN = K.extraN || 0; if (mins < 40) K.extraN = Math.min(3, K.extraN + 1); else if (mins > 65) K.extraN = Math.max(-2, K.extraN - 1);
     ev(kid, 'день завершён', { coins: K.coins, score: D.pts + ' мин игры заработано', secs: D.secs, text: `занимался ${mins} мин` }); }
   ev(kid, 'урок завершён', { subj: subjName(kid, subj, cur.ds), unit: lessonTitle(kid, subj, cur.ds), score: `${first}/${tot}`, grade: L.grade, passed: L.passed === undefined ? '' : L.consolidate ? 'сдано 1 из 2 (закрепление завтра)' : L.passed ? 'тема пройдена' : 'повтор', mood: (L.fb || {}).mood, diff: (L.fb || {}).diff, like: (L.fb || {}).like, text: (L.fb || {}).text, coins: K.coins });
