@@ -804,7 +804,8 @@ function lessonQuality(kid, subj, L, ratio){
   if (L.rt && !L.rt.adult) parts.push([L.rt.score, .2]);
   const w = parts.reduce((a, x) => a + x[1], 0); return parts.reduce((a, x) => a + x[0] * x[1], 0) / w;
 }
-/* Пропуск дня: баллы сгорают. Пропущен 1 день — половина, 2 и больше — все. */
+/* Пропуск дня: баллы сгорают по нарастающей (Юрий 28.11): 1-й пропущенный день подряд — 10% от того, что есть, 2-й — 20%, 3-й — 30% … 10-й — всё. Сделанный день сбрасывает счёт. */
+function burnPct(n){ return Math.min(100, n * 10); }
 /* Обычное время каждый день (по умолчанию 60 мин игр + 30 мин YouTube, родитель меняет на экране «Время»), не сгорает. Сгорают только заработанные баллы. */
 const BASE_GAME = 60, BASE_YT = 30;
 /* Что разрешено каждый день: родитель сам вписывает, на что и сколько минут (экран «Время», 22.11). По умолчанию игры 60 + YouTube 30 */
@@ -817,12 +818,13 @@ function burnCheck(kid){ const K = S.kids[kid], t = U.today(); if (!K.lastDone) 
   const before = K.burnBase == null ? missed : missed - K.burnBase; K.burnBase = missed;
   if (missed < 1 || before < 1 || (K.coins <= 0 && !(K.piggy > 0))) return;
   K.okStreak = 0;
-  let lost = K.coins > 0 ? (missed >= 2 ? K.coins : Math.ceil(K.coins / 2)) : 0; K.coins -= lost; if (K.piggy > 0) { const lp = missed >= 2 ? K.piggy : Math.ceil(K.piggy / 2); K.piggy -= lp; lost += lp; }
+  let lost = 0; for (let n = missed - before + 1; n <= missed; n++) { const pc = burnPct(n); if (K.coins > 0) { const l = Math.ceil(K.coins * pc / 100); K.coins -= l; lost += l; } if (K.piggy > 0) { const lp = Math.ceil(K.piggy * pc / 100); K.piggy -= lp; lost += lp; } }
   const bt = baseTime(kid);
-  K.burnMsg = `Ты пропустил(а) занятия — сгорело ${agree(lost + ' баллов')}.`;
+  if (lost <= 0) { save(); return; }
+  K.burnMsg = `Ты пропустил(а) занятия — сгорело ${agree(lost + ' баллов')} (${burnPct(missed)}%). Каждый следующий пропуск подряд — на 10% больше.`;
   ev(kid, 'баллы сгорели', { coins: K.coins, price: -lost, text: `пропущено дней: ${missed}` }); save(); }
 function burnWarn(kid){ const K = S.kids[kid], t = U.today(); if (K.lastDone === t || K.coins <= 0 || dayWorked(kid, t)) return '';
-  const y = U.addDays(t, -1); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${K.lastDone >= y ? 'половина баллов' : 'всё, что накоплено'} (${K.coins}).</div>`; }
+  const n = Math.max(1, U.dayNum(t) - U.dayNum(K.lastDone)), pc = burnPct(n); return `<div class="note warn">⏳ Не закончишь сегодня все уроки — завтра сгорит ${pc}% баллов (${Math.ceil(K.coins * pc / 100)} из ${K.coins}).</div>`; }
 function timeCard(kid){ const K = S.kids[kid], bt = baseTime(kid);
   return `<div class="card timecard"><h2>Время на сегодня</h2><div class="tt2">${bt.list.filter(x => x.m > 0).map(x => `<span class="tipc" data-tip="base">${icon(baseIcon(x.name))} ${U.esc(x.name)} <b>${x.m} мин</b></span>`).join('')}<span class="tipc" data-tip="coins">⭐ Баллы <b>${K.coins}</b>&nbsp;(+1 минута за балл)</span></div>${piggyCard(kid)}</div>`; }
 /* ----- Копилка: заработанное за неделю копится и в воскресенье переходит на счёт с прибавкой +10%. Забрать раньше можно, но без прибавки. ----- */
