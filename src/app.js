@@ -670,7 +670,7 @@ function finishLesson(){
   if (subj === 'hw') K.hwText.forEach(h => { if ((L.txt || []).includes(h.id)) h.done = true; });
   L.secs = Math.min(1500, Math.round((Date.now() - (L.t0 || Date.now())) / 1000)); D.secs = (D.secs || 0) + L.secs; restTick(kid, L.secs);
   if (subj === 'extra') { /* Экстра после закрытого дня: +5 баллов при 80% верных с первого раза, +3 при 60% */
-    const rk = rusK(kid, subj), pts = Math.round((ratio >= .8 ? EXTRA_BONUS : ratio >= .6 ? 3 : 0) * rk); if (rk < 1) L.rusCut = Math.round(rk * 100); pts = piggyAdd(K, pts); L.coins = pts; D.extraPts = pts; L.phase = 'done';
+    const rk = rusK(kid, subj); let pts = Math.round((ratio >= .8 ? EXTRA_BONUS : ratio >= .6 ? 3 : 0) * rk); if (rk < 1) L.rusCut = Math.round(rk * 100); pts = piggyAdd(K, pts); L.coins = pts; D.extraPts = pts; L.phase = 'done';
     ev(kid, 'экстра', { subj: 'Экстра', score: `${first}/${tot}`, grade: L.grade, coins: K.coins, text: `+${pts} баллов` }); save(); render(); return; }
   if (subj === 'train') { /* Испытание после PRO: новые темы, одна попытка; до +15 баллов */
     let pts = ratio >= .85 ? TRAIN_BONUS : ratio >= .7 ? 10 : ratio >= .55 ? 5 : 0; { const rk = rusK(kid, subj); if (rk < 1) { pts = Math.round(pts * rk); L.rusCut = Math.round(rk * 100); } } const minS = T.length * (TPL(kid) === 'yarik' ? 25 : 30); if (L.secs < minS) { pts = Math.round(pts / 2); L.fastCut = true; }
